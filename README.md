@@ -1,98 +1,134 @@
 # Ocean Research Hub
 
-A collaborative scientific knowledge base for Oceanography × Statistics × Machine Learning × Deep Learning × Data Assimilation × Scientific ML.
+Ocean Research Hub is a local, evidence-first MVP for ingesting, inspecting, comparing, and
+benchmarking structured ocean-science paper records. Scientific fields retain their verification
+status, provenance, and source evidence. Missing values remain `NOT_REPORTED`, disagreements remain
+`CONFLICT`, and AI/team interpretation stays separate from author-reported content.
 
-## Goal
+The scientific and multi-agent operating contract is in [`AGENTS.md`](AGENTS.md).
 
-Turn scientific papers into deeply structured, evidence-backed records that researchers can search, compare, audit, and use to identify research gaps.
+## Prerequisites
 
-Core principles:
+- Python 3.11 or newer
+- [`uv`](https://docs.astral.sh/uv/)
+- Network access only when importing DOI metadata from Crossref
 
-- **Scientific traceability first**: every extracted fact must point back to evidence in the source paper.
-- **Never guess missing technical details**: use `NOT_REPORTED` when the paper does not state a value.
-- **Separate facts from interpretation**: author-reported facts and limitations must remain distinct from AI/team analysis.
-- **Multi-agent quality control**: implementation, QA, and scientific audit are independent responsibilities.
+## Install and start
 
-The detailed agent contract lives in `AGENTS.md`.
-
-## Codex multi-agent setup
-
-Project-level Codex configuration lives in `.codex/config.toml` with three specialist roles:
-
-- **Developer** — `gpt-5.6-sol`, medium reasoning;
-- **QA Engineer** — `gpt-5.6-terra`, high reasoning;
-- **Scientific Auditor** — `gpt-5.6-sol`, high reasoning.
-
-The parent/orchestrator is configured for `gpt-5.6-sol` with high reasoning.
-
-Start Codex from the repository root:
-
-```bash
-codex
-```
-
-Then begin with:
-
-```text
-Read AGENTS.md carefully and start GitHub issue #1.
-Use the Developer -> QA Engineer -> Scientific Auditor workflow.
-Verify the effective subagent model/effort if the runtime exposes that metadata.
-Do not move to issue #2 until issue #1 satisfies all acceptance criteria.
-```
-
-If the runtime ignores a role-specific model pin, report it explicitly rather than assuming model separation worked.
-
-## Run the ingestion vertical slice
-
-Install the locked dependencies and start the local API:
+From the repository root, install exactly the locked dependencies and start the API:
 
 ```bash
 uv sync --all-extras --frozen
 uv run ocean-research-hub
 ```
 
-The service uses `.data/ocean-research-hub.db` by default. Set `OCEAN_HUB_DB_PATH` to use a
-different local SQLite file. API documentation is available at `http://127.0.0.1:8000/docs`.
+The server listens on `http://127.0.0.1:8000`. Check it at:
 
-Import a DOI (Crossref network access required):
+- health: `http://127.0.0.1:8000/health`
+- interactive API documentation: `http://127.0.0.1:8000/docs`
+- OpenAPI schema: `http://127.0.0.1:8000/openapi.json`
+
+Records are stored in `.data/ocean-research-hub.db` by default. To use another SQLite file:
+
+```bash
+OCEAN_HUB_DB_PATH=/absolute/path/ocean-hub.db uv run ocean-research-hub
+```
+
+## Ingest a paper
+
+Import bibliographic metadata by DOI through Crossref:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/papers/ingest \
   -H 'content-type: application/json' \
-  -d '{"doi":"10.1000/example"}'
+  -d '{"doi":"10.5194/gmd-16-2119-2023"}'
 ```
 
-For an offline import, send `metadata`, `parsed_paper`, or both. Retrieved records are available
-as JSON at `/api/papers/{id}` and as a minimal evidence/status detail page at `/papers/{id}`.
-Repeated identical ingestion returns the existing paper; a duplicate identity with different
-content returns `409` and never overwrites the stored record.
+For deterministic or offline ingestion, post `metadata`, `parsed_paper`, or both to the same
+endpoint. `parsed_paper` must be a complete `PaperRecord`; the canonical example is
+[`specs/paper-record.example.json`](specs/paper-record.example.json). For example:
 
-Compare any two stored papers in request order as canonical JSON:
+```bash
+uv run python - <<'PY' > /tmp/ocean-hub-ingest.json
+import json
+from pathlib import Path
+
+record = json.loads(Path("specs/paper-record.example.json").read_text())
+print(json.dumps({"parsed_paper": record}))
+PY
+curl -X POST http://127.0.0.1:8000/api/papers/ingest \
+  -H 'content-type: application/json' \
+  --data-binary @/tmp/ocean-hub-ingest.json
+```
+
+The response contains the stable paper `id`. Repeating identical input returns the existing record;
+reusing the same identity with different content returns HTTP `409` and does not overwrite it.
+Schema-invalid or scientifically unsafe structured fields are rejected.
+
+## Retrieve and compare papers
+
+Replace `PAPER_ID` with an ID returned by ingestion:
+
+```bash
+curl http://127.0.0.1:8000/api/papers/PAPER_ID
+```
+
+The evidence/status-aware HTML detail is at `http://127.0.0.1:8000/papers/PAPER_ID`.
+
+Compare two distinct stored records in request order:
 
 ```bash
 curl "http://127.0.0.1:8000/api/papers/compare?left_id=PAPER_ID_A&right_id=PAPER_ID_B"
 ```
 
-The minimal side-by-side view is available at
-`/papers/compare?left_id=PAPER_ID_A&right_id=PAPER_ID_B`. It covers data, architecture,
-training, losses, evaluation, results, and limitations. Every compared field retains its
-verification status and provenance; source evidence is inspectable, `NOT_REPORTED` values remain
-visible, conflicts retain all alternatives, and AI interpretation is visually separated from
-author-reported content.
+The side-by-side HTML view is at
+`http://127.0.0.1:8000/papers/compare?left_id=PAPER_ID_A&right_id=PAPER_ID_B`. It covers data,
+architecture, training, losses, evaluation, results, and limitations without stripping status,
+provenance, evidence, `NOT_REPORTED`, or conflict alternatives.
 
-## Run the scientific extraction benchmark
+## Run the extraction benchmark
 
-The initial golden dataset contains three independently audited, primary-source-backed ocean-AI papers and
-a deterministic field-level benchmark. Run it against a prediction JSON file with:
+The repository includes three independently audited golden papers and a deterministic field-level
+benchmark. Smoke-test the CLI with the intentionally empty example predictions:
+
+```bash
+uv run ocean-research-hub-benchmark evaluation/example_predictions.json
+```
+
+Evaluate another prediction file, optionally against a different audited corpus:
 
 ```bash
 uv run ocean-research-hub-benchmark path/to/predictions.json
+uv run ocean-research-hub-benchmark path/to/predictions.json \
+  --golden-dir path/to/golden_dataset
 ```
 
-The corpus methodology, prediction contract, metric definitions, and Scientific Auditor handoff
-are documented in [`evaluation/README.md`](evaluation/README.md). Truth labels retain audited
-`VERIFIED`, `NOT_REPORTED`, or `CONFLICT` states while extractor predictions remain independently
-pre-audit.
+The input contract, strict metrics, corpus sources, and audit procedure are documented in
+[`evaluation/README.md`](evaluation/README.md).
 
-The local persistence/UI choice is documented in
+## Validate the project
+
+```bash
+uv run pytest
+uv run python -m compileall -q src tests
+uv build
+```
+
+`pytest` runs schema, ingestion, persistence, API, detail/comparison rendering, golden-dataset,
+benchmark, provenance, and scientific-integrity regressions.
+
+## MVP boundaries
+
+- Persistence is local SQLite; there is no PostgreSQL/Supabase deployment, authentication, or
+  multi-user collaboration yet.
+- DOI ingestion retrieves Crossref bibliographic metadata. The MVP does not download or parse PDFs;
+  structured parsed records are supplied by the caller behind a replaceable parser interface.
+- Retrieval is by stable paper ID. There is no catalog, keyword search, or semantic/vector search.
+- The server-rendered detail and comparison pages are intentionally minimal; there is no Next.js
+  client yet.
+- The three-paper golden dataset is a compact safety benchmark, not a comprehensive scientific
+  corpus. Extraction outputs remain pre-audit until an independent Scientific Auditor verifies
+  them against primary sources.
+
+The local architecture decision and replacement boundaries are recorded in
 [`docs/adr/0001-local-vertical-slice.md`](docs/adr/0001-local-vertical-slice.md).

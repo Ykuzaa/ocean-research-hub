@@ -170,16 +170,7 @@ def _render_comparison_cell(field: EvidenceField[object]) -> str:
     if provenance == "AI_INTERPRETATION":
         classes.append("ai-interpretation")
 
-    if status == "CONFLICT":
-        value = _json_value(field.conflict_values)
-    elif status == "NOT_REPORTED":
-        value = "NOT_REPORTED"
-    elif field.value is None:
-        # A null extraction failure is not evidence that the paper omitted the
-        # field. Keep the failure explicit instead of turning it into absence.
-        value = "EXTRACTION_ERROR (no extracted value)"
-    else:
-        value = _json_value(field.value)
+    value = _render_field_value(field)
 
     supplied_sources = [
         source for source in (field.source, *field.sources) if source.is_supplied
@@ -203,6 +194,20 @@ def _json_value(value: object) -> str:
         return str(item)
 
     return json.dumps(value, default=serialize, ensure_ascii=False)
+
+
+def _render_field_value(field: EvidenceField[object]) -> str:
+    """Render audit states without conflating failure with reported absence."""
+    status = field.status.value
+    if status == "CONFLICT":
+        return _json_value(field.conflict_values)
+    if status == "NOT_REPORTED":
+        return "NOT_REPORTED"
+    if field.value is None:
+        # The schema permits a null value for extraction failure. A parser
+        # failure is not evidence that the source omitted the field.
+        return "EXTRACTION_ERROR (no extracted value)"
+    return _json_value(field.value)
 
 
 def _render_identity_audit(field: EvidenceField[object]) -> str:
@@ -261,14 +266,7 @@ def _render_model(model: BaseModel, path: str) -> str:
 
 
 def _render_evidence_field(label: str, field: EvidenceField[object], path: str) -> str:
-    if field.status.value == "CONFLICT":
-        rendered_value = json.dumps(
-            field.conflict_values, default=str, ensure_ascii=False
-        )
-    elif field.value is None:
-        rendered_value = "Not reported"
-    else:
-        rendered_value = json.dumps(field.value, default=str, ensure_ascii=False)
+    rendered_value = _render_field_value(field)
 
     sources = [field.source, *field.sources]
     evidence_parts = []

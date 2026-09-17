@@ -1,0 +1,27 @@
+# Project-level Codex configuration for Ocean Research Hub.
+# The orchestrator uses the strongest reasoning profile; each named role
+# overrides model/effort in its own config file.
+
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-5.6-terra"
+default_subagent_reasoning_effort = "medium"
+
+[agents.developer]
+description = "Implementation engineer for Ocean Research Hub. Builds features but never self-certifies scientific truth."
+config_file = "./agents/developer.toml"
+nickname_candidates = ["Turing", "Hamilton"]
+
+[agents.qa_engineer]
+description = "Independent adversarial QA engineer. Reproduces behavior, writes tests, and searches for regressions and silent corruption."
+config_file = "./agents/qa-engineer.toml"
+nickname_candidates = ["Hopper", "Dijkstra"]
+
+[agents.scientific_auditor]
+description = "Scientific evidence auditor. Verifies extracted claims against primary-source paper evidence and rejects unsupported claims."
+config_file = "./agents/scientific-auditor.toml"
+nickname_candidates = ["Curie", "Gauss"]

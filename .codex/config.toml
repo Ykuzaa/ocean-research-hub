@@ -5,6 +5,16 @@
 model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
 
+# Autonomous project mode: do not prompt for per-command approval,
+# while keeping filesystem writes constrained to the current workspace.
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+# Allow the workspace sandbox to reach package registries, GitHub,
+# Crossref, and other external services needed by the project.
+[sandbox_workspace_write]
+network_access = true
+
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3

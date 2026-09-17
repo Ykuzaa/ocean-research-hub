@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, get_args, get_origin
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator, model_validator
 
@@ -34,7 +34,7 @@ class ProvenanceType(StrEnum):
 class SourceEvidence(BaseModel):
     """A precise pointer to the source supporting an extracted field."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, strict=True)
 
     section: str | None = None
     page: int | None = Field(default=None, ge=1)
@@ -68,10 +68,44 @@ class EvidenceField(BaseModel, Generic[T]):
     verified_by: str | None = None
     verified_at: datetime | None = None
 
+    @field_validator("value", mode="before")
+    @classmethod
+    def reject_coerced_scientific_values(cls, value: object) -> object:
+        """Reject type coercion while retaining JSON string enum inputs.
+
+        Status and provenance are deliberate string-valued API enums.  Values
+        instead are generated scientific claims and must arrive in their
+        declared type so malformed extraction cannot be silently repaired.
+        """
+        if value is None:
+            return value
+
+        generic_args = cls.__pydantic_generic_metadata__["args"]
+        if not generic_args:
+            return value
+        expected_type = generic_args[0]
+        origin = get_origin(expected_type)
+        if expected_type is str and not isinstance(value, str):
+            raise ValueError("scientific value must be a string")
+        if expected_type is int and (type(value) is not int):
+            raise ValueError("scientific value must be an integer")
+        if expected_type is float and (type(value) is not float):
+            raise ValueError("scientific value must be a float")
+        if expected_type is bool and (type(value) is not bool):
+            raise ValueError("scientific value must be a boolean")
+        if origin is list:
+            item_type = get_args(expected_type)[0]
+            if not isinstance(value, list) or any(not isinstance(item, item_type) for item in value):
+                raise ValueError("scientific value must be a list with correctly typed items")
+        return value
+
     @model_validator(mode="after")
     def enforce_evidence_rules(self) -> "EvidenceField[T]":
-        if self.status is VerificationStatus.VERIFIED and not self.source.has_textual_evidence:
-            raise ValueError("VERIFIED fields require non-empty source.evidence")
+        if self.status is VerificationStatus.VERIFIED:
+            if self.value is None or (isinstance(self.value, str) and not self.value.strip()):
+                raise ValueError("VERIFIED fields require a non-empty claim value")
+            if not self.source.has_textual_evidence:
+                raise ValueError("VERIFIED fields require non-empty source.evidence")
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")
         return self
@@ -235,15 +269,29 @@ class Results(BaseModel):
 class Limitations(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    author_reported: TextListField = Field(default_factory=TextListField)
-    future_work: TextListField = Field(default_factory=TextListField)
-    reproducibility: TextListField = Field(default_factory=TextListField)
-    data: TextListField = Field(default_factory=TextListField)
-    physics: TextListField = Field(default_factory=TextListField)
-    generalization: TextListField = Field(default_factory=TextListField)
-    uncertainty: TextListField = Field(default_factory=TextListField)
-    compute: TextListField = Field(default_factory=TextListField)
-    ai_interpretation: TextListField = Field(default_factory=TextListField)
+    author_reported: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    future_work: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    reproducibility: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    data: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    physics: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    generalization: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    uncertainty: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    compute: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
+    ai_interpretation: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AI_INTERPRETATION))
+
+    @model_validator(mode="after")
+    def enforce_limitation_provenance(self) -> "Limitations":
+        author_reported_fields = (
+            "author_reported", "future_work", "reproducibility", "data", "physics",
+            "generalization", "uncertainty", "compute",
+        )
+        for name in author_reported_fields:
+            field = getattr(self, name)
+            if field.provenance_type is not ProvenanceType.AUTHOR_REPORTED_LIMITATION:
+                raise ValueError(f"limitations.{name} requires AUTHOR_REPORTED_LIMITATION provenance")
+        if self.ai_interpretation.provenance_type is not ProvenanceType.AI_INTERPRETATION:
+            raise ValueError("limitations.ai_interpretation requires AI_INTERPRETATION provenance")
+        return self
 
 
 class PaperRecord(BaseModel):

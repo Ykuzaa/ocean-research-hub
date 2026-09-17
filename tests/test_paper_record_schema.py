@@ -43,6 +43,12 @@ def test_verified_field_with_evidence_is_valid() -> None:
     assert field.status is VerificationStatus.VERIFIED
 
 
+@pytest.mark.parametrize("value", [None, "", "   "])
+def test_verified_field_requires_a_non_empty_claim_value(value: str | None) -> None:
+    with pytest.raises(ValidationError, match="non-empty claim value"):
+        EvidenceField[str](value=value, status="VERIFIED", source={"evidence": "AdamW was used."})
+
+
 def test_not_reported_cannot_hide_a_value() -> None:
     with pytest.raises(ValidationError, match="NOT_REPORTED"):
         EvidenceField[str](value="GELU", status="NOT_REPORTED")
@@ -75,3 +81,30 @@ def test_invalid_verification_status_is_rejected(status: str) -> None:
 def test_extra_fields_are_rejected_to_prevent_untracked_claims() -> None:
     with pytest.raises(ValidationError):
         PaperRecord.model_validate({"training": {"optimizer": {"value": "Adam"}, "secret": "x"}})
+
+
+def test_limitations_keep_ai_interpretation_separate_from_author_reported_limitations() -> None:
+    record = PaperRecord()
+
+    assert record.limitations.author_reported.provenance_type is ProvenanceType.AUTHOR_REPORTED_LIMITATION
+    assert record.limitations.ai_interpretation.provenance_type is ProvenanceType.AI_INTERPRETATION
+
+    with pytest.raises(ValidationError, match="limitations.ai_interpretation"):
+        PaperRecord.model_validate({"limitations": {"ai_interpretation": {
+            "value": ["The evidence may not support OOD performance."],
+            "status": "NOT_VERIFIED", "provenance_type": "AUTHOR_REPORTED_FACT",
+        }}})
+
+    with pytest.raises(ValidationError, match="limitations.author_reported"):
+        PaperRecord.model_validate({"limitations": {"author_reported": {
+            "value": ["The authors report limited temporal coverage."],
+            "status": "NOT_VERIFIED", "provenance_type": "AI_INTERPRETATION",
+        }}})
+
+
+def test_scientific_field_types_are_strict_and_do_not_coerce_malformed_inputs() -> None:
+    with pytest.raises(ValidationError):
+        EvidenceField[int](value="32")
+
+    with pytest.raises(ValidationError):
+        EvidenceField[str](source={"page": True})

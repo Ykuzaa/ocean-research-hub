@@ -24,6 +24,29 @@ The application must ingest scientific papers, extract detailed technical inform
 
 ## Three-agent model
 
+Ocean Research Hub uses three independent specialist roles coordinated by the parent Codex session.
+
+### Codex model routing policy
+
+Use the project configurations in `.codex/config.toml` and `.codex/agents/`.
+
+| Role | Model | Reasoning effort | Intent |
+|---|---|---|---|
+| Orchestrator / parent | `gpt-5.6-sol` | `high` | planning, delegation, difficult cross-agent decisions |
+| Developer | `gpt-5.6-sol` | `medium` | architecture and implementation |
+| QA Engineer | `gpt-5.6-terra` | `high` | high-throughput adversarial review and testing |
+| Scientific Auditor | `gpt-5.6-sol` | `high` | evidence-sensitive scientific verification |
+
+The Scientific Auditor must not be downgraded merely to save quota. Scientific evidence validation is a high-reasoning task.
+
+### Runtime model verification
+
+Model routing is a requested runtime policy, not something agents may silently assume succeeded.
+
+When Codex exposes effective child-thread model/effort metadata, the orchestrator should verify it at the start of a multi-agent run. If the runtime ignores a role-specific model pin and a child inherits the parent model, report that explicitly in the final run summary. Do not claim cost/quota separation unless the effective runtime confirms it.
+
+If a configured model is unavailable to the current account/runtime, fail visibly or use an explicitly approved fallback; never silently substitute a weaker scientific-audit model.
+
 ### Agent 1 — Developer
 
 Responsible for implementation only.

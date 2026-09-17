@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import httpx
 from hashlib import sha256
 from typing import Any
 
@@ -36,6 +37,7 @@ from .models import (
     PaperWorkflowStatus,
 )
 from .providers import MetadataProvider, ParsedPaperProvider
+from .pdf import PdfParser, ScientificExtractor, read_pdf_path
 from .repository import PaperRepository
 
 DOI_PATTERN = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
@@ -66,10 +68,14 @@ class PaperIngestionService:
         repository: PaperRepository,
         metadata_provider: MetadataProvider,
         parsed_paper_provider: ParsedPaperProvider,
+        pdf_parser: PdfParser | None = None,
+        scientific_extractor: ScientificExtractor | None = None,
     ) -> None:
         self.repository = repository
         self.metadata_provider = metadata_provider
         self.parsed_paper_provider = parsed_paper_provider
+        self.pdf_parser = pdf_parser or PdfParser()
+        self.scientific_extractor = scientific_extractor or ScientificExtractor()
 
     async def ingest(self, request: IngestPaperRequest) -> IngestPaperResponse:
         requested_doi = normalize_doi(request.doi) if request.doi else None
@@ -99,7 +105,27 @@ class PaperIngestionService:
             )
         canonical_doi = requested_doi or metadata_doi
 
-        if request.parsed_paper is None:
+        extraction_warnings: list[str] = []
+        if request.parsed_paper is None and (request.pdf_path is not None or request.pdf_url is not None or (metadata and metadata.pdf_url)):
+            pdf_url = request.pdf_url or (metadata.pdf_url if metadata else None)
+            if request.pdf_path:
+                content, source_name = read_pdf_path(request.pdf_path)
+            else:
+                assert pdf_url is not None
+                try:
+                    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+                        response = await client.get(str(pdf_url))
+                        response.raise_for_status()
+                        content, source_name = response.content, str(pdf_url).rsplit("/", 1)[-1] or "paper.pdf"
+                except (httpx.HTTPError, OSError) as exc:
+                    raise ParserError(f"could not download PDF source: {pdf_url}") from exc
+            parsed_pdf = self.pdf_parser.parse(content, source_name=source_name)
+            extracted = self.scientific_extractor.extract(parsed_pdf)
+            record = extracted.record
+            extraction_warnings.extend(extracted.warnings)
+            extraction_warnings.append("scientific search scope: " + "; ".join(extracted.search_scope))
+            workflow_status = PaperWorkflowStatus.EXTRACTED
+        elif request.parsed_paper is None:
             record = PaperRecord()
             workflow_status = PaperWorkflowStatus.INGESTED
         else:
@@ -112,7 +138,7 @@ class PaperIngestionService:
             workflow_status = PaperWorkflowStatus.EXTRACTED
 
         record = record.model_copy(deep=True)
-        warnings: list[str] = []
+        warnings: list[str] = extraction_warnings
         if metadata is not None:
             self._merge_metadata(record.paper, metadata, canonical_doi, warnings)
         elif canonical_doi is not None:

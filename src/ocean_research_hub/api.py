@@ -32,6 +32,7 @@ from ocean_research_hub.ingestion.providers import (
     ParsedPaperProvider,
     StructuredPayloadParser,
 )
+from ocean_research_hub.ingestion.pdf import PdfParser, ScientificExtractor
 from ocean_research_hub.ingestion.repository import (
     PaperRepository,
     SqlitePaperRepository,
@@ -45,6 +46,8 @@ def create_app(
     repository: PaperRepository | None = None,
     metadata_provider: MetadataProvider | None = None,
     parsed_paper_provider: ParsedPaperProvider | None = None,
+    pdf_parser: PdfParser | None = None,
+    scientific_extractor: ScientificExtractor | None = None,
 ) -> FastAPI:
     database_path = Path(os.getenv("OCEAN_HUB_DB_PATH", ".data/ocean-research-hub.db"))
     paper_repository = repository or SqlitePaperRepository(database_path)
@@ -52,6 +55,8 @@ def create_app(
         repository=paper_repository,
         metadata_provider=metadata_provider or CrossrefMetadataProvider(),
         parsed_paper_provider=parsed_paper_provider or StructuredPayloadParser(),
+        pdf_parser=pdf_parser,
+        scientific_extractor=scientific_extractor,
     )
 
     @asynccontextmanager

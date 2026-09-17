@@ -83,6 +83,8 @@ class IngestPaperRequest(BaseModel):
     doi: str | None = None
     metadata: MetadataPayload | None = None
     parsed_paper: dict[str, Any] | None = None
+    pdf_path: str | None = None
+    pdf_url: HttpUrl | None = None
 
     @field_validator("doi")
     @classmethod
@@ -93,8 +95,10 @@ class IngestPaperRequest(BaseModel):
 
     @model_validator(mode="after")
     def require_an_ingestion_source(self) -> IngestPaperRequest:
-        if self.doi is None and self.metadata is None and self.parsed_paper is None:
-            raise ValueError("provide a DOI, metadata, or parsed_paper")
+        if self.doi is None and self.metadata is None and self.parsed_paper is None and self.pdf_path is None and self.pdf_url is None:
+            raise ValueError("provide a DOI, metadata, parsed_paper, pdf_path, or pdf_url")
+        if self.parsed_paper is not None and (self.pdf_path is not None or self.pdf_url is not None):
+            raise ValueError("parsed_paper cannot be combined with a PDF source")
         return self
 
 

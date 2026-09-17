@@ -49,6 +49,27 @@ def test_verified_field_requires_a_non_empty_claim_value(value: str | None) -> N
         EvidenceField[str](value=value, status="VERIFIED", source={"evidence": "AdamW was used."})
 
 
+@pytest.mark.parametrize("value", [[], {}, set()])
+def test_verified_field_requires_a_non_empty_collection_or_mapping_claim(value: object) -> None:
+    with pytest.raises(ValidationError, match="non-empty claim value"):
+        EvidenceField[object](
+            value=value,
+            status="VERIFIED",
+            source={"evidence": "No activation functions are used."},
+        )
+
+
+@pytest.mark.parametrize("value", [False, 0])
+def test_verified_field_permits_meaningful_false_and_zero_values(value: bool | int) -> None:
+    field = EvidenceField[bool | int](
+        value=value,
+        status="VERIFIED",
+        source={"evidence": "The reported value is explicitly false or zero."},
+    )
+
+    assert field.value == value
+
+
 def test_not_reported_cannot_hide_a_value() -> None:
     with pytest.raises(ValidationError, match="NOT_REPORTED"):
         EvidenceField[str](value="GELU", status="NOT_REPORTED")

@@ -8,6 +8,7 @@ evidence.
 
 from __future__ import annotations
 
+from collections.abc import Collection, Mapping
 from datetime import datetime
 from enum import StrEnum
 from typing import Generic, TypeVar, get_args, get_origin
@@ -102,7 +103,11 @@ class EvidenceField(BaseModel, Generic[T]):
     @model_validator(mode="after")
     def enforce_evidence_rules(self) -> "EvidenceField[T]":
         if self.status is VerificationStatus.VERIFIED:
-            if self.value is None or (isinstance(self.value, str) and not self.value.strip()):
+            if (
+                self.value is None
+                or (isinstance(self.value, str) and not self.value.strip())
+                or (isinstance(self.value, (Collection, Mapping)) and not self.value)
+            ):
                 raise ValueError("VERIFIED fields require a non-empty claim value")
             if not self.source.has_textual_evidence:
                 raise ValueError("VERIFIED fields require non-empty source.evidence")

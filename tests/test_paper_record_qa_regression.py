@@ -34,7 +34,7 @@ def test_qa_verified_text_list_claim_cannot_be_empty_or_contain_blank_items(valu
 
 
 def test_qa_false_and_zero_are_valid_verified_claims() -> None:
-    evidence = {"evidence": "The paper explicitly reports this value."}
+    evidence = {"page": 1, "evidence": "The paper explicitly reports this value.", "origin": "PRIMARY_PAPER"}
 
     assert BooleanField(value=False, status="VERIFIED", source=evidence).value is False
     assert IntegerField(value=0, status="VERIFIED", source=evidence).value == 0
@@ -43,18 +43,18 @@ def test_qa_false_and_zero_are_valid_verified_claims() -> None:
 def test_qa_partial_record_keeps_missing_metadata_and_fields_unreported() -> None:
     record = PaperRecord.model_validate(
         {
-            "paper": {"title": "Partial extraction without a DOI"},
+            "paper": {"title": {"value": "Partial extraction without a DOI", "status": "NOT_VERIFIED"}},
             "architecture": {
                 "activations": {
                     "value": ["GELU"],
                     "status": "PARTIALLY_VERIFIED",
-                    "source": {"page": 3, "evidence": "GELU follows each layer."},
+                    "source": {"page": 3, "evidence": "GELU follows each layer.", "origin": "PRIMARY_PAPER"},
                 }
             },
         }
     )
 
-    assert record.paper.doi is None
+    assert record.paper.doi.value is None
     assert record.architecture.activations.value == ["GELU"]
     assert record.architecture.dropout.status is VerificationStatus.NOT_REPORTED
 
@@ -63,7 +63,8 @@ def test_qa_conflict_is_retained_and_ai_interpretation_cannot_be_author_claim() 
     conflict = TextListField(
         value=["Adam", "SGD"],
         status="CONFLICT",
-        source={"evidence": "Methods and appendix disagree."},
+        source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER"},
+        sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL"}],
     )
     assert conflict.status is VerificationStatus.CONFLICT
 

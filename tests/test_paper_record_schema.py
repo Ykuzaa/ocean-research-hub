@@ -16,7 +16,7 @@ from ocean_research_hub.schemas.paper_record import (
 def test_empty_record_preserves_not_reported_defaults() -> None:
     record = PaperRecord()
 
-    assert record.paper.doi is None
+    assert record.paper.doi.value is None
     assert record.training.optimizer.value is None
     assert record.training.optimizer.status is VerificationStatus.NOT_REPORTED
     assert record.architecture.activations.value is None
@@ -38,6 +38,7 @@ def test_verified_field_with_evidence_is_valid() -> None:
             "page": 12,
             "locator": "Appendix A, paragraph 2",
             "evidence": "Models were optimized using AdamW.",
+            "origin": "PRIMARY_PAPER",
         },
     )
 
@@ -66,7 +67,7 @@ def test_verified_field_permits_meaningful_false_and_zero_values(value: bool | i
     field = EvidenceField[bool | int](
         value=value,
         status="VERIFIED",
-        source={"evidence": "The reported value is explicitly false or zero."},
+        source={"page": 1, "evidence": "The reported value is explicitly false or zero.", "origin": "PRIMARY_PAPER"},
     )
 
     assert field.value == value
@@ -112,7 +113,8 @@ def test_conflict_is_retained_as_an_explicit_status() -> None:
         value=["Adam", "SGD"],
         status="CONFLICT",
         provenance_type="AUTHOR_REPORTED_FACT",
-        source={"evidence": "Methods reports Adam; appendix reports SGD."},
+        source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER"},
+        sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL"}],
     )
 
     assert field.status is VerificationStatus.CONFLICT

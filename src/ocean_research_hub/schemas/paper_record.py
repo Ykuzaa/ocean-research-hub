@@ -13,7 +13,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Generic, TypeVar, get_args, get_origin
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, StrictInt, field_validator, model_validator
 
 
 class VerificationStatus(StrEnum):
@@ -32,15 +32,27 @@ class ProvenanceType(StrEnum):
     TEAM_NOTE = "TEAM_NOTE"
 
 
+class SourceOrigin(StrEnum):
+    """Constrained identities for evidence sources."""
+
+    PRIMARY_PAPER = "PRIMARY_PAPER"
+    SUPPLEMENTARY_MATERIAL = "SUPPLEMENTARY_MATERIAL"
+    AUTHOR_PROVIDED_MATERIAL = "AUTHOR_PROVIDED_MATERIAL"
+    PUBLISHER_METADATA = "PUBLISHER_METADATA"
+    CROSSREF_METADATA = "CROSSREF_METADATA"
+    SECONDARY_SOURCE = "SECONDARY_SOURCE"
+
+
 class SourceEvidence(BaseModel):
     """A precise pointer to the source supporting an extracted field."""
 
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, strict=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     section: str | None = None
-    page: int | None = Field(default=None, ge=1)
+    page: StrictInt | None = Field(default=None, ge=1)
     locator: str | None = None
     evidence: str | None = None
+    origin: SourceOrigin | None = None
 
     @field_validator("section", "locator", "evidence")
     @classmethod
@@ -51,6 +63,18 @@ class SourceEvidence(BaseModel):
     def has_textual_evidence(self) -> bool:
         """Whether the source contains the required quoted/cited evidence."""
         return bool(self.evidence)
+
+    @property
+    def is_locatable(self) -> bool:
+        return self.has_textual_evidence and any((self.section, self.page, self.locator))
+
+    @property
+    def is_primary_author_source(self) -> bool:
+        return self.origin in {
+            SourceOrigin.PRIMARY_PAPER,
+            SourceOrigin.SUPPLEMENTARY_MATERIAL,
+            SourceOrigin.AUTHOR_PROVIDED_MATERIAL,
+        }
 
 
 T = TypeVar("T")
@@ -66,6 +90,9 @@ class EvidenceField(BaseModel, Generic[T]):
     provenance_type: ProvenanceType = ProvenanceType.AUTHOR_REPORTED_FACT
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
     source: SourceEvidence = Field(default_factory=SourceEvidence)
+    # ``source`` remains the primary evidence object. ``sources`` carries
+    # additional independently locatable support, notably for conflicts.
+    sources: list[SourceEvidence] = Field(default_factory=list)
     verified_by: str | None = None
     verified_at: datetime | None = None
 
@@ -107,6 +134,11 @@ class EvidenceField(BaseModel, Generic[T]):
 
     @model_validator(mode="after")
     def enforce_evidence_rules(self) -> "EvidenceField[T]":
+        evidence_records = [self.source, *self.sources]
+        qualifying_records = [
+            record for record in evidence_records
+            if record.is_locatable and record.is_primary_author_source
+        ]
         if self.status is VerificationStatus.VERIFIED:
             if (
                 self.value is None
@@ -114,8 +146,19 @@ class EvidenceField(BaseModel, Generic[T]):
                 or (isinstance(self.value, (Collection, Mapping)) and not self.value)
             ):
                 raise ValueError("VERIFIED fields require a non-empty claim value")
-            if not self.source.has_textual_evidence:
-                raise ValueError("VERIFIED fields require non-empty source.evidence")
+            if self.provenance_type not in {
+                ProvenanceType.AUTHOR_REPORTED_FACT,
+                ProvenanceType.AUTHOR_REPORTED_LIMITATION,
+            }:
+                raise ValueError("VERIFIED fields require author-reported provenance")
+            if not qualifying_records:
+                raise ValueError("VERIFIED fields require locatable primary-author source evidence")
+        if self.status is VerificationStatus.PARTIALLY_VERIFIED and not qualifying_records:
+            raise ValueError("PARTIALLY_VERIFIED fields require locatable primary-author source evidence")
+        if self.status is VerificationStatus.CONFLICT:
+            locators = {(record.page, record.section, record.locator) for record in qualifying_records}
+            if len(locators) < 2:
+                raise ValueError("CONFLICT fields require at least two distinct locatable primary-author evidence records")
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")
         return self
@@ -138,17 +181,17 @@ class PaperUrls(BaseModel):
 
 
 class Bibliography(BaseModel):
-    """Imported bibliographic metadata; scientific claims live in EvidenceField."""
+    """Evidence-backed bibliographic metadata; bare metadata is not canonical."""
 
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
-    title: str = ""
-    authors: list[str] = Field(default_factory=list)
-    year: int | None = Field(default=None, ge=1)
-    venue: str | None = None
-    doi: str | None = None
-    arxiv: str | None = None
-    urls: PaperUrls = Field(default_factory=PaperUrls)
+    title: TextField = Field(default_factory=TextField)
+    authors: TextListField = Field(default_factory=TextListField)
+    year: IntegerField = Field(default_factory=IntegerField)
+    venue: TextField = Field(default_factory=TextField)
+    doi: TextField = Field(default_factory=TextField)
+    arxiv: TextField = Field(default_factory=TextField)
+    urls: EvidenceField[PaperUrls] = Field(default_factory=lambda: EvidenceField[PaperUrls]())
 
 
 class ScientificFraming(BaseModel):
@@ -318,3 +361,28 @@ class PaperRecord(BaseModel):
     evaluation: Evaluation = Field(default_factory=Evaluation)
     results: Results = Field(default_factory=Results)
     limitations: Limitations = Field(default_factory=Limitations)
+
+    @model_validator(mode="after")
+    def enforce_fact_provenance_outside_limitations(self) -> "PaperRecord":
+        """Only author-reported facts may be verified in fact-valued sections."""
+
+        def evidence_fields(model: BaseModel):
+            for name in type(model).model_fields:
+                value = getattr(model, name)
+                if isinstance(value, EvidenceField):
+                    yield value
+                elif isinstance(value, BaseModel):
+                    yield from evidence_fields(value)
+
+        fact_sections = (
+            self.paper, self.scientific_framing, self.data, self.architecture,
+            self.training, self.objective, self.evaluation, self.results,
+        )
+        for section in fact_sections:
+            for field in evidence_fields(section):
+                if (
+                    field.status is VerificationStatus.VERIFIED
+                    and field.provenance_type is not ProvenanceType.AUTHOR_REPORTED_FACT
+                ):
+                    raise ValueError("VERIFIED fact fields require AUTHOR_REPORTED_FACT provenance")
+        return self

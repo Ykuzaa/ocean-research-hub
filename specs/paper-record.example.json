@@ -1,0 +1,137 @@
+{
+  "paper": {
+    "title": "",
+    "authors": [],
+    "year": null,
+    "venue": null,
+    "doi": null,
+    "arxiv": null,
+    "urls": {
+      "publisher": null,
+      "pdf": null,
+      "code": null,
+      "datasets": []
+    }
+  },
+  "scientific_framing": {
+    "problem": null,
+    "motivation": null,
+    "objective": null,
+    "task_type": [],
+    "domain": [],
+    "region": [],
+    "ocean_regime": []
+  },
+  "data": {
+    "datasets": [],
+    "inputs": [],
+    "outputs": [],
+    "depth_levels": null,
+    "spatial_resolution": null,
+    "temporal_resolution": null,
+    "time_coverage": null,
+    "splits": {
+      "train": null,
+      "validation": null,
+      "test": null
+    },
+    "preprocessing": {
+      "missing_data": null,
+      "masking": null,
+      "regridding": null,
+      "interpolation": null,
+      "normalization": null,
+      "anomalies": null,
+      "filtering": null,
+      "augmentation": null,
+      "derived_features": []
+    }
+  },
+  "architecture": {
+    "family": [],
+    "summary": null,
+    "encoder": null,
+    "decoder": null,
+    "blocks": [],
+    "layer_count": null,
+    "hidden_dimensions": [],
+    "channels": [],
+    "patch_or_window": null,
+    "attention": null,
+    "positional_encoding": null,
+    "skip_connections": null,
+    "activations": [],
+    "normalization_layers": [],
+    "dropout": null,
+    "parameter_count": null,
+    "forecasting_mode": null,
+    "probabilistic_mode": null,
+    "physical_components": []
+  },
+  "training": {
+    "optimizer": null,
+    "learning_rate": null,
+    "scheduler": null,
+    "batch_size": null,
+    "epochs_or_steps": null,
+    "early_stopping": null,
+    "weight_decay": null,
+    "gradient_clipping": null,
+    "initialization": null,
+    "mixed_precision": null,
+    "random_seeds": [],
+    "hardware": [],
+    "training_time": null
+  },
+  "objective": {
+    "primary_loss": null,
+    "auxiliary_losses": [],
+    "physics_constraints": [],
+    "loss_weights": []
+  },
+  "evaluation": {
+    "baselines": [],
+    "metrics": [],
+    "forecast_horizon": null,
+    "evaluation_datasets": [],
+    "observation_space_validation": null,
+    "uncertainty_calibration": null,
+    "ablations": [],
+    "ood_tests": [],
+    "statistical_significance": null
+  },
+  "results": {
+    "headline": [],
+    "by_variable": [],
+    "by_region": [],
+    "by_depth": [],
+    "by_horizon": [],
+    "qualitative": [],
+    "compute_cost": null
+  },
+  "limitations": {
+    "author_reported": [],
+    "future_work": [],
+    "reproducibility": [],
+    "data": [],
+    "physics": [],
+    "generalization": [],
+    "uncertainty": [],
+    "compute": [],
+    "ai_interpretation": []
+  },
+  "field_evidence_example": {
+    "value": "AdamW",
+    "status": "VERIFIED",
+    "provenance_type": "AUTHOR_REPORTED_FACT",
+    "confidence": 0.99,
+    "source": {
+      "section": "Training details",
+      "page": 12,
+      "locator": "Appendix A, paragraph 2",
+      "evidence": "Models were optimized using AdamW."
+    },
+    "verified_by": "scientific-auditor",
+    "verified_at": "2026-09-17T00:00:00Z"
+  }
+}

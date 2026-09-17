@@ -118,6 +118,12 @@ def test_not_reported_cannot_hide_a_value() -> None:
         EvidenceField[str](value="GELU", status="NOT_REPORTED")
 
 
+@pytest.mark.parametrize("value", [None, "", "   "])
+def test_not_verified_requires_a_real_claim_value(value: str | None) -> None:
+    with pytest.raises(ValidationError, match="non-empty claim value|must not be blank"):
+        TextField(value=value, status="NOT_VERIFIED")
+
+
 def test_conflict_is_retained_as_an_explicit_status() -> None:
     field = EvidenceField[str](
         conflict_values=["Adam", "SGD"],

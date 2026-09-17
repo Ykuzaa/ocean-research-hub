@@ -25,5 +25,11 @@ class PaperNotFoundError(IngestionError):
     code = "PAPER_NOT_FOUND"
 
 
+class InvalidComparisonError(IngestionError):
+    """Raised when a two-paper comparison request is not meaningful."""
+
+    code = "INVALID_COMPARISON"
+
+
 class PersistenceError(IngestionError):
     code = "PERSISTENCE_ERROR"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+import re
 import sqlite3
 
 import pytest
@@ -125,7 +126,38 @@ def test_local_parsed_paper_round_trips_to_api_and_detail_page(
         assert "Evidence-backed ocean forecast" in page.text
         assert "VERIFIED" in page.text
         assert "PRIMARY_PAPER" in page.text
-        assert "Not reported" in page.text
+        assert "NOT_REPORTED" in page.text
+
+
+def test_detail_page_does_not_render_null_extraction_error_as_not_reported(
+    repository: SqlitePaperRepository,
+) -> None:
+    parsed_paper = verified_title_payload("Synthetic detail extraction failure")
+    parsed_paper["training"] = {
+        "optimizer": {
+            "value": None,
+            "status": "EXTRACTION_ERROR",
+            "provenance_type": "AUTHOR_REPORTED_FACT",
+        }
+    }
+
+    with make_client(repository) as client:
+        response = client.post(
+            "/api/papers/ingest", json={"parsed_paper": parsed_paper}
+        )
+        assert response.status_code == 201
+        paper_id = response.json()["paper"]["id"]
+
+        page = client.get(f"/papers/{paper_id}")
+
+    assert page.status_code == 200
+    optimizer = re.search(
+        r'<dd data-field="training.optimizer">(.*?)</dd>', page.text
+    )
+    assert optimizer is not None
+    assert "EXTRACTION_ERROR (no extracted value)" in optimizer.group(1)
+    assert '<span class="status">EXTRACTION_ERROR</span>' in optimizer.group(1)
+    assert "NOT_REPORTED" not in optimizer.group(1)
 
 
 def test_table_caption_and_appendix_claims_round_trip_without_filling_absent_fields(

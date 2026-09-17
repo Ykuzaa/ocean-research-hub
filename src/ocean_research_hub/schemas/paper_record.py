@@ -197,6 +197,7 @@ class EvidenceField(BaseModel, Generic[T]):
         claim_bearing_statuses = {
             VerificationStatus.VERIFIED,
             VerificationStatus.PARTIALLY_VERIFIED,
+            VerificationStatus.NOT_VERIFIED,
         }
         if self.status in claim_bearing_statuses:
             if (

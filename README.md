@@ -41,3 +41,31 @@ Do not move to issue #2 until issue #1 satisfies all acceptance criteria.
 ```
 
 If the runtime ignores a role-specific model pin, report it explicitly rather than assuming model separation worked.
+
+## Run the ingestion vertical slice
+
+Install the locked dependencies and start the local API:
+
+```bash
+uv sync --all-extras --frozen
+uv run ocean-research-hub
+```
+
+The service uses `.data/ocean-research-hub.db` by default. Set `OCEAN_HUB_DB_PATH` to use a
+different local SQLite file. API documentation is available at `http://127.0.0.1:8000/docs`.
+
+Import a DOI (Crossref network access required):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/papers/ingest \
+  -H 'content-type: application/json' \
+  -d '{"doi":"10.1000/example"}'
+```
+
+For an offline import, send `metadata`, `parsed_paper`, or both. Retrieved records are available
+as JSON at `/api/papers/{id}` and as a minimal evidence/status detail page at `/papers/{id}`.
+Repeated identical ingestion returns the existing paper; a duplicate identity with different
+content returns `409` and never overwrites the stored record.
+
+The local persistence/UI choice is documented in
+[`docs/adr/0001-local-vertical-slice.md`](docs/adr/0001-local-vertical-slice.md).

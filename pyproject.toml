@@ -7,7 +7,12 @@ name = "ocean-research-hub"
 version = "0.1.0"
 description = "Evidence-backed scientific paper records"
 requires-python = ">=3.11"
-dependencies = ["pydantic>=2.7,<3"]
+dependencies = [
+    "fastapi>=0.115,<1",
+    "httpx>=0.28,<1",
+    "pydantic>=2.7,<3",
+    "uvicorn>=0.30,<1",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
@@ -17,3 +22,6 @@ testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ocean_research_hub"]
+
+[project.scripts]
+ocean-research-hub = "ocean_research_hub.__main__:main"

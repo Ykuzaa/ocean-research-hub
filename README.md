@@ -132,3 +132,18 @@ benchmark, provenance, and scientific-integrity regressions.
 
 The local architecture decision and replacement boundaries are recorded in
 [`docs/adr/0001-local-vertical-slice.md`](docs/adr/0001-local-vertical-slice.md).
+
+# PDF scientific extraction
+
+The ingestion API accepts a local PDF path or a resolvable PDF URL:
+
+```json
+{"pdf_path": "/data/papers/ocean-paper.pdf"}
+```
+
+The parser records page-aware primary-paper evidence and the deterministic
+extractor emits conservative `NOT_VERIFIED` claims. Fields not found in the
+extractable page text remain `NOT_REPORTED`; parser failures return
+`PARSER_ERROR` and are not represented as absent science. Repeated conflicting
+claims retain both alternatives as `CONFLICT`. The extraction search scope is
+stored in the paper warnings for audit review.

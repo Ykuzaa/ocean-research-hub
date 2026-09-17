@@ -63,8 +63,8 @@ def test_qa_conflict_is_retained_and_ai_interpretation_cannot_be_author_claim() 
     conflict = TextListField(
         value=["Adam", "SGD"],
         status="CONFLICT",
-        source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER"},
-        sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL"}],
+        source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER", "claimed_value": "Adam"},
+        sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL", "claimed_value": "SGD"}],
     )
     assert conflict.status is VerificationStatus.CONFLICT
 

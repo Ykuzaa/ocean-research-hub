@@ -113,8 +113,8 @@ def test_conflict_is_retained_as_an_explicit_status() -> None:
         value=["Adam", "SGD"],
         status="CONFLICT",
         provenance_type="AUTHOR_REPORTED_FACT",
-        source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER"},
-        sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL"}],
+        source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER", "claimed_value": "Adam"},
+        sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL", "claimed_value": "SGD"}],
     )
 
     assert field.status is VerificationStatus.CONFLICT

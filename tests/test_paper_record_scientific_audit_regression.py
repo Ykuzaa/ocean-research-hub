@@ -20,6 +20,7 @@ SECONDARY_PRIMARY_EVIDENCE = {
     "page": 12,
     "section": "Appendix",
     "evidence": "The conflicting optimizer is SGD.",
+    "claimed_value": "SGD",
 }
 
 
@@ -59,23 +60,51 @@ def test_claim_bearing_non_verified_statuses_require_meaningful_values(
         EvidenceField[object](**kwargs)
 
 
-@pytest.mark.parametrize("status", ["PARTIALLY_VERIFIED", "CONFLICT"])
 @pytest.mark.parametrize("value", [False, 0])
-def test_claim_bearing_non_verified_statuses_retain_false_and_zero(status: str, value: bool | int) -> None:
-    kwargs: dict[str, object] = {"value": value, "status": status, "source": PRIMARY_EVIDENCE}
-    if status == "CONFLICT":
-        kwargs["sources"] = [SECONDARY_PRIMARY_EVIDENCE]
-
-    assert EvidenceField[bool | int](**kwargs).value == value
+def test_partially_verified_claims_retain_false_and_zero(value: bool | int) -> None:
+    assert EvidenceField[bool | int](
+        value=value, status="PARTIALLY_VERIFIED", source=PRIMARY_EVIDENCE
+    ).value == value
 
 
-def test_conflict_requires_distinct_evidence_for_each_side() -> None:
-    with pytest.raises(ValidationError, match="at least two distinct"):
+def test_conflict_requires_evidence_bound_to_every_side() -> None:
+    with pytest.raises(ValidationError, match="explicitly bound to every alternative"):
         TextListField(
             value=["Adam", "SGD"],
             status="CONFLICT",
-            source=PRIMARY_EVIDENCE,
-            sources=[PRIMARY_EVIDENCE],
+            source={**PRIMARY_EVIDENCE, "claimed_value": "Adam"},
+            sources=[{**SECONDARY_PRIMARY_EVIDENCE, "claimed_value": "Adam"}],
+        )
+
+
+def test_conflict_preserves_false_and_zero_as_explicit_alternatives() -> None:
+    field = EvidenceField[list[int]](
+        value=[0, 1],
+        status="CONFLICT",
+        source={**PRIMARY_EVIDENCE, "claimed_value": 0},
+        sources=[{**SECONDARY_PRIMARY_EVIDENCE, "claimed_value": 1}],
+    )
+
+    assert field.value == [0, 1]
+
+
+def test_team_notes_are_separate_from_author_limitations_and_ai_interpretation() -> None:
+    record = PaperRecord.model_validate(
+        {"limitations": {"team_note": {
+            "value": ["Replicate this result on an independent basin."],
+            "status": "NOT_VERIFIED",
+            "provenance_type": "TEAM_NOTE",
+        }}}
+    )
+    assert record.limitations.team_note.provenance_type.value == "TEAM_NOTE"
+
+    with pytest.raises(ValidationError, match="limitations.team_note"):
+        PaperRecord.model_validate(
+            {"limitations": {"team_note": {
+                "value": ["This must not be presented as author reported."],
+                "status": "NOT_VERIFIED",
+                "provenance_type": "AUTHOR_REPORTED_LIMITATION",
+            }}}
         )
 
 

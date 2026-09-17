@@ -13,7 +13,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Generic, TypeVar, get_args, get_origin
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, StrictInt, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, JsonValue, StrictInt, field_validator, model_validator
 
 
 class VerificationStatus(StrEnum):
@@ -53,6 +53,9 @@ class SourceEvidence(BaseModel):
     locator: str | None = None
     evidence: str | None = None
     origin: SourceOrigin | None = None
+    # Required for each record that supports one side of a CONFLICT field.
+    # JsonValue preserves a typed, serializable link to the asserted value.
+    claimed_value: JsonValue | None = None
 
     @field_validator("section", "locator", "evidence")
     @classmethod
@@ -162,9 +165,25 @@ class EvidenceField(BaseModel, Generic[T]):
         if self.status is VerificationStatus.PARTIALLY_VERIFIED and not qualifying_records:
             raise ValueError("PARTIALLY_VERIFIED fields require locatable primary-author source evidence")
         if self.status is VerificationStatus.CONFLICT:
-            locators = {(record.page, record.section, record.locator) for record in qualifying_records}
-            if len(locators) < 2:
-                raise ValueError("CONFLICT fields require at least two distinct locatable primary-author evidence records")
+            if not isinstance(self.value, list):
+                raise ValueError("CONFLICT fields must represent competing alternatives as a list")
+
+            def typed_key(value: JsonValue) -> tuple[str, str]:
+                return (type(value).__name__, repr(value))
+
+            alternatives = {typed_key(value) for value in self.value}
+            if len(alternatives) < 2:
+                raise ValueError("CONFLICT fields require at least two distinct competing alternatives")
+            claimed_alternatives = {
+                typed_key(record.claimed_value)
+                for record in qualifying_records
+                if record.claimed_value is not None
+            }
+            uncovered = alternatives - claimed_alternatives
+            if uncovered:
+                raise ValueError(
+                    "CONFLICT fields require locatable primary-author evidence explicitly bound to every alternative"
+                )
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")
         return self
@@ -337,6 +356,7 @@ class Limitations(BaseModel):
     uncertainty: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
     compute: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AUTHOR_REPORTED_LIMITATION))
     ai_interpretation: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.AI_INTERPRETATION))
+    team_note: TextListField = Field(default_factory=lambda: TextListField(provenance_type=ProvenanceType.TEAM_NOTE))
 
     @model_validator(mode="after")
     def enforce_limitation_provenance(self) -> "Limitations":
@@ -350,6 +370,8 @@ class Limitations(BaseModel):
                 raise ValueError(f"limitations.{name} requires AUTHOR_REPORTED_LIMITATION provenance")
         if self.ai_interpretation.provenance_type is not ProvenanceType.AI_INTERPRETATION:
             raise ValueError("limitations.ai_interpretation requires AI_INTERPRETATION provenance")
+        if self.team_note.provenance_type is not ProvenanceType.TEAM_NOTE:
+            raise ValueError("limitations.team_note requires TEAM_NOTE provenance")
         return self
 
 

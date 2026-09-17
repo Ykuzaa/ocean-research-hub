@@ -47,5 +47,17 @@
       "verified_by": "scientific-auditor",
       "verified_at": "2026-09-17T00:00:00Z"
     }
+  },
+  "limitations": {
+    "team_note": {
+      "value": ["Replicate findings with an independent regional dataset."],
+      "status": "NOT_VERIFIED",
+      "provenance_type": "TEAM_NOTE",
+      "confidence": 0.0,
+      "source": {},
+      "sources": [],
+      "verified_by": null,
+      "verified_at": null
+    }
   }
 }

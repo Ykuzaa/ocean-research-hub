@@ -77,6 +77,25 @@ def test_conflict_requires_evidence_bound_to_every_side() -> None:
         )
 
 
+def test_conflict_rejects_evidence_bound_to_an_unlisted_alternative() -> None:
+    with pytest.raises(ValidationError, match="claimed values must exactly match"):
+        TextListField(
+            value=["Adam", "SGD"],
+            status="CONFLICT",
+            source={**PRIMARY_EVIDENCE, "claimed_value": "Adam"},
+            sources=[
+                {**SECONDARY_PRIMARY_EVIDENCE, "claimed_value": "SGD"},
+                {
+                    "origin": "PRIMARY_PAPER",
+                    "page": 16,
+                    "section": "Ablation",
+                    "evidence": "RMSProp is used in this unrelated experiment.",
+                    "claimed_value": "RMSProp",
+                },
+            ],
+        )
+
+
 def test_conflict_preserves_false_and_zero_as_explicit_alternatives() -> None:
     field = EvidenceField[list[int]](
         value=[0, 1],

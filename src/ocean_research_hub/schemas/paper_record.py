@@ -184,6 +184,11 @@ class EvidenceField(BaseModel, Generic[T]):
                 raise ValueError(
                     "CONFLICT fields require locatable primary-author evidence explicitly bound to every alternative"
                 )
+            extra_claims = claimed_alternatives - alternatives
+            if extra_claims:
+                raise ValueError(
+                    "CONFLICT evidence claimed values must exactly match the listed alternatives"
+                )
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")
         return self

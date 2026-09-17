@@ -86,8 +86,11 @@ class EvidenceField(BaseModel, Generic[T]):
             return value
         expected_type = generic_args[0]
         origin = get_origin(expected_type)
-        if expected_type is str and not isinstance(value, str):
-            raise ValueError("scientific value must be a string")
+        if expected_type is str:
+            if not isinstance(value, str):
+                raise ValueError("scientific value must be a string")
+            if not value.strip():
+                raise ValueError("scientific text values must not be blank")
         if expected_type is int and (type(value) is not int):
             raise ValueError("scientific value must be an integer")
         if expected_type is float and (type(value) is not float):

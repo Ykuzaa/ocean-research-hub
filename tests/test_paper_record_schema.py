@@ -7,6 +7,7 @@ from ocean_research_hub.schemas.paper_record import (
     EvidenceField,
     PaperRecord,
     ProvenanceType,
+    TextField,
     TextListField,
     VerificationStatus,
 )
@@ -46,7 +47,7 @@ def test_verified_field_with_evidence_is_valid() -> None:
 
 @pytest.mark.parametrize("value", [None, "", "   "])
 def test_verified_field_requires_a_non_empty_claim_value(value: str | None) -> None:
-    with pytest.raises(ValidationError, match="non-empty claim value"):
+    with pytest.raises(ValidationError, match="non-empty claim value|scientific text values must not be blank"):
         EvidenceField[str](value=value, status="VERIFIED", source={"evidence": "AdamW was used."})
 
 
@@ -82,6 +83,23 @@ def test_text_list_fields_reject_blank_items_for_every_status(
 
     with pytest.raises(ValidationError, match="must not contain blank items"):
         TextListField(**kwargs)
+
+
+@pytest.mark.parametrize("value", ["", "   ", "\t"])
+@pytest.mark.parametrize("status", ["NOT_VERIFIED", "PARTIALLY_VERIFIED", "VERIFIED"])
+def test_text_fields_reject_blank_values_for_every_status(value: str, status: str) -> None:
+    kwargs: dict[str, object] = {"value": value, "status": status}
+    if status == "VERIFIED":
+        kwargs["source"] = {"evidence": "The field is reported in the paper."}
+
+    with pytest.raises(ValidationError, match="scientific text values must not be blank"):
+        TextField(**kwargs)
+
+
+def test_text_field_retains_none_as_an_absent_not_reported_value() -> None:
+    field = TextField(value=None, status="NOT_REPORTED")
+
+    assert field.value is None
 
 
 def test_not_reported_cannot_hide_a_value() -> None:

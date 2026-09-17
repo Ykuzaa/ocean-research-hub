@@ -96,6 +96,47 @@ def test_conflict_rejects_evidence_bound_to_an_unlisted_alternative() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "extra_source",
+    [
+        {
+            "origin": "SECONDARY_SOURCE", "page": 8, "section": "Review",
+            "evidence": "A review claims RMSProp.", "claimed_value": "RMSProp",
+        },
+        {
+            "origin": "PRIMARY_PAPER",
+            "evidence": "An unlocatable mention claims RMSProp.", "claimed_value": "RMSProp",
+        },
+    ],
+)
+def test_conflict_rejects_extra_claims_from_secondary_or_unlocatable_sources(
+    extra_source: dict[str, object]
+) -> None:
+    with pytest.raises(ValidationError, match="claimed values must exactly match"):
+        TextListField(
+            value=["Adam", "SGD"],
+            status="CONFLICT",
+            source={**PRIMARY_EVIDENCE, "claimed_value": "Adam"},
+            sources=[{**SECONDARY_PRIMARY_EVIDENCE, "claimed_value": "SGD"}, extra_source],
+        )
+
+
+def test_conflict_rejects_a_provided_evidence_record_without_claim_binding() -> None:
+    with pytest.raises(ValidationError, match="must be explicitly bound"):
+        TextListField(
+            value=["Adam", "SGD"],
+            status="CONFLICT",
+            source={**PRIMARY_EVIDENCE, "claimed_value": "Adam"},
+            sources=[
+                {**SECONDARY_PRIMARY_EVIDENCE, "claimed_value": "SGD"},
+                {
+                    "origin": "PRIMARY_PAPER", "page": 16, "section": "Ablation",
+                    "evidence": "An additional optimizer statement without a bound value.",
+                },
+            ],
+        )
+
+
 def test_conflict_preserves_false_and_zero_as_explicit_alternatives() -> None:
     field = EvidenceField[list[int]](
         value=[0, 1],

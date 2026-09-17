@@ -79,6 +79,11 @@ class SourceEvidence(BaseModel):
             SourceOrigin.AUTHOR_PROVIDED_MATERIAL,
         }
 
+    @property
+    def is_supplied(self) -> bool:
+        """Whether this is an intentional evidence record rather than the default shell."""
+        return any((self.section, self.page, self.locator, self.evidence, self.origin, self.claimed_value))
+
 
 T = TypeVar("T")
 
@@ -174,6 +179,17 @@ class EvidenceField(BaseModel, Generic[T]):
             alternatives = {typed_key(value) for value in self.value}
             if len(alternatives) < 2:
                 raise ValueError("CONFLICT fields require at least two distinct competing alternatives")
+            provided_records = [record for record in evidence_records if record.is_supplied]
+            if any(record.claimed_value is None for record in provided_records):
+                raise ValueError("CONFLICT evidence records must be explicitly bound to an alternative")
+            all_claimed_alternatives = {
+                typed_key(record.claimed_value) for record in provided_records
+            }
+            extra_claims = all_claimed_alternatives - alternatives
+            if extra_claims:
+                raise ValueError(
+                    "CONFLICT evidence claimed values must exactly match the listed alternatives"
+                )
             claimed_alternatives = {
                 typed_key(record.claimed_value)
                 for record in qualifying_records
@@ -183,11 +199,6 @@ class EvidenceField(BaseModel, Generic[T]):
             if uncovered:
                 raise ValueError(
                     "CONFLICT fields require locatable primary-author evidence explicitly bound to every alternative"
-                )
-            extra_claims = claimed_alternatives - alternatives
-            if extra_claims:
-                raise ValueError(
-                    "CONFLICT evidence claimed values must exactly match the listed alternatives"
                 )
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")

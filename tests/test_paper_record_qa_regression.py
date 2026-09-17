@@ -60,13 +60,14 @@ def test_qa_partial_record_keeps_missing_metadata_and_fields_unreported() -> Non
 
 
 def test_qa_conflict_is_retained_and_ai_interpretation_cannot_be_author_claim() -> None:
-    conflict = TextListField(
-        value=["Adam", "SGD"],
+    conflict = TextField(
+        conflict_values=["Adam", "SGD"],
         status="CONFLICT",
         source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER", "claimed_value": "Adam"},
         sources=[{"page": 12, "section": "Appendix", "evidence": "SGD is used.", "origin": "SUPPLEMENTARY_MATERIAL", "claimed_value": "SGD"}],
     )
     assert conflict.status is VerificationStatus.CONFLICT
+    assert conflict.conflict_values == ["Adam", "SGD"]
 
     with pytest.raises(ValidationError, match="limitations.ai_interpretation"):
         PaperRecord.model_validate(

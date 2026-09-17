@@ -4,6 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from ocean_research_hub.schemas.paper_record import (
+    DecimalField,
     EvidenceField,
     PaperRecord,
     ProvenanceType,
@@ -20,6 +21,15 @@ def test_empty_record_preserves_not_reported_defaults() -> None:
     assert record.training.optimizer.value is None
     assert record.training.optimizer.status is VerificationStatus.NOT_REPORTED
     assert record.architecture.activations.value is None
+    assert record.data.origins.status is VerificationStatus.NOT_REPORTED
+    assert record.data.variables.status is VerificationStatus.NOT_REPORTED
+    assert record.data.units.status is VerificationStatus.NOT_REPORTED
+    assert record.data.sample_counts.status is VerificationStatus.NOT_REPORTED
+    assert record.training.gpu_count.status is VerificationStatus.NOT_REPORTED
+    assert record.training.gpu_types.status is VerificationStatus.NOT_REPORTED
+    assert record.objective.spectral_losses.status is VerificationStatus.NOT_REPORTED
+    assert record.objective.gradient_front_losses.status is VerificationStatus.NOT_REPORTED
+    assert record.objective.probabilistic_losses.status is VerificationStatus.NOT_REPORTED
 
 
 def test_verified_field_requires_textual_source_evidence() -> None:
@@ -109,8 +119,8 @@ def test_not_reported_cannot_hide_a_value() -> None:
 
 
 def test_conflict_is_retained_as_an_explicit_status() -> None:
-    field = EvidenceField[list[str]](
-        value=["Adam", "SGD"],
+    field = EvidenceField[str](
+        conflict_values=["Adam", "SGD"],
         status="CONFLICT",
         provenance_type="AUTHOR_REPORTED_FACT",
         source={"page": 4, "section": "Methods", "evidence": "Adam is used.", "origin": "PRIMARY_PAPER", "claimed_value": "Adam"},
@@ -118,7 +128,8 @@ def test_conflict_is_retained_as_an_explicit_status() -> None:
     )
 
     assert field.status is VerificationStatus.CONFLICT
-    assert field.value == ["Adam", "SGD"]
+    assert field.value is None
+    assert field.conflict_values == ["Adam", "SGD"]
 
 
 @pytest.mark.parametrize("key", ["INFERRED", "AUTHOR_GUESS", ""])
@@ -163,3 +174,23 @@ def test_scientific_field_types_are_strict_and_do_not_coerce_malformed_inputs() 
 
     with pytest.raises(ValidationError):
         EvidenceField[str](source={"page": True})
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_decimal_fields_reject_non_finite_claims(value: float) -> None:
+    with pytest.raises(ValidationError, match="must be finite"):
+        DecimalField(value=value, status="NOT_VERIFIED")
+
+    with pytest.raises(ValidationError, match="must be finite"):
+        DecimalField(
+            status="CONFLICT",
+            conflict_values=[0.1, value],
+            source={
+                "origin": "PRIMARY_PAPER", "page": 1, "evidence": "Dropout 0.1.",
+                "claimed_value": 0.1,
+            },
+            sources=[{
+                "origin": "PRIMARY_PAPER", "page": 2, "evidence": "Other dropout.",
+                "claimed_value": value,
+            }],
+        )

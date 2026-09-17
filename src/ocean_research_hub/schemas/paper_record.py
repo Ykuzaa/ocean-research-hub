@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Collection, Mapping
 from datetime import datetime
 from enum import StrEnum
+from math import isfinite
 from typing import Generic, TypeVar, get_args, get_origin
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, JsonValue, StrictInt, field_validator, model_validator
@@ -94,6 +95,10 @@ class EvidenceField(BaseModel, Generic[T]):
     model_config = ConfigDict(extra="forbid")
 
     value: T | None = None
+    # Conflicts are not encoded in ``value`` because that breaks the declared
+    # type of scalar fields and is ambiguous for fields whose value is already
+    # a list. Each alternative retains the field's canonical type instead.
+    conflict_values: list[T] = Field(default_factory=list)
     status: VerificationStatus = VerificationStatus.NOT_REPORTED
     provenance_type: ProvenanceType = ProvenanceType.AUTHOR_REPORTED_FACT
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -128,8 +133,11 @@ class EvidenceField(BaseModel, Generic[T]):
                 raise ValueError("scientific text values must not be blank")
         if expected_type is int and (type(value) is not int):
             raise ValueError("scientific value must be an integer")
-        if expected_type is float and (type(value) is not float):
-            raise ValueError("scientific value must be a float")
+        if expected_type is float:
+            if type(value) is not float:
+                raise ValueError("scientific value must be a float")
+            if not isfinite(value):
+                raise ValueError("scientific float values must be finite")
         if expected_type is bool and (type(value) is not bool):
             raise ValueError("scientific value must be a boolean")
         if origin is list:
@@ -138,6 +146,45 @@ class EvidenceField(BaseModel, Generic[T]):
                 raise ValueError("scientific value must be a list with correctly typed items")
             if item_type is str and any(not item.strip() for item in value):
                 raise ValueError("scientific text lists must not contain blank items")
+        return value
+
+    @field_validator("conflict_values", mode="before")
+    @classmethod
+    def reject_coerced_conflict_values(cls, value: object) -> object:
+        """Apply the scientific value's strict typing to every alternative."""
+        if not isinstance(value, list):
+            raise ValueError("conflict_values must be a list")
+
+        generic_args = cls.__pydantic_generic_metadata__["args"]
+        if not generic_args:
+            return value
+        expected_type = generic_args[0]
+        origin = get_origin(expected_type)
+        for alternative in value:
+            if expected_type is str:
+                if not isinstance(alternative, str):
+                    raise ValueError("conflict alternative must be a string")
+                if not alternative.strip():
+                    raise ValueError("conflict text alternatives must not be blank")
+            elif expected_type is int and type(alternative) is not int:
+                raise ValueError("conflict alternative must be an integer")
+            elif expected_type is float:
+                if type(alternative) is not float:
+                    raise ValueError("conflict alternative must be a float")
+                if not isfinite(alternative):
+                    raise ValueError("conflict float alternatives must be finite")
+            elif expected_type is bool and type(alternative) is not bool:
+                raise ValueError("conflict alternative must be a boolean")
+            elif origin is list:
+                item_type = get_args(expected_type)[0]
+                if not isinstance(alternative, list) or any(
+                    not isinstance(item, item_type) for item in alternative
+                ):
+                    raise ValueError(
+                        "conflict alternative must be a list with correctly typed items"
+                    )
+                if item_type is str and any(not item.strip() for item in alternative):
+                    raise ValueError("conflict text-list alternatives must not contain blank items")
         return value
 
     @model_validator(mode="after")
@@ -150,7 +197,6 @@ class EvidenceField(BaseModel, Generic[T]):
         claim_bearing_statuses = {
             VerificationStatus.VERIFIED,
             VerificationStatus.PARTIALLY_VERIFIED,
-            VerificationStatus.CONFLICT,
         }
         if self.status in claim_bearing_statuses:
             if (
@@ -167,23 +213,71 @@ class EvidenceField(BaseModel, Generic[T]):
                 raise ValueError("VERIFIED fields require author-reported provenance")
             if not qualifying_records:
                 raise ValueError("VERIFIED fields require locatable primary-author source evidence")
-        if self.status is VerificationStatus.PARTIALLY_VERIFIED and not qualifying_records:
-            raise ValueError("PARTIALLY_VERIFIED fields require locatable primary-author source evidence")
+        if self.status is VerificationStatus.PARTIALLY_VERIFIED:
+            if self.provenance_type not in {
+                ProvenanceType.AUTHOR_REPORTED_FACT,
+                ProvenanceType.AUTHOR_REPORTED_LIMITATION,
+            }:
+                raise ValueError("PARTIALLY_VERIFIED fields require author-reported provenance")
+            if not qualifying_records:
+                raise ValueError("PARTIALLY_VERIFIED fields require locatable primary-author source evidence")
         if self.status is VerificationStatus.CONFLICT:
-            if not isinstance(self.value, list):
-                raise ValueError("CONFLICT fields must represent competing alternatives as a list")
+            if self.provenance_type not in {
+                ProvenanceType.AUTHOR_REPORTED_FACT,
+                ProvenanceType.AUTHOR_REPORTED_LIMITATION,
+            }:
+                raise ValueError("CONFLICT fields require author-reported provenance")
+            if self.value is not None:
+                raise ValueError("CONFLICT fields must keep value null and use conflict_values")
 
-            def typed_key(value: JsonValue) -> tuple[str, str]:
+            def typed_key(value: object) -> object:
+                """Return a stable, type-preserving key for JSON-like claims."""
+                if isinstance(value, BaseModel):
+                    return typed_key(
+                        value.model_dump(mode="json", exclude_none=True, exclude_defaults=True)
+                    )
+                if value is None:
+                    return ("null",)
+                if isinstance(value, bool):
+                    return ("boolean", value)
+                if type(value) is int:
+                    return ("integer", value)
+                if type(value) is float:
+                    return ("number", repr(value))
+                if isinstance(value, str):
+                    return ("string", value)
+                if isinstance(value, list):
+                    return ("array", tuple(typed_key(item) for item in value))
+                if isinstance(value, Mapping):
+                    return (
+                        "object",
+                        tuple(sorted((str(key), typed_key(item)) for key, item in value.items())),
+                    )
                 return (type(value).__name__, repr(value))
 
-            alternatives = {typed_key(value) for value in self.value}
+            alternatives = {typed_key(value) for value in self.conflict_values}
             if len(alternatives) < 2:
                 raise ValueError("CONFLICT fields require at least two distinct competing alternatives")
+
+            generic_args = type(self).__pydantic_generic_metadata__["args"]
+            expected_type = generic_args[0] if generic_args else None
+
+            def claimed_value_key(value: JsonValue) -> object:
+                # Evidence bindings are JSON, while composite alternatives are
+                # parsed models. Validate through the field type so URL
+                # normalization and defaults compare semantically.
+                if (
+                    isinstance(expected_type, type)
+                    and issubclass(expected_type, BaseModel)
+                ):
+                    return typed_key(expected_type.model_validate(value))
+                return typed_key(value)
+
             provided_records = [record for record in evidence_records if record.is_supplied]
             if any(record.claimed_value is None for record in provided_records):
                 raise ValueError("CONFLICT evidence records must be explicitly bound to an alternative")
             all_claimed_alternatives = {
-                typed_key(record.claimed_value) for record in provided_records
+                claimed_value_key(record.claimed_value) for record in provided_records
             }
             extra_claims = all_claimed_alternatives - alternatives
             if extra_claims:
@@ -191,7 +285,7 @@ class EvidenceField(BaseModel, Generic[T]):
                     "CONFLICT evidence claimed values must exactly match the listed alternatives"
                 )
             claimed_alternatives = {
-                typed_key(record.claimed_value)
+                claimed_value_key(record.claimed_value)
                 for record in qualifying_records
                 if record.claimed_value is not None
             }
@@ -200,6 +294,10 @@ class EvidenceField(BaseModel, Generic[T]):
                 raise ValueError(
                     "CONFLICT fields require locatable primary-author evidence explicitly bound to every alternative"
                 )
+        elif self.conflict_values:
+            raise ValueError("conflict_values may only be populated when status is CONFLICT")
+        elif any(record.claimed_value is not None for record in evidence_records):
+            raise ValueError("claimed_value evidence bindings may only be used for CONFLICT fields")
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")
         return self
@@ -219,6 +317,12 @@ class PaperUrls(BaseModel):
     pdf: HttpUrl | None = None
     code: HttpUrl | None = None
     datasets: list[HttpUrl] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def require_at_least_one_url(self) -> "PaperUrls":
+        if not any((self.publisher, self.pdf, self.code, self.datasets)):
+            raise ValueError("paper URL values must contain at least one URL")
+        return self
 
 
 class Bibliography(BaseModel):
@@ -273,12 +377,16 @@ class DataDescription(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     datasets: TextListField = Field(default_factory=TextListField)
+    origins: TextListField = Field(default_factory=TextListField)
+    variables: TextListField = Field(default_factory=TextListField)
+    units: TextListField = Field(default_factory=TextListField)
     inputs: TextListField = Field(default_factory=TextListField)
     outputs: TextListField = Field(default_factory=TextListField)
     depth_levels: TextField = Field(default_factory=TextField)
     spatial_resolution: TextField = Field(default_factory=TextField)
     temporal_resolution: TextField = Field(default_factory=TextField)
     time_coverage: TextField = Field(default_factory=TextField)
+    sample_counts: TextField = Field(default_factory=TextField)
     splits: DataSplits = Field(default_factory=DataSplits)
     preprocessing: Preprocessing = Field(default_factory=Preprocessing)
 
@@ -322,6 +430,8 @@ class Training(BaseModel):
     mixed_precision: BooleanField = Field(default_factory=BooleanField)
     random_seeds: TextListField = Field(default_factory=TextListField)
     hardware: TextListField = Field(default_factory=TextListField)
+    gpu_count: IntegerField = Field(default_factory=IntegerField)
+    gpu_types: TextListField = Field(default_factory=TextListField)
     training_time: TextField = Field(default_factory=TextField)
 
 
@@ -331,6 +441,9 @@ class Objective(BaseModel):
     primary_loss: TextField = Field(default_factory=TextField)
     auxiliary_losses: TextListField = Field(default_factory=TextListField)
     physics_constraints: TextListField = Field(default_factory=TextListField)
+    spectral_losses: TextListField = Field(default_factory=TextListField)
+    gradient_front_losses: TextListField = Field(default_factory=TextListField)
+    probabilistic_losses: TextListField = Field(default_factory=TextListField)
     loss_weights: TextListField = Field(default_factory=TextListField)
 
 
@@ -425,8 +538,14 @@ class PaperRecord(BaseModel):
         for section in fact_sections:
             for field in evidence_fields(section):
                 if (
-                    field.status is VerificationStatus.VERIFIED
+                    field.status in {
+                        VerificationStatus.VERIFIED,
+                        VerificationStatus.PARTIALLY_VERIFIED,
+                        VerificationStatus.CONFLICT,
+                    }
                     and field.provenance_type is not ProvenanceType.AUTHOR_REPORTED_FACT
                 ):
-                    raise ValueError("VERIFIED fact fields require AUTHOR_REPORTED_FACT provenance")
+                    raise ValueError(
+                        "verified or conflicting fact fields require AUTHOR_REPORTED_FACT provenance"
+                    )
         return self

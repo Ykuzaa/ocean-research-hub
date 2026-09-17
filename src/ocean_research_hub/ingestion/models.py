@@ -116,3 +116,12 @@ class IngestPaperResponse(BaseModel):
 
     created: bool
     paper: StoredPaper
+
+
+class PaperComparisonResponse(BaseModel):
+    """An ordered pair of canonical records for deterministic comparison."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    left: StoredPaper
+    right: StoredPaper

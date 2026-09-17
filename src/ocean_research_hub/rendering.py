@@ -8,7 +8,18 @@ from html import escape
 from pydantic import BaseModel
 
 from ocean_research_hub.ingestion.models import StoredPaper
-from ocean_research_hub.schemas.paper_record import EvidenceField
+from ocean_research_hub.schemas.paper_record import EvidenceField, SourceEvidence
+
+
+COMPARISON_SECTIONS = (
+    ("data", "Data"),
+    ("architecture", "Architecture"),
+    ("training", "Training"),
+    ("objective", "Losses"),
+    ("evaluation", "Evaluation"),
+    ("results", "Results"),
+    ("limitations", "Limitations"),
+)
 
 
 def render_paper_detail(paper: StoredPaper) -> str:
@@ -54,6 +65,185 @@ def render_paper_detail(paper: StoredPaper) -> str:
   {"".join(sections)}
 </body>
 </html>"""
+
+
+def render_paper_comparison(left: StoredPaper, right: StoredPaper) -> str:
+    """Render an ordered, field-level comparison without changing audit state."""
+    left_title = left.record.paper.title.value or "Untitled paper"
+    right_title = right.record.paper.title.value or "Untitled paper"
+    sections = "".join(
+        _render_comparison_section(
+            heading,
+            section_name,
+            getattr(left.record, section_name),
+            getattr(right.record, section_name),
+        )
+        for section_name, heading in COMPARISON_SECTIONS
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compare papers · Ocean Research Hub</title>
+  <style>
+    :root {{ color-scheme: light dark; font-family: system-ui, sans-serif; }}
+    body {{ max-width: 90rem; margin: 0 auto; padding: 2rem; line-height: 1.45; }}
+    header, section, aside {{ margin-bottom: 1.25rem; padding: 1rem 1.25rem; border: 1px solid #7893; border-radius: .6rem; }}
+    h1, h2 {{ margin-top: 0; }}
+    table {{ width: 100%; border-collapse: collapse; table-layout: fixed; }}
+    th, td {{ padding: .7rem; border-top: 1px solid #7893; text-align: left; vertical-align: top; overflow-wrap: anywhere; }}
+    thead th {{ border-top: 0; }}
+    th:first-child {{ width: 19%; }}
+    .status, .provenance {{ display: inline-block; margin-top: .35rem; margin-right: .25rem; font-size: .75rem; padding: .1rem .4rem; border: 1px solid currentColor; border-radius: 1rem; }}
+    .not-reported {{ font-style: italic; opacity: .85; }}
+    .ai-interpretation {{ border-left: .35rem solid #a855f7; padding-left: .65rem; background: #a855f712; }}
+    details {{ margin-top: .45rem; font-size: .9rem; }}
+    .evidence {{ display: block; margin-top: .35rem; padding-left: .6rem; border-left: .15rem solid #7898; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Paper comparison</h1>
+    <p>Every value retains its verification status and provenance. Missing values remain explicitly <strong>NOT_REPORTED</strong>.</p>
+    <p><span class="provenance">AUTHOR_REPORTED_FACT / AUTHOR_REPORTED_LIMITATION</span> Author-reported content
+       <span class="provenance ai-interpretation">AI_INTERPRETATION</span> AI interpretation</p>
+  </header>
+  <aside>
+    <strong>Left:</strong> {escape(left_title)} <code>{escape(left.id)}</code>
+    {_render_identity_audit(left.record.paper.title)}<br>
+    <strong>Right:</strong> {escape(right_title)} <code>{escape(right.id)}</code>
+    {_render_identity_audit(right.record.paper.title)}
+  </aside>
+  {sections}
+</body>
+</html>"""
+
+
+def _render_comparison_section(
+    heading: str,
+    section_name: str,
+    left: BaseModel,
+    right: BaseModel,
+) -> str:
+    left_fields = dict(_flatten_evidence_fields(left))
+    right_fields = dict(_flatten_evidence_fields(right))
+    # Both objects have the same canonical schema. Keeping the model order also
+    # makes output stable across calls and Python hash seeds.
+    rows = []
+    for relative_path, left_field in left_fields.items():
+        right_field = right_fields[relative_path]
+        label = " › ".join(part.replace("_", " ").title() for part in relative_path.split("."))
+        full_path = f"{section_name}.{relative_path}"
+        rows.append(
+            f'<tr data-field="{escape(full_path)}"><th scope="row">{escape(label)}</th>'
+            f"{_render_comparison_cell(left_field)}{_render_comparison_cell(right_field)}</tr>"
+        )
+    return (
+        f'<section id="{escape(section_name)}"><h2>{escape(heading)}</h2>'
+        '<table><thead><tr><th scope="col">Field</th><th scope="col">Left paper</th>'
+        f'<th scope="col">Right paper</th></tr></thead><tbody>{"".join(rows)}</tbody></table></section>'
+    )
+
+
+def _flatten_evidence_fields(
+    model: BaseModel, prefix: str = ""
+) -> list[tuple[str, EvidenceField[object]]]:
+    fields: list[tuple[str, EvidenceField[object]]] = []
+    for name in type(model).model_fields:
+        value = getattr(model, name)
+        path = f"{prefix}.{name}" if prefix else name
+        if isinstance(value, EvidenceField):
+            fields.append((path, value))
+        elif isinstance(value, BaseModel):
+            fields.extend(_flatten_evidence_fields(value, path))
+    return fields
+
+
+def _render_comparison_cell(field: EvidenceField[object]) -> str:
+    status = field.status.value
+    provenance = field.provenance_type.value
+    classes = ["comparison-value"]
+    if status == "NOT_REPORTED":
+        classes.append("not-reported")
+    if provenance == "AI_INTERPRETATION":
+        classes.append("ai-interpretation")
+
+    if status == "CONFLICT":
+        value = _json_value(field.conflict_values)
+    elif status == "NOT_REPORTED":
+        value = "NOT_REPORTED"
+    elif field.value is None:
+        # A null extraction failure is not evidence that the paper omitted the
+        # field. Keep the failure explicit instead of turning it into absence.
+        value = "EXTRACTION_ERROR (no extracted value)"
+    else:
+        value = _json_value(field.value)
+
+    supplied_sources = [
+        source for source in (field.source, *field.sources) if source.is_supplied
+    ]
+    evidence = ""
+    if supplied_sources:
+        evidence_items = "".join(_render_source(source) for source in supplied_sources)
+        evidence = f"<details><summary>Inspect source evidence</summary>{evidence_items}</details>"
+    return (
+        f'<td class="{" ".join(classes)}" data-status="{escape(status)}" '
+        f'data-provenance="{escape(provenance)}">{escape(value)}<br>'
+        f'<span class="status">{escape(status)}</span>'
+        f'<span class="provenance">{escape(provenance)}</span>{evidence}</td>'
+    )
+
+
+def _json_value(value: object) -> str:
+    def serialize(item: object) -> object:
+        if isinstance(item, BaseModel):
+            return item.model_dump(mode="json")
+        return str(item)
+
+    return json.dumps(value, default=serialize, ensure_ascii=False)
+
+
+def _render_identity_audit(field: EvidenceField[object]) -> str:
+    status = field.status.value
+    provenance = field.provenance_type.value
+    sources = [source for source in (field.source, *field.sources) if source.is_supplied]
+    evidence = ""
+    if sources:
+        evidence = (
+            "<details><summary>Inspect title source evidence</summary>"
+            + "".join(_render_source(source) for source in sources)
+            + "</details>"
+        )
+    return (
+        f'<span class="status">{escape(status)}</span>'
+        f'<span class="provenance">{escape(provenance)}</span>{evidence}'
+    )
+
+
+def _render_source(source: SourceEvidence) -> str:
+    # Sources arrive from the validated schema; keeping this helper separate
+    # makes escaping of both evidence and location explicit.
+    location = ", ".join(
+        part
+        for part in (
+            source.origin.value if source.origin else None,
+            source.section,
+            f"page {source.page}" if source.page else None,
+            source.locator,
+        )
+        if part
+    )
+    claimed_value = (
+        f"<br><strong>Supports:</strong> {escape(_json_value(source.claimed_value))}"
+        if source.claimed_value is not None
+        else ""
+    )
+    return (
+        f'<span class="evidence"><strong>{escape(location or "Unlocated source")}</strong>: '
+        f'{escape(source.evidence or "No evidence text")}{claimed_value}</span>'
+    )
 
 
 def _render_model(model: BaseModel, path: str) -> str:

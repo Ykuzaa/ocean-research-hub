@@ -67,6 +67,19 @@ as JSON at `/api/papers/{id}` and as a minimal evidence/status detail page at `/
 Repeated identical ingestion returns the existing paper; a duplicate identity with different
 content returns `409` and never overwrites the stored record.
 
+Compare any two stored papers in request order as canonical JSON:
+
+```bash
+curl "http://127.0.0.1:8000/api/papers/compare?left_id=PAPER_ID_A&right_id=PAPER_ID_B"
+```
+
+The minimal side-by-side view is available at
+`/papers/compare?left_id=PAPER_ID_A&right_id=PAPER_ID_B`. It covers data, architecture,
+training, losses, evaluation, results, and limitations. Every compared field retains its
+verification status and provenance; source evidence is inspectable, `NOT_REPORTED` values remain
+visible, conflicts retain all alternatives, and AI interpretation is visually separated from
+author-reported content.
+
 ## Run the scientific extraction benchmark
 
 The initial golden dataset contains three independently audited, primary-source-backed ocean-AI papers and

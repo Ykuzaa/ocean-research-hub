@@ -13,6 +13,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from ocean_research_hub.ingestion.errors import (
     IngestionConflictError,
     IngestionError,
+    InvalidComparisonError,
     InvalidDoiError,
     MetadataProviderError,
     PaperNotFoundError,
@@ -22,6 +23,7 @@ from ocean_research_hub.ingestion.errors import (
 from ocean_research_hub.ingestion.models import (
     IngestPaperRequest,
     IngestPaperResponse,
+    PaperComparisonResponse,
     StoredPaper,
 )
 from ocean_research_hub.ingestion.providers import (
@@ -35,7 +37,7 @@ from ocean_research_hub.ingestion.repository import (
     SqlitePaperRepository,
 )
 from ocean_research_hub.ingestion.service import PaperIngestionService
-from ocean_research_hub.rendering import render_paper_detail
+from ocean_research_hub.rendering import render_paper_comparison, render_paper_detail
 
 
 def create_app(
@@ -94,6 +96,12 @@ def create_app(
     async def not_found_handler(_: Request, error: PaperNotFoundError) -> JSONResponse:
         return error_response(404, error)
 
+    @app.exception_handler(InvalidComparisonError)
+    async def invalid_comparison_handler(
+        _: Request, error: InvalidComparisonError
+    ) -> JSONResponse:
+        return error_response(422, error)
+
     @app.exception_handler(PersistenceError)
     async def persistence_error_handler(
         _: Request, error: PersistenceError
@@ -118,9 +126,22 @@ def create_app(
             response.status_code = 200
         return result
 
+    @app.get("/api/papers/compare", response_model=PaperComparisonResponse)
+    async def compare_papers_api(
+        left_id: str,
+        right_id: str,
+    ) -> PaperComparisonResponse:
+        left, right = get_comparison_pair(left_id, right_id)
+        return PaperComparisonResponse(left=left, right=right)
+
     @app.get("/api/papers/{paper_id}", response_model=StoredPaper)
     async def get_paper(paper_id: str) -> StoredPaper:
         return get_stored_paper(paper_id)
+
+    @app.get("/papers/compare", response_class=HTMLResponse)
+    async def compare_papers_view(left_id: str, right_id: str) -> HTMLResponse:
+        left, right = get_comparison_pair(left_id, right_id)
+        return HTMLResponse(render_paper_comparison(left, right))
 
     @app.get("/papers/{paper_id}", response_class=HTMLResponse)
     async def paper_detail(paper_id: str) -> HTMLResponse:
@@ -134,6 +155,15 @@ def create_app(
             raise
         except Exception as exc:
             raise PersistenceError("paper repository read failed") from exc
+
+    def get_comparison_pair(
+        left_id: str, right_id: str
+    ) -> tuple[StoredPaper, StoredPaper]:
+        if left_id == right_id:
+            raise InvalidComparisonError("comparison requires two distinct paper IDs")
+        # Lookups intentionally follow request order so both the API and view
+        # retain stable left/right semantics.
+        return get_stored_paper(left_id), get_stored_paper(right_id)
 
     return app
 

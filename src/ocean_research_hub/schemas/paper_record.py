@@ -98,6 +98,8 @@ class EvidenceField(BaseModel, Generic[T]):
             item_type = get_args(expected_type)[0]
             if not isinstance(value, list) or any(not isinstance(item, item_type) for item in value):
                 raise ValueError("scientific value must be a list with correctly typed items")
+            if item_type is str and any(not item.strip() for item in value):
+                raise ValueError("scientific text lists must not contain blank items")
         return value
 
     @model_validator(mode="after")

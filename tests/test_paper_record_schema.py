@@ -7,6 +7,7 @@ from ocean_research_hub.schemas.paper_record import (
     EvidenceField,
     PaperRecord,
     ProvenanceType,
+    TextListField,
     VerificationStatus,
 )
 
@@ -68,6 +69,19 @@ def test_verified_field_permits_meaningful_false_and_zero_values(value: bool | i
     )
 
     assert field.value == value
+
+
+@pytest.mark.parametrize("value", [["   "], [""], ["reported value", " \t "]])
+@pytest.mark.parametrize("status", ["NOT_VERIFIED", "VERIFIED"])
+def test_text_list_fields_reject_blank_items_for_every_status(
+    value: list[str], status: str
+) -> None:
+    kwargs: dict[str, object] = {"value": value, "status": status}
+    if status == "VERIFIED":
+        kwargs["source"] = {"evidence": "The reported list is documented."}
+
+    with pytest.raises(ValidationError, match="must not contain blank items"):
+        TextListField(**kwargs)
 
 
 def test_not_reported_cannot_hide_a_value() -> None:

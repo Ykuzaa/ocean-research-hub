@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "curation_status": "AUDITED",
+  "paper": {
+    "id": "4dvarnet-ssh-2023",
+    "title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry",
+    "category": "reconstruction_data_assimilation",
+    "doi": "10.5194/gmd-16-2119-2023",
+    "primary_source_url": "https://doi.org/10.5194/gmd-16-2119-2023",
+    "pdf_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+  },
+  "fields": [
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.datasets", "family": "data", "value": ["NATL60 nature run", "simulated four-nadir altimetry", "simulated one-SWOT-plus-four-nadir altimetry"], "status": "VERIFIED",
+      "source": {"section": "4.1 NATL60 dataset and case study regions", "page": 2124, "locator": "opening paragraph", "evidence": "the nature run (NR) corresponds to the NATL60 configuration", "origin": "PRIMARY_PAPER"},
+      "sources": [{"section": "4.2 Simulated altimetry datasets", "page": 2126, "locator": "opening paragraph", "evidence": "the two observational datasets used to train 4DVarNet, namely the four nadir and one SWOT plus four nadir configurations", "origin": "PRIMARY_PAPER"}],
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.inputs", "family": "data", "value": ["raw satellite altimeter data", "optimally interpolated SSH fields"], "status": "VERIFIED",
+      "source": {"section": "1 Introduction", "page": 2120, "locator": "contributions bullet 1", "evidence": "using raw satellite altimeter data and optimally interpolated fields as input", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.outputs", "family": "data", "value": ["reconstructed sea surface height fields"], "status": "VERIFIED",
+      "source": {"section": "6 Conclusion and discussion", "page": 2133, "locator": "opening sentence", "evidence": "space–time interpolation of SSH fields from nadir and wide-swath satellite altimetry data", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.train", "family": "data", "value": "2013-02-04 through 2013-09-30", "status": "VERIFIED",
+      "source": {"section": "4.3 Evaluation framework", "page": 2126, "locator": "Training and evaluation setting bullet", "evidence": "we train all learning-based models using the time period from 4 February to 30 September 2013", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.validation", "family": "data", "value": "2013-01-01 through 2013-02-02", "status": "VERIFIED",
+      "source": {"section": "4.3 Evaluation framework", "page": 2126, "locator": "Training and evaluation setting bullet", "evidence": "validation period from 1 January to 2 February 2013", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.test", "family": "data", "value": "2012-10-22 through 2012-12-02 (42 days)", "status": "VERIFIED",
+      "source": {"section": "4.3 Evaluation framework", "page": 2127, "locator": "test-period paragraph", "evidence": "test period from 22 October to 2 December 2012, which is 42 d", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.spatial_resolution", "family": "data", "value": "NATL60 SSH downgraded to 1/20 degree for experiments", "status": "VERIFIED",
+      "source": {"section": "4.1 NATL60 dataset and case study regions", "page": 2125, "locator": "final paragraph", "evidence": "the SSH resolution of the nature run is downgraded to 1/20°", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "architecture.family", "family": "architecture", "value": ["end-to-end neural variational data assimilation", "4DVarNet"], "status": "VERIFIED",
+      "source": {"section": "6 Conclusion and discussion", "page": 2133, "locator": "opening paragraph", "evidence": "an end-to-end neural architecture ... bridge data assimilation and deep learning with a view to training 4D-Var DA models and solvers from data", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "architecture.activations", "family": "architecture", "value": ["linear", "ReLU"], "status": "VERIFIED",
+      "source": {"section": "3.2 4DVarNet-SSH parameterization", "page": 2123, "locator": "operator Phi paragraph", "evidence": "two hidden convolutional layers, respectively, with linear and rectified linear unit (ReLU) activations", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "training.optimizer", "family": "training", "value": "Adam", "status": "VERIFIED",
+      "source": {"section": "3.3 Learning setting", "page": 2124, "locator": "training configuration paragraph", "evidence": "we use a single GPU and Adam optimizer with a batch size of 2 over 200 epochs", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "training.learning_rate", "family": "training", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["published primary paper full text", "Sections 3.3-3.4", "tables and appendices", "publisher asset page and descriptions of all four linked reconstruction video supplements"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "objective.primary_loss", "family": "objective", "value": "weighted sum of SSH reconstruction L2 loss, gradient reconstruction L2 loss, and two prior regularization losses", "status": "VERIFIED",
+      "source": {"section": "3.3 Learning setting", "page": 2123, "locator": "equations (7)-(8)", "evidence": "training loss L combines reconstruction losses and additional regularization terms", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.forecast_horizon", "family": "evaluation", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["published primary paper full text and appendices", "publisher asset page and descriptions of all four linked reconstruction video supplements", "reconstruction task has a 7-day assimilation window and 42-day evaluation period but no forecast horizon is reported"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.baselines", "family": "evaluation", "value": ["DUACS OI", "BFN", "DYMOST", "MIOST", "fixed-point 4DVarNet"], "status": "VERIFIED",
+      "source": {"section": "5.1 Benchmarking experiments", "page": 2126, "locator": "Table 2", "evidence": "4DVarNet-SSH performance ... compared to DUACS OI ... BFN ... MIOST ... DYMOST ... fixed-point versions", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.metrics", "family": "evaluation", "value": ["mean normalized RMSE", "temporal standard deviation of normalized RMSE", "minimum resolved spatial wavelength", "minimum resolved temporal wavelength"], "status": "VERIFIED",
+      "source": {"section": "4.3 Evaluation framework", "page": 2127, "locator": "Evaluation metrics bullet", "evidence": "RMSEs(t) ... sigma[RMSEs(t)] ... lambda_x ... lambda_t", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "results.headline", "family": "results", "value": "The paper reports a 30%-60% relative reconstruction-error improvement over operational optimal interpolation.", "status": "VERIFIED",
+      "source": {"section": "Abstract", "page": 2119, "locator": "abstract", "evidence": "relative improvement with respect to the operational optimal interpolation between 30% and 60% in terms of the reconstruction error", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "limitations.author_reported", "family": "limitations", "value": "Scaling from regional domains to basin or global scale remains a challenge and may require more complex dynamical-prior parameterizations.", "status": "VERIFIED", "provenance_type": "AUTHOR_REPORTED_LIMITATION",
+      "source": {"section": "6 Conclusion and discussion", "page": 2134, "locator": "Scaling up bullet", "evidence": "Scaling up to a basin scale or even the global scale naturally arises as a key challenge ... necessary to explore more complex 4DVarNet-SSH parameterizations", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+    }
+  ]
+}

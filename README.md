@@ -67,5 +67,19 @@ as JSON at `/api/papers/{id}` and as a minimal evidence/status detail page at `/
 Repeated identical ingestion returns the existing paper; a duplicate identity with different
 content returns `409` and never overwrites the stored record.
 
+## Run the scientific extraction benchmark
+
+The initial golden dataset contains three independently audited, primary-source-backed ocean-AI papers and
+a deterministic field-level benchmark. Run it against a prediction JSON file with:
+
+```bash
+uv run ocean-research-hub-benchmark path/to/predictions.json
+```
+
+The corpus methodology, prediction contract, metric definitions, and Scientific Auditor handoff
+are documented in [`evaluation/README.md`](evaluation/README.md). Truth labels retain audited
+`VERIFIED`, `NOT_REPORTED`, or `CONFLICT` states while extractor predictions remain independently
+pre-audit.
+
 The local persistence/UI choice is documented in
 [`docs/adr/0001-local-vertical-slice.md`](docs/adr/0001-local-vertical-slice.md).

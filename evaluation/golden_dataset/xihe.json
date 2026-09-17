@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "curation_status": "AUDITED",
+  "paper": {
+    "id": "xihe-2024",
+    "title": "XiHe: A Data-Driven Model for Global Ocean Eddy-Resolving Forecasting",
+    "category": "global_ocean_forecasting",
+    "arxiv": "2402.02995v4",
+    "primary_source_url": "https://arxiv.org/abs/2402.02995v4",
+    "pdf_url": "https://arxiv.org/pdf/2402.02995v4"
+  },
+  "fields": [
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.datasets", "family": "data",
+      "value": ["GLORYS12", "ERA5", "OSTIA"], "status": "VERIFIED",
+      "source": {"section": "3.1 Training Dataset", "page": 3, "locator": "paragraphs 1-3", "evidence": "The main training data of XiHe is the GLORYS12 reanalysis ... The wind field data for training is from ... ERA5 ... we introduce the satellite SST data from ... OSTIA", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.inputs", "family": "data",
+      "value": ["sea surface temperature", "sea surface height", "ocean temperature at 23 depth levels", "sea salinity at 23 depth levels", "zonal ocean current at 23 depth levels", "meridional ocean current at 23 depth levels", "10 m zonal wind", "10 m meridional wind"], "status": "VERIFIED",
+      "source": {"section": "4.1 Problem Statement", "page": 4, "locator": "paragraph 2", "evidence": "the input variables ... include 2 sea surface variables ... 4 ocean variables with 23 layers ... and 2 atmospheric variables ... a total of 96 variables", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.outputs", "family": "data",
+      "value": null, "status": "CONFLICT",
+      "conflict_values": [
+        "reported output variables: ocean temperature, salinity, zonal and meridional ocean currents at 23 depth levels, plus sea surface height",
+        "reported output dimensions: 4320 × 2041 × 94, with two atmospheric variables excluded"
+      ],
+      "source": {"section": "4.1 Problem Statement", "page": 4, "locator": "opening paragraph", "evidence": "predicting 5 ocean variables including ocean temperature, salinity, zonal and meridional components of ocean currents with 23 layers ... and SSH", "origin": "PRIMARY_PAPER", "claimed_value": "reported output variables: ocean temperature, salinity, zonal and meridional ocean currents at 23 depth levels, plus sea surface height"},
+      "sources": [
+        {"section": "4.2 Framework Overview", "page": 5, "locator": "Figure 1", "evidence": "Temperature, Salinity, uo, vo with 23 layers ... SSH", "origin": "PRIMARY_PAPER", "claimed_value": "reported output variables: ocean temperature, salinity, zonal and meridional ocean currents at 23 depth levels, plus sea surface height"},
+        {"section": "4.1 Problem Statement", "page": 4, "locator": "equation (1) adjacent paragraph", "evidence": "The data dimensions of the output ... are 4320 × 2041 × 94 (2 atmospheric variables are excluded).", "origin": "PRIMARY_PAPER", "claimed_value": "reported output dimensions: 4320 × 2041 × 94, with two atmospheric variables excluded"}
+      ],
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.train", "family": "data",
+      "value": "25 years of daily ocean reanalysis data", "status": "VERIFIED",
+      "source": {"section": "Abstract", "page": 1, "locator": "abstract", "evidence": "established from the 25-year France Mercator Ocean International’s daily GLORYS12 reanalysis data", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.validation", "family": "data", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["primary paper full text", "Sections 3.1, 4.6, and 5"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.test", "family": "data",
+      "value": "2019-01-01 through 2020-12-31", "status": "VERIFIED",
+      "source": {"section": "5.1.2 Overall Evaluation", "page": 9, "locator": "Figure 3 caption", "evidence": "for each lead time, the RMSE is averaged from 1st Jan, 2019 to 31st Dec, 2020.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.spatial_resolution", "family": "data", "value": "1/12 degree (4320 × 2041 longitude-latitude grid points)", "status": "VERIFIED",
+      "source": {"section": "4.1 Problem Statement", "page": 4, "locator": "paragraph 2", "evidence": "The GLORYS12 global reanalysis data has a spatial resolution of 1/12° (4320 × 2041 longitude-latitude grid points)", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "architecture.family", "family": "architecture", "value": ["hierarchical transformer", "ocean-specific transformer"], "status": "VERIFIED",
+      "source": {"section": "4.2 Framework Overview", "page": 4, "locator": "paragraph 1", "evidence": "XiHe is a hierarchical transformer-based machine learning framework ... patch partition module, ocean-specific transformer, and the patch restoration module.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "architecture.activations", "family": "architecture", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["primary paper full text", "Sections 4.2 through 4.6", "architecture figures and captions"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "training.optimizer", "family": "training", "value": "AdamW", "status": "VERIFIED",
+      "source": {"section": "4.6 Optimization Details", "page": 6, "locator": "final paragraph continuing on page 7", "evidence": "We use the AdamW optimizer", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "training.learning_rate", "family": "training", "value": "5e-5", "status": "VERIFIED",
+      "source": {"section": "4.6 Optimization Details", "page": 7, "locator": "first line", "evidence": "a learning rate 5e−5", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "objective.primary_loss", "family": "objective", "value": "mean square error (MSE)", "status": "VERIFIED",
+      "source": {"section": "4.6 Optimization Details", "page": 6, "locator": "equation (9)", "evidence": "The loss function used is the Mean Square Error (MSE) loss.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.forecast_horizon", "family": "evaluation", "value": "1 to 10 days for the main multi-variable evaluation; ocean-current evaluation extended to 60 days", "status": "VERIFIED",
+      "source": {"section": "5.1.2 Overall Evaluation", "page": 7, "locator": "opening paragraph", "evidence": "lead times ranging from 1 day to 10 days", "origin": "PRIMARY_PAPER"},
+      "sources": [{"section": "5.1.2 Overall Evaluation", "page": 7, "locator": "opening paragraph, continuation", "evidence": "we extended the forecast lead times to 20, 30, and 60 days", "origin": "PRIMARY_PAPER"}],
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.baselines", "family": "evaluation", "value": ["PSY4", "GIOPS", "BLUElink OceanMAPS", "FOAM"], "status": "VERIFIED",
+      "source": {"section": "5.1.2 Overall Evaluation", "page": 7, "locator": "paragraph 2", "evidence": "compared with ... PSY4, GIOPS, FOAM, and BLUElink OceanMAPS (BLK)", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.metrics", "family": "evaluation", "value": ["Bias", "root mean square error (RMSE)", "anomaly correlation coefficient (ACC)", "Spearman correlation coefficient (SCC)"], "status": "VERIFIED",
+      "source": {"section": "5.1.1 The IV-TT Class 4 Framework", "page": 7, "locator": "metrics paragraph", "evidence": "The RMSE, ACC, and Bias are used in this paper.", "origin": "PRIMARY_PAPER"},
+      "sources": [{"section": "5.3 Large-Scale Ocean Currents Evaluation with Satellite Observation", "page": 10, "locator": "Table 2", "evidence": "Mean RMSEs and Spearman correlation coefficients (SCC) of geostrophic currents", "origin": "PRIMARY_PAPER"}],
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "results.headline", "family": "results", "value": "For 10-day lead time, XiHe improved average uo RMSE by 10.16% and vo RMSE by 11.21% over PSY4.", "status": "VERIFIED",
+      "source": {"section": "5.1.2 Overall Evaluation", "page": 8, "locator": "paragraph discussing Figure 6", "evidence": "XiHe achieves an average improvement of 10.16% and 11.21% over PSY4 in the 10-day lead time forecasting", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "limitations.author_reported", "family": "limitations", "value": "Combining data assimilation methods and large models to form better initial fields and forecasts remains future work.", "status": "VERIFIED", "provenance_type": "AUTHOR_REPORTED_LIMITATION",
+      "source": {"section": "6 Conclusion and Discussion", "page": 17, "locator": "final paragraph", "evidence": "How to combine data assimilation methods and large models to form better initial fields and forecasting results is a worthwhile endeavour.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2402.02995v4"
+    }
+  ]
+}

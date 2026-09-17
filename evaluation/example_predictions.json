@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "predictions": [
+    {"paper_id": "xihe-2024", "fields": []},
+    {"paper_id": "4dvarnet-ssh-2023", "fields": []},
+    {"paper_id": "oceannet-2023", "fields": []}
+  ]
+}

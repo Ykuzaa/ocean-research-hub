@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "curation_status": "AUDITED",
+  "paper": {
+    "id": "oceannet-2023",
+    "title": "OceanNet: A principled neural operator-based digital twin for regional oceans",
+    "category": "neural_operator_physics_ml",
+    "arxiv": "2310.00813v2",
+    "primary_source_url": "https://arxiv.org/abs/2310.00813v2",
+    "pdf_url": "https://arxiv.org/pdf/2310.00813v2"
+  },
+  "fields": [
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.datasets", "family": "data", "value": ["high-resolution northwest Atlantic regional ocean reanalysis produced with ROMS and EnKF"], "status": "VERIFIED",
+      "source": {"section": "4.1 Reanalysis Data", "page": 11, "locator": "opening paragraph", "evidence": "We utilized high-resolution northwest Atlantic regional ocean reanalysis data ... This reanalysis was generated using a regional implementation of ROMS with the ensemble Kalman filter data assimilation method (EnKF).", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.inputs", "family": "data", "value": ["historical 5-day mean sea surface height"], "status": "VERIFIED",
+      "source": {"section": "4.2.1 Fourier Neural Operator (FNO)", "page": 12, "locator": "opening paragraph", "evidence": "Training utilizes labeled pairs of historical 5-day mean SSH data ... X(t) (input)", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.outputs", "family": "data", "value": ["future sea surface height"], "status": "VERIFIED",
+      "source": {"section": "4.2.1 Fourier Neural Operator (FNO)", "page": 12, "locator": "opening paragraph", "evidence": "X(t + 5Δt) (label), and X(t + 10Δt) (label) ... labels are X(t + 4Δt) and X(t + 8Δt)", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.train", "family": "data", "value": "1993 through 2018", "status": "VERIFIED",
+      "source": {"section": "4.1 Reanalysis Data", "page": 11, "locator": "final paragraph", "evidence": "Both training datasets consist of 26 years of reanalysis data from 1993 through 2018.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.validation", "family": "data", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["arXiv v2 primary paper full text and figure captions", "Methods Sections 4.1-4.2", "linked three-page publisher Supplementary Information inspected in full"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.splits.test", "family": "data", "value": "2019 through 2020", "status": "VERIFIED",
+      "source": {"section": "4.1 Reanalysis Data", "page": 11, "locator": "final paragraph", "evidence": "SSH Forecasting was conducted for 2019-2020.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "data.spatial_resolution", "family": "data", "value": "4 km horizontal resolution with 50 vertical layers in the source reanalysis", "status": "VERIFIED",
+      "source": {"section": "4.1 Reanalysis Data", "page": 11, "locator": "opening paragraph", "evidence": "It features a horizontal resolution of 4 km with 50 vertical layers.", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "architecture.family", "family": "architecture", "value": ["Fourier neural operator", "predictor-evaluate-corrector integrator"], "status": "VERIFIED",
+      "source": {"section": "1 Introduction", "page": 3, "locator": "OceanNet overview paragraph", "evidence": "OceanNet, relies on a Fourier neural operator (FNO), which incorporates a predictor-evaluate-corrector (PEC) integration scheme", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "architecture.activations", "family": "architecture", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["arXiv v2 primary paper full text, Methods Section 4.2, and Figure 6", "linked three-page publisher Supplementary Information inspected in full"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "training.optimizer", "family": "training", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["arXiv v2 primary paper full text and Methods Section 4.2", "linked three-page publisher Supplementary Information inspected in full"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "training.learning_rate", "family": "training", "value": null, "status": "NOT_REPORTED",
+      "absence_search_scope": ["arXiv v2 primary paper full text and Methods Section 4.2", "linked three-page publisher Supplementary Information inspected in full"]
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "objective.primary_loss", "family": "objective", "value": "two-time-step sum of mean squared error and a spectral regularizer", "status": "VERIFIED",
+      "source": {"section": "4.2.3 Fourier Regularizer and 2-time-step Loss Function", "page": 14, "locator": "equations (6)-(8)", "evidence": "combined loss function, which integrates both MSE and the spectral regularizer is evaluated over two time steps", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.forecast_horizon", "family": "evaluation", "value": "up to 120 days", "status": "VERIFIED",
+      "source": {"section": "2.1 Performance of OceanNet in the GoM", "page": 4, "locator": "opening sentence", "evidence": "seasonal (up to 120 days) forecasting performance", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.baselines", "family": "evaluation", "value": ["regional ocean dynamical model forecast, identified as ROMS-based", "persistence forecast", "1,000 random training-sample pairs used as a saturation reference"], "status": "VERIFIED",
+      "source": {"section": "2.1 Performance of OceanNet in the GoM", "page": 6, "locator": "Figure 3 caption", "evidence": "1,000 random pairs sourced from the training data ... regional ocean dynamical forecast model ... gray dots are persistence", "origin": "PRIMARY_PAPER"},
+      "sources": [{"section": "1 Introduction", "page": 3, "locator": "OceanNet overview paragraph", "evidence": "regional ocean dynamical prediction that is based on the state-of-the-art Regional Ocean Modeling System (ROMS)", "origin": "PRIMARY_PAPER"}],
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "evaluation.metrics", "family": "evaluation", "value": ["root mean squared error (RMSE)", "correlation coefficient (CC)", "modified Hausdorff distance (MHD)"], "status": "VERIFIED",
+      "source": {"section": "2 Results", "page": 3, "locator": "metrics paragraph", "evidence": "metrics ... include root mean squared error (RMSE) and correlation coefficient (CC) ... modified Hausdorff distance (MHD)", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "results.headline", "family": "results", "value": "OceanNet remained competitive with the regional dynamical model forecast while running approximately 500,000 times faster.", "status": "VERIFIED",
+      "source": {"section": "1 Introduction", "page": 3, "locator": "OceanNet overview paragraph", "evidence": "demonstrates long-term stability and competitive skills ... competitive with SSH prediction made by a regional ocean dynamical prediction", "origin": "PRIMARY_PAPER"},
+      "sources": [{"section": "2.1 Performance of OceanNet in the GoM", "page": 6, "locator": "paragraph after Figure 3", "evidence": "approximately 500,000 times faster than regional dynamical model forecasts", "origin": "PRIMARY_PAPER"}],
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
+      "path": "limitations.author_reported", "family": "limitations", "value": "OceanNet was trained and tested only on reanalysis data for mesoscale eddies and meanders, so performance across real-world ocean applications needs investigation.", "status": "VERIFIED", "provenance_type": "AUTHOR_REPORTED_LIMITATION",
+      "source": {"section": "3 Discussion", "page": 10, "locator": "limitations paragraph", "evidence": "this study exclusively trained and tested OceanNet using reanalysis data pertaining to mesoscale ocean eddies and meanders ... necessitate further investigation", "origin": "PRIMARY_PAPER"},
+      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+    }
+  ]
+}

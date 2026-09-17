@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from ocean_research_hub.schemas.paper_record import PaperRecord, TextField, TextListField
+from ocean_research_hub.schemas.paper_record import EvidenceField, PaperRecord, TextField, TextListField
 
 
 PRIMARY_EVIDENCE = {
@@ -13,6 +13,13 @@ PRIMARY_EVIDENCE = {
     "page": 5,
     "section": "Methods",
     "evidence": "The optimizer is AdamW.",
+}
+
+SECONDARY_PRIMARY_EVIDENCE = {
+    "origin": "SUPPLEMENTARY_MATERIAL",
+    "page": 12,
+    "section": "Appendix",
+    "evidence": "The conflicting optimizer is SGD.",
 }
 
 
@@ -37,6 +44,29 @@ def test_verified_claim_requires_locatable_primary_author_evidence(source: dict[
 def test_partially_verified_claim_requires_locatable_primary_author_evidence() -> None:
     with pytest.raises(ValidationError, match="PARTIALLY_VERIFIED.*locatable primary-author"):
         TextField(value="AdamW", status="PARTIALLY_VERIFIED", source={"evidence": "AdamW is used."})
+
+
+@pytest.mark.parametrize("status", ["PARTIALLY_VERIFIED", "CONFLICT"])
+@pytest.mark.parametrize("value", [None, "", [], {}])
+def test_claim_bearing_non_verified_statuses_require_meaningful_values(
+    status: str, value: object
+) -> None:
+    kwargs: dict[str, object] = {"value": value, "status": status, "source": PRIMARY_EVIDENCE}
+    if status == "CONFLICT":
+        kwargs["sources"] = [SECONDARY_PRIMARY_EVIDENCE]
+
+    with pytest.raises(ValidationError, match="require a non-empty claim value|must not be blank"):
+        EvidenceField[object](**kwargs)
+
+
+@pytest.mark.parametrize("status", ["PARTIALLY_VERIFIED", "CONFLICT"])
+@pytest.mark.parametrize("value", [False, 0])
+def test_claim_bearing_non_verified_statuses_retain_false_and_zero(status: str, value: bool | int) -> None:
+    kwargs: dict[str, object] = {"value": value, "status": status, "source": PRIMARY_EVIDENCE}
+    if status == "CONFLICT":
+        kwargs["sources"] = [SECONDARY_PRIMARY_EVIDENCE]
+
+    assert EvidenceField[bool | int](**kwargs).value == value
 
 
 def test_conflict_requires_distinct_evidence_for_each_side() -> None:

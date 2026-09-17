@@ -139,13 +139,19 @@ class EvidenceField(BaseModel, Generic[T]):
             record for record in evidence_records
             if record.is_locatable and record.is_primary_author_source
         ]
-        if self.status is VerificationStatus.VERIFIED:
+        claim_bearing_statuses = {
+            VerificationStatus.VERIFIED,
+            VerificationStatus.PARTIALLY_VERIFIED,
+            VerificationStatus.CONFLICT,
+        }
+        if self.status in claim_bearing_statuses:
             if (
                 self.value is None
                 or (isinstance(self.value, str) and not self.value.strip())
                 or (isinstance(self.value, (Collection, Mapping)) and not self.value)
             ):
-                raise ValueError("VERIFIED fields require a non-empty claim value")
+                raise ValueError(f"{self.status} fields require a non-empty claim value")
+        if self.status is VerificationStatus.VERIFIED:
             if self.provenance_type not in {
                 ProvenanceType.AUTHOR_REPORTED_FACT,
                 ProvenanceType.AUTHOR_REPORTED_LIMITATION,

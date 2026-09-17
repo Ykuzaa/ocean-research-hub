@@ -200,7 +200,7 @@ class ScientificExtractor:
         if families:
             cls._set(record, "architecture.family", list(dict.fromkeys(families)), page, section, sentence, list_value=True)
         if "limitation" in low or "future work" in low or "remains a challenge" in low:
-            cls._set(record, "limitations.author_reported", sentence, page, section, sentence, limitation=True)
+            cls._set(record, "limitations.author_reported", [sentence], page, section, sentence, list_value=True, limitation=True)
 
     @staticmethod
     def _fields(record: PaperRecord):

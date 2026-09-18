@@ -1,26 +1,26 @@
 {
   "schema_version": 1,
   "paper_count": 3,
-  "field_count": 51,
+  "field_count": 52,
   "overall": {
     "precision": {
-      "numerator": 33,
-      "denominator": 33,
+      "numerator": 34,
+      "denominator": 34,
       "value": 1.0
     },
     "recall": {
-      "numerator": 33,
-      "denominator": 43,
-      "value": 0.767442
+      "numerator": 34,
+      "denominator": 44,
+      "value": 0.772727
     },
     "exact_match": {
-      "numerator": 33,
-      "denominator": 51,
-      "value": 0.647059
+      "numerator": 34,
+      "denominator": 52,
+      "value": 0.653846
     },
     "unsupported_claim_rate": {
       "numerator": 0,
-      "denominator": 33,
+      "denominator": 34,
       "value": 0.0
     },
     "not_reported_accuracy": {
@@ -29,9 +29,9 @@
       "value": 0.0
     },
     "evidence_location_accuracy": {
-      "numerator": 33,
-      "denominator": 43,
-      "value": 0.767442
+      "numerator": 34,
+      "denominator": 44,
+      "value": 0.772727
     }
   },
   "by_field_family": {
@@ -165,23 +165,23 @@
     },
     "evaluation": {
       "precision": {
-        "numerator": 5,
-        "denominator": 5,
+        "numerator": 6,
+        "denominator": 6,
         "value": 1.0
       },
       "recall": {
-        "numerator": 5,
-        "denominator": 8,
-        "value": 0.625
+        "numerator": 6,
+        "denominator": 9,
+        "value": 0.666667
       },
       "exact_match": {
-        "numerator": 5,
-        "denominator": 9,
-        "value": 0.555556
+        "numerator": 6,
+        "denominator": 10,
+        "value": 0.6
       },
       "unsupported_claim_rate": {
         "numerator": 0,
-        "denominator": 5,
+        "denominator": 6,
         "value": 0.0
       },
       "not_reported_accuracy": {
@@ -190,9 +190,9 @@
         "value": 0.0
       },
       "evidence_location_accuracy": {
-        "numerator": 5,
-        "denominator": 8,
-        "value": 0.625
+        "numerator": 6,
+        "denominator": 9,
+        "value": 0.666667
       }
     },
     "results": {

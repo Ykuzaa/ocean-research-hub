@@ -85,11 +85,21 @@
       "source_url": "https://arxiv.org/pdf/2310.00813v2"
     },
     {
-      "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",
-      "path": "evaluation.baselines", "family": "evaluation", "value": ["regional ocean dynamical model forecast, identified as ROMS-based", "persistence forecast", "1,000 random training-sample pairs used as a saturation reference"], "status": "VERIFIED",
-      "source": {"section": "2.1 Performance of OceanNet in the GoM", "page": 6, "locator": "Figure 3 caption", "evidence": "1,000 random pairs sourced from the training data ... regional ocean dynamical forecast model ... gray dots are persistence", "origin": "PRIMARY_PAPER"},
-      "sources": [{"section": "1 Introduction", "page": 3, "locator": "OceanNet overview paragraph", "evidence": "regional ocean dynamical prediction that is based on the state-of-the-art Regional Ocean Modeling System (ROMS)", "origin": "PRIMARY_PAPER"}],
-      "source_url": "https://arxiv.org/pdf/2310.00813v2"
+      "verified_by": "scientific-auditor:issue-19", "verified_at": "2026-09-18T12:14:43+02:00",
+      "path": "evaluation.baselines", "family": "evaluation", "value": ["regional ocean dynamical model forecast, identified as ROMS-based", "persistence forecast", "1,000 random training-sample pairs used as a saturation reference", "baseline U-NET trained on the same data as OceanNet"], "status": "VERIFIED",
+      "source": {"section": "2.1 Performance of OceanNet in the GoM", "page": 6, "locator": "Figure 3 caption", "evidence": "1,000 random pairs ... regional ocean dynamical forecast model ... gray dots are persistence", "origin": "PRIMARY_PAPER", "evidence_url": "https://arxiv.org/pdf/2310.00813v2"},
+      "sources": [
+        {"section": "1 Introduction", "page": 3, "locator": "OceanNet overview paragraph", "evidence": "Regional Ocean Modeling System (ROMS)", "origin": "PRIMARY_PAPER", "evidence_url": "https://arxiv.org/pdf/2310.00813v2"},
+        {"section": "1 Performance of an U-NET on the GS", "page": 1, "locator": "opening paragraph and Figure S1", "evidence": "baseline U-NET", "origin": "SUPPLEMENTARY_MATERIAL", "evidence_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"}
+      ],
+      "source_url": "https://www.nature.com/articles/s41598-024-72145-0"
+    },
+    {
+      "verified_by": "scientific-auditor:issue-19", "verified_at": "2026-09-18T12:14:43+02:00",
+      "path": "evaluation.ablations", "family": "evaluation", "value": ["FNO without the spectral regularizer or PEC integrator", "FNO with a geostrophic constraint and without the spectral regularizer or PEC integrator"], "status": "VERIFIED",
+      "source": {"section": "2 FNO without spectral regularizer or PEC integrator", "page": 2, "locator": "section opening and Figure S2", "evidence": "FNO without spectral regularizer or PEC integrator", "origin": "SUPPLEMENTARY_MATERIAL", "evidence_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"},
+      "sources": [{"section": "3 FNO with a geostrophic constraint without spectral regularization or the PEC integrator", "page": 2, "locator": "section paragraph continuing to Figure S3 on page 3", "evidence": "geostrophic constraint ... did not yield fruitful results", "origin": "SUPPLEMENTARY_MATERIAL", "evidence_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"}],
+      "source_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"
     },
     {
       "verified_by": "scientific-auditor:issue-3", "verified_at": "2026-09-17T18:01:01Z",

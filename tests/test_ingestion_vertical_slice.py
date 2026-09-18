@@ -224,6 +224,7 @@ def test_table_caption_and_appendix_claims_round_trip_without_filling_absent_fie
             "locator": None,
             "evidence": None,
             "origin": None,
+            "evidence_url": None,
             "claimed_value": None,
         },
             "sources": [],
@@ -321,6 +322,7 @@ def test_case_equivalent_parsed_dois_are_idempotent(
         "section": None,
         "locator": "First-page DOI",
         "evidence": "doi: 10.1234/OCEAN.1",
+        "evidence_url": None,
         "claimed_value": None,
     }
     assert repository.count() == 1

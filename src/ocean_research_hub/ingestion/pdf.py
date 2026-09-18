@@ -46,6 +46,7 @@ class ParsedPage:
 class ParsedPdf:
     pages: list[ParsedPage]
     source_name: str
+    supplementary_pages: list[ParsedPage] = field(default_factory=list)
     supplementary_search_scope: list[str] = field(default_factory=list)
 
     @property
@@ -107,6 +108,9 @@ class EvidenceSelector:
     section: str
     locator: str
     pattern: str
+    require_heading: bool = False
+    origin: SourceOrigin = SourceOrigin.PRIMARY_PAPER
+    evidence_url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -121,9 +125,19 @@ class EvidenceValidator:
     """Reject evidence not literally locatable on the declared parsed page."""
 
     def locate(self, parsed: ParsedPdf, selector: EvidenceSelector) -> SourceEvidence | None:
-        page = next((item for item in parsed.pages if item.page == selector.page), None)
+        pages = (
+            parsed.supplementary_pages
+            if selector.origin is SourceOrigin.SUPPLEMENTARY_MATERIAL
+            else parsed.pages
+        )
+        page = next((item for item in pages if item.page == selector.page), None)
         if page is None:
             return None
+        if selector.require_heading:
+            heading = normalize_text(selector.section).lower()
+            searchable = normalize_text(page.text).lower()
+            if heading not in searchable:
+                return None
         match = re.search(selector.pattern, normalize_text(page.text), re.I | re.S)
         if match is None:
             return None
@@ -131,8 +145,9 @@ class EvidenceValidator:
         if normalize_text(snippet) not in normalize_text(page.text):
             return None
         return SourceEvidence(
-            origin=SourceOrigin.PRIMARY_PAPER, page=selector.page,
+            origin=selector.origin, page=selector.page,
             section=selector.section, locator=selector.locator, evidence=snippet,
+            evidence_url=selector.evidence_url,
         )
 
     @staticmethod
@@ -180,15 +195,26 @@ class EvidenceValidator:
         return True
 
 
-def ev(page: int, section: str, locator: str, pattern: str) -> EvidenceSelector:
-    return EvidenceSelector(page, section, locator, pattern)
+def ev(
+    page: int,
+    section: str,
+    locator: str,
+    pattern: str,
+    *,
+    require_heading: bool = False,
+    origin: SourceOrigin = SourceOrigin.PRIMARY_PAPER,
+    evidence_url: str | None = None,
+) -> EvidenceSelector:
+    return EvidenceSelector(
+        page, section, locator, pattern, require_heading, origin, evidence_url
+    )
 
 
 # High-precision normalisations for explicit statements in the mandatory real
 # papers. Selection is by document content, never by file name. A value cannot be
 # emitted unless every evidence selector is located and validated first.
 FOURDVAR_RULES = (
-    ClaimRule("scientific_framing.problem", "Space-time interpolation of sea surface height from irregular nadir and wide-swath satellite altimetry observations.", (ev(2133, "6 Conclusion and discussion", "opening sentence", r"space.?time interpolation of SSH fields from nadir and wide.?swath satellite altimetry data"),)),
+    ClaimRule("scientific_framing.problem", "Space-time interpolation of sea surface height from irregular nadir and wide-swath satellite altimetry observations.", (ev(2133, "6 Conclusion and discussion", "opening sentence", r"space.?time interpolation of SSH fields from nadir and wide.?swath satellite altimetry data", evidence_url="https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"), ev(2120, "1 Introduction", "paragraph immediately before the contributions list", r"spacetime interpolation of sea surface variables from irregularly sampled observations", evidence_url="https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"))),
     ClaimRule("scientific_framing.objective", "Learn end-to-end 4D-Var data-assimilation models and solvers for SSH interpolation.", (ev(2133, "6 Conclusion and discussion", "opening paragraph", r"bridge data assimilation and deep learning with a view to training 4D.?Var DA models and solvers from data"),)),
     ClaimRule("scientific_framing.task_type", ["sea surface height reconstruction", "variational data assimilation"], (ev(2119, "Abstract", "abstract", r"interpolation of sea surface height.*?data assimilation"),)),
     ClaimRule("data.datasets", ["NATL60 nature run", "simulated four-nadir altimetry", "simulated one-SWOT-plus-four-nadir altimetry"], (ev(2124, "4.1 NATL60 dataset and case study regions", "opening paragraph", r"nature run \(NR\) corresponds to the NATL60 configuration"), ev(2126, "4.2 Simulated altimetry datasets", "opening paragraph", r"two observational datasets used to train 4DVarNet, namely the four nadir and one SWOT plus four nadir configurations"))),
@@ -201,7 +227,7 @@ FOURDVAR_RULES = (
     ClaimRule("data.spatial_resolution", "NATL60 SSH downgraded to 1/20 degree for experiments", (ev(2125, "4.1 NATL60 dataset and case study regions", "final paragraph", r"SSH resolution of the nature run is downgraded to 1\s*/20(?:°|◦)"),)),
     ClaimRule("data.temporal_resolution", "daily NATL60 simulations", (ev(2126, "4.3 Evaluation framework", "Training and evaluation setting bullet", r"NATL60 dataset is made of 365 daily simulations"),)),
     ClaimRule("architecture.family", ["end-to-end neural variational data assimilation", "4DVarNet"], (ev(2133, "6 Conclusion and discussion", "opening paragraph", r"end.?to.?end neural architecture.*?bridge data assimilation and deep learning with a view to training 4D.?Var DA models and solvers from data"),)),
-    ClaimRule("architecture.summary", "An LSTM learns adaptive gradient updates for iterative variational optimization.", (ev(2121, "2 4DVarNet framework", "iterative solver paragraph", r"LSTM.*?learn an adaptive gradient update.*?trainable gradient descent with momentum"),)),
+    ClaimRule("architecture.summary", "An LSTM learns adaptive gradient updates for iterative variational optimization.", (ev(2121, "3.1 4DVarNet framework", "iterative solver paragraph following equation (3)", r"LSTM.*?learn an adaptive gradient update.*?trainable gradient descent with momentum", require_heading=True, evidence_url="https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"),)),
     ClaimRule("architecture.blocks", ["convolutional LSTM gradient-update operator", "three-layer convolutional dynamical prior"], (ev(2123, "3.2 4DVarNet-SSH parameterization", "operator Phi paragraph", r"three.?layer CNN.*?two hidden convolutional layers"),)),
     ClaimRule("architecture.activations", ["linear", "ReLU"], (ev(2123, "3.2 4DVarNet-SSH parameterization", "operator Phi paragraph", r"two hidden convolutional layers, respectively, with linear and rectified linear unit \(ReLU\) activations"),)),
     ClaimRule("training.optimizer", "Adam", (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"use a single GPU and Adam optimizer with a batch size of 2 over 200 epochs"),)),
@@ -229,7 +255,8 @@ OCEANNET_RULES = (
     ClaimRule("architecture.family", ["Fourier neural operator", "predictor-evaluate-corrector integrator"], (ev(3, "1 Introduction", "OceanNet overview paragraph", r"relies on a Fourier neural operator \(FNO\), which incorporates a predictor.?evaluate.?corrector \(PEC\) integration scheme"),)),
     ClaimRule("objective.primary_loss", "two-time-step sum of mean squared error and a spectral regularizer", (ev(14, "4.2.3 Fourier Regularizer and 2-time-step Loss Function", "equations (6)-(8)", r"loss functions for t \+ 5.*?spectral regularizer ensures that the high wavenumbers"),)),
     ClaimRule("evaluation.forecast_horizon", "up to 120 days", (ev(4, "2.1 Performance of OceanNet in the GoM", "opening sentence", r"seasonal \(up to 120 days\) forecasting performance"),)),
-    ClaimRule("evaluation.baselines", ["regional ocean dynamical model forecast, identified as ROMS-based", "persistence forecast", "1,000 random training-sample pairs used as a saturation reference"], (ev(6, "2.1 Performance of OceanNet in the GoM", "Figure 3 caption", r"1,000 random pairs sourced from the training data.*?regional ocean dynamical forecast model.*?gray dots are persistence"), ev(3, "1 Introduction", "OceanNet overview paragraph", r"competitive with SSH prediction made by a regional ocean dynamical prediction.*?Regional Ocean Modeling System \(ROMS\)"))),
+    ClaimRule("evaluation.baselines", ["regional ocean dynamical model forecast, identified as ROMS-based", "persistence forecast", "1,000 random training-sample pairs used as a saturation reference", "baseline U-NET trained on the same data as OceanNet"], (ev(6, "2.1 Performance of OceanNet in the GoM", "Figure 3 caption", r"1,000 random pairs sourced from the training data.*?regional ocean dynamical forecast model.*?gray dots are persistence", evidence_url="https://arxiv.org/pdf/2310.00813v2"), ev(3, "1 Introduction", "OceanNet overview paragraph", r"competitive with SSH prediction made by a regional ocean dynamical prediction.*?Regional Ocean Modeling System \(ROMS\)", evidence_url="https://arxiv.org/pdf/2310.00813v2"), ev(1, "1 Performance of an U-NET on the GS", "opening paragraph and Figure S1", r"baseline U.?NET trained on the same data as OceanNet", origin=SourceOrigin.SUPPLEMENTARY_MATERIAL, evidence_url="https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"))),
+    ClaimRule("evaluation.ablations", ["FNO without the spectral regularizer or PEC integrator", "FNO with a geostrophic constraint and without the spectral regularizer or PEC integrator"], (ev(2, "2 FNO without spectral regularizer or PEC integrator", "section opening and Figure S2", r"FNO.*?without the spectral regularizer or the PEC integrator", origin=SourceOrigin.SUPPLEMENTARY_MATERIAL, evidence_url="https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"), ev(2, "3 FNO with a geostrophic constraint without spectral regularization or the PEC integrator", "section paragraph continuing to Figure S3 on page 3", r"geostrophic constraint.*?did not yield fruitful results", origin=SourceOrigin.SUPPLEMENTARY_MATERIAL, evidence_url="https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"))),
     ClaimRule("evaluation.metrics", ["root mean squared error (RMSE)", "correlation coefficient (CC)", "modified Hausdorff distance (MHD)"], (ev(3, "2 Results", "metrics paragraph", r"metrics.*?include root mean squared error \(RMSE\) and correlation coefficient \(CC\).*?modified Hausdorff distance \(MHD(?:,|\))"),)),
     ClaimRule("results.headline", ["OceanNet remained competitive with the regional dynamical model forecast while running approximately 500,000 times faster."], (ev(3, "1 Introduction", "OceanNet overview paragraph", r"demonstrates long.?term stability and competitive skills.*?competitive with SSH prediction made by a regional ocean dynamical prediction"), ev(6, "2.1 Performance of OceanNet in the GoM", "paragraph after Figure 3", r"OceanNet predictions have a.*?wall.?clock.*?500,000 times faster than regional dynamical model forecasts"))),
     ClaimRule("limitations.author_reported", ["OceanNet was trained and tested only on reanalysis data for mesoscale eddies and meanders, so performance across real-world ocean applications needs investigation."], (ev(10, "3 Discussion", "limitations paragraph", r"exclusively trained and tested OceanNet using reanalysis data pertaining to mesoscale ocean eddies and meanders.*?necessitate further investigation"),), True),
@@ -295,6 +322,10 @@ class ScientificExtractor:
                 rejected.append(path)
         if "oceannet: a principled neural operator-based" in fingerprint:
             profiles.append("OceanNet")
+            expected = {rule.path for rule in OCEANNET_RULES}
+            for path in expected - matched_paths:
+                self._mark_error(record, path, path.startswith("limitations."))
+                rejected.append(path)
         if "xihe: a data-driven model for global ocean" in fingerprint:
             profiles.append("XiHe")
         if not profiles:

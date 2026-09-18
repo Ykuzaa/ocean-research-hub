@@ -151,3 +151,37 @@ absent science. Repeated conflicting claims retain both alternatives as
 `CONFLICT`. The extraction search scope is stored in the paper warnings for
 audit review. A PDF-only run does not claim to have searched supplementary
 material, so fields requiring that scope stay `EXTRACTION_ERROR`.
+
+# Semantic (LLM-assisted) extraction
+
+The deterministic rules above (`ScientificExtractor`) only cover fields for
+which a maintainer has hand-written a regex/section-heading rule; that is
+enough for the three audited golden papers but does not generalize to an
+arbitrary paper. `SemanticExtractor`
+(`src/ocean_research_hub/ingestion/semantic.py`) is a second pass, run only
+against fields the deterministic pass left unresolved (`NOT_REPORTED` or
+`EXTRACTION_ERROR`), that asks an LLM (Google Gemini) to propose a value, a
+page, a section, and a verbatim quoted snippet for each remaining field.
+
+The LLM's proposal is never trusted directly. Before a value is stored:
+
+1. its quoted `evidence` must be independently re-located, verbatim, on the
+   exact page cited (`EvidenceValidator.locate_free_text`);
+2. the claimed `value` must be consistent with that quote — token-overlap for
+   text/list fields, and a literal substring match for numeric fields, so a
+   real, correctly-located quote cannot be paired with a fabricated or
+   exaggerated value (`EvidenceValidator.supports_normalization`).
+
+A rejected or unproposed field becomes `EXTRACTION_ERROR`, matching the rest
+of this project's "never guess, never confuse failure with absence" rule.
+Accepted claims are stored as `NOT_VERIFIED`, exactly like the deterministic
+path, pending the same independent Scientific Auditor gate.
+
+To enable it, set `GEMINI_API_KEY` (get one at
+[aistudio.google.com](https://aistudio.google.com/apikey)) in a local `.env`
+file (see `.env.example`; never committed) or the environment before starting
+the server. Without a key, ingestion still works and simply logs a
+`semantic extraction skipped: no LLM client configured` warning. Pass
+`semantic_extractor=False` to `create_app` to disable it explicitly even when
+a key is present (this is also how the test suite stays network-free
+regardless of a contributor's local `.env` — see `tests/conftest.py`).

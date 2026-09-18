@@ -106,6 +106,9 @@ class EvidenceField(BaseModel, Generic[T]):
     # ``source`` remains the primary evidence object. ``sources`` carries
     # additional independently locatable support, notably for conflicts.
     sources: list[SourceEvidence] = Field(default_factory=list)
+    # Absence is an audit result, not the lack of an extraction. A non-empty
+    # scope records the field-specific primary/supplement material searched.
+    absence_search_scope: list[str] = Field(default_factory=list)
     verified_by: str | None = None
     verified_at: datetime | None = None
 
@@ -301,6 +304,13 @@ class EvidenceField(BaseModel, Generic[T]):
             raise ValueError("claimed_value evidence bindings may only be used for CONFLICT fields")
         if self.status is VerificationStatus.NOT_REPORTED and self.value is not None:
             raise ValueError("NOT_REPORTED fields must not contain a value")
+        if self.status is VerificationStatus.NOT_REPORTED:
+            if any(record.is_supplied for record in evidence_records):
+                raise ValueError("NOT_REPORTED fields cannot carry point evidence")
+            if self.confidence > 0 and not self.absence_search_scope:
+                raise ValueError("confident NOT_REPORTED fields require an explicit absence search scope")
+        elif self.absence_search_scope:
+            raise ValueError("absence_search_scope is reserved for NOT_REPORTED fields")
         return self
 
 

@@ -149,4 +149,5 @@ page. A configured claim whose evidence cannot be located becomes
 `NOT_REPORTED`. Parser failures return `PARSER_ERROR` and are not represented as
 absent science. Repeated conflicting claims retain both alternatives as
 `CONFLICT`. The extraction search scope is stored in the paper warnings for
-audit review.
+audit review. A PDF-only run does not claim to have searched supplementary
+material, so fields requiring that scope stay `EXTRACTION_ERROR`.

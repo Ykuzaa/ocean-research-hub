@@ -141,9 +141,12 @@ The ingestion API accepts a local PDF path or a resolvable PDF URL:
 {"pdf_path": "/data/papers/ocean-paper.pdf"}
 ```
 
-The parser records page-aware primary-paper evidence and the deterministic
-extractor emits conservative `NOT_VERIFIED` claims. Fields not found in the
-extractable page text remain `NOT_REPORTED`; parser failures return
-`PARSER_ERROR` and are not represented as absent science. Repeated conflicting
-claims retain both alternatives as `CONFLICT`. The extraction search scope is
-stored in the paper warnings for audit review.
+The parser records printed page labels, sections, blocks, and primary-paper
+evidence. The deterministic extractor emits conservative `NOT_VERIFIED` claims
+only after the evidence validator locates the supporting text on the declared
+page. A configured claim whose evidence cannot be located becomes
+`EXTRACTION_ERROR`; only an exhaustively searched field-specific absence remains
+`NOT_REPORTED`. Parser failures return `PARSER_ERROR` and are not represented as
+absent science. Repeated conflicting claims retain both alternatives as
+`CONFLICT`. The extraction search scope is stored in the paper warnings for
+audit review.

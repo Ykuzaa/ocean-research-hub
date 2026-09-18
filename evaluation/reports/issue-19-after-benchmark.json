@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "paper_count": 3,
+  "field_count": 51,
+  "overall": {
+    "precision": {
+      "numerator": 33,
+      "denominator": 33,
+      "value": 1.0
+    },
+    "recall": {
+      "numerator": 33,
+      "denominator": 43,
+      "value": 0.767442
+    },
+    "exact_match": {
+      "numerator": 41,
+      "denominator": 51,
+      "value": 0.803922
+    },
+    "unsupported_claim_rate": {
+      "numerator": 0,
+      "denominator": 33,
+      "value": 0.0
+    },
+    "not_reported_accuracy": {
+      "numerator": 8,
+      "denominator": 8,
+      "value": 1.0
+    },
+    "evidence_location_accuracy": {
+      "numerator": 33,
+      "denominator": 43,
+      "value": 0.767442
+    }
+  },
+  "by_field_family": {
+    "data": {
+      "precision": {
+        "numerator": 14,
+        "denominator": 14,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 14,
+        "denominator": 19,
+        "value": 0.736842
+      },
+      "exact_match": {
+        "numerator": 16,
+        "denominator": 21,
+        "value": 0.761905
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 14,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 2,
+        "denominator": 2,
+        "value": 1.0
+      },
+      "evidence_location_accuracy": {
+        "numerator": 14,
+        "denominator": 19,
+        "value": 0.736842
+      }
+    },
+    "architecture": {
+      "precision": {
+        "numerator": 4,
+        "denominator": 4,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 4,
+        "denominator": 4,
+        "value": 1.0
+      },
+      "exact_match": {
+        "numerator": 6,
+        "denominator": 6,
+        "value": 1.0
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 4,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 2,
+        "denominator": 2,
+        "value": 1.0
+      },
+      "evidence_location_accuracy": {
+        "numerator": 4,
+        "denominator": 4,
+        "value": 1.0
+      }
+    },
+    "training": {
+      "precision": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "exact_match": {
+        "numerator": 6,
+        "denominator": 6,
+        "value": 1.0
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 3,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "evidence_location_accuracy": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      }
+    },
+    "objective": {
+      "precision": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "exact_match": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 3,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "evidence_location_accuracy": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
+      }
+    },
+    "evaluation": {
+      "precision": {
+        "numerator": 5,
+        "denominator": 5,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 5,
+        "denominator": 8,
+        "value": 0.625
+      },
+      "exact_match": {
+        "numerator": 6,
+        "denominator": 9,
+        "value": 0.666667
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 5,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 1,
+        "denominator": 1,
+        "value": 1.0
+      },
+      "evidence_location_accuracy": {
+        "numerator": 5,
+        "denominator": 8,
+        "value": 0.625
+      }
+    },
+    "results": {
+      "precision": {
+        "numerator": 2,
+        "denominator": 2,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
+      },
+      "exact_match": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 2,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "evidence_location_accuracy": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
+      }
+    },
+    "limitations": {
+      "precision": {
+        "numerator": 2,
+        "denominator": 2,
+        "value": 1.0
+      },
+      "recall": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
+      },
+      "exact_match": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
+      },
+      "unsupported_claim_rate": {
+        "numerator": 0,
+        "denominator": 2,
+        "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "evidence_location_accuracy": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
+      }
+    }
+  }
+}

@@ -4,7 +4,9 @@ from fastapi.testclient import TestClient
 
 from ocean_research_hub.api import create_app
 from ocean_research_hub.ingestion.models import MetadataPayload
-from ocean_research_hub.ingestion.pdf import ParsedPage, ParsedPdf, PdfParser, ScientificExtractor
+from ocean_research_hub.ingestion.pdf import (
+    EvidenceSelector, EvidenceValidator, ParsedPage, ParsedPdf, PdfParser, ScientificExtractor,
+)
 from ocean_research_hub.ingestion.repository import SqlitePaperRepository
 
 
@@ -67,3 +69,18 @@ def test_malformed_pdf_is_not_reported_as_an_empty_scientific_record(tmp_path: P
         response = client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "PARSER_ERROR"
+
+
+def test_evidence_validator_rejects_wrong_page_and_unlocatable_text() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(2124, "We use a single GPU and Adam optimizer.")],
+        source_name="paper.pdf",
+    )
+    validator = EvidenceValidator()
+
+    assert validator.locate(parsed, EvidenceSelector(2123, "3.3", "paragraph", r"Adam")) is None
+    assert validator.locate(parsed, EvidenceSelector(2124, "3.3", "paragraph", r"AdamW")) is None
+    evidence = validator.locate(parsed, EvidenceSelector(2124, "3.3", "paragraph", r"Adam optimizer"))
+    assert evidence is not None
+    assert evidence.page == 2124
+    assert evidence.evidence == "Adam optimizer"

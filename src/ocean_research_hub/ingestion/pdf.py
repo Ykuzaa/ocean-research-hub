@@ -150,6 +150,38 @@ class EvidenceValidator:
             evidence_url=selector.evidence_url,
         )
 
+    MIN_FREE_TEXT_EVIDENCE_LENGTH = 20
+
+    def locate_free_text(
+        self, parsed: ParsedPdf, *, page: int, section: str | None, evidence: str,
+        origin: SourceOrigin, evidence_url: str | None,
+    ) -> SourceEvidence | None:
+        """Verify a freely proposed (e.g. LLM-authored) quote against the real page.
+
+        Unlike :meth:`locate`, there is no regex pattern to anchor against: the
+        caller supplies the exact snippet it claims is on the page, and this
+        independently confirms it is literally present before any value derived
+        from it may be stored. A short snippet is rejected outright because a
+        few generic words can appear on almost any page by coincidence.
+        """
+        cleaned = normalize_text(evidence)
+        if len(cleaned) < self.MIN_FREE_TEXT_EVIDENCE_LENGTH:
+            return None
+        pages = (
+            parsed.supplementary_pages
+            if origin is SourceOrigin.SUPPLEMENTARY_MATERIAL
+            else parsed.pages
+        )
+        located_page = next((item for item in pages if item.page == page), None)
+        if located_page is None:
+            return None
+        if cleaned.lower() not in normalize_text(located_page.text).lower():
+            return None
+        return SourceEvidence(
+            origin=origin, page=page, section=section, locator="LLM-proposed evidence",
+            evidence=cleaned, evidence_url=evidence_url,
+        )
+
     @staticmethod
     def supports_normalization(value: Any, sources: list[SourceEvidence]) -> bool:
         """Require every normalized value component to retain source anchors.
@@ -287,6 +319,61 @@ FOURDVAR_PRIORITY_PATHS = {
 }
 
 
+def resolve_field_target(record: PaperRecord, path: str) -> tuple[BaseModel, str, EvidenceField[Any]]:
+    target: BaseModel = record
+    parts = path.split(".")
+    for part in parts[:-1]:
+        target = getattr(target, part)
+    return target, parts[-1], getattr(target, parts[-1])
+
+
+def set_extracted_field(
+    record: PaperRecord, path: str, value: Any, sources: list[SourceEvidence],
+    limitation: bool = False,
+) -> None:
+    """Store an evidence-backed claim, or fork to CONFLICT on a contradicting repeat.
+
+    Shared by every extraction path (deterministic rules, the generic fallback,
+    and LLM-proposed claims) so a claim from one mechanism can be recognised as
+    contradicting a claim already stored by another.
+    """
+    target, name, current = resolve_field_target(record, path)
+    if current.status is VerificationStatus.NOT_VERIFIED and current.value != value:
+        old_source = current.source.model_copy(update={"claimed_value": current.value})
+        new_source = sources[0].model_copy(update={"claimed_value": value})
+        setattr(target, name, current.__class__.model_validate({
+            "status": VerificationStatus.CONFLICT, "value": None,
+            "conflict_values": [current.value, value],
+            "provenance_type": current.provenance_type, "confidence": current.confidence,
+            "source": old_source, "sources": [new_source],
+        }))
+        return
+    setattr(target, name, current.__class__.model_validate({
+        "value": value, "status": VerificationStatus.NOT_VERIFIED,
+        "provenance_type": ProvenanceType.AUTHOR_REPORTED_LIMITATION if limitation else ProvenanceType.AUTHOR_REPORTED_FACT,
+        "confidence": 0.9, "source": sources[0], "sources": sources[1:],
+    }))
+
+
+def mark_extraction_error(record: PaperRecord, path: str, limitation: bool = False) -> None:
+    target, name, current = resolve_field_target(record, path)
+    setattr(target, name, current.__class__.model_validate({
+        "status": VerificationStatus.EXTRACTION_ERROR,
+        "provenance_type": ProvenanceType.AUTHOR_REPORTED_LIMITATION if limitation else ProvenanceType.AUTHOR_REPORTED_FACT,
+    }))
+
+
+def iter_evidence_fields(record: PaperRecord) -> Iterable[EvidenceField[Any]]:
+    def walk(model: BaseModel) -> Iterable[EvidenceField[Any]]:
+        for name in type(model).model_fields:
+            value = getattr(model, name)
+            if isinstance(value, EvidenceField):
+                yield value
+            elif isinstance(value, BaseModel):
+                yield from walk(value)
+    return walk(record)
+
+
 class ScientificExtractor:
     """Deterministic extractor whose populated claims must pass the evidence gate."""
 
@@ -346,38 +433,15 @@ class ScientificExtractor:
 
     @staticmethod
     def _target(record: PaperRecord, path: str) -> tuple[BaseModel, str, EvidenceField[Any]]:
-        target: BaseModel = record
-        parts = path.split(".")
-        for part in parts[:-1]:
-            target = getattr(target, part)
-        return target, parts[-1], getattr(target, parts[-1])
+        return resolve_field_target(record, path)
 
     @classmethod
     def _set(cls, record: PaperRecord, path: str, value: Any, sources: list[SourceEvidence], limitation: bool = False) -> None:
-        target, name, current = cls._target(record, path)
-        if current.status is VerificationStatus.NOT_VERIFIED and current.value != value:
-            old_source = current.source.model_copy(update={"claimed_value": current.value})
-            new_source = sources[0].model_copy(update={"claimed_value": value})
-            setattr(target, name, current.__class__.model_validate({
-                "status": VerificationStatus.CONFLICT, "value": None,
-                "conflict_values": [current.value, value],
-                "provenance_type": current.provenance_type, "confidence": current.confidence,
-                "source": old_source, "sources": [new_source],
-            }))
-            return
-        setattr(target, name, current.__class__.model_validate({
-            "value": value, "status": VerificationStatus.NOT_VERIFIED,
-            "provenance_type": ProvenanceType.AUTHOR_REPORTED_LIMITATION if limitation else ProvenanceType.AUTHOR_REPORTED_FACT,
-            "confidence": 0.9, "source": sources[0], "sources": sources[1:],
-        }))
+        set_extracted_field(record, path, value, sources, limitation)
 
     @classmethod
     def _mark_error(cls, record: PaperRecord, path: str, limitation: bool = False) -> None:
-        target, name, current = cls._target(record, path)
-        setattr(target, name, current.__class__.model_validate({
-            "status": VerificationStatus.EXTRACTION_ERROR,
-            "provenance_type": ProvenanceType.AUTHOR_REPORTED_LIMITATION if limitation else ProvenanceType.AUTHOR_REPORTED_FACT,
-        }))
+        mark_extraction_error(record, path, limitation)
 
     @classmethod
     def _generic_extract(cls, record: PaperRecord, parsed: ParsedPdf) -> None:
@@ -405,14 +469,7 @@ class ScientificExtractor:
 
     @staticmethod
     def _fields(record: PaperRecord) -> Iterable[EvidenceField[Any]]:
-        def walk(model: BaseModel) -> Iterable[EvidenceField[Any]]:
-            for name in type(model).model_fields:
-                value = getattr(model, name)
-                if isinstance(value, EvidenceField):
-                    yield value
-                elif isinstance(value, BaseModel):
-                    yield from walk(value)
-        return walk(record)
+        return iter_evidence_fields(record)
 
 
 def read_pdf_path(path: str) -> tuple[bytes, str]:

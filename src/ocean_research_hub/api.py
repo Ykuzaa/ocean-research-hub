@@ -7,8 +7,15 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse
+
+# Loaded here (not just __main__) so GEMINI_API_KEY is present before
+# `app = create_app()` runs below, regardless of entry point (uvicorn's
+# import-string launch, `uv run ocean-research-hub`, or direct import in
+# tests). Never overrides a variable already set in the real environment.
+load_dotenv()
 
 from ocean_research_hub.ingestion.errors import (
     IngestionConflictError,
@@ -37,6 +44,7 @@ from ocean_research_hub.ingestion.repository import (
     PaperRepository,
     SqlitePaperRepository,
 )
+from ocean_research_hub.ingestion.semantic import GeminiClient, SemanticExtractor
 from ocean_research_hub.ingestion.service import PaperIngestionService
 from ocean_research_hub.landing import (
     LandingDrilldownResponse,
@@ -54,15 +62,31 @@ def create_app(
     parsed_paper_provider: ParsedPaperProvider | None = None,
     pdf_parser: PdfParser | None = None,
     scientific_extractor: ScientificExtractor | None = None,
+    semantic_extractor: SemanticExtractor | None | bool = None,
 ) -> FastAPI:
     database_path = Path(os.getenv("OCEAN_HUB_DB_PATH", ".data/ocean-research-hub.db"))
     paper_repository = repository or SqlitePaperRepository(database_path)
+    # `semantic_extractor=False` explicitly disables the LLM step even when a
+    # key is configured; leaving the parameter out auto-enables it from the
+    # environment so `uv run ocean-research-hub` picks up GEMINI_API_KEY
+    # without extra wiring, while tests that never set the env var stay
+    # network-free by default.
+    resolved_semantic_extractor: SemanticExtractor | None
+    if semantic_extractor is False:
+        resolved_semantic_extractor = None
+    elif isinstance(semantic_extractor, SemanticExtractor):
+        resolved_semantic_extractor = semantic_extractor
+    elif os.environ.get("GEMINI_API_KEY"):
+        resolved_semantic_extractor = SemanticExtractor(client=GeminiClient())
+    else:
+        resolved_semantic_extractor = None
     service = PaperIngestionService(
         repository=paper_repository,
         metadata_provider=metadata_provider or CrossrefMetadataProvider(),
         parsed_paper_provider=parsed_paper_provider or StructuredPayloadParser(),
         pdf_parser=pdf_parser,
         scientific_extractor=scientific_extractor,
+        semantic_extractor=resolved_semantic_extractor,
     )
 
     @asynccontextmanager

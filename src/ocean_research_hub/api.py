@@ -44,7 +44,7 @@ from ocean_research_hub.ingestion.repository import (
     PaperRepository,
     SqlitePaperRepository,
 )
-from ocean_research_hub.ingestion.semantic import GeminiClient, SemanticExtractor
+from ocean_research_hub.ingestion.semantic import AnthropicClient, GeminiClient, SemanticExtractor
 from ocean_research_hub.ingestion.service import PaperIngestionService
 from ocean_research_hub.landing import (
     LandingDrilldownResponse,
@@ -68,14 +68,18 @@ def create_app(
     paper_repository = repository or SqlitePaperRepository(database_path)
     # `semantic_extractor=False` explicitly disables the LLM step even when a
     # key is configured; leaving the parameter out auto-enables it from the
-    # environment so `uv run ocean-research-hub` picks up GEMINI_API_KEY
-    # without extra wiring, while tests that never set the env var stay
-    # network-free by default.
+    # environment so `uv run ocean-research-hub` picks up a configured key
+    # without extra wiring, while tests that never set either env var stay
+    # network-free by default. ANTHROPIC_API_KEY takes priority when both are
+    # set - Claude is the preferred provider; Gemini remains a cheaper option
+    # for callers who only configure that key.
     resolved_semantic_extractor: SemanticExtractor | None
     if semantic_extractor is False:
         resolved_semantic_extractor = None
     elif isinstance(semantic_extractor, SemanticExtractor):
         resolved_semantic_extractor = semantic_extractor
+    elif os.environ.get("ANTHROPIC_API_KEY"):
+        resolved_semantic_extractor = SemanticExtractor(client=AnthropicClient())
     elif os.environ.get("GEMINI_API_KEY"):
         resolved_semantic_extractor = SemanticExtractor(client=GeminiClient())
     else:

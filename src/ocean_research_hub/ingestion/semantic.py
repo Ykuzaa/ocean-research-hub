@@ -27,6 +27,7 @@ from .pdf import (
 )
 
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash"
+DEFAULT_ANTHROPIC_MODEL = "claude-opus-5"
 
 
 class SemanticExtractionError(RuntimeError):
@@ -74,6 +75,52 @@ class GeminiClient:
         if not response.text:
             raise SemanticExtractionError("Gemini returned no text content")
         return response.text
+
+
+class AnthropicClient:
+    """Thin wrapper around the Claude API used for semantic claim proposal."""
+
+    def __init__(
+        self, *, api_key: str | None = None, model: str | None = None,
+        timeout_ms: int = 180_000,
+    ) -> None:
+        # Imported lazily: constructing an AnthropicClient is the only thing
+        # that should require the anthropic package and an API key at runtime.
+        import anthropic
+
+        resolved_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
+        if not resolved_key:
+            raise SemanticExtractionError("ANTHROPIC_API_KEY is not set")
+        self._client = anthropic.Anthropic(api_key=resolved_key, timeout=timeout_ms / 1000)
+        self._model = model or os.environ.get("ANTHROPIC_MODEL", DEFAULT_ANTHROPIC_MODEL)
+
+    def propose_claims(self, prompt: str) -> str:
+        # A paper with many unresolved fields can make Claude generate a long
+        # JSON response; a non-streaming call risks the connection-level
+        # timeout Anthropic documents for long-running requests. Streaming
+        # keeps the connection alive as tokens arrive instead. Opus 5's
+        # adaptive thinking is on by default and can consume most of a small
+        # max_tokens budget before any visible output is written (observed:
+        # 13k+ thinking tokens against a 16k cap on a 92-field extraction,
+        # truncating the JSON) - this task is mechanical quote-matching, not
+        # deep reasoning, so a lower effort leaves the budget for output.
+        try:
+            with self._client.messages.stream(
+                model=self._model, max_tokens=64000,
+                output_config={"effort": "medium"},
+                messages=[{"role": "user", "content": prompt}],
+            ) as stream:
+                response = stream.get_final_message()
+        except Exception as exc:  # any transport/API failure is a hard error, never silent
+            raise SemanticExtractionError(f"Claude request failed: {exc}") from exc
+        if response.stop_reason == "max_tokens":
+            raise SemanticExtractionError(
+                "Claude response was truncated at the max_tokens limit before completing"
+            )
+        text = "".join(block.text for block in response.content if block.type == "text")
+        if not text:
+            raise SemanticExtractionError("Claude returned no text content")
+        return text
 
 
 class _LLMClaim(BaseModel):
@@ -197,6 +244,18 @@ no markdown fences, no commentary.
 {primary_block}{supplement_section}"""
 
 
+def _strip_markdown_fence(text: str) -> str:
+    """Tolerate a ```json ... ``` wrapper some models add despite instructions not to."""
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        stripped = stripped.split("\n", 1)[-1]
+        if stripped.endswith("```"):
+            stripped = stripped[: -len("```")]
+        elif "```" in stripped:
+            stripped = stripped.rsplit("```", 1)[0]
+    return stripped.strip()
+
+
 @dataclass(frozen=True)
 class SemanticExtractionResult:
     accepted: list[str]
@@ -229,7 +288,7 @@ class SemanticExtractor:
 
         raw = self.client.propose_claims(_build_prompt(parsed, pending))
         try:
-            payload = json.loads(raw)
+            payload = json.loads(_strip_markdown_fence(raw))
         except json.JSONDecodeError as exc:
             raise SemanticExtractionError("semantic extraction returned invalid JSON") from exc
         if isinstance(payload, dict):

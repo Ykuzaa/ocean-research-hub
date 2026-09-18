@@ -39,6 +39,7 @@ from .models import (
 from .providers import MetadataProvider, ParsedPaperProvider
 from .pdf import PdfParser, ScientificExtractor, read_pdf_path
 from .repository import PaperRepository
+from .semantic import SemanticExtractionError, SemanticExtractor
 
 DOI_PATTERN = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
 
@@ -70,12 +71,14 @@ class PaperIngestionService:
         parsed_paper_provider: ParsedPaperProvider,
         pdf_parser: PdfParser | None = None,
         scientific_extractor: ScientificExtractor | None = None,
+        semantic_extractor: SemanticExtractor | None = None,
     ) -> None:
         self.repository = repository
         self.metadata_provider = metadata_provider
         self.parsed_paper_provider = parsed_paper_provider
         self.pdf_parser = pdf_parser or PdfParser()
         self.scientific_extractor = scientific_extractor or ScientificExtractor()
+        self.semantic_extractor = semantic_extractor
 
     async def ingest(self, request: IngestPaperRequest) -> IngestPaperResponse:
         requested_doi = normalize_doi(request.doi) if request.doi else None
@@ -124,6 +127,23 @@ class PaperIngestionService:
             record = extracted.record
             extraction_warnings.extend(extracted.warnings)
             extraction_warnings.append("scientific search scope: " + "; ".join(extracted.search_scope))
+            if self.semantic_extractor is not None:
+                try:
+                    semantic_result = self.semantic_extractor.extract(parsed_pdf, record)
+                except SemanticExtractionError as exc:
+                    extraction_warnings.append(f"semantic extraction unavailable: {exc}")
+                else:
+                    if semantic_result.accepted:
+                        extraction_warnings.append(
+                            "semantic extraction populated: " + ", ".join(semantic_result.accepted)
+                        )
+                    if semantic_result.rejected:
+                        extraction_warnings.append(
+                            "semantic extraction proposed but could not verify: "
+                            + ", ".join(semantic_result.rejected)
+                        )
+            else:
+                extraction_warnings.append("semantic extraction skipped: no LLM client configured")
             workflow_status = PaperWorkflowStatus.EXTRACTED
         elif request.parsed_paper is None:
             record = PaperRecord()

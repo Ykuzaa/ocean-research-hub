@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -8,6 +9,7 @@ from ocean_research_hub.ingestion.pdf import (
     EvidenceSelector, EvidenceValidator, ParsedPage, ParsedPdf, PdfParser, ScientificExtractor,
 )
 from ocean_research_hub.ingestion.repository import SqlitePaperRepository
+from ocean_research_hub.ingestion.semantic import SemanticExtractionError, SemanticExtractor
 
 
 class StubPdfParser(PdfParser):
@@ -193,3 +195,83 @@ def test_profile_cannot_emit_specific_loss_components_from_generic_loss_phrase()
 
     assert field.status.name == "EXTRACTION_ERROR"
     assert field.value is None
+
+
+class _FakeSemanticLLMClient:
+    def __init__(self, payload: object) -> None:
+        self.payload = payload
+
+    def propose_claims(self, prompt: str) -> str:
+        return json.dumps(self.payload)
+
+
+class _ExplodingSemanticLLMClient:
+    def propose_claims(self, prompt: str) -> str:
+        raise SemanticExtractionError("simulated Gemini outage")
+
+
+def test_ingestion_reports_fields_populated_by_the_configured_semantic_extractor(
+    tmp_path: Path,
+) -> None:
+    pdf = tmp_path / "xihe.pdf"
+    pdf.write_bytes(b"%PDF-1.7 fixture")
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    client = _FakeSemanticLLMClient([
+        {
+            # data.time_coverage is untouched by ScientificExtractor's generic
+            # fallback (unlike data.spatial_resolution, which the same source
+            # sentence would already satisfy), so this exercises the semantic
+            # path specifically rather than the deterministic one.
+            "path": "data.time_coverage", "value": "1/12 degree", "page": 1, "section": None,
+            "evidence": "The spatial resolution is 1/12 degree.", "origin": "PRIMARY_PAPER",
+        },
+    ])
+    app = create_app(
+        repository=repository, pdf_parser=StubPdfParser(),
+        semantic_extractor=SemanticExtractor(client=client),
+    )
+
+    with TestClient(app) as test_client:
+        response = test_client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
+
+    result = response.json()["paper"]
+    assert result["record"]["data"]["time_coverage"]["value"] == "1/12 degree"
+    assert any(
+        "semantic extraction populated" in warning and "data.time_coverage" in warning
+        for warning in result["warnings"]
+    )
+
+
+def test_ingestion_survives_a_semantic_extractor_failure_with_a_visible_warning(
+    tmp_path: Path,
+) -> None:
+    pdf = tmp_path / "xihe.pdf"
+    pdf.write_bytes(b"%PDF-1.7 fixture")
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    app = create_app(
+        repository=repository, pdf_parser=StubPdfParser(),
+        semantic_extractor=SemanticExtractor(client=_ExplodingSemanticLLMClient()),
+    )
+
+    with TestClient(app) as test_client:
+        response = test_client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
+
+    assert response.status_code == 201
+    result = response.json()["paper"]
+    assert any(
+        "semantic extraction unavailable" in warning and "simulated Gemini outage" in warning
+        for warning in result["warnings"]
+    )
+
+
+def test_ingestion_notes_when_no_semantic_extractor_is_configured(tmp_path: Path) -> None:
+    pdf = tmp_path / "xihe.pdf"
+    pdf.write_bytes(b"%PDF-1.7 fixture")
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    app = create_app(repository=repository, pdf_parser=StubPdfParser())
+
+    with TestClient(app) as test_client:
+        response = test_client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
+
+    result = response.json()["paper"]
+    assert any("semantic extraction skipped" in warning for warning in result["warnings"])

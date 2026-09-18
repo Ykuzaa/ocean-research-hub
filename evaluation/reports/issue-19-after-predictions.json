@@ -182,7 +182,7 @@
           "path": "training.learning_rate",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -212,7 +212,7 @@
           "path": "evaluation.forecast_horizon",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -344,7 +344,7 @@
             "section": "4.2.1 Fourier Neural Operator (FNO)",
             "page": 12,
             "locator": "opening paragraph",
-            "evidence": "X(t + 5∆t) (label), and X(t + 10∆t) (label), where ∆t = 1 day. For training OceanNet in the northwest Atlantic region, the labels are X(t + 4∆t) and X(t + 8",
+            "evidence": "Training utilizes labeled pairs of historical 5-day mean SSH data in the GoM (section 4.1), X(t) (input), X(t + 5∆t) (label), and X(t + 10∆t) (label), where ∆t = 1 day. For training OceanNet in the northwest Atlantic region, the labels are X(t + 4∆t) and X(t + 8",
             "origin": "PRIMARY_PAPER",
             "claimed_value": null
           },
@@ -369,7 +369,7 @@
           "path": "data.splits.validation",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -432,7 +432,7 @@
           "path": "architecture.activations",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -447,7 +447,7 @@
           "path": "training.optimizer",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -462,7 +462,7 @@
           "path": "training.learning_rate",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -617,7 +617,7 @@
           "path": "data.inputs",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -632,7 +632,7 @@
           "path": "data.outputs",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -647,7 +647,7 @@
           "path": "data.splits.train",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -662,7 +662,7 @@
           "path": "data.splits.validation",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -677,7 +677,7 @@
           "path": "data.splits.test",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -725,7 +725,7 @@
           "path": "architecture.activations",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -785,7 +785,7 @@
           "path": "evaluation.forecast_horizon",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -800,7 +800,7 @@
           "path": "evaluation.baselines",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -815,7 +815,7 @@
           "path": "evaluation.metrics",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -830,7 +830,7 @@
           "path": "results.headline",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,
@@ -845,7 +845,7 @@
           "path": "limitations.author_reported",
           "value": null,
           "conflict_values": [],
-          "status": "NOT_REPORTED",
+          "status": "EXTRACTION_ERROR",
           "source": {
             "section": null,
             "page": null,

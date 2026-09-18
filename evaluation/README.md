@@ -73,7 +73,9 @@ uv run ocean-research-hub-real-pdf-benchmark \
 
 Downloaded PDFs are kept under the ignored `.data/golden-pdfs/` directory. The
 runner never marks an extracted scientific claim `VERIFIED`; the audit report has
-an explicit Scientific Auditor confirmation column for the independent gate.
+an explicit Scientific Auditor confirmation column for the independent gate. A
+PDF-only run has no supplementary-material search scope, so unset fields are
+benchmarked as `EXTRACTION_ERROR`, not credited as `NOT_REPORTED`.
 
 For a no-extraction smoke run (all fields intentionally missing), use:
 

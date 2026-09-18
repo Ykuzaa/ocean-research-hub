@@ -226,8 +226,9 @@ def test_table_caption_and_appendix_claims_round_trip_without_filling_absent_fie
             "origin": None,
             "claimed_value": None,
         },
-        "sources": [],
-        "verified_by": None,
+            "sources": [],
+            "absence_search_scope": [],
+            "verified_by": None,
         "verified_at": None,
     }
 

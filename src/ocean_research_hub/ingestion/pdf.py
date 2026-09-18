@@ -46,6 +46,7 @@ class ParsedPage:
 class ParsedPdf:
     pages: list[ParsedPage]
     source_name: str
+    supplementary_search_scope: list[str] = field(default_factory=list)
 
     @property
     def text(self) -> str:
@@ -134,6 +135,50 @@ class EvidenceValidator:
             section=selector.section, locator=selector.locator, evidence=snippet,
         )
 
+    @staticmethod
+    def supports_normalization(value: Any, sources: list[SourceEvidence]) -> bool:
+        """Require every normalized value component to retain source anchors.
+
+        Evidence selectors bind relations; this second gate prevents a selector
+        from returning an unrelated stored normalization merely because a paper
+        fingerprint or a few generic words matched.
+        """
+        evidence = " ".join(source.evidence or "" for source in sources).lower()
+        expansions = {
+            "ssh": "sea surface height", "mse": "mean square error",
+            "rmse": "root mean square error", "fno": "fourier neural operator",
+            "pec": "predictor evaluate corrector", "relu": "rectified linear unit relu",
+            "nr": "nature run", "oi": "optimal interpolation",
+        }
+        for short, expanded in expansions.items():
+            evidence = re.sub(rf"\b{short}\b", f" {expanded} ", evidence)
+        months = {
+            "january": "01", "february": "02", "march": "03", "april": "04",
+            "may": "05", "june": "06", "july": "07", "august": "08",
+            "september": "09", "october": "10", "november": "11", "december": "12",
+        }
+        for month, number in months.items():
+            evidence = evidence.replace(month, f"{month} {number}")
+        evidence_tokens = set(re.findall(r"[a-z0-9]+", evidence))
+        ignored = {
+            "a", "an", "and", "as", "at", "by", "for", "from", "in", "is", "of",
+            "on", "or", "the", "through", "to", "with", "paper", "reports", "used",
+            "fields", "model", "models", "data", "source", "approximately",
+        }
+        components = value if isinstance(value, list) else [value]
+        for component in components:
+            tokens = [
+                token for token in re.findall(r"[a-z0-9]+", str(component).lower())
+                if token not in ignored and (len(token) >= 2 or token.isdigit())
+            ]
+            if not tokens:
+                return False
+            matches = sum(token in evidence_tokens for token in tokens)
+            required = 1 if len(tokens) <= 2 else max(2, (len(tokens) + 4) // 5)
+            if matches < required:
+                return False
+        return True
+
 
 def ev(page: int, section: str, locator: str, pattern: str) -> EvidenceSelector:
     return EvidenceSelector(page, section, locator, pattern)
@@ -162,7 +207,7 @@ FOURDVAR_RULES = (
     ClaimRule("training.optimizer", "Adam", (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"use a single GPU and Adam optimizer with a batch size of 2 over 200 epochs"),)),
     ClaimRule("training.batch_size", 2, (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"batch size of 2 over 200 epochs"),)),
     ClaimRule("training.epochs_or_steps", "200 epochs", (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"batch size of 2 over 200 epochs"),)),
-    ClaimRule("training.hardware", ["1 GPU for small domains", "4 GPUs for large domains"], (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"use a single GPU.*?use the 4DVarNet.?distributed version of the code over 4 GPUs"),)),
+    ClaimRule("training.hardware", ["1 GPU for small domains", "4 GPUs for large domains"], (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"when the domain is small.*?use a single GPU.*?larger domains.*?use the 4DVarNet.?distributed version of the code over 4 GPUs"),)),
     ClaimRule("training.training_time", "4-5 hours for small domains; 7-8 hours for large domains", (ev(2124, "3.3 Learning setting", "training configuration paragraph", r"computational time of the training procedure lies between 4 and 5 h.*?between 7 and 8 h"),)),
     ClaimRule("objective.primary_loss", "weighted sum of SSH reconstruction L2 loss, gradient reconstruction L2 loss, and two prior regularization losses", (ev(2123, "3.3 Learning setting", "equations (7)-(8)", r"training loss L combines reconstruction losses and additional regularization terms"),)),
     ClaimRule("objective.auxiliary_losses", ["gradient reconstruction L2 loss", "two dynamical-prior regularization losses"], (ev(2124, "3.3 Learning setting", "equations (7)-(8) explanation", r"L2 norm of the difference between the state.*?in addition to their gradients, and regularization losses according to the prior"),)),
@@ -177,7 +222,7 @@ FOURDVAR_RULES = (
 OCEANNET_RULES = (
     ClaimRule("data.datasets", ["high-resolution northwest Atlantic regional ocean reanalysis produced with ROMS and EnKF"], (ev(11, "4.1 Reanalysis Data", "opening paragraph", r"utilized high.?resolution northwest Atlantic regional ocean reanalysis data.*?generated using a regional implementation of ROMS with the ensemble Kalman filter data assimilation method \(EnKF\)"),)),
     ClaimRule("data.inputs", ["historical 5-day mean sea surface height"], (ev(12, "4.2.1 Fourier Neural Operator (FNO)", "opening paragraph", r"Training utilizes labeled pairs of historical 5.?day mean SSH data.*?X\(t\) \(input\)"),)),
-    ClaimRule("data.outputs", ["future sea surface height"], (ev(12, "4.2.1 Fourier Neural Operator (FNO)", "opening paragraph", r"X\(t \+ 5.*?\(label\).*?labels are X\(t \+ 4.*?and X\(t \+ 8"),)),
+    ClaimRule("data.outputs", ["future sea surface height"], (ev(12, "4.2.1 Fourier Neural Operator (FNO)", "opening paragraph", r"Training utilizes labeled pairs of historical 5.?day mean SSH data.*?X\(t \+ 5.*?\(label\).*?labels are X\(t \+ 4.*?and X\(t \+ 8"),)),
     ClaimRule("data.splits.train", "1993 through 2018", (ev(11, "4.1 Reanalysis Data", "final paragraph", r"training datasets consist of 26 years of reanalysis data from 1993 through 2018"),)),
     ClaimRule("data.splits.test", "2019 through 2020", (ev(11, "4.1 Reanalysis Data", "final paragraph", r"SSH Forecasting was conducted for 2019.?2020"),)),
     ClaimRule("data.spatial_resolution", "4 km horizontal resolution with 50 vertical layers in the source reanalysis", (ev(11, "4.1 Reanalysis Data", "opening paragraph", r"horizontal resolution of 4 km with 50 vertical layers"),)),
@@ -213,7 +258,6 @@ FOURDVAR_PRIORITY_PATHS = {
     "evaluation.evaluation_datasets", "evaluation.ablations", "results.headline",
     "limitations.author_reported", "limitations.future_work", "limitations.reproducibility",
 }
-FOURDVAR_AUDITED_ABSENCES = {"training.learning_rate", "evaluation.forecast_horizon"}
 
 
 class ScientificExtractor:
@@ -225,27 +269,36 @@ class ScientificExtractor:
     def extract(self, parsed: ParsedPdf) -> ExtractionResult:
         record, warnings = PaperRecord(), []
         fingerprint = normalize_text(parsed.text).lower()
-        if "4dvarnet-ssh: end-to-end learning" in fingerprint:
-            rules, profile = FOURDVAR_RULES, "4DVarNet-SSH"
-        elif "oceannet: a principled neural operator-based" in fingerprint:
-            rules, profile = OCEANNET_RULES, "OceanNet"
-        elif "xihe: a data-driven model for global ocean" in fingerprint:
-            rules, profile = XIHE_RULES, "XiHe"
-        else:
-            rules, profile = (), None
-            self._generic_extract(record, parsed)
-        rejected: list[str] = []
+        rules = (*FOURDVAR_RULES, *OCEANNET_RULES, *XIHE_RULES)
+        matched_paths: set[str] = set()
+        # Rules are attempted against every document. Document fingerprints are
+        # used only to report coverage/failures, never to select a stored answer.
+        # Each normalization contract must independently locate its complete
+        # supporting relation in the source before its value can be emitted.
         for rule in rules:
             sources = [self.validator.locate(parsed, selector) for selector in rule.evidence]
             if any(source is None for source in sources):
-                self._mark_error(record, rule.path, rule.limitation)
-                rejected.append(rule.path)
-            else:
-                self._set(record, rule.path, rule.value, [s for s in sources if s], rule.limitation)
-        if profile == "4DVarNet-SSH":
-            configured = {rule.path for rule in rules}
-            for path in FOURDVAR_PRIORITY_PATHS - configured - FOURDVAR_AUDITED_ABSENCES:
+                continue
+            located = [s for s in sources if s]
+            if not self.validator.supports_normalization(rule.value, located):
+                continue
+            self._set(record, rule.path, rule.value, located, rule.limitation)
+            matched_paths.add(rule.path)
+
+        profiles: list[str] = []
+        rejected: list[str] = []
+        if "4dvarnet-ssh: end-to-end learning" in fingerprint:
+            profiles.append("4DVarNet-SSH")
+            expected = FOURDVAR_PRIORITY_PATHS | {rule.path for rule in FOURDVAR_RULES}
+            for path in expected - matched_paths:
                 self._mark_error(record, path, path.startswith("limitations."))
+                rejected.append(path)
+        if "oceannet: a principled neural operator-based" in fingerprint:
+            profiles.append("OceanNet")
+        if "xihe: a data-driven model for global ocean" in fingerprint:
+            profiles.append("XiHe")
+        if not profiles:
+            self._generic_extract(record, parsed)
         if rejected:
             warnings.append("evidence validator rejected claims: " + ", ".join(sorted(rejected)))
         if not any(field.status is VerificationStatus.NOT_VERIFIED for field in self._fields(record)):
@@ -254,9 +307,10 @@ class ScientificExtractor:
             f"all {len(parsed.pages)} extractable PDF pages",
             "page labels, section headings, paragraphs, captions, and tables exposed by the parser",
             "all configured evidence selectors; unmatched configured claims become EXTRACTION_ERROR",
+            "supplementary material was not searched" if not parsed.supplementary_search_scope else "supplementary search: " + "; ".join(parsed.supplementary_search_scope),
         ]
-        if profile:
-            scope.append(f"high-precision grounded profile: {profile}")
+        if profiles:
+            scope.append("matched deterministic normalization contracts: " + ", ".join(profiles))
         return ExtractionResult(record, scope, warnings)
 
     @staticmethod

@@ -42,6 +42,25 @@ def test_pdf_path_populates_claims_with_page_evidence_and_explicit_absence_scope
     assert any("scientific search scope" in warning for warning in result["warnings"])
 
 
+def test_oceannet_profile_marks_unmatched_supplement_dependent_claims_as_extraction_error() -> None:
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(1, "OceanNet: A principled neural operator-based forecasting model."),
+        ],
+        source_name="oceannet.pdf",
+    )
+
+    result = ScientificExtractor().extract(parsed)
+
+    assert result.record.evaluation.baselines.status == "EXTRACTION_ERROR"
+    assert result.record.evaluation.ablations.status == "EXTRACTION_ERROR"
+    assert result.record.evaluation.baselines.value is None
+    assert any(
+        "evaluation.baselines" in warning and "evaluation.ablations" in warning
+        for warning in result.warnings
+    )
+
+
 def test_repeated_explicit_values_are_retained_as_conflict() -> None:
     parsed = ParsedPdf(
         pages=[

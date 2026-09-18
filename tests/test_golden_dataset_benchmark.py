@@ -62,15 +62,19 @@ def test_golden_corpus_covers_three_required_families_and_compact_subset() -> No
         "reconstruction_data_assimilation",
         "neural_operator_physics_ml",
     }
-    assert all(len(paper.fields) == 17 for paper in papers)
+    assert sorted(len(paper.fields) for paper in papers) == [17, 17, 18]
 
 
 def test_every_golden_label_has_audited_metadata_and_required_evidence() -> None:
     for paper in load_golden(GOLDEN_DIR):
         assert paper.curation_status == "AUDITED"
         for field in paper.fields:
-            assert field.verified_by == "scientific-auditor:issue-3"
-            assert field.verified_at.isoformat() == "2026-09-17T18:01:01+00:00"
+            expected_audit = {
+                "scientific-auditor:issue-3": "2026-09-17T18:01:01+00:00",
+                "scientific-auditor:issue-19": "2026-09-18T12:14:43+02:00",
+            }
+            assert field.verified_by in expected_audit
+            assert field.verified_at.isoformat() == expected_audit[field.verified_by]
             if field.status in {GoldenStatus.VERIFIED, GoldenStatus.CONFLICT}:
                 assert field.confidence == 1.0
                 assert any(
@@ -257,7 +261,7 @@ def test_perfect_predictions_score_all_metrics_exactly() -> None:
     report = benchmark(load_golden(GOLDEN_DIR), _perfect_predictions())
 
     assert report.paper_count == 3
-    assert report.field_count == 51
+    assert report.field_count == 52
     assert report.overall.precision.value == 1.0
     assert report.overall.recall.value == 1.0
     assert report.overall.exact_match.value == 1.0

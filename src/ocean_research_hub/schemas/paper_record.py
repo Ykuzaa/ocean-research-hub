@@ -54,6 +54,7 @@ class SourceEvidence(BaseModel):
     locator: str | None = None
     evidence: str | None = None
     origin: SourceOrigin | None = None
+    evidence_url: HttpUrl | None = None
     # Required for each record that supports one side of a CONFLICT field.
     # JsonValue preserves a typed, serializable link to the asserted value.
     claimed_value: JsonValue | None = None
@@ -83,7 +84,7 @@ class SourceEvidence(BaseModel):
     @property
     def is_supplied(self) -> bool:
         """Whether this is an intentional evidence record rather than the default shell."""
-        return any((self.section, self.page, self.locator, self.evidence, self.origin, self.claimed_value))
+        return any((self.section, self.page, self.locator, self.evidence, self.origin, self.evidence_url, self.claimed_value))
 
 
 T = TypeVar("T")

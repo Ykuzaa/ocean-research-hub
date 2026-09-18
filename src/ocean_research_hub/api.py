@@ -8,7 +8,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Query, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 
 # Loaded here (not just __main__) so GEMINI_API_KEY is present before
@@ -31,6 +32,8 @@ from ocean_research_hub.ingestion.models import (
     IngestPaperRequest,
     IngestPaperResponse,
     PaperComparisonResponse,
+    PaperListResponse,
+    PaperSummary,
     StoredPaper,
 )
 from ocean_research_hub.ingestion.providers import (
@@ -97,6 +100,14 @@ def create_app(
         version="0.1.0",
         lifespan=lifespan,
     )
+    # Local-only MVP: the frontend runs on a different origin/port (Next.js
+    # dev server) and calls this API directly from the browser.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=os.getenv("OCEAN_HUB_CORS_ORIGINS", "http://localhost:3000").split(","),
+        allow_methods=["GET", "POST"],
+        allow_headers=["content-type"],
+    )
 
     def error_response(status_code: int, error: Exception) -> JSONResponse:
         code = getattr(error, "code", "INGESTION_ERROR")
@@ -158,6 +169,24 @@ def create_app(
         if not result.created:
             response.status_code = 200
         return result
+
+    @app.get("/api/papers", response_model=PaperListResponse)
+    async def list_papers_api(
+        limit: int = Query(default=20, ge=1, le=100),
+        offset: int = Query(default=0, ge=0),
+    ) -> PaperListResponse:
+        papers, total = paper_repository.list_papers(limit=limit, offset=offset)
+        return PaperListResponse(
+            papers=[
+                PaperSummary(
+                    id=paper.id, title=paper.record.paper.title.value, doi=paper.doi,
+                    workflow_status=paper.workflow_status,
+                    created_at=paper.created_at, updated_at=paper.updated_at,
+                )
+                for paper in papers
+            ],
+            total=total,
+        )
 
     @app.get("/api/papers/compare", response_model=PaperComparisonResponse)
     async def compare_papers_api(

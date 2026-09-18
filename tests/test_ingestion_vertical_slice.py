@@ -646,6 +646,49 @@ def test_missing_or_invalid_ingest_identity_is_rejected(
     assert repository.count() == 0
 
 
+def test_listing_papers_returns_summaries_most_recently_updated_first(
+    repository: SqlitePaperRepository,
+) -> None:
+    with make_client(repository) as client:
+        first = client.post(
+            "/api/papers/ingest",
+            json={"parsed_paper": verified_title_payload("First ingested paper")},
+        )
+        second = client.post(
+            "/api/papers/ingest",
+            json={"parsed_paper": verified_title_payload("Second ingested paper")},
+        )
+        listed = client.get("/api/papers")
+
+    assert first.status_code == 201
+    assert second.status_code == 201
+    assert listed.status_code == 200
+    body = listed.json()
+    assert body["total"] == 2
+    assert [paper["title"] for paper in body["papers"]] == [
+        "Second ingested paper", "First ingested paper",
+    ]
+    assert body["papers"][0]["id"] == second.json()["paper"]["id"]
+    assert body["papers"][0]["workflow_status"] == "EXTRACTED"
+
+
+def test_listing_papers_supports_limit_and_offset(
+    repository: SqlitePaperRepository,
+) -> None:
+    with make_client(repository) as client:
+        for index in range(3):
+            client.post(
+                "/api/papers/ingest",
+                json={"parsed_paper": verified_title_payload(f"Paper {index}")},
+            )
+        first_page = client.get("/api/papers", params={"limit": 2, "offset": 0})
+        second_page = client.get("/api/papers", params={"limit": 2, "offset": 2})
+
+    assert first_page.json()["total"] == 3
+    assert len(first_page.json()["papers"]) == 2
+    assert len(second_page.json()["papers"]) == 1
+
+
 def test_crossref_mapping_tolerates_missing_or_malformed_optional_dates() -> None:
     missing = CrossrefMetadataProvider._to_metadata({"title": ["No date"]})
     malformed = CrossrefMetadataProvider._to_metadata(

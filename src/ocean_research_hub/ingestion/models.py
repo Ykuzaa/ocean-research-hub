@@ -122,6 +122,26 @@ class IngestPaperResponse(BaseModel):
     paper: StoredPaper
 
 
+class PaperSummary(BaseModel):
+    """A light-weight row for list views; full evidence lives at GET /api/papers/{id}."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    title: str | None
+    doi: str | None
+    workflow_status: PaperWorkflowStatus
+    created_at: datetime
+    updated_at: datetime
+
+
+class PaperListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    papers: list[PaperSummary]
+    total: int
+
+
 class PaperComparisonResponse(BaseModel):
     """An ordered pair of canonical records for deterministic comparison."""
 

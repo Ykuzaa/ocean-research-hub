@@ -42,6 +42,8 @@ class PaperRepository(Protocol):
 
     def get(self, paper_id: str) -> StoredPaper: ...
 
+    def list_papers(self, *, limit: int, offset: int) -> tuple[list[StoredPaper], int]: ...
+
 
 class SqlitePaperRepository:
     """Persist canonical records atomically without weakening schema validation."""
@@ -178,6 +180,24 @@ class SqlitePaperRepository:
             return self._from_row(row)
         except (ValueError, KeyError, TypeError) as exc:
             raise PersistenceError("stored paper could not be validated") from exc
+
+    def list_papers(self, *, limit: int, offset: int) -> tuple[list[StoredPaper], int]:
+        """Most-recently-updated first, for a simple list/browse view."""
+        try:
+            with self._connect() as connection:
+                rows = connection.execute(
+                    "SELECT * FROM papers ORDER BY updated_at DESC LIMIT ? OFFSET ?",
+                    (limit, offset),
+                ).fetchall()
+                total_row = connection.execute("SELECT COUNT(*) AS count FROM papers").fetchone()
+        except sqlite3.Error as exc:
+            raise PersistenceError("paper database list failed") from exc
+        assert total_row is not None
+        try:
+            papers = [self._from_row(row) for row in rows]
+        except (ValueError, KeyError, TypeError) as exc:
+            raise PersistenceError("stored paper could not be validated") from exc
+        return papers, int(total_row["count"])
 
     def count(self) -> int:
         """Expose a deterministic integration-test and maintenance probe."""

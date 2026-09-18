@@ -27,3 +27,4 @@ packages = ["src/ocean_research_hub"]
 [project.scripts]
 ocean-research-hub = "ocean_research_hub.__main__:main"
 ocean-research-hub-benchmark = "ocean_research_hub.evaluation.__main__:main"
+ocean-research-hub-real-pdf-benchmark = "ocean_research_hub.evaluation.real_pdf:main"

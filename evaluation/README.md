@@ -58,6 +58,23 @@ uv run ocean-research-hub-benchmark path/to/predictions.json
 Use `--golden-dir` to evaluate another audited corpus directory. Output is deterministic JSON with
 overall metrics and the same metrics for every field family.
 
+### Reproduce the real-PDF quality gate
+
+Issue #19 adds a runner that downloads the pinned primary PDFs when absent, parses
+their real page labels and text, writes pre-audit predictions, runs the golden
+benchmark, and generates the human-readable 4DVarNet-SSH audit table:
+
+```bash
+uv run ocean-research-hub-real-pdf-benchmark \
+  --predictions-out evaluation/reports/issue-19-after-predictions.json \
+  --benchmark-out evaluation/reports/issue-19-after-benchmark.json \
+  --audit-out evaluation/reports/4dvarnet-ssh-extraction-audit.md
+```
+
+Downloaded PDFs are kept under the ignored `.data/golden-pdfs/` directory. The
+runner never marks an extracted scientific claim `VERIFIED`; the audit report has
+an explicit Scientific Auditor confirmation column for the independent gate.
+
 For a no-extraction smoke run (all fields intentionally missing), use:
 
 ```bash

@@ -4,7 +4,7 @@ import pytest
 
 from ocean_research_hub.ingestion.pdf import ParsedPage, ParsedPdf, ScientificExtractor
 from ocean_research_hub.ingestion.semantic import (
-    GeminiClient, SemanticExtractionError, SemanticExtractor, field_catalog,
+    AnthropicClient, GeminiClient, SemanticExtractionError, SemanticExtractor, field_catalog,
 )
 from ocean_research_hub.schemas.paper_record import PaperRecord, VerificationStatus
 
@@ -223,6 +223,32 @@ def test_gemini_client_fails_closed_without_an_api_key(monkeypatch: pytest.Monke
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     with pytest.raises(SemanticExtractionError, match="GEMINI_API_KEY"):
         GeminiClient(api_key=None)
+
+
+def test_anthropic_client_fails_closed_without_an_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    with pytest.raises(SemanticExtractionError, match="ANTHROPIC_API_KEY"):
+        AnthropicClient(api_key=None)
+
+
+def test_claims_wrapped_in_a_markdown_fence_are_still_parsed() -> None:
+    # Some providers wrap JSON in ```json ... ``` despite instructions not to.
+    parsed = _parsed_pdf()
+
+    class FencedClient:
+        def propose_claims(self, prompt: str) -> str:
+            return (
+                "```json\n"
+                '[{"path": "architecture.dropout", "value": 0.2, "page": 1, '
+                '"section": null, "evidence": "a dropout rate of 0.2", '
+                '"origin": "PRIMARY_PAPER"}]\n'
+                "```"
+            )
+
+    extractor = SemanticExtractor(client=FencedClient())
+    result = extractor.extract(parsed, PaperRecord())
+
+    assert result.accepted == ["architecture.dropout"]
 
 
 def test_malformed_response_shape_yields_zero_claims_not_a_crash() -> None:

@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Evidence-backed scientific paper records"
 requires-python = ">=3.11"
 dependencies = [
+    "anthropic>=0.40,<1",
     "fastapi>=0.115,<1",
     "google-genai>=1.0,<2",
     "httpx>=0.28,<1",

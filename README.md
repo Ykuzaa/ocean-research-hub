@@ -67,6 +67,15 @@ Schema-invalid or scientifically unsafe structured fields are rejected.
 
 ## Retrieve and compare papers
 
+List stored papers (paginated, most recently updated first):
+
+```bash
+curl "http://127.0.0.1:8000/api/papers?limit=20&offset=0"
+```
+
+Or browse them at [http://localhost:3000](http://localhost:3000) via the Next.js frontend
+(`cd frontend && npm install && npm run dev`; see `frontend/README.md`).
+
 Replace `PAPER_ID` with an ID returned by ingestion:
 
 ```bash
@@ -123,9 +132,11 @@ benchmark, provenance, and scientific-integrity regressions.
   multi-user collaboration yet.
 - DOI ingestion retrieves Crossref bibliographic metadata. The MVP does not download or parse PDFs;
   structured parsed records are supplied by the caller behind a replaceable parser interface.
-- Retrieval is by stable paper ID. There is no catalog, keyword search, or semantic/vector search.
-- The server-rendered detail and comparison pages are intentionally minimal; there is no Next.js
-  client yet.
+- Retrieval is by stable paper ID or `GET /api/papers` (paginated list, no keyword or
+  semantic/vector search yet).
+- A Next.js + TypeScript + Tailwind frontend (`frontend/`) covers the paper list/browse view;
+  paper detail and comparison still link out to the backend's own minimal server-rendered
+  pages (`/papers/{id}`, `/papers/compare`) rather than having a dedicated frontend view yet.
 - The three-paper golden dataset is a compact safety benchmark, not a comprehensive scientific
   corpus. Extraction outputs remain pre-audit until an independent Scientific Auditor verifies
   them against primary sources.

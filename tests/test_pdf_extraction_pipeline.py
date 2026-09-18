@@ -111,3 +111,66 @@ def test_profile_cannot_emit_hard_coded_hardware_roles_when_source_reverses_them
 
     assert field.status.name == "EXTRACTION_ERROR"
     assert field.value is None
+
+
+def test_profile_cannot_emit_hardware_claim_when_large_domain_gpu_is_negated() -> None:
+    """Negation must not satisfy an evidence contract for an asserted relation."""
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(1, "4DVarNet-SSH: end-to-end learning"),
+            ParsedPage(
+                2124,
+                "When the domain is small, we use a single GPU. The same "
+                "parameters hold for larger domains, but we do not use the "
+                "4DVarNet-distributed version of the code over 4 GPUs.",
+            ),
+        ],
+        source_name="negated-hardware-4dvarnet.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.training.hardware
+
+    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.value is None
+
+
+def test_profile_cannot_emit_training_time_when_domain_duration_roles_reverse() -> None:
+    """The duration numbers alone do not support their normalized domain roles."""
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(1, "4DVarNet-SSH: end-to-end learning"),
+            ParsedPage(
+                2124,
+                "The computational time of the training procedure lies between "
+                "4 and 5 h for the large-domain setup and between 7 and 8 h "
+                "for the small-domain setup.",
+            ),
+        ],
+        source_name="reversed-time-4dvarnet.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.training.training_time
+
+    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.value is None
+
+
+def test_profile_cannot_emit_specific_loss_components_from_generic_loss_phrase() -> None:
+    """Generic reconstruction/regularization wording cannot prove L2/count terms."""
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(1, "4DVarNet-SSH: end-to-end learning"),
+            ParsedPage(
+                2123,
+                "The training loss L combines reconstruction losses and "
+                "additional regularization terms as follows: one non-L2 "
+                "penalty only.",
+            ),
+        ],
+        source_name="generic-loss-4dvarnet.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.objective.primary_loss
+
+    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.value is None

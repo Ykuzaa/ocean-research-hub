@@ -202,7 +202,7 @@
             "section": "3.3 Learning setting",
             "page": 2123,
             "locator": "equations (7)-(8)",
-            "evidence": "training loss L combines reconstruction losses and additional regularization terms",
+            "evidence": "training loss L combines reconstruction losses and additional regularization terms as follows: L(x,x⋆)=λ1 N∑ i=1 wi||x-x⋆||2+λ2| N∑ i=1 wi|∇x-∇x⋆||2 (7) +λ3 N∑ i=1 wi||x-8(x⋆)||2+λ4 N∑ i=1 wi||x-8(x)||2, (8)",
             "origin": "PRIMARY_PAPER",
             "claimed_value": null
           },

@@ -84,3 +84,30 @@ def test_evidence_validator_rejects_wrong_page_and_unlocatable_text() -> None:
     assert evidence is not None
     assert evidence.page == 2124
     assert evidence.evidence == "Adam optimizer"
+
+
+def test_profile_cannot_emit_hard_coded_hardware_roles_when_source_reverses_them() -> None:
+    """A literal match alone cannot justify a normalized semantic claim.
+
+    This is an adversarial profile fixture: it retains the words matched by the
+    4DVarNet hardware selector while reversing which domain size uses each GPU
+    configuration.  An evidence-grounded extractor must reject the stale
+    normalized registry value rather than label it as a supported claim.
+    """
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(1, "4DVarNet-SSH: end-to-end learning"),
+            ParsedPage(
+                2124,
+                "We use a single GPU for the large domain. The same set of "
+                "parameters holds for small domains, but we use the "
+                "4DVarNet-distributed version of the code over 4 GPUs.",
+            ),
+        ],
+        source_name="adversarial-4dvarnet.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.training.hardware
+
+    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.value is None

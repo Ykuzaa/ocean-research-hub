@@ -44,7 +44,13 @@ class PaperRepository(Protocol):
 
     def find_by_identity(self, identity_key: str) -> StoredPaper | None: ...
 
-    def list_papers(self, *, limit: int, offset: int) -> tuple[list[StoredPaper], int]: ...
+    def add_domains(self, paper_id: str, domains: list[str]) -> StoredPaper: ...
+
+    def list_papers(
+        self, *, limit: int, offset: int, domain: str | None = None,
+    ) -> tuple[list[StoredPaper], int]: ...
+
+    def domain_counts(self) -> dict[str, int]: ...
 
 
 class SqlitePaperRepository:
@@ -74,6 +80,11 @@ class SqlitePaperRepository:
                         ON papers(doi) WHERE doi IS NOT NULL;
                     """
                 )
+                columns = {row["name"] for row in connection.execute("PRAGMA table_info(papers)")}
+                if "domains_json" not in columns:
+                    connection.execute(
+                        "ALTER TABLE papers ADD COLUMN domains_json TEXT NOT NULL DEFAULT '[]'"
+                    )
         except (OSError, sqlite3.Error) as exc:
             raise PersistenceError("paper database initialization failed") from exc
 
@@ -85,6 +96,7 @@ class SqlitePaperRepository:
         record: PaperRecord,
         workflow_status: PaperWorkflowStatus,
         warnings: list[str],
+        domains: list[str] | None = None,
     ) -> tuple[StoredPaper, bool]:
         record_json = json.dumps(
             record.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
@@ -92,6 +104,7 @@ class SqlitePaperRepository:
         fingerprint = sha256(record_json.encode("utf-8")).hexdigest()
         now = datetime.now(UTC).isoformat()
         paper_id = str(uuid4())
+        domains = list(dict.fromkeys(domains or []))
 
         try:
             with self._connect() as connection:
@@ -100,8 +113,8 @@ class SqlitePaperRepository:
                         """
                         INSERT INTO papers (
                             id, identity_key, doi, fingerprint, workflow_status,
-                            record_json, warnings_json, created_at, updated_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            record_json, warnings_json, created_at, updated_at, domains_json
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
                             paper_id,
@@ -113,6 +126,7 @@ class SqlitePaperRepository:
                             json.dumps(warnings),
                             now,
                             now,
+                            json.dumps(domains),
                         ),
                     )
                 except sqlite3.IntegrityError:
@@ -122,31 +136,62 @@ class SqlitePaperRepository:
                     ).fetchone()
                     if row is None:
                         raise
-                    if row["fingerprint"] != fingerprint:
-                        raise IngestionConflictError(
-                            "this paper identity already exists with different content; "
-                            "the stored scientific record was not overwritten"
-                        )
                     existing = self._from_row(row)
+                    if row["fingerprint"] != fingerprint:
+                        # A metadata-only record holds no scientific claims, so
+                        # replacing it with a full PDF extraction loses nothing.
+                        # Anything else (including conflicting metadata for the
+                        # same DOI) is refused rather than silently overwritten.
+                        upgrade = (
+                            existing.workflow_status is PaperWorkflowStatus.INGESTED
+                            and WORKFLOW_ORDER[workflow_status] > WORKFLOW_ORDER[PaperWorkflowStatus.INGESTED]
+                        )
+                        if not upgrade:
+                            raise IngestionConflictError(
+                                "this paper identity already exists with different content; "
+                                "the stored scientific record was not overwritten"
+                            )
+                        connection.execute(
+                            """
+                            UPDATE papers
+                            SET record_json = ?, fingerprint = ?, workflow_status = ?,
+                                warnings_json = ?, domains_json = ?, updated_at = ?
+                            WHERE id = ?
+                            """,
+                            (
+                                record_json, fingerprint, workflow_status.value,
+                                json.dumps(list(dict.fromkeys([*existing.warnings, *warnings]))),
+                                json.dumps(list(dict.fromkeys([*existing.domains, *domains]))),
+                                now, existing.id,
+                            ),
+                        )
+                        row = connection.execute(
+                            "SELECT * FROM papers WHERE id = ?", (existing.id,)
+                        ).fetchone()
+                        return self._from_row(row), False
                     merged_warnings = list(dict.fromkeys([*existing.warnings, *warnings]))
+                    merged_domains = list(dict.fromkeys([*existing.domains, *domains]))
                     merged_status = max(
                         (existing.workflow_status, workflow_status),
                         key=WORKFLOW_ORDER.__getitem__,
                     )
                     if (
                         merged_warnings != existing.warnings
+                        or merged_domains != existing.domains
                         or merged_status is not existing.workflow_status
                     ):
                         connection.execute(
                             """
                             UPDATE papers
-                            SET warnings_json = ?, workflow_status = ?, updated_at = ?
+                            SET warnings_json = ?, workflow_status = ?, updated_at = ?,
+                                domains_json = ?
                             WHERE id = ?
                             """,
                             (
                                 json.dumps(merged_warnings),
                                 merged_status.value,
                                 now,
+                                json.dumps(merged_domains),
                                 existing.id,
                             ),
                         )
@@ -198,15 +243,37 @@ class SqlitePaperRepository:
         except (ValueError, KeyError, TypeError) as exc:
             raise PersistenceError("stored paper could not be validated") from exc
 
-    def list_papers(self, *, limit: int, offset: int) -> tuple[list[StoredPaper], int]:
-        """Most-recently-updated first, for a simple list/browse view."""
+    def add_domains(self, paper_id: str, domains: list[str]) -> StoredPaper:
+        paper = self.get(paper_id)
+        merged = list(dict.fromkeys([*paper.domains, *domains]))
+        if merged == paper.domains:
+            return paper
+        try:
+            with self._connect() as connection:
+                connection.execute(
+                    "UPDATE papers SET domains_json = ?, updated_at = ? WHERE id = ?",
+                    (json.dumps(merged), datetime.now(UTC).isoformat(), paper_id),
+                )
+        except sqlite3.Error as exc:
+            raise PersistenceError("paper database write failed") from exc
+        return self.get(paper_id)
+
+    def list_papers(
+        self, *, limit: int, offset: int, domain: str | None = None,
+    ) -> tuple[list[StoredPaper], int]:
+        """Most-recently-updated first, optionally restricted to one domain."""
+        # Domain ids are slugs (no quotes), so matching the quoted id inside
+        # the JSON array text is exact.
+        where, params = ("WHERE domains_json LIKE ?", [f'%"{domain}"%']) if domain else ("", [])
         try:
             with self._connect() as connection:
                 rows = connection.execute(
-                    "SELECT * FROM papers ORDER BY updated_at DESC LIMIT ? OFFSET ?",
-                    (limit, offset),
+                    f"SELECT * FROM papers {where} ORDER BY updated_at DESC LIMIT ? OFFSET ?",
+                    (*params, limit, offset),
                 ).fetchall()
-                total_row = connection.execute("SELECT COUNT(*) AS count FROM papers").fetchone()
+                total_row = connection.execute(
+                    f"SELECT COUNT(*) AS count FROM papers {where}", params
+                ).fetchone()
         except sqlite3.Error as exc:
             raise PersistenceError("paper database list failed") from exc
         assert total_row is not None
@@ -215,6 +282,18 @@ class SqlitePaperRepository:
         except (ValueError, KeyError, TypeError) as exc:
             raise PersistenceError("stored paper could not be validated") from exc
         return papers, int(total_row["count"])
+
+    def domain_counts(self) -> dict[str, int]:
+        try:
+            with self._connect() as connection:
+                rows = connection.execute("SELECT domains_json FROM papers").fetchall()
+        except sqlite3.Error as exc:
+            raise PersistenceError("paper database read failed") from exc
+        counts: dict[str, int] = {}
+        for row in rows:
+            for domain in json.loads(row["domains_json"]):
+                counts[domain] = counts.get(domain, 0) + 1
+        return counts
 
     def count(self) -> int:
         """Expose a deterministic integration-test and maintenance probe."""
@@ -242,6 +321,7 @@ class SqlitePaperRepository:
             workflow_status=row["workflow_status"],
             record=PaperRecord.model_validate_json(row["record_json"]),
             warnings=json.loads(row["warnings_json"]),
+            domains=json.loads(row["domains_json"]),
             created_at=row["created_at"],
             updated_at=row["updated_at"],
         )

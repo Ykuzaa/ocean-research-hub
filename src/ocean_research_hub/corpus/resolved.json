@@ -1,0 +1,1600 @@
+[
+ {
+  "title": "GLONET: Mercator's End-to-End Neural Global Ocean Forecasting System",
+  "doi": "10.1029/2025JH000686",
+  "domains": [
+   "forecasting",
+   "neural-operators",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "GLONET: Mercator's End-to-End Neural Global Ocean Forecasting System",
+   "openalex_id": "https://openalex.org/W4414267179",
+   "doi": "10.1029/2025jh000686",
+   "title": "GLONET: Mercator's End‐to‐End Neural Global Ocean Forecasting System",
+   "year": 2025,
+   "venue": "Journal of Geophysical Research Machine Learning and Computation",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2025JH000686"
+   ]
+  },
+  "pdf_url": "https://arxiv.org/pdf/2412.05454"
+ },
+ {
+  "title": "XiHe: A Data-Driven Model for Global Ocean Eddy-Resolving Forecasting",
+  "domains": [
+   "forecasting",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "XiHe: A Data-Driven Model for Global Ocean Eddy-Resolving Forecasting",
+   "openalex_id": "https://openalex.org/W4391621871",
+   "doi": "10.48550/arxiv.2402.02995",
+   "title": "XiHe: A Data-Driven Model for Global Ocean Eddy-Resolving Forecasting",
+   "year": 2024,
+   "venue": "arXiv (Cornell University)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2402.02995"
+   ]
+  }
+ },
+ {
+  "title": "Forecasting the Eddying Ocean with a Deep Neural Network",
+  "alias": "WenHai",
+  "domains": [
+   "forecasting",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "Forecasting the Eddying Ocean with a Deep Neural Network",
+   "openalex_id": "https://openalex.org/W4408185664",
+   "doi": "10.1038/s41467-025-57389-2",
+   "title": "Forecasting the eddying ocean with a deep neural network",
+   "year": 2025,
+   "venue": "Nature Communications",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "FuXi-Ocean: A Global Ocean Forecasting System with Sub-Daily Resolution",
+  "domains": [
+   "forecasting",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "FuXi-Ocean: A Global Ocean Forecasting System with Sub-Daily Resolution",
+   "openalex_id": "https://openalex.org/W7197018718",
+   "doi": "10.52202/085713-1095",
+   "title": "FuXi-Ocean: A Global Ocean Forecasting System with Sub-Daily Resolution",
+   "year": 2025,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "LangYa: a large AI model for global ocean forecasting",
+  "domains": [
+   "forecasting",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "LangYa: a large AI model for global ocean forecasting",
+   "openalex_id": "https://openalex.org/W7172206774",
+   "doi": "10.1016/j.scib.2026.08.001",
+   "title": "LangYa: a large AI model for global ocean forecasting",
+   "year": 2026,
+   "venue": "中国科学通报：英文版",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.sciencedirect.com/science/article/pii/S2095927326008674/pdf"
+   ]
+  }
+ },
+ {
+  "title": "Accurate Mediterranean Sea Forecasting via Graph-Based Deep Learning",
+  "alias": "SeaCast",
+  "domains": [
+   "forecasting",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "Accurate Mediterranean Sea Forecasting via Graph-Based Deep Learning",
+   "openalex_id": "https://openalex.org/W4417071029",
+   "doi": "10.1038/s41598-025-31177-w",
+   "title": "Accurate Mediterranean Sea forecasting via graph-based deep learning",
+   "year": 2025,
+   "venue": "Scientific Reports",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2506.23900",
+    "https://www.nature.com/articles/s41598-025-31177-w_reference.pdf"
+   ]
+  }
+ },
+ {
+  "title": "OceanNet: a principled neural operator-based digital twin for regional oceans",
+  "domains": [
+   "forecasting",
+   "neural-operators",
+   "currents"
+  ],
+  "resolution": {
+   "query_title": "OceanNet: a principled neural operator-based digital twin for regional oceans",
+   "openalex_id": "https://openalex.org/W4402452350",
+   "doi": "10.1038/s41598-024-72145-0",
+   "title": "OceanNet: a principled neural operator-based digital twin for regional oceans",
+   "year": 2024,
+   "venue": "Scientific Reports",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2310.00813",
+    "https://www.nature.com/articles/s41598-024-72145-0.pdf",
+    "https://escholarship.org/content/qt5wn2x2sn/qt5wn2x2sn.pdf",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC11390968/pdf/41598_2024_Article_72145.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Prediction of Three-Dimensional Ocean Temperature, Salinity and Current Fields Based on Fourier Neural Operators",
+  "domains": [
+   "forecasting",
+   "neural-operators"
+  ],
+  "resolution": {
+   "query_title": "Prediction of Three-Dimensional Ocean Temperature, Salinity and Current Fields Based on Fourier Neural Operators",
+   "openalex_id": "https://openalex.org/W7115014864",
+   "doi": "10.1016/j.ocemod.2025.102674",
+   "title": "Prediction of three-dimensional ocean temperature, salinity and current fields based on fourier neural operators",
+   "year": 2025,
+   "venue": "Ocean Modelling",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Evaluation of Deep Neural Operator Models toward Ocean Forecasting",
+  "domains": [
+   "forecasting",
+   "benchmarks",
+   "neural-operators"
+  ],
+  "resolution": {
+   "query_title": "Evaluation of Deep Neural Operator Models toward Ocean Forecasting",
+   "openalex_id": "https://openalex.org/W4389543768",
+   "doi": "10.23919/oceans52994.2023.10337380",
+   "title": "Evaluation of Deep Neural Operator Models Toward Ocean Forecasting",
+   "year": 2023,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2308.11814"
+   ]
+  }
+ },
+ {
+  "title": "Streamlining Ocean Dynamics Modeling with Fourier Neural Operators: A Multiobjective Hyperparameter and Architecture Optimization Approach",
+  "domains": [
+   "forecasting",
+   "neural-operators"
+  ],
+  "resolution": {
+   "query_title": "Streamlining Ocean Dynamics Modeling with Fourier Neural Operators: A Multiobjective Hyperparameter and Architecture Optimization Approach",
+   "openalex_id": "https://openalex.org/W4396812718",
+   "doi": "10.3390/math12101483",
+   "title": "Streamlining Ocean Dynamics Modeling with Fourier Neural Operators: A Multiobjective Hyperparameter and Architecture Optimization Approach",
+   "year": 2024,
+   "venue": "Mathematics",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2404.05768",
+    "https://www.osti.gov/servlets/purl/2477212"
+   ]
+  }
+ },
+ {
+  "title": "South China Sea \"Trident\": Solution for Ocean Forecast Foundation Models",
+  "domains": [
+   "forecasting"
+  ],
+  "resolution": {
+   "query_title": "South China Sea \"Trident\": Solution for Ocean Forecast Foundation Models",
+   "openalex_id": "https://openalex.org/W7147564937",
+   "doi": "10.1016/j.xinn.2026.101364",
+   "title": "South China Sea “神针(Trident)”: Solution for ocean forecast foundation models",
+   "year": 2026,
+   "venue": "The Innovation",
+   "similarity": 0.979,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Deep Learning-Based Correction of Global Ocean Forecasts for the South China Sea",
+  "domains": [
+   "forecasting"
+  ],
+  "resolution": {
+   "query_title": "Deep Learning-Based Correction of Global Ocean Forecasts for the South China Sea",
+   "openalex_id": "https://openalex.org/W7163030392",
+   "doi": "10.3389/fmars.2026.1826293",
+   "title": "Deep learning-based correction of global ocean forecasts for the South China Sea",
+   "year": 2026,
+   "venue": "Frontiers in Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "OceanBench: A Benchmark for Data-Driven Global Ocean Forecasting Systems",
+  "note": "Benchmark Mercator/NeurIPS de prévision globale — pas le OceanBench du projet OceanGPT (connaissances des LLM).",
+  "domains": [
+   "benchmarks",
+   "forecasting"
+  ],
+  "resolution": {
+   "query_title": "OceanBench: A Benchmark for Data-Driven Global Ocean Forecasting Systems",
+   "openalex_id": "https://openalex.org/W4417298702",
+   "doi": "10.52202/085713-0303",
+   "title": "OceanBench: A Benchmark for Data-Driven Global Ocean Forecasting systems",
+   "year": 2025,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry",
+  "doi": "10.5194/gmd-16-2119-2023",
+  "domains": [
+   "data-assimilation",
+   "ssh-altimetry"
+  ],
+  "resolution": {
+   "query_title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry",
+   "openalex_id": "https://openalex.org/W4366425772",
+   "doi": "10.5194/gmd-16-2119-2023",
+   "title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry",
+   "year": 2023,
+   "venue": "Geoscientific model development",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  },
+  "pdf_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
+ },
+ {
+  "title": "Multimodal 4DVarNets for the Reconstruction of Sea Surface Dynamics From SST-SSH Synergies",
+  "domains": [
+   "data-assimilation",
+   "ssh-altimetry",
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "Multimodal 4DVarNets for the Reconstruction of Sea Surface Dynamics From SST-SSH Synergies",
+   "openalex_id": "https://openalex.org/W4313731077",
+   "doi": "10.1109/tgrs.2023.3268006",
+   "title": "Multimodal 4DVarNets for the Reconstruction of Sea Surface Dynamics From SST-SSH Synergies",
+   "year": 2023,
+   "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "http://arxiv.org/pdf/2207.01372",
+    "https://arxiv.org/pdf/2207.01372",
+    "https://archimer.ifremer.fr/doc/00835/94680/102989.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Joint Interpolation and Representation Learning for Irregularly Sampled Satellite-Derived Geophysical Fields",
+  "domains": [
+   "data-assimilation"
+  ],
+  "resolution": {
+   "query_title": "Joint Interpolation and Representation Learning for Irregularly Sampled Satellite-Derived Geophysical Fields",
+   "openalex_id": "https://openalex.org/W3162258555",
+   "doi": "10.3389/fams.2021.655224",
+   "title": "Joint Interpolation and Representation Learning for Irregularly Sampled Satellite-Derived Geophysical Fields",
+   "year": 2021,
+   "venue": "Frontiers in Applied Mathematics and Statistics",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.frontiersin.org/articles/10.3389/fams.2021.655224/pdf"
+   ]
+  }
+ },
+ {
+  "title": "Multimodal learning-based inversion models for the space-time reconstruction of satellite-derived geophysical fields",
+  "domains": [
+   "data-assimilation"
+  ],
+  "resolution": {
+   "query_title": "Multimodal learning-based inversion models for the space-time reconstruction of satellite-derived geophysical fields",
+   "openalex_id": "https://openalex.org/W4226058613",
+   "doi": "10.48550/arxiv.2203.10640",
+   "title": "Multimodal learning-based inversion models for the space-time reconstruction of satellite-derived geophysical fields",
+   "year": 2022,
+   "venue": "arXiv (Cornell University)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2203.10640"
+   ]
+  }
+ },
+ {
+  "title": "Observation-Only Deep Learning for Gappy Satellite-Derived Ocean Color Data Using 4DVarNet",
+  "domains": [
+   "data-assimilation",
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Observation-Only Deep Learning for Gappy Satellite-Derived Ocean Color Data Using 4DVarNet",
+   "openalex_id": "https://openalex.org/W4415481205",
+   "doi": "10.1109/tgrs.2025.3624465",
+   "title": "Observation-Only Deep Learning for Gappy Satellite-Derived Ocean Color Data Using 4DVarNet",
+   "year": 2025,
+   "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2503.11532",
+    "https://ird.hal.science/ird-05338406v1/document",
+    "https://ird.hal.science/ird-05338406v2/document",
+    "https://archimer.ifremer.fr/doc/00944/105542/123153.pdf"
+   ]
+  }
+ },
+ {
+  "title": "DINCAE 1.0: a convolutional neural network with error estimates to reconstruct sea surface temperature satellite observations",
+  "domains": [
+   "data-assimilation",
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "DINCAE 1.0: a convolutional neural network with error estimates to reconstruct sea surface temperature satellite observations",
+   "openalex_id": "https://openalex.org/W2955038187",
+   "doi": "10.5194/gmd-13-1609-2020",
+   "title": "DINCAE 1.0: a convolutional neural network with error estimates to reconstruct sea surface temperature satellite observations",
+   "year": 2020,
+   "venue": "Geoscientific model development",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://gmd.copernicus.org/articles/13/1609/2020/gmd-13-1609-2020.pdf",
+    "https://orbi.uliege.be/bitstream/2268/246313/1/gmd-13-1609-2020.pdf",
+    "https://doi.org/10.5194/gmd-2019-128"
+   ]
+  }
+ },
+ {
+  "title": "DINCAE 2.0: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations",
+  "domains": [
+   "data-assimilation",
+   "sst",
+   "ssh-altimetry"
+  ],
+  "resolution": {
+   "query_title": "DINCAE 2.0: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations",
+   "openalex_id": "https://openalex.org/W3211785646",
+   "doi": "10.5194/gmd-2021-353",
+   "title": "DINCAE 2: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations",
+   "year": 2021,
+   "venue": null,
+   "similarity": 0.993,
+   "pdf_candidates": [
+    "https://doi.org/10.5194/gmd-2021-353",
+    "https://www.vliz.be/imisdocs/publications/377890.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Hybrid machine learning data assimilation for marine biogeochemistry",
+  "domains": [
+   "data-assimilation",
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Hybrid machine learning data assimilation for marine biogeochemistry",
+   "openalex_id": "https://openalex.org/W7122732327",
+   "doi": "10.5194/bg-23-315-2026",
+   "title": "Hybrid machine learning data assimilation for marine biogeochemistry",
+   "year": 2026,
+   "venue": "Biogeosciences",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2504.05218",
+    "https://bg.copernicus.org/articles/23/315/2026/bg-23-315-2026.pdf",
+    "https://centaur.reading.ac.uk/127198/9/bg-23-315-2026.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Neural Synthetic Profiles from Remote Sensing and Observations (NeSPReSO): Reconstructing temperature and salinity fields in the Gulf of Mexico",
+  "alias": "NeSPReSO",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Neural Synthetic Profiles from Remote Sensing and Observations (NeSPReSO): Reconstructing temperature and salinity fields in the Gulf of Mexico",
+   "openalex_id": "https://openalex.org/W4409661413",
+   "doi": "10.1016/j.ocemod.2025.102550",
+   "title": "Neural Synthetic Profiles from Remote Sensing and Observations (NeSPReSO) — Reconstructing temperature and salinity fields in the Gulf of Mexico",
+   "year": 2025,
+   "venue": "Ocean Modelling",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://archimer.ifremer.fr/doc/00938/105017/117379.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Reconstruction of subsurface ocean state variables using Convolutional Neural Networks with combined satellite and in situ data",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Reconstruction of subsurface ocean state variables using Convolutional Neural Networks with combined satellite and in situ data",
+   "openalex_id": "https://openalex.org/W4386930766",
+   "doi": "10.3389/fmars.2023.1218514",
+   "title": "Reconstruction of subsurface ocean state variables using Convolutional Neural Networks with combined satellite and in situ data",
+   "year": 2023,
+   "venue": "Frontiers in Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Reconstructing High-Resolution Ocean Subsurface and Interior Temperature and Salinity Anomalies From Satellite Observations",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Reconstructing High-Resolution Ocean Subsurface and Interior Temperature and Salinity Anomalies From Satellite Observations",
+   "openalex_id": "https://openalex.org/W3201062030",
+   "doi": "10.1109/tgrs.2021.3109979",
+   "title": "Reconstructing High-Resolution Ocean Subsurface and Interior Temperature and Salinity Anomalies From Satellite Observations",
+   "year": 2021,
+   "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Subsurface Temperature Reconstruction for the Global Ocean from 1993 to 2020 Using Satellite Observations and Deep Learning",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Subsurface Temperature Reconstruction for the Global Ocean from 1993 to 2020 Using Satellite Observations and Deep Learning",
+   "openalex_id": "https://openalex.org/W4283818963",
+   "doi": "10.3390/rs14133198",
+   "title": "Subsurface Temperature Reconstruction for the Global Ocean from 1993 to 2020 Using Satellite Observations and Deep Learning",
+   "year": 2022,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/2072-4292/14/13/3198/pdf?version=1657019989"
+   ]
+  }
+ },
+ {
+  "title": "Reconstruction of the Subsurface Temperature and Salinity in the South China Sea Using Deep-Learning Techniques with a Physical Guidance",
+  "alias": "FFPG-net",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Reconstruction of the Subsurface Temperature and Salinity in the South China Sea Using Deep-Learning Techniques with a Physical Guidance",
+   "openalex_id": "https://openalex.org/W4413661085",
+   "doi": "10.3390/rs17172954",
+   "title": "Reconstruction of the Subsurface Temperature and Salinity in the South China Sea Using Deep-Learning Techniques with a Physical Guidance",
+   "year": 2025,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Reconstruction of Three-Dimensional Temperature and Salinity in the Equatorial Ocean with Deep-Learning",
+  "alias": "VI-UNet",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Reconstruction of Three-Dimensional Temperature and Salinity in the Equatorial Ocean with Deep-Learning",
+   "openalex_id": "https://openalex.org/W4411179015",
+   "doi": "10.3390/rs17122005",
+   "title": "Reconstruction of Three-Dimensional Temperature and Salinity in the Equatorial Ocean with Deep-Learning",
+   "year": 2025,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/2072-4292/17/12/2005/pdf?version=1749562726"
+   ]
+  }
+ },
+ {
+  "title": "Enhancing Ocean Temperature and Salinity Reconstruction with Deep Learning: The Role of Surface Waves",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Enhancing Ocean Temperature and Salinity Reconstruction with Deep Learning: The Role of Surface Waves",
+   "openalex_id": "https://openalex.org/W4410069126",
+   "doi": "10.3390/jmse13050910",
+   "title": "Enhancing Ocean Temperature and Salinity Reconstruction with Deep Learning: The Role of Surface Waves",
+   "year": 2025,
+   "venue": "Journal of Marine Science and Engineering",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/2077-1312/13/5/910/pdf?version=1746264836"
+   ]
+  }
+ },
+ {
+  "title": "Incremental Stable/Dynamic Disentanglement Learning for Ocean Subsurface Temperature Prediction",
+  "domains": [
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Incremental Stable/Dynamic Disentanglement Learning for Ocean Subsurface Temperature Prediction",
+   "openalex_id": "https://openalex.org/W4405779036",
+   "doi": "10.1109/tgrs.2024.3522998",
+   "title": "Incremental Stable/Dynamic Disentanglement Learning for Ocean Subsurface Temperature Prediction",
+   "year": 2024,
+   "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A Physics-informed deep neural network for the joint prediction of 3D chlorophyll-a and hydrographic fields in the Mediterranean Sea",
+  "alias": "4DMED-bionet",
+  "domains": [
+   "subsurface",
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "A Physics-informed deep neural network for the joint prediction of 3D chlorophyll-a and hydrographic fields in the Mediterranean Sea",
+   "openalex_id": null,
+   "doi": null,
+   "title": null,
+   "year": null,
+   "venue": null,
+   "similarity": 0.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "CARE-SST: context-aware reconstruction diffusion model for sea surface temperature",
+  "domains": [
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "CARE-SST: context-aware reconstruction diffusion model for sea surface temperature",
+   "openalex_id": "https://openalex.org/W4406206998",
+   "doi": "10.1016/j.isprsjprs.2025.01.001",
+   "title": "CARE-SST: context-aware reconstruction diffusion model for sea surface temperature",
+   "year": 2025,
+   "venue": "ISPRS Journal of Photogrammetry and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "MAESSTRO: Masked Autoencoders for Sea Surface Temperature Reconstruction under Occlusion",
+  "domains": [
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "MAESSTRO: Masked Autoencoders for Sea Surface Temperature Reconstruction under Occlusion",
+   "openalex_id": "https://openalex.org/W4403733542",
+   "doi": "10.5194/os-20-1309-2024",
+   "title": "MAESSTRO: Masked Autoencoders for Sea Surface Temperature Reconstruction under Occlusion",
+   "year": 2024,
+   "venue": "Ocean science",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://os.copernicus.org/articles/20/1309/2024/os-20-1309-2024.pdf",
+    "https://repository.publisso.de/resource/frl:6498222/data"
+   ]
+  }
+ },
+ {
+  "title": "A Daily High-Resolution Sea Surface Temperature Reconstruction Using an I-DINCAE and DNN Model Based on FY-3C Thermal Infrared Data",
+  "domains": [
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "A Daily High-Resolution Sea Surface Temperature Reconstruction Using an I-DINCAE and DNN Model Based on FY-3C Thermal Infrared Data",
+   "openalex_id": "https://openalex.org/W4396932193",
+   "doi": "10.3390/rs16101745",
+   "title": "A Daily High-Resolution Sea Surface Temperature Reconstruction Using an I-DINCAE and DNN Model Based on FY-3C Thermal Infrared Data",
+   "year": 2024,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "High-Resolution Seamless Daily Sea Surface Temperature Based on Satellite Data Fusion and Machine Learning over Kuroshio Extension",
+  "domains": [
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "High-Resolution Seamless Daily Sea Surface Temperature Based on Satellite Data Fusion and Machine Learning over Kuroshio Extension",
+   "openalex_id": "https://openalex.org/W4210641064",
+   "doi": "10.3390/rs14030575",
+   "title": "High-Resolution Seamless Daily Sea Surface Temperature Based on Satellite Data Fusion and Machine Learning over Kuroshio Extension",
+   "year": 2022,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/2072-4292/14/3/575/pdf?version=1643187290"
+   ]
+  }
+ },
+ {
+  "title": "Physics-guided deep learning for global sea surface temperature forecasting: Balancing accuracy and stability across timescales",
+  "alias": "SSTFormer",
+  "domains": [
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "Physics-guided deep learning for global sea surface temperature forecasting: Balancing accuracy and stability across timescales",
+   "openalex_id": "https://openalex.org/W7124786958",
+   "doi": "10.1016/j.gsf.2026.102255",
+   "title": "Physics-guided deep learning for global sea surface temperature forecasting: Balancing accuracy and stability across timescales",
+   "year": 2026,
+   "venue": "Geoscience Frontiers",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A deep learning approach for near-coastal sea surface temperature prediction",
+  "domains": [
+   "sst"
+  ],
+  "resolution": {
+   "query_title": "A deep learning approach for near-coastal sea surface temperature prediction",
+   "openalex_id": "https://openalex.org/W7141277822",
+   "doi": "10.3389/fmars.2026.1798048",
+   "title": "A deep learning approach for near-coastal sea surface temperature prediction",
+   "year": 2026,
+   "venue": "Frontiers in Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://public-pages-files-2025.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2026.1798048/pdf"
+   ]
+  }
+ },
+ {
+  "title": "HIDRA-D: deep-learning model for dense sea level forecasting using sparse altimetry and tide gauge data",
+  "domains": [
+   "ssh-altimetry"
+  ],
+  "resolution": {
+   "query_title": "HIDRA-D: deep-learning model for dense sea level forecasting using sparse altimetry and tide gauge data",
+   "openalex_id": "https://openalex.org/W4412174405",
+   "doi": "10.5194/egusphere-2025-3187",
+   "title": "HIDRA-D: deep-learning model for dense sea level forecasting using sparse altimetry and tide gauge data",
+   "year": 2025,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://egusphere.copernicus.org/preprints/2025/egusphere-2025-3187/egusphere-2025-3187.pdf",
+    "https://gmd.copernicus.org/articles/19/2177/2026/gmd-19-2177-2026.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Future digital twins: emulating a highly complex marine biogeochemical model with machine learning to predict hypoxia",
+  "domains": [
+   "neural-operators",
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Future digital twins: emulating a highly complex marine biogeochemical model with machine learning to predict hypoxia",
+   "openalex_id": "https://openalex.org/W4366212868",
+   "doi": "10.3389/fmars.2023.1058837",
+   "title": "Future digital twins: emulating a highly complex marine biogeochemical model with machine learning to predict hypoxia",
+   "year": 2023,
+   "venue": "Frontiers in Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://plymsea.ac.uk/id/eprint/9917/1/fmars-10-1058837.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Applications of Deep Learning to Ocean Data Inference and Subgrid Parameterization",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Applications of Deep Learning to Ocean Data Inference and Subgrid Parameterization",
+   "openalex_id": "https://openalex.org/W2908155528",
+   "doi": "10.1029/2018ms001472",
+   "title": "Applications of Deep Learning to Ocean Data Inference and Subgrid Parameterization",
+   "year": 2019,
+   "venue": "Journal of Advances in Modeling Earth Systems",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://agupubs.onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2018MS001472"
+   ]
+  }
+ },
+ {
+  "title": "Data-Driven Equation Discovery of Ocean Mesoscale Closures",
+  "alias": "Zanna & Bolton",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Data-Driven Equation Discovery of Ocean Mesoscale Closures",
+   "openalex_id": "https://openalex.org/W3047626512",
+   "doi": "10.1029/2020gl088376",
+   "title": "Data‐Driven Equation Discovery of Ocean Mesoscale Closures",
+   "year": 2020,
+   "venue": "Geophysical Research Letters",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Stochastic-Deep Learning Parameterization of Ocean Momentum Forcing",
+  "alias": "Guillaumin & Zanna",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Stochastic-Deep Learning Parameterization of Ocean Momentum Forcing",
+   "openalex_id": "https://openalex.org/W3140418716",
+   "doi": "10.1029/2021ms002534",
+   "title": "Stochastic‐Deep Learning Parameterization of Ocean Momentum Forcing",
+   "year": 2021,
+   "venue": "Journal of Advances in Modeling Earth Systems",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2021MS002534",
+    "https://essopenarchive.org/doi/pdf/10.1002/essoar.10506419.1"
+   ]
+  }
+ },
+ {
+  "title": "Implementation and Evaluation of a Machine Learned Mesoscale Eddy Parameterization into a Numerical Ocean Circulation Model",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Implementation and Evaluation of a Machine Learned Mesoscale Eddy Parameterization into a Numerical Ocean Circulation Model",
+   "openalex_id": "https://openalex.org/W4387574762",
+   "doi": "10.1029/2023ms003697",
+   "title": "Implementation and Evaluation of a Machine Learned Mesoscale Eddy Parameterization Into a Numerical Ocean Circulation Model",
+   "year": 2023,
+   "venue": "Journal of Advances in Modeling Earth Systems",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2303.00962",
+    "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2023MS003697"
+   ]
+  }
+ },
+ {
+  "title": "Parameterizing Vertical Mixing Coefficients in the Ocean Surface Boundary Layer Using Neural Networks",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Parameterizing Vertical Mixing Coefficients in the Ocean Surface Boundary Layer Using Neural Networks",
+   "openalex_id": "https://openalex.org/W4387881612",
+   "doi": "10.1029/2023ms003890",
+   "title": "Parameterizing Vertical Mixing Coefficients in the Ocean Surface Boundary Layer Using Neural Networks",
+   "year": 2023,
+   "venue": "Journal of Advances in Modeling Earth Systems",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2306.09045",
+    "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2023MS003890"
+   ]
+  }
+ },
+ {
+  "title": "Machine Learned Equations for Vertical Mixing Coefficients in the Ocean Surface Boundary Layer",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Machine Learned Equations for Vertical Mixing Coefficients in the Ocean Surface Boundary Layer",
+   "openalex_id": "https://openalex.org/W7161038862",
+   "doi": "10.1029/2026gl122106",
+   "title": "Machine Learned Equations for Vertical Mixing Coefficients in the Ocean Surface Boundary Layer",
+   "year": 2026,
+   "venue": "Geophysical Research Letters",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Assessing Data-Driven Eddy-Parameterizations in an Atlantic Sector Model",
+  "domains": [
+   "parameterization"
+  ],
+  "resolution": {
+   "query_title": "Assessing Data-Driven Eddy-Parameterizations in an Atlantic Sector Model",
+   "openalex_id": "https://openalex.org/W7128772749",
+   "doi": "10.22541/essoar.177100611.18240844/v1",
+   "title": "Assessing Data-Driven Eddy-Parameterizations in an Atlantic Sector Model",
+   "year": 2026,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Ocean Eddy Identification and Tracking using Neural Networks",
+  "domains": [
+   "eddies-fronts"
+  ],
+  "resolution": {
+   "query_title": "Ocean Eddy Identification and Tracking using Neural Networks",
+   "openalex_id": "https://openalex.org/W2793944556",
+   "doi": "10.1109/igarss.2018.8519261",
+   "title": "Ocean Eddy Identification and Tracking Using Neural Networks",
+   "year": 2018,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/1803.07436"
+   ]
+  }
+ },
+ {
+  "title": "Global Oceanic Eddy Identification: A Deep Learning Method From Argo Profiles and Altimetry Data",
+  "domains": [
+   "eddies-fronts"
+  ],
+  "resolution": {
+   "query_title": "Global Oceanic Eddy Identification: A Deep Learning Method From Argo Profiles and Altimetry Data",
+   "openalex_id": "https://openalex.org/W3159533952",
+   "doi": "10.3389/fmars.2021.646926",
+   "title": "Global Oceanic Eddy Identification: A Deep Learning Method From Argo Profiles and Altimetry Data",
+   "year": 2021,
+   "venue": "Frontiers in Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.frontiersin.org/articles/10.3389/fmars.2021.646926/pdf"
+   ]
+  }
+ },
+ {
+  "title": "Ocean eddy detection based on YOLO deep learning algorithm by synthetic aperture radar data",
+  "alias": "EOLO",
+  "domains": [
+   "eddies-fronts"
+  ],
+  "resolution": {
+   "query_title": "Ocean eddy detection based on YOLO deep learning algorithm by synthetic aperture radar data",
+   "openalex_id": "https://openalex.org/W4394741712",
+   "doi": "10.1016/j.rse.2024.114139",
+   "title": "Ocean eddy detection based on YOLO deep learning algorithm by synthetic aperture radar data",
+   "year": 2024,
+   "venue": "Remote Sensing of Environment",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A two-stage deep learning architecture for detection global coastal and offshore submesoscale ocean eddy using SDGSAT-1 multispectral imagery",
+  "domains": [
+   "eddies-fronts"
+  ],
+  "resolution": {
+   "query_title": "A two-stage deep learning architecture for detection global coastal and offshore submesoscale ocean eddy using SDGSAT-1 multispectral imagery",
+   "openalex_id": "https://openalex.org/W4404007190",
+   "doi": "10.1016/j.srs.2024.100174",
+   "title": "A two-stage deep learning architecture for detection global coastal and offshore submesoscale ocean eddy using SDGSAT-1 multispectral imagery",
+   "year": 2024,
+   "venue": "Science of Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Advancing Marine Heatwave Forecasts: An Integrated Deep Learning Approach",
+  "domains": [
+   "marine-heatwaves"
+  ],
+  "resolution": {
+   "query_title": "Advancing Marine Heatwave Forecasts: An Integrated Deep Learning Approach",
+   "openalex_id": "https://openalex.org/W4405172901",
+   "doi": "10.48550/arxiv.2412.04475",
+   "title": "Advancing Marine Heatwave Forecasts: An Integrated Deep Learning Approach",
+   "year": 2024,
+   "venue": "arXiv (Cornell University)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2412.04475"
+   ]
+  }
+ },
+ {
+  "title": "Global Subseasonal-to-Seasonal Marine Heatwave Forecasts Boosted by Explainable Deep Learning",
+  "alias": "MHWCorrNet",
+  "domains": [
+   "marine-heatwaves"
+  ],
+  "resolution": {
+   "query_title": "Global Subseasonal-to-Seasonal Marine Heatwave Forecasts Boosted by Explainable Deep Learning",
+   "openalex_id": "https://openalex.org/W7172127165",
+   "doi": "10.1029/2026jh001380",
+   "title": "Global Subseasonal‐to‐Seasonal Marine Heatwave Forecasts Boosted by Explainable Deep Learning",
+   "year": 2026,
+   "venue": "Journal of Geophysical Research Machine Learning and Computation",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Machine learning techniques for marine heatwave prediction: a comprehensive review",
+  "domains": [
+   "marine-heatwaves",
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "Machine learning techniques for marine heatwave prediction: a comprehensive review",
+   "openalex_id": "https://openalex.org/W4414530478",
+   "doi": "10.1007/s44295-025-00076-1",
+   "title": "Machine learning techniques for marine heatwave prediction: a comprehensive review",
+   "year": 2025,
+   "venue": "Intelligent Marine Technology and Systems",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://link.springer.com/content/pdf/10.1007/s44295-025-00076-1.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Sea Ice Edge Constraint Improves Antarctic Sea Ice Seasonal Prediction in Deep Learning Models",
+  "alias": "ASICNet",
+  "domains": [
+   "sea-ice"
+  ],
+  "resolution": {
+   "query_title": "Sea Ice Edge Constraint Improves Antarctic Sea Ice Seasonal Prediction in Deep Learning Models",
+   "openalex_id": "https://openalex.org/W7115009093",
+   "doi": "10.1007/s00376-025-5024-2",
+   "title": "Sea Ice Edge Constraint Improves Antarctic Sea Ice Seasonal Prediction in Deep Learning Models",
+   "year": 2025,
+   "venue": "Advances in Atmospheric Sciences",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Season-Aware Hybrid Convolutional-Transformer for Antarctic Sea Ice Concentration Forecasting",
+  "domains": [
+   "sea-ice"
+  ],
+  "resolution": {
+   "query_title": "Season-Aware Hybrid Convolutional-Transformer for Antarctic Sea Ice Concentration Forecasting",
+   "openalex_id": "https://openalex.org/W7204954139",
+   "doi": "10.48550/arxiv.2608.30654",
+   "title": "Season-Aware Hybrid Convolutional-Transformer for Antarctic Sea Ice Concentration Forecasting",
+   "year": 2026,
+   "venue": "arXiv (Cornell University)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2608.30654"
+   ]
+  }
+ },
+ {
+  "title": "WaveCastNet-C: Forecasting the significant wave height in the China Sea with a fully convolutional neural network",
+  "domains": [
+   "waves"
+  ],
+  "resolution": {
+   "query_title": "WaveCastNet-C: Forecasting the significant wave height in the China Sea with a fully convolutional neural network",
+   "openalex_id": "https://openalex.org/W7125140753",
+   "doi": "10.1016/j.oceaneng.2026.124373",
+   "title": "WaveCastNet-C: Forecasting the significant wave height in the China Sea with a fully convolutional neural network",
+   "year": 2026,
+   "venue": "Ocean Engineering",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Prediction and reconstruction of ocean wave heights based on bathymetric data using LSTM neural networks",
+  "domains": [
+   "waves"
+  ],
+  "resolution": {
+   "query_title": "Prediction and reconstruction of ocean wave heights based on bathymetric data using LSTM neural networks",
+   "openalex_id": "https://openalex.org/W3162791930",
+   "doi": "10.1016/j.oceaneng.2021.109046",
+   "title": "Prediction and reconstruction of ocean wave heights based on bathymetric data using LSTM neural networks",
+   "year": 2021,
+   "venue": "Ocean Engineering",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Bias correction of significant wave height with LSTM neural networks",
+  "domains": [
+   "waves"
+  ],
+  "resolution": {
+   "query_title": "Bias correction of significant wave height with LSTM neural networks",
+   "openalex_id": "https://openalex.org/W4405636061",
+   "doi": "10.1016/j.oceaneng.2024.120015",
+   "title": "Bias correction of significant wave height with LSTM neural networks",
+   "year": 2024,
+   "venue": "Ocean Engineering",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A deep learning super-resolution model to speed up computations of coastal sea states",
+  "domains": [
+   "waves"
+  ],
+  "resolution": {
+   "query_title": "A deep learning super-resolution model to speed up computations of coastal sea states",
+   "openalex_id": "https://openalex.org/W4388063485",
+   "doi": "10.1016/j.apor.2023.103776",
+   "title": "A deep learning super-resolution model to speed up computations of coastal sea states",
+   "year": 2023,
+   "venue": "Applied Ocean Research",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://hal.science/hal-04295948v1/file/Revision_FinalDraft.pdf"
+   ]
+  }
+ },
+ {
+  "title": "CRPS-Net: A novel framework for AI-assisted meteo-marine ensemble forecasting",
+  "domains": [
+   "waves"
+  ],
+  "resolution": {
+   "query_title": "CRPS-Net: A novel framework for AI-assisted meteo-marine ensemble forecasting",
+   "openalex_id": "https://openalex.org/W4415931300",
+   "doi": "10.1016/j.envsoft.2025.106765",
+   "title": "CRPS-Net: A novel framework for AI-assisted meteo-marine ensemble forecasting",
+   "year": 2025,
+   "venue": "Environmental Modelling & Software",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "End-to-End Neural Interpolation of Satellite-Derived Sea Surface Suspended Sediment Concentrations",
+  "domains": [
+   "biogeochemistry",
+   "data-assimilation"
+  ],
+  "resolution": {
+   "query_title": "End-to-End Neural Interpolation of Satellite-Derived Sea Surface Suspended Sediment Concentrations",
+   "openalex_id": "https://openalex.org/W4292408536",
+   "doi": "10.3390/rs14164024",
+   "title": "End-to-End Neural Interpolation of Satellite-Derived Sea Surface Suspended Sediment Concentrations",
+   "year": 2022,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/2072-4292/14/16/4024/pdf?version=1660818601"
+   ]
+  }
+ },
+ {
+  "title": "Enhanced forecasting of chlorophyll-a concentration in coastal waters through integration of Fourier analysis and Transformer networks",
+  "alias": "ChloroFormer",
+  "domains": [
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Enhanced forecasting of chlorophyll-a concentration in coastal waters through integration of Fourier analysis and Transformer networks",
+   "openalex_id": "https://openalex.org/W4401158815",
+   "doi": "10.1016/j.watres.2024.122160",
+   "title": "Enhanced forecasting of chlorophyll-a concentration in coastal waters through integration of Fourier analysis and Transformer networks",
+   "year": 2024,
+   "venue": "Water Research",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Deep learning models to identify drivers of chlorophyll-a dynamics in the Atlantic Ocean",
+  "domains": [
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Deep learning models to identify drivers of chlorophyll-a dynamics in the Atlantic Ocean",
+   "openalex_id": "https://openalex.org/W7166066325",
+   "doi": "10.1016/j.pocean.2026.103782",
+   "title": "Deep learning models to identify drivers of chlorophyll-a dynamics in the Atlantic Ocean",
+   "year": 2026,
+   "venue": "Progress In Oceanography",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Spatiotemporal prediction of chlorophyll-a in semi-enclosed gulfs using a hybrid graph neural network-transformer framework with satellite data and causal analysis",
+  "domains": [
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Spatiotemporal prediction of chlorophyll-a in semi-enclosed gulfs using a hybrid graph neural network-transformer framework with satellite data and causal analysis",
+   "openalex_id": "https://openalex.org/W7138849142",
+   "doi": "10.1038/s41598-026-42388-0",
+   "title": "Spatiotemporal prediction of chlorophyll-a in semi-enclosed gulfs using a hybrid graph neural network-transformer framework with satellite data and causal analysis",
+   "year": 2026,
+   "venue": "Scientific Reports",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.nature.com/articles/s41598-026-42388-0_reference.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Integrating physics-based modeling and deep learning for high-resolution vertical chlorophyll-a predictions in the ocean",
+  "domains": [
+   "biogeochemistry",
+   "subsurface"
+  ],
+  "resolution": {
+   "query_title": "Integrating physics-based modeling and deep learning for high-resolution vertical chlorophyll-a predictions in the ocean",
+   "openalex_id": "https://openalex.org/W7133841620",
+   "doi": "10.1016/j.marpolbul.2026.119506",
+   "title": "Integrating physics-based modeling and deep learning for high-resolution vertical chlorophyll-a predictions in the ocean",
+   "year": 2026,
+   "venue": "Marine Pollution Bulletin",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Satellite-Derived Bathymetry Using Deep Convolutional Neural Network",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "Satellite-Derived Bathymetry Using Deep Convolutional Neural Network",
+   "openalex_id": "https://openalex.org/W3130796775",
+   "doi": "10.1109/igarss39084.2020.9324053",
+   "title": "Satellite-Derived Bathymetry Using Deep Convolutional Neural Network",
+   "year": 2020,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A Machine Learning Approach to Multispectral Satellite Derived Bathymetry",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "A Machine Learning Approach to Multispectral Satellite Derived Bathymetry",
+   "openalex_id": "https://openalex.org/W3047336743",
+   "doi": "10.5194/isprs-annals-v-3-2020-565-2020",
+   "title": "A MACHINE LEARNING APPROACH TO MULTISPECTRAL SATELLITE DERIVED BATHYMETRY",
+   "year": 2020,
+   "venue": "ISPRS annals of the photogrammetry, remote sensing and spatial information sciences",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.isprs-ann-photogramm-remote-sens-spatial-inf-sci.net/V-3-2020/565/2020/isprs-annals-V-3-2020-565-2020.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Machine Learning Based Estimation of Coastal Bathymetry From ICESat-2 and Sentinel-2 Data",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "Machine Learning Based Estimation of Coastal Bathymetry From ICESat-2 and Sentinel-2 Data",
+   "openalex_id": "https://openalex.org/W4388283871",
+   "doi": "10.1109/jstars.2023.3326238",
+   "title": "Machine Learning Based Estimation of Coastal Bathymetry From ICESat-2 and Sentinel-2 Data",
+   "year": 2023,
+   "venue": "IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://ieeexplore.ieee.org/ielx7/4609443/4609444/10306283.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Satellite-derived bathymetry using machine learning and optimal Sentinel-2 imagery in South-West Florida coastal waters",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "Satellite-derived bathymetry using machine learning and optimal Sentinel-2 imagery in South-West Florida coastal waters",
+   "openalex_id": "https://openalex.org/W4289931670",
+   "doi": "10.1080/15481603.2022.2100597",
+   "title": "Satellite-derived bathymetry using machine learning and optimal Sentinel-2 imagery in South-West Florida coastal waters",
+   "year": 2022,
+   "venue": "GIScience & Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.tandfonline.com/doi/pdf/10.1080/15481603.2022.2100597?needAccess=true",
+    "https://constellation.uqac.ca/id/eprint/9576/1/Satellite-derived%20bathymetry%20using%20machine%20learning%20and%20optimal%20Sentinel-2%20imagery%20in%20South-West%20Florida%20coastal%20waters.pdf",
+    "http://repository.library.noaa.gov/view/noaa/48220/noaa_48220_DS1.pdf"
+   ]
+  }
+ },
+ {
+  "title": "On improved nearshore bathymetry estimates from satellites using ensemble and machine learning approaches",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "On improved nearshore bathymetry estimates from satellites using ensemble and machine learning approaches",
+   "openalex_id": "https://openalex.org/W3175377896",
+   "doi": "10.1016/j.asr.2021.06.034",
+   "title": "On improved nearshore bathymetry estimates from satellites using ensemble and machine learning approaches",
+   "year": 2021,
+   "venue": "Advances in Space Research",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Generalized satellite-derived bathymetry across spatial and temporal domains: a domain-adaptive deep learning approach with multi-source remote sensing data",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "Generalized satellite-derived bathymetry across spatial and temporal domains: a domain-adaptive deep learning approach with multi-source remote sensing data",
+   "openalex_id": null,
+   "doi": null,
+   "title": null,
+   "year": null,
+   "venue": null,
+   "similarity": 0.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Seabed-Net: A multi-task network for joint bathymetry estimation and seabed classification from remote sensing imagery in shallow waters",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "Seabed-Net: A multi-task network for joint bathymetry estimation and seabed classification from remote sensing imagery in shallow waters",
+   "openalex_id": "https://openalex.org/W4416012619",
+   "doi": "10.1016/j.isprsjprs.2025.11.007",
+   "title": "Seabed-Net: A multi-task network for joint bathymetry estimation and seabed classification from remote sensing imagery in shallow waters",
+   "year": 2025,
+   "venue": "ISPRS Journal of Photogrammetry and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2510.19329",
+    "https://depositonce.tu-berlin.de/bitstreams/da3c592e-c805-436b-b6a8-0e1c7ed3b896/download"
+   ]
+  }
+ },
+ {
+  "title": "Blending physical and artificial intelligence models to improve satellite-derived bathymetry mapping",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "Blending physical and artificial intelligence models to improve satellite-derived bathymetry mapping",
+   "openalex_id": "https://openalex.org/W4412434753",
+   "doi": "10.1016/j.ecoinf.2025.103328",
+   "title": "Blending physical and artificial intelligence models to improve satellite-derived bathymetry mapping",
+   "year": 2025,
+   "venue": "Ecological Informatics",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "From Local Training to Large-Scale Mapping: A Comparative Assessment of Machine Learning and Deep Learning for Transferable Satellite-Derived Bathymetry",
+  "domains": [
+   "bathymetry"
+  ],
+  "resolution": {
+   "query_title": "From Local Training to Large-Scale Mapping: A Comparative Assessment of Machine Learning and Deep Learning for Transferable Satellite-Derived Bathymetry",
+   "openalex_id": "https://openalex.org/W7163018756",
+   "doi": "10.3390/rs18111768",
+   "title": "From Local Training to Large-Scale Mapping: A Comparative Assessment of Machine Learning and Deep Learning for Transferable Satellite-Derived Bathymetry",
+   "year": 2026,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2606.02764"
+   ]
+  }
+ },
+ {
+  "title": "A Review on Bathymetric Inversion Research Based on Deep Learning Models and Remote Sensing Images",
+  "domains": [
+   "bathymetry",
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "A Review on Bathymetric Inversion Research Based on Deep Learning Models and Remote Sensing Images",
+   "openalex_id": "https://openalex.org/W7131819416",
+   "doi": "10.3390/rs18050720",
+   "title": "A Review on Bathymetric Inversion Research Based on Deep Learning Models and Remote Sensing Images",
+   "year": 2026,
+   "venue": "Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/2072-4292/18/5/720/pdf?version=1772210700"
+   ]
+  }
+ },
+ {
+  "title": "WV-Net: A foundation model for SAR WV-mode satellite imagery trained using contrastive self-supervised learning on 10 million images",
+  "domains": [
+   "foundation-models",
+   "waves"
+  ],
+  "resolution": {
+   "query_title": "WV-Net: A foundation model for SAR WV-mode satellite imagery trained using contrastive self-supervised learning on 10 million images",
+   "openalex_id": "https://openalex.org/W4400141483",
+   "doi": "10.48550/arxiv.2406.18765",
+   "title": "WV-Net: A foundation model for SAR WV-mode satellite imagery trained using contrastive self-supervised learning on 10 million images",
+   "year": 2024,
+   "venue": "arXiv (Cornell University)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2406.18765"
+   ]
+  }
+ },
+ {
+  "title": "OceanGPT: A Large Language Model for Ocean Science Tasks",
+  "domains": [
+   "foundation-models",
+   "llm-agents"
+  ],
+  "resolution": {
+   "query_title": "OceanGPT: A Large Language Model for Ocean Science Tasks",
+   "openalex_id": "https://openalex.org/W4402671748",
+   "doi": "10.18653/v1/2024.acl-long.184",
+   "title": "OceanGPT: A Large Language Model for Ocean Science Tasks",
+   "year": 2024,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2310.02031",
+    "https://aclanthology.org/2024.acl-long.184.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Deep Learning for Enhanced Ocean Color Remote Sensing: A Foundation Model Approach",
+  "domains": [
+   "foundation-models",
+   "biogeochemistry"
+  ],
+  "resolution": {
+   "query_title": "Deep Learning for Enhanced Ocean Color Remote Sensing: A Foundation Model Approach",
+   "openalex_id": "https://openalex.org/W4413472065",
+   "doi": "10.1109/tgrs.2025.3600411",
+   "title": "Deep Learning for Enhanced Ocean Color Remote Sensing: A Foundation Model Approach",
+   "year": 2025,
+   "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "OceanGym: A Benchmark Environment for Underwater Embodied Agents",
+  "domains": [
+   "llm-agents"
+  ],
+  "resolution": {
+   "query_title": "OceanGym: A Benchmark Environment for Underwater Embodied Agents",
+   "openalex_id": "https://openalex.org/W4415339243",
+   "doi": "10.48550/arxiv.2509.26536",
+   "title": "OceanGym: A Benchmark Environment for Underwater Embodied Agents",
+   "year": 2025,
+   "venue": "arXiv (Cornell University)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2509.26536"
+   ]
+  }
+ },
+ {
+  "title": "Machine learning in marine ecology: an overview of techniques and applications",
+  "domains": [
+   "marine-ecology",
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "Machine learning in marine ecology: an overview of techniques and applications",
+   "openalex_id": "https://openalex.org/W4387140887",
+   "doi": "10.1093/icesjms/fsad100",
+   "title": "Machine learning in marine ecology: an overview of techniques and applications",
+   "year": 2023,
+   "venue": "ICES Journal of Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://academic.oup.com/icesjms/article-pdf/80/7/1829/51951447/fsad100.pdf",
+    "https://oceanrep.geomar.de/id/eprint/59134/7/fsad100.pdf",
+    "https://hal.science/hal-04254804/document",
+    "https://hal.science/hal-04284704v1/file/fsad100.pdf",
+    "https://archimer.ifremer.fr/doc/00850/96150/104335.pdf",
+    "https://biblio.ugent.be/publication/01HHC5AY4Y7BNCX8N47BWBNWH8/file/01HHC5E8KDG9MJF397YFBV0954.pdf",
+    "https://bora.uib.no/bora-xmlui/bitstream/11250/3098824/1/fsad100.pdf",
+    "https://imr.brage.unit.no/imr-xmlui/bitstream/11250/3096842/1/fsad100.pdf",
+    "https://jukuri.luke.fi/bitstream/10024/553765/1/Machine_learning_in_marine_ecology.pdf",
+    "https://edepot.wur.nl/638603",
+    "https://uwe-repository.worktribe.com/preview/15896263/fsad100.pdf"
+   ]
+  }
+ },
+ {
+  "title": "Unlocking the potential of deep learning for marine ecology: overview, applications, and outlook",
+  "domains": [
+   "marine-ecology",
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "Unlocking the potential of deep learning for marine ecology: overview, applications, and outlook",
+   "openalex_id": "https://openalex.org/W4205814812",
+   "doi": "10.1093/icesjms/fsab255",
+   "title": "Unlocking the potential of deep learning for marine ecology: overview, applications, and outlook",
+   "year": 2022,
+   "venue": "Research at the University of Copenhagen (University of Copenhagen)",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://arxiv.org/pdf/2109.14737",
+    "https://academic.oup.com/icesjms/article-pdf/79/2/319/42807082/fsab255.pdf",
+    "https://hdl.handle.net/11250/2938707"
+   ]
+  }
+ },
+ {
+  "title": "Underwater sound classification using learning based methods: A review",
+  "domains": [
+   "marine-ecology",
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "Underwater sound classification using learning based methods: A review",
+   "openalex_id": "https://openalex.org/W4399914636",
+   "doi": "10.1016/j.eswa.2024.124498",
+   "title": "Underwater sound classification using learning based methods: A review",
+   "year": 2024,
+   "venue": "Expert Systems with Applications",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A Survey of Underwater Acoustic Data Classification Methods Using Deep Learning for Shoreline Surveillance",
+  "domains": [
+   "marine-ecology"
+  ],
+  "resolution": {
+   "query_title": "A Survey of Underwater Acoustic Data Classification Methods Using Deep Learning for Shoreline Surveillance",
+   "openalex_id": "https://openalex.org/W4220669915",
+   "doi": "10.3390/s22062181",
+   "title": "A Survey of Underwater Acoustic Data Classification Methods Using Deep Learning for Shoreline Surveillance",
+   "year": 2022,
+   "venue": "Sensors",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.mdpi.com/1424-8220/22/6/2181/pdf?version=1646965434"
+   ]
+  }
+ },
+ {
+  "title": "Deep Learning to Infer Ocean Dynamics",
+  "domains": [
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "Deep Learning to Infer Ocean Dynamics",
+   "openalex_id": "https://openalex.org/W7211923834",
+   "doi": "10.1146/annurev-marine-040324-023244",
+   "title": "Deep Learning to Infer Ocean Dynamics",
+   "year": 2026,
+   "venue": "Annual Review of Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Learning-Based Methods and the Future of Numerical Ocean and Sea-Ice Modeling",
+  "domains": [
+   "reviews",
+   "sea-ice"
+  ],
+  "resolution": {
+   "query_title": "Learning-Based Methods and the Future of Numerical Ocean and Sea-Ice Modeling",
+   "openalex_id": "https://openalex.org/W7153556722",
+   "doi": "10.31223/x5hb6s",
+   "title": "Learning-Based Methods and the Future of Numerical Ocean and Sea Ice Modeling",
+   "year": 2026,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://eartharxiv.org/repository/object/12581/download/22410/"
+   ]
+  }
+ },
+ {
+  "title": "Applications of deep learning in physical oceanography: a comprehensive review",
+  "domains": [
+   "reviews"
+  ],
+  "resolution": {
+   "query_title": "Applications of deep learning in physical oceanography: a comprehensive review",
+   "openalex_id": "https://openalex.org/W4400664837",
+   "doi": "10.3389/fmars.2024.1396322",
+   "title": "Applications of deep learning in physical oceanography: a comprehensive review",
+   "year": 2024,
+   "venue": "Frontiers in Marine Science",
+   "similarity": 1.0,
+   "pdf_candidates": [
+    "https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2024.1396322/pdf"
+   ]
+  }
+ },
+ {
+  "title": "Deep Learning for Ocean Forecasting: A Comprehensive Review of Methods, Applications, and Datasets",
+  "domains": [
+   "reviews",
+   "forecasting"
+  ],
+  "resolution": {
+   "query_title": "Deep Learning for Ocean Forecasting: A Comprehensive Review of Methods, Applications, and Datasets",
+   "openalex_id": "https://openalex.org/W4409057815",
+   "doi": "10.1109/tcyb.2025.3539990",
+   "title": "Deep Learning for Ocean Forecasting: A Comprehensive Review of Methods, Applications, and Datasets",
+   "year": 2025,
+   "venue": "IEEE Transactions on Cybernetics",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "Machine learning in ocean data assimilation: Advances, gaps and the road to operations",
+  "domains": [
+   "reviews",
+   "data-assimilation"
+  ],
+  "resolution": {
+   "query_title": "Machine learning in ocean data assimilation: Advances, gaps and the road to operations",
+   "openalex_id": "https://openalex.org/W7118084306",
+   "doi": "10.1016/j.ocemod.2026.102678",
+   "title": "Machine learning in ocean data assimilation: Advances, gaps and the road to operations",
+   "year": 2026,
+   "venue": "Ocean Modelling",
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ },
+ {
+  "title": "A Survey of Foundation Models for Ocean Science",
+  "domains": [
+   "reviews",
+   "foundation-models"
+  ],
+  "resolution": {
+   "query_title": "A Survey of Foundation Models for Ocean Science",
+   "openalex_id": "https://openalex.org/W7155815040",
+   "doi": "10.13140/rg.2.2.34865.34409",
+   "title": "A Survey of Foundation Models for Ocean Science",
+   "year": 2026,
+   "venue": null,
+   "similarity": 1.0,
+   "pdf_candidates": []
+  }
+ }
+]

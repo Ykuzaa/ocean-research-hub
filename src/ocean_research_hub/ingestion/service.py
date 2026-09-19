@@ -115,7 +115,7 @@ class PaperIngestionService:
 
         extraction_warnings: list[str] = []
         pdf_identity: str | None = None
-        if request.parsed_paper is None and (request.pdf_path is not None or request.pdf_url is not None or (metadata and metadata.pdf_url)):
+        if request.extract and request.parsed_paper is None and (request.pdf_path is not None or request.pdf_url is not None or (metadata and metadata.pdf_url)):
             pdf_url = request.pdf_url or (metadata.pdf_url if metadata else None)
             if request.pdf_path:
                 content, source_name = read_pdf_path(request.pdf_path)
@@ -136,6 +136,8 @@ class PaperIngestionService:
                 pdf_identity = f"pdf:{sha256(content).hexdigest()}"
                 existing = self.repository.find_by_identity(pdf_identity)
                 if existing is not None:
+                    if request.domains:
+                        existing = self.repository.add_domains(existing.id, request.domains)
                     return IngestPaperResponse(created=False, paper=existing)
             # Parsing and LLM extraction are blocking and can take minutes;
             # running them in a thread keeps the server responsive meanwhile.
@@ -215,6 +217,7 @@ class PaperIngestionService:
                 record=record,
                 workflow_status=workflow_status,
                 warnings=warnings,
+                domains=request.domains,
             )
         except IngestionError:
             raise

@@ -16,6 +16,7 @@ from pydantic import (
     model_validator,
 )
 
+from ocean_research_hub.corpus import domain_ids
 from ocean_research_hub.schemas.paper_record import PaperRecord, SourceOrigin
 
 
@@ -85,12 +86,24 @@ class IngestPaperRequest(BaseModel):
     parsed_paper: dict[str, Any] | None = None
     pdf_path: str | None = None
     pdf_url: HttpUrl | None = None
+    domains: list[str] = Field(default_factory=list)
+    # False stores bibliography only, even when the metadata carries a PDF link
+    # (Crossref often does): no download, no LLM call, no cost.
+    extract: bool = True
 
     @field_validator("doi")
     @classmethod
     def reject_blank_doi(cls, value: str | None) -> str | None:
         if value is not None and not value:
             raise ValueError("DOI must not be blank")
+        return value
+
+    @field_validator("domains")
+    @classmethod
+    def require_known_domains(cls, value: list[str]) -> list[str]:
+        unknown = sorted(set(value) - set(domain_ids()))
+        if unknown:
+            raise ValueError(f"unknown domains: {', '.join(unknown)}")
         return value
 
     @model_validator(mode="after")
@@ -111,6 +124,7 @@ class StoredPaper(BaseModel):
     workflow_status: PaperWorkflowStatus
     record: PaperRecord
     warnings: list[str] = Field(default_factory=list)
+    domains: list[str] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 
@@ -136,6 +150,7 @@ class PaperSummary(BaseModel):
     architecture: list[str] = Field(default_factory=list)
     headline: str | None = None
     extracted_field_count: int = 0
+    domains: list[str] = Field(default_factory=list)
     workflow_status: PaperWorkflowStatus
     created_at: datetime
     updated_at: datetime
@@ -146,6 +161,15 @@ class PaperListResponse(BaseModel):
 
     papers: list[PaperSummary]
     total: int
+
+
+class DomainSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    name: str
+    description: str
+    paper_count: int
 
 
 class PaperComparisonResponse(BaseModel):

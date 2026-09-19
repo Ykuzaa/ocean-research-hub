@@ -13,6 +13,8 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any, Protocol, get_args, get_origin
 
 from pydantic import BaseModel, ConfigDict, JsonValue, ValidationError
@@ -82,7 +84,7 @@ class AnthropicClient:
 
     def __init__(
         self, *, api_key: str | None = None, model: str | None = None,
-        timeout_ms: int = 180_000,
+        timeout_ms: int = 600_000,
     ) -> None:
         # Imported lazily: constructing an AnthropicClient is the only thing
         # that should require the anthropic package and an API key at runtime.
@@ -91,8 +93,17 @@ class AnthropicClient:
         resolved_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not resolved_key:
             raise SemanticExtractionError("ANTHROPIC_API_KEY is not set")
-        self._client = anthropic.Anthropic(api_key=resolved_key, timeout=timeout_ms / 1000)
+        # The read timeout bounds the gap *between* streamed events, and the
+        # model can think silently for minutes on a long paper before its
+        # first visible token (a 180 s read timeout killed a 30-page paper
+        # three times in a row). One retry keeps the worst case bounded.
+        self._client = anthropic.Anthropic(
+            api_key=resolved_key,
+            timeout=anthropic.Timeout(timeout_ms / 1000, connect=10.0),
+            max_retries=1,
+        )
         self._model = model or os.environ.get("ANTHROPIC_MODEL", DEFAULT_ANTHROPIC_MODEL)
+        self._usage_log = Path(os.environ.get("OCEAN_HUB_LLM_USAGE_LOG", ".data/llm_usage.jsonl"))
 
     def propose_claims(self, prompt: str) -> str:
         # A paper with many unresolved fields can make Claude generate a long
@@ -113,6 +124,7 @@ class AnthropicClient:
                 response = stream.get_final_message()
         except Exception as exc:  # any transport/API failure is a hard error, never silent
             raise SemanticExtractionError(f"Claude request failed: {exc}") from exc
+        self._log_usage(response)
         if response.stop_reason == "max_tokens":
             raise SemanticExtractionError(
                 "Claude response was truncated at the max_tokens limit before completing"
@@ -121,6 +133,25 @@ class AnthropicClient:
         if not text:
             raise SemanticExtractionError("Claude returned no text content")
         return text
+
+    def _log_usage(self, response: Any) -> None:
+        """Append token usage so extraction cost is measured, not estimated."""
+        usage = response.usage
+        entry = {
+            "at": datetime.now(UTC).isoformat(),
+            "model": response.model,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cache_read_input_tokens": usage.cache_read_input_tokens or 0,
+            "cache_creation_input_tokens": usage.cache_creation_input_tokens or 0,
+            "stop_reason": response.stop_reason,
+        }
+        try:
+            self._usage_log.parent.mkdir(parents=True, exist_ok=True)
+            with self._usage_log.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(entry) + "\n")
+        except OSError:
+            pass  # cost accounting must never break an extraction
 
 
 class _LLMClaim(BaseModel):
@@ -315,13 +346,18 @@ class SemanticExtractor:
                 origin = SourceOrigin(claim.origin)
             except ValueError:
                 origin = SourceOrigin.PRIMARY_PAPER
-            evidence = (
-                self.validator.locate_free_text(
-                    parsed, page=claim.page, section=claim.section, evidence=claim.evidence,
-                    origin=origin, evidence_url=None,
+            try:
+                evidence = (
+                    self.validator.locate_free_text(
+                        parsed, page=claim.page, section=claim.section, evidence=claim.evidence,
+                        origin=origin, evidence_url=None,
+                    )
+                    if value is not None else None
                 )
-                if value is not None else None
-            )
+            except ValidationError:
+                # e.g. a page number the evidence schema rejects: drop this one
+                # claim, never the whole paper's extraction.
+                evidence = None
             # A correctly-located quote only proves the TEXT is real and on
             # the cited page - unlike the deterministic path, where a regex's
             # captured group physically IS the value, the LLM's `value` is
@@ -339,9 +375,13 @@ class SemanticExtractor:
             if expected_type in (int, float) and str(value) not in normalize_text(evidence.evidence or ""):
                 rejected.add(claim.path)
                 continue
-            set_extracted_field(
-                record, claim.path, value, [evidence], claim.path.startswith("limitations."),
-            )
+            try:
+                set_extracted_field(
+                    record, claim.path, value, [evidence], claim.path.startswith("limitations."),
+                )
+            except ValidationError:
+                rejected.add(claim.path)
+                continue
             accepted.add(claim.path)
 
         pending_paths = {path for path, _ in pending}

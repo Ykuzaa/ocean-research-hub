@@ -79,7 +79,9 @@ class PdfParser:
         current_section: str | None = None
         for physical_page, text in enumerate(texts, 1):
             label = labels[physical_page - 1] if physical_page <= len(labels) else str(physical_page)
-            page = int(label) if str(label).isdigit() else physical_page
+            # Printed labels are what readers cite, but a cover labelled "0"
+            # is not a valid page reference; fall back to the physical page.
+            page = int(label) if str(label).isdigit() and int(label) >= 1 else physical_page
             blocks: list[ParsedBlock] = []
             for number, paragraph in enumerate(re.split(r"\n\s*\n", text), 1):
                 cleaned = normalize_text(paragraph)

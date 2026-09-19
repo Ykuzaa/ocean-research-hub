@@ -28,7 +28,9 @@ from ocean_research_hub.ingestion.errors import (
     ParserError,
     PersistenceError,
 )
+from ocean_research_hub.corpus import domain_ids, load_seed
 from ocean_research_hub.ingestion.models import (
+    DomainSummary,
     IngestPaperRequest,
     IngestPaperResponse,
     PaperComparisonResponse,
@@ -75,6 +77,7 @@ def summarize(paper: StoredPaper) -> PaperSummary:
         architecture=record.architecture.family.value or [],
         headline=headline[0] if headline else None,
         extracted_field_count=extracted,
+        domains=paper.domains,
         workflow_status=paper.workflow_status,
         created_at=paper.created_at,
         updated_at=paper.updated_at,
@@ -203,11 +206,25 @@ def create_app(
 
     @app.get("/api/papers", response_model=PaperListResponse)
     async def list_papers_api(
-        limit: int = Query(default=20, ge=1, le=100),
+        limit: int = Query(default=20, ge=1, le=200),
         offset: int = Query(default=0, ge=0),
+        domain: str | None = Query(default=None),
     ) -> PaperListResponse:
-        papers, total = paper_repository.list_papers(limit=limit, offset=offset)
+        if domain is not None and domain not in domain_ids():
+            raise PaperNotFoundError(f"domain {domain} does not exist")
+        papers, total = paper_repository.list_papers(limit=limit, offset=offset, domain=domain)
         return PaperListResponse(papers=[summarize(paper) for paper in papers], total=total)
+
+    @app.get("/api/domains", response_model=list[DomainSummary])
+    async def list_domains_api() -> list[DomainSummary]:
+        counts = paper_repository.domain_counts()
+        return [
+            DomainSummary(
+                id=domain["id"], name=domain["name"], description=domain["description"],
+                paper_count=counts.get(domain["id"], 0),
+            )
+            for domain in load_seed()["domains"]
+        ]
 
     @app.get("/api/papers/compare", response_model=PaperComparisonResponse)
     async def compare_papers_api(

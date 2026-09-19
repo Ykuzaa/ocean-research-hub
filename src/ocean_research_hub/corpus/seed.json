@@ -1,0 +1,267 @@
+{
+  "domains": [
+    {
+      "id": "forecasting",
+      "name": "Prévision globale et régionale",
+      "description": "Modèles d'IA qui prévoient l'état de l'océan, du global au régional.",
+      "discovery_topics": []
+    },
+    {
+      "id": "benchmarks",
+      "name": "Benchmarks et évaluation",
+      "description": "Comment comparer et valider les modèles océaniques d'IA.",
+      "discovery_topics": [
+        "évaluation GLONET / XiHe / WenHai / GLO12",
+        "validation sur observations : CLASS4, Argo, drifters, satellite",
+        "diagnostics spectraux, physiques et lagrangiens"
+      ]
+    },
+    {
+      "id": "data-assimilation",
+      "name": "Assimilation de données et interpolation",
+      "description": "Reconstruire des champs complets à partir d'observations lacunaires.",
+      "discovery_topics": [
+        "learned variational assimilation, learned optimizers autour de 4DVarNet",
+        "ML + EnKF, hybrid DA, neural DA"
+      ]
+    },
+    {
+      "id": "subsurface",
+      "name": "Océan 3D et subsurface",
+      "description": "Reconstruire température, salinité et courants sous la surface.",
+      "discovery_topics": []
+    },
+    {
+      "id": "sst",
+      "name": "Température de surface (SST)",
+      "description": "Prévision, reconstruction et comblement de lacunes de la SST.",
+      "discovery_topics": ["prévision SST avec CNN, ConvLSTM, Transformers et modèles hybrides"]
+    },
+    {
+      "id": "ssh-altimetry",
+      "name": "Niveau marin, altimétrie et SWOT",
+      "description": "Hauteur de mer, altimétrie nadir et large fauchée, SWOT.",
+      "discovery_topics": [
+        "HIDRA1 / HIDRA2 / HIDRA3",
+        "SWOT, BOOST-SWOT",
+        "neural mapping SLA / ADT",
+        "reconstruction des courants de surface à partir de la SSH"
+      ]
+    },
+    {
+      "id": "neural-operators",
+      "name": "Neural operators et jumeaux numériques",
+      "description": "Émulateurs rapides de modèles océaniques physiques.",
+      "discovery_topics": [
+        "FNO / AFNO pour la circulation océanique",
+        "émulateurs NEMO / PISCES et biogéochimiques"
+      ]
+    },
+    {
+      "id": "parameterization",
+      "name": "Paramétrisation et turbulence",
+      "description": "Processus sous-maille appris par ML et couplés aux modèles numériques.",
+      "discovery_topics": ["généralisation hors distribution des CNN de paramétrisation d'eddies"]
+    },
+    {
+      "id": "currents",
+      "name": "Courants, circulation et transport",
+      "description": "Courants U/V, circulation 3D, trajectoires lagrangiennes, Gulf Stream, Kuroshio.",
+      "discovery_topics": [
+        "drifters et trajectoires lagrangiennes",
+        "Gulf Stream, Kuroshio, gyres",
+        "correction de courants"
+      ]
+    },
+    {
+      "id": "eddies-fronts",
+      "name": "Tourbillons et fronts",
+      "description": "Détection et suivi des tourbillons, fronts et filaments, méso et sous-méso-échelle.",
+      "discovery_topics": [
+        "segmentation CNN sur SLA, eddy tracking",
+        "détection de fronts et filaments",
+        "reconnaissance de structures océaniques sur images SAR"
+      ]
+    },
+    {
+      "id": "marine-heatwaves",
+      "name": "Vagues de chaleur marines",
+      "description": "Détection et prévision des marine heatwaves et extrêmes océaniques.",
+      "discovery_topics": [
+        "détection et prédiction ML des marine heatwaves",
+        "niveaux marins extrêmes côtiers",
+        "réponse de l'océan aux typhons"
+      ]
+    },
+    {
+      "id": "sea-ice",
+      "name": "Banquise",
+      "description": "Prévision de la concentration et de l'étendue de la glace de mer.",
+      "discovery_topics": [
+        "ConvLSTM de concentration de glace de mer",
+        "CNN / Transformers Arctique et Antarctique",
+        "émulation hybride océan–glace"
+      ]
+    },
+    {
+      "id": "waves",
+      "name": "Vagues et état de mer",
+      "description": "Hauteur significative des vagues, prévision déterministe et probabiliste.",
+      "discovery_topics": [
+        "GRU / LSTM de hauteur significative",
+        "estimation de la hauteur de vagues depuis SAR ou images",
+        "prévision d'ensemble des vagues"
+      ]
+    },
+    {
+      "id": "biogeochemistry",
+      "name": "Biogéochimie et couleur de l'océan",
+      "description": "Chlorophylle, ocean color, oxygène, nutriments, carbone, phytoplancton.",
+      "discovery_topics": ["émulateurs PISCES / BGC, oxygène, nutriments, carbone, phytoplancton"]
+    },
+    {
+      "id": "bathymetry",
+      "name": "Bathymétrie et fonds côtiers",
+      "description": "Profondeur et nature des fonds estimées depuis le satellite.",
+      "discovery_topics": []
+    },
+    {
+      "id": "foundation-models",
+      "name": "Modèles de fondation et multimodal",
+      "description": "Grands modèles pré-entraînés et apprentissage auto-supervisé pour l'océan.",
+      "discovery_topics": [
+        "OceanGPT-o, OceanPile, OceanInstruct",
+        "modèles de fondation pour images marines, adaptation de Segment Anything",
+        "DARWIN (à suivre séparément tant qu'il n'y a pas de publication)"
+      ]
+    },
+    {
+      "id": "llm-agents",
+      "name": "LLM et agents",
+      "description": "Modèles de langage, assistants scientifiques et agents pour les sciences océaniques.",
+      "discovery_topics": [
+        "OceanGPT-o, OceanGPT-coder, OceanPile, OceanInstruct",
+        "RAG, graphes de connaissances océaniques, agents marins multimodaux"
+      ]
+    },
+    {
+      "id": "marine-ecology",
+      "name": "Écologie marine et bioacoustique",
+      "description": "Poissons, plancton, mammifères marins, coraux, images, vidéo et acoustique.",
+      "discovery_topics": ["annotation d'images marines assistée par modèles de fondation"]
+    },
+    {
+      "id": "reviews",
+      "name": "Revues de référence",
+      "description": "Grandes revues du domaine, dont les bibliographies serviront à découvrir d'autres papiers.",
+      "discovery_topics": []
+    }
+  ],
+  "papers": [
+    {"title": "GLONET: Mercator's End-to-End Neural Global Ocean Forecasting System", "doi": "10.1029/2025JH000686", "pdf_url": "https://arxiv.org/pdf/2412.05454", "domains": ["forecasting", "neural-operators", "currents"]},
+    {"title": "XiHe: A Data-Driven Model for Global Ocean Eddy-Resolving Forecasting", "domains": ["forecasting", "currents"]},
+    {"title": "Forecasting the Eddying Ocean with a Deep Neural Network", "alias": "WenHai", "domains": ["forecasting", "currents"]},
+    {"title": "FuXi-Ocean: A Global Ocean Forecasting System with Sub-Daily Resolution", "domains": ["forecasting", "currents"]},
+    {"title": "LangYa: a large AI model for global ocean forecasting", "domains": ["forecasting", "currents"]},
+    {"title": "Accurate Mediterranean Sea Forecasting via Graph-Based Deep Learning", "alias": "SeaCast", "domains": ["forecasting", "currents"]},
+    {"title": "OceanNet: a principled neural operator-based digital twin for regional oceans", "domains": ["forecasting", "neural-operators", "currents"]},
+    {"title": "Prediction of Three-Dimensional Ocean Temperature, Salinity and Current Fields Based on Fourier Neural Operators", "domains": ["forecasting", "neural-operators"]},
+    {"title": "Evaluation of Deep Neural Operator Models toward Ocean Forecasting", "domains": ["forecasting", "benchmarks", "neural-operators"]},
+    {"title": "Streamlining Ocean Dynamics Modeling with Fourier Neural Operators: A Multiobjective Hyperparameter and Architecture Optimization Approach", "domains": ["forecasting", "neural-operators"]},
+    {"title": "South China Sea \"Trident\": Solution for Ocean Forecast Foundation Models", "domains": ["forecasting"]},
+    {"title": "Deep Learning-Based Correction of Global Ocean Forecasts for the South China Sea", "domains": ["forecasting"]},
+
+    {"title": "OceanBench: A Benchmark for Data-Driven Global Ocean Forecasting Systems", "note": "Benchmark Mercator/NeurIPS de prévision globale — pas le OceanBench du projet OceanGPT (connaissances des LLM).", "domains": ["benchmarks", "forecasting"]},
+
+    {"title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry", "doi": "10.5194/gmd-16-2119-2023", "pdf_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf", "domains": ["data-assimilation", "ssh-altimetry"]},
+    {"title": "Multimodal 4DVarNets for the Reconstruction of Sea Surface Dynamics From SST-SSH Synergies", "domains": ["data-assimilation", "ssh-altimetry", "sst"]},
+    {"title": "Joint Interpolation and Representation Learning for Irregularly Sampled Satellite-Derived Geophysical Fields", "domains": ["data-assimilation"]},
+    {"title": "Multimodal learning-based inversion models for the space-time reconstruction of satellite-derived geophysical fields", "domains": ["data-assimilation"]},
+    {"title": "Observation-Only Deep Learning for Gappy Satellite-Derived Ocean Color Data Using 4DVarNet", "domains": ["data-assimilation", "biogeochemistry"]},
+    {"title": "DINCAE 1.0: a convolutional neural network with error estimates to reconstruct sea surface temperature satellite observations", "domains": ["data-assimilation", "sst"]},
+    {"title": "DINCAE 2.0: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations", "domains": ["data-assimilation", "sst", "ssh-altimetry"]},
+    {"title": "Hybrid machine learning data assimilation for marine biogeochemistry", "domains": ["data-assimilation", "biogeochemistry"]},
+
+    {"title": "Neural Synthetic Profiles from Remote Sensing and Observations (NeSPReSO): Reconstructing temperature and salinity fields in the Gulf of Mexico", "alias": "NeSPReSO", "domains": ["subsurface"]},
+    {"title": "Reconstruction of subsurface ocean state variables using Convolutional Neural Networks with combined satellite and in situ data", "domains": ["subsurface"]},
+    {"title": "Reconstructing High-Resolution Ocean Subsurface and Interior Temperature and Salinity Anomalies From Satellite Observations", "domains": ["subsurface"]},
+    {"title": "Subsurface Temperature Reconstruction for the Global Ocean from 1993 to 2020 Using Satellite Observations and Deep Learning", "domains": ["subsurface"]},
+    {"title": "Reconstruction of the Subsurface Temperature and Salinity in the South China Sea Using Deep-Learning Techniques with a Physical Guidance", "alias": "FFPG-net", "domains": ["subsurface"]},
+    {"title": "Reconstruction of Three-Dimensional Temperature and Salinity in the Equatorial Ocean with Deep-Learning", "alias": "VI-UNet", "domains": ["subsurface"]},
+    {"title": "Enhancing Ocean Temperature and Salinity Reconstruction with Deep Learning: The Role of Surface Waves", "domains": ["subsurface"]},
+    {"title": "Incremental Stable/Dynamic Disentanglement Learning for Ocean Subsurface Temperature Prediction", "domains": ["subsurface"]},
+    {"title": "A Physics-informed deep neural network for the joint prediction of 3D chlorophyll-a and hydrographic fields in the Mediterranean Sea", "alias": "4DMED-bionet", "domains": ["subsurface", "biogeochemistry"]},
+
+    {"title": "CARE-SST: context-aware reconstruction diffusion model for sea surface temperature", "domains": ["sst"]},
+    {"title": "MAESSTRO: Masked Autoencoders for Sea Surface Temperature Reconstruction under Occlusion", "domains": ["sst"]},
+    {"title": "A Daily High-Resolution Sea Surface Temperature Reconstruction Using an I-DINCAE and DNN Model Based on FY-3C Thermal Infrared Data", "domains": ["sst"]},
+    {"title": "High-Resolution Seamless Daily Sea Surface Temperature Based on Satellite Data Fusion and Machine Learning over Kuroshio Extension", "domains": ["sst"]},
+    {"title": "Physics-guided deep learning for global sea surface temperature forecasting: Balancing accuracy and stability across timescales", "alias": "SSTFormer", "domains": ["sst"]},
+    {"title": "A deep learning approach for near-coastal sea surface temperature prediction", "domains": ["sst"]},
+
+    {"title": "HIDRA-D: deep-learning model for dense sea level forecasting using sparse altimetry and tide gauge data", "domains": ["ssh-altimetry"]},
+
+    {"title": "Future digital twins: emulating a highly complex marine biogeochemical model with machine learning to predict hypoxia", "domains": ["neural-operators", "biogeochemistry"]},
+
+    {"title": "Applications of Deep Learning to Ocean Data Inference and Subgrid Parameterization", "domains": ["parameterization"]},
+    {"title": "Data-Driven Equation Discovery of Ocean Mesoscale Closures", "alias": "Zanna & Bolton", "domains": ["parameterization"]},
+    {"title": "Stochastic-Deep Learning Parameterization of Ocean Momentum Forcing", "alias": "Guillaumin & Zanna", "domains": ["parameterization"]},
+    {"title": "Implementation and Evaluation of a Machine Learned Mesoscale Eddy Parameterization into a Numerical Ocean Circulation Model", "domains": ["parameterization"]},
+    {"title": "Parameterizing Vertical Mixing Coefficients in the Ocean Surface Boundary Layer Using Neural Networks", "domains": ["parameterization"]},
+    {"title": "Machine Learned Equations for Vertical Mixing Coefficients in the Ocean Surface Boundary Layer", "domains": ["parameterization"]},
+    {"title": "Assessing Data-Driven Eddy-Parameterizations in an Atlantic Sector Model", "domains": ["parameterization"]},
+
+    {"title": "Ocean Eddy Identification and Tracking using Neural Networks", "domains": ["eddies-fronts"]},
+    {"title": "Global Oceanic Eddy Identification: A Deep Learning Method From Argo Profiles and Altimetry Data", "domains": ["eddies-fronts"]},
+    {"title": "Ocean eddy detection based on YOLO deep learning algorithm by synthetic aperture radar data", "alias": "EOLO", "domains": ["eddies-fronts"]},
+    {"title": "A two-stage deep learning architecture for detection global coastal and offshore submesoscale ocean eddy using SDGSAT-1 multispectral imagery", "domains": ["eddies-fronts"]},
+
+    {"title": "Advancing Marine Heatwave Forecasts: An Integrated Deep Learning Approach", "domains": ["marine-heatwaves"]},
+    {"title": "Global Subseasonal-to-Seasonal Marine Heatwave Forecasts Boosted by Explainable Deep Learning", "alias": "MHWCorrNet", "domains": ["marine-heatwaves"]},
+    {"title": "Machine learning techniques for marine heatwave prediction: a comprehensive review", "domains": ["marine-heatwaves", "reviews"]},
+
+    {"title": "Sea Ice Edge Constraint Improves Antarctic Sea Ice Seasonal Prediction in Deep Learning Models", "alias": "ASICNet", "domains": ["sea-ice"]},
+    {"title": "Season-Aware Hybrid Convolutional-Transformer for Antarctic Sea Ice Concentration Forecasting", "domains": ["sea-ice"]},
+
+    {"title": "WaveCastNet-C: Forecasting the significant wave height in the China Sea with a fully convolutional neural network", "domains": ["waves"]},
+    {"title": "Prediction and reconstruction of ocean wave heights based on bathymetric data using LSTM neural networks", "domains": ["waves"]},
+    {"title": "Bias correction of significant wave height with LSTM neural networks", "domains": ["waves"]},
+    {"title": "A deep learning super-resolution model to speed up computations of coastal sea states", "domains": ["waves"]},
+    {"title": "CRPS-Net: A novel framework for AI-assisted meteo-marine ensemble forecasting", "domains": ["waves"]},
+
+    {"title": "End-to-End Neural Interpolation of Satellite-Derived Sea Surface Suspended Sediment Concentrations", "domains": ["biogeochemistry", "data-assimilation"]},
+    {"title": "Enhanced forecasting of chlorophyll-a concentration in coastal waters through integration of Fourier analysis and Transformer networks", "alias": "ChloroFormer", "domains": ["biogeochemistry"]},
+    {"title": "Deep learning models to identify drivers of chlorophyll-a dynamics in the Atlantic Ocean", "domains": ["biogeochemistry"]},
+    {"title": "Spatiotemporal prediction of chlorophyll-a in semi-enclosed gulfs using a hybrid graph neural network-transformer framework with satellite data and causal analysis", "domains": ["biogeochemistry"]},
+    {"title": "Integrating physics-based modeling and deep learning for high-resolution vertical chlorophyll-a predictions in the ocean", "domains": ["biogeochemistry", "subsurface"]},
+
+    {"title": "Satellite-Derived Bathymetry Using Deep Convolutional Neural Network", "domains": ["bathymetry"]},
+    {"title": "A Machine Learning Approach to Multispectral Satellite Derived Bathymetry", "domains": ["bathymetry"]},
+    {"title": "Machine Learning Based Estimation of Coastal Bathymetry From ICESat-2 and Sentinel-2 Data", "domains": ["bathymetry"]},
+    {"title": "Satellite-derived bathymetry using machine learning and optimal Sentinel-2 imagery in South-West Florida coastal waters", "domains": ["bathymetry"]},
+    {"title": "On improved nearshore bathymetry estimates from satellites using ensemble and machine learning approaches", "domains": ["bathymetry"]},
+    {"title": "Generalized satellite-derived bathymetry across spatial and temporal domains: a domain-adaptive deep learning approach with multi-source remote sensing data", "domains": ["bathymetry"]},
+    {"title": "Seabed-Net: A multi-task network for joint bathymetry estimation and seabed classification from remote sensing imagery in shallow waters", "domains": ["bathymetry"]},
+    {"title": "Blending physical and artificial intelligence models to improve satellite-derived bathymetry mapping", "domains": ["bathymetry"]},
+    {"title": "From Local Training to Large-Scale Mapping: A Comparative Assessment of Machine Learning and Deep Learning for Transferable Satellite-Derived Bathymetry", "domains": ["bathymetry"]},
+    {"title": "A Review on Bathymetric Inversion Research Based on Deep Learning Models and Remote Sensing Images", "domains": ["bathymetry", "reviews"]},
+
+    {"title": "WV-Net: A foundation model for SAR WV-mode satellite imagery trained using contrastive self-supervised learning on 10 million images", "domains": ["foundation-models", "waves"]},
+    {"title": "OceanGPT: A Large Language Model for Ocean Science Tasks", "domains": ["foundation-models", "llm-agents"]},
+    {"title": "Deep Learning for Enhanced Ocean Color Remote Sensing: A Foundation Model Approach", "domains": ["foundation-models", "biogeochemistry"]},
+
+    {"title": "OceanGym: A Benchmark Environment for Underwater Embodied Agents", "domains": ["llm-agents"]},
+
+    {"title": "Machine learning in marine ecology: an overview of techniques and applications", "domains": ["marine-ecology", "reviews"]},
+    {"title": "Unlocking the potential of deep learning for marine ecology: overview, applications, and outlook", "domains": ["marine-ecology", "reviews"]},
+    {"title": "Underwater sound classification using learning based methods: A review", "domains": ["marine-ecology", "reviews"]},
+    {"title": "A Survey of Underwater Acoustic Data Classification Methods Using Deep Learning for Shoreline Surveillance", "domains": ["marine-ecology"]},
+
+    {"title": "Deep Learning to Infer Ocean Dynamics", "domains": ["reviews"]},
+    {"title": "Learning-Based Methods and the Future of Numerical Ocean and Sea-Ice Modeling", "domains": ["reviews", "sea-ice"]},
+    {"title": "Applications of deep learning in physical oceanography: a comprehensive review", "domains": ["reviews"]},
+    {"title": "Deep Learning for Ocean Forecasting: A Comprehensive Review of Methods, Applications, and Datasets", "domains": ["reviews", "forecasting"]},
+    {"title": "Machine learning in ocean data assimilation: Advances, gaps and the road to operations", "domains": ["reviews", "data-assimilation"]},
+    {"title": "A Survey of Foundation Models for Ocean Science", "domains": ["reviews", "foundation-models"]}
+  ]
+}

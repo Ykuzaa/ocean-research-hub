@@ -134,9 +134,9 @@ benchmark, provenance, and scientific-integrity regressions.
   structured parsed records are supplied by the caller behind a replaceable parser interface.
 - Retrieval is by stable paper ID or `GET /api/papers` (paginated list, no keyword or
   semantic/vector search yet).
-- A Next.js + TypeScript + Tailwind frontend (`frontend/`) covers the paper list/browse view;
-  paper detail and comparison still link out to the backend's own minimal server-rendered
-  pages (`/papers/{id}`, `/papers/compare`) rather than having a dedicated frontend view yet.
+- A Next.js + TypeScript + Tailwind frontend (`frontend/`) covers browsing by domain, search,
+  paper detail (with click-to-see source quotes) and comparison. Papers are added through the
+  API / seed CLI, not from the UI.
 - The three-paper golden dataset is a compact safety benchmark, not a comprehensive scientific
   corpus. Extraction outputs remain pre-audit until an independent Scientific Auditor verifies
   them against primary sources.
@@ -200,3 +200,32 @@ skipped: no LLM client configured` warning. Pass
 `semantic_extractor=False` to `create_app` to disable it explicitly even when
 a key is present (this is also how the test suite stays network-free
 regardless of a contributor's local `.env` — see `tests/conftest.py`).
+
+# Seed corpus and domains
+
+`src/ocean_research_hub/corpus/seed.json` is the curated starting corpus: 19
+research domains and ~90 papers, each tagged with every domain it belongs to
+(a paper can sit in several). Loose "look for work on X" entries are kept per
+domain as `discovery_topics` for future automatic discovery, not as papers.
+
+```bash
+# Look every title up in OpenAlex: DOI, authors, venue, open-access PDF links
+# (arXiv first — publishers often block scripted downloads). Writes
+# corpus/resolved.json. The anonymous OpenAlex budget is small and shared per
+# IP; set OPENALEX_API_KEY (free at openalex.org) for full runs.
+uv run ocean-research-hub-seed resolve
+
+# Store every paper's bibliography only — no PDF, no LLM call, no cost.
+uv run ocean-research-hub-seed ingest --metadata-only --concurrency 1
+
+# Extract technical details from open-access PDFs (LLM cost per paper;
+# already-extracted papers are skipped). --select narrows to title/alias substrings.
+uv run ocean-research-hub-seed ingest --select GLONET --select XiHe
+```
+
+A paper stored with its bibliography only is upgraded in place when its PDF is
+extracted later; a paper that already carries extracted claims is never
+overwritten. Every Claude call's token usage is appended to
+`.data/llm_usage.jsonl` so extraction cost is measured, not estimated.
+`GET /api/domains` lists the domains with their paper counts, and
+`GET /api/papers?domain=<id>` filters by domain.

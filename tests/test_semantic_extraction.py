@@ -255,6 +255,29 @@ def test_claims_wrapped_in_a_markdown_fence_are_still_parsed() -> None:
     assert result.accepted == ["architecture.dropout"]
 
 
+def test_a_claim_citing_an_invalid_page_is_rejected_without_losing_the_others() -> None:
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(0, "Cover page. We use a dropout rate of 0.2 throughout the network."),
+            ParsedPage(1, "Training used 4 NVIDIA A100 GPUs for 12 hours."),
+        ],
+        source_name="hal.pdf",
+    )
+    client = FakeLLMClient([
+        {"path": "architecture.dropout", "value": 0.2, "page": 0, "section": None,
+         "evidence": "a dropout rate of 0.2", "origin": "PRIMARY_PAPER"},
+        {"path": "training.gpu_count", "value": 4, "page": 1, "section": None,
+         "evidence": "Training used 4 NVIDIA A100 GPUs", "origin": "PRIMARY_PAPER"},
+    ])
+    record = PaperRecord()
+
+    result = SemanticExtractor(client=client).extract(parsed, record)
+
+    assert result.rejected == ["architecture.dropout"]
+    assert result.accepted == ["training.gpu_count"]
+    assert record.training.gpu_count.value == 4
+
+
 def test_malformed_response_shape_yields_zero_claims_not_a_crash() -> None:
     client = FakeLLMClient({"error": "the model refused to answer"})
     extractor = SemanticExtractor(client=client)

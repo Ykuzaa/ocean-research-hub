@@ -42,7 +42,7 @@ from ocean_research_hub.ingestion.providers import (
     ParsedPaperProvider,
     StructuredPayloadParser,
 )
-from ocean_research_hub.ingestion.pdf import PdfParser, ScientificExtractor
+from ocean_research_hub.ingestion.pdf import PdfParser, ScientificExtractor, iter_evidence_fields
 from ocean_research_hub.ingestion.repository import (
     PaperRepository,
     SqlitePaperRepository,
@@ -50,6 +50,35 @@ from ocean_research_hub.ingestion.repository import (
 from ocean_research_hub.ingestion.semantic import AnthropicClient, GeminiClient, SemanticExtractor
 from ocean_research_hub.ingestion.service import PaperIngestionService
 from ocean_research_hub.rendering import render_paper_comparison, render_paper_detail
+
+
+def summarize(paper: StoredPaper) -> PaperSummary:
+    record = paper.record
+    scientific_sections = (
+        record.scientific_framing, record.data, record.architecture, record.training,
+        record.objective, record.evaluation, record.results, record.limitations,
+    )
+    extracted = sum(
+        1
+        for section in scientific_sections
+        for field in iter_evidence_fields(section)
+        if field.value is not None or field.conflict_values
+    )
+    headline = record.results.headline.value
+    return PaperSummary(
+        id=paper.id,
+        title=record.paper.title.value,
+        authors=record.paper.authors.value or [],
+        year=record.paper.year.value,
+        venue=record.paper.venue.value,
+        doi=paper.doi,
+        architecture=record.architecture.family.value or [],
+        headline=headline[0] if headline else None,
+        extracted_field_count=extracted,
+        workflow_status=paper.workflow_status,
+        created_at=paper.created_at,
+        updated_at=paper.updated_at,
+    )
 
 
 def create_app(
@@ -104,7 +133,9 @@ def create_app(
     # dev server) and calls this API directly from the browser.
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=os.getenv("OCEAN_HUB_CORS_ORIGINS", "http://localhost:3000").split(","),
+        allow_origins=os.getenv(
+            "OCEAN_HUB_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+        ).split(","),
         allow_methods=["GET", "POST"],
         allow_headers=["content-type"],
     )
@@ -176,17 +207,7 @@ def create_app(
         offset: int = Query(default=0, ge=0),
     ) -> PaperListResponse:
         papers, total = paper_repository.list_papers(limit=limit, offset=offset)
-        return PaperListResponse(
-            papers=[
-                PaperSummary(
-                    id=paper.id, title=paper.record.paper.title.value, doi=paper.doi,
-                    workflow_status=paper.workflow_status,
-                    created_at=paper.created_at, updated_at=paper.updated_at,
-                )
-                for paper in papers
-            ],
-            total=total,
-        )
+        return PaperListResponse(papers=[summarize(paper) for paper in papers], total=total)
 
     @app.get("/api/papers/compare", response_model=PaperComparisonResponse)
     async def compare_papers_api(

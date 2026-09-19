@@ -42,6 +42,8 @@ class PaperRepository(Protocol):
 
     def get(self, paper_id: str) -> StoredPaper: ...
 
+    def find_by_identity(self, identity_key: str) -> StoredPaper | None: ...
+
     def list_papers(self, *, limit: int, offset: int) -> tuple[list[StoredPaper], int]: ...
 
 
@@ -176,6 +178,21 @@ class SqlitePaperRepository:
             raise PersistenceError("paper database read failed") from exc
         if row is None:
             raise PaperNotFoundError(f"paper {paper_id} was not found")
+        try:
+            return self._from_row(row)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise PersistenceError("stored paper could not be validated") from exc
+
+    def find_by_identity(self, identity_key: str) -> StoredPaper | None:
+        try:
+            with self._connect() as connection:
+                row = connection.execute(
+                    "SELECT * FROM papers WHERE identity_key = ?", (identity_key,)
+                ).fetchone()
+        except sqlite3.Error as exc:
+            raise PersistenceError("paper database read failed") from exc
+        if row is None:
+            return None
         try:
             return self._from_row(row)
         except (ValueError, KeyError, TypeError) as exc:

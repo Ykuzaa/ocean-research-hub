@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 import httpx
@@ -42,6 +43,10 @@ from .repository import PaperRepository
 from .semantic import SemanticExtractionError, SemanticExtractor
 
 DOI_PATTERN = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
+# A bibliography field the PDF pass searched for but could not verify carries
+# no value, so metadata may still fill it; a verified PDF value is never
+# overwritten (primary source wins).
+_METADATA_REPLACEABLE = {VerificationStatus.NOT_REPORTED, VerificationStatus.EXTRACTION_ERROR}
 
 
 def normalize_doi(value: str) -> str:
@@ -109,6 +114,7 @@ class PaperIngestionService:
         canonical_doi = requested_doi or metadata_doi
 
         extraction_warnings: list[str] = []
+        pdf_identity: str | None = None
         if request.parsed_paper is None and (request.pdf_path is not None or request.pdf_url is not None or (metadata and metadata.pdf_url)):
             pdf_url = request.pdf_url or (metadata.pdf_url if metadata else None)
             if request.pdf_path:
@@ -122,14 +128,29 @@ class PaperIngestionService:
                         content, source_name = response.content, str(pdf_url).rsplit("/", 1)[-1] or "paper.pdf"
                 except (httpx.HTTPError, OSError) as exc:
                     raise ParserError(f"could not download PDF source: {pdf_url}") from exc
-            parsed_pdf = self.pdf_parser.parse(content, source_name=source_name)
-            extracted = self.scientific_extractor.extract(parsed_pdf)
+            if canonical_doi is None:
+                # LLM extraction is non-deterministic, so a record-content hash
+                # would give the same PDF a new identity on every upload (a
+                # duplicate paper and a second paid extraction). Identify a
+                # DOI-less PDF by its bytes and return the stored record.
+                pdf_identity = f"pdf:{sha256(content).hexdigest()}"
+                existing = self.repository.find_by_identity(pdf_identity)
+                if existing is not None:
+                    return IngestPaperResponse(created=False, paper=existing)
+            # Parsing and LLM extraction are blocking and can take minutes;
+            # running them in a thread keeps the server responsive meanwhile.
+            parsed_pdf = await asyncio.to_thread(
+                self.pdf_parser.parse, content, source_name=source_name
+            )
+            extracted = await asyncio.to_thread(self.scientific_extractor.extract, parsed_pdf)
             record = extracted.record
             extraction_warnings.extend(extracted.warnings)
             extraction_warnings.append("scientific search scope: " + "; ".join(extracted.search_scope))
             if self.semantic_extractor is not None:
                 try:
-                    semantic_result = self.semantic_extractor.extract(parsed_pdf, record)
+                    semantic_result = await asyncio.to_thread(
+                        self.semantic_extractor.extract, parsed_pdf, record
+                    )
                 except SemanticExtractionError as exc:
                     extraction_warnings.append(f"semantic extraction unavailable: {exc}")
                 else:
@@ -185,7 +206,7 @@ class PaperIngestionService:
         identity_key = (
             f"doi:{canonical_doi}"
             if canonical_doi
-            else f"content:{sha256(canonical_json.encode('utf-8')).hexdigest()}"
+            else pdf_identity or f"content:{sha256(canonical_json.encode('utf-8')).hexdigest()}"
         )
         try:
             paper, created = self.repository.create_or_get(
@@ -225,7 +246,7 @@ class PaperIngestionService:
         ) -> None:
             if incoming is None or incoming == []:
                 return
-            if field.status is VerificationStatus.NOT_REPORTED:
+            if field.status in _METADATA_REPLACEABLE:
                 replacement: EvidenceField[Any]
                 source = evidence(field_name, incoming)
                 if isinstance(incoming, list):
@@ -286,7 +307,7 @@ class PaperIngestionService:
             else None
         )
         if urls is not None:
-            if bibliography.urls.status is VerificationStatus.NOT_REPORTED:
+            if bibliography.urls.status in _METADATA_REPLACEABLE:
                 bibliography.urls = EvidenceField[PaperUrls](
                     value=urls,
                     status=VerificationStatus.NOT_VERIFIED,
@@ -307,7 +328,7 @@ class PaperIngestionService:
         origin: SourceOrigin | None = None,
     ) -> None:
         source_origin = origin or SourceOrigin.SECONDARY_SOURCE
-        if bibliography.doi.status is VerificationStatus.NOT_REPORTED:
+        if bibliography.doi.status in _METADATA_REPLACEABLE:
             bibliography.doi = TextField(
                 value=doi,
                 status=VerificationStatus.NOT_VERIFIED,

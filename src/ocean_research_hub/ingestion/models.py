@@ -129,7 +129,13 @@ class PaperSummary(BaseModel):
 
     id: str
     title: str | None
+    authors: list[str] = Field(default_factory=list)
+    year: int | None = None
+    venue: str | None = None
     doi: str | None
+    architecture: list[str] = Field(default_factory=list)
+    headline: str | None = None
+    extracted_field_count: int = 0
     workflow_status: PaperWorkflowStatus
     created_at: datetime
     updated_at: datetime

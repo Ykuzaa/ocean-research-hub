@@ -363,15 +363,15 @@ def mark_extraction_error(record: PaperRecord, path: str, limitation: bool = Fal
     }))
 
 
-def iter_evidence_fields(record: PaperRecord) -> Iterable[EvidenceField[Any]]:
-    def walk(model: BaseModel) -> Iterable[EvidenceField[Any]]:
-        for name in type(model).model_fields:
-            value = getattr(model, name)
+def iter_evidence_fields(model: BaseModel) -> Iterable[EvidenceField[Any]]:
+    def walk(node: BaseModel) -> Iterable[EvidenceField[Any]]:
+        for name in type(node).model_fields:
+            value = getattr(node, name)
             if isinstance(value, EvidenceField):
                 yield value
             elif isinstance(value, BaseModel):
                 yield from walk(value)
-    return walk(record)
+    return walk(model)
 
 
 class ScientificExtractor:
@@ -450,9 +450,11 @@ class ScientificExtractor:
             mappings = (
                 (r"(?:we use|using) (?:the )?(AdamW|Adam|SGD|RMSProp) optimizer", "training.optimizer", False),
                 (r"learning rate (?:of|is|was) ([0-9.eE×-]+)", "training.learning_rate", False),
-                (r"(?:spatial|horizontal) resolution (?:of|is|was) (.+?)(?:\.|;)", "data.spatial_resolution", False),
+                # A sentence ends at a period followed by space/end, not at a
+                # decimal point ("0.25°" must not be captured as "0").
+                (r"(?:spatial|horizontal) resolution (?:of|is|was) (.+?)(?:\.(?=\s|$)|;)", "data.spatial_resolution", False),
                 (r"batch size (?:of|is|was) ([0-9]+)", "training.batch_size", False),
-                (r"loss function (?:used is|is|was) (.+?)(?:\.|;)", "objective.primary_loss", False),
+                (r"loss function (?:used is|is|was) (.+?)(?:\.(?=\s|$)|;)", "objective.primary_loss", False),
             )
             for pattern, path, is_list in mappings:
                 match = re.search(pattern, text, re.I)

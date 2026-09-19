@@ -39,9 +39,13 @@ def _parsed_pdf() -> ParsedPdf:
     )
 
 
-def test_field_catalog_excludes_bibliography_and_reports_declared_types() -> None:
+def test_field_catalog_covers_readable_bibliography_but_not_identifiers() -> None:
     catalog = dict(field_catalog(PaperRecord()))
-    assert "paper.title" not in catalog
+    assert catalog["paper.title"] is str
+    assert catalog["paper.year"] is int
+    assert "paper.doi" not in catalog
+    assert "paper.arxiv" not in catalog
+    assert "paper.urls" not in catalog
     assert catalog["architecture.dropout"] is float
     assert catalog["training.gpu_count"] is int
     assert catalog["architecture.family"] == list[str]

@@ -197,6 +197,17 @@ def test_profile_cannot_emit_specific_loss_components_from_generic_loss_phrase()
     assert field.value is None
 
 
+def test_generic_fallback_does_not_truncate_decimal_resolutions() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(1, "The spatial resolution is 0.25° × 0.25° on a global grid. Other text.")],
+        source_name="paper.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.data.spatial_resolution
+
+    assert field.value == "0.25° × 0.25° on a global grid"
+
+
 class _FakeSemanticLLMClient:
     def __init__(self, payload: object) -> None:
         self.payload = payload
@@ -262,6 +273,81 @@ def test_ingestion_survives_a_semantic_extractor_failure_with_a_visible_warning(
         "semantic extraction unavailable" in warning and "simulated Gemini outage" in warning
         for warning in result["warnings"]
     )
+
+
+class _CountingSemanticLLMClient:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def propose_claims(self, prompt: str) -> str:
+        self.calls += 1
+        return json.dumps([])
+
+
+def test_reuploading_the_same_pdf_returns_the_stored_paper_without_re_extracting(
+    tmp_path: Path,
+) -> None:
+    pdf = tmp_path / "xihe.pdf"
+    pdf.write_bytes(b"%PDF-1.7 fixture")
+    client = _CountingSemanticLLMClient()
+    app = create_app(
+        repository=SqlitePaperRepository(tmp_path / "papers.db"), pdf_parser=StubPdfParser(),
+        semantic_extractor=SemanticExtractor(client=client),
+    )
+
+    with TestClient(app) as test_client:
+        first = test_client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
+        second = test_client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
+        listed = test_client.get("/api/papers")
+
+    assert first.status_code == 201
+    assert second.status_code == 200
+    assert second.json()["paper"]["id"] == first.json()["paper"]["id"]
+    assert client.calls == 1
+    assert listed.json()["total"] == 1
+
+
+class _TitleMetadataProvider:
+    async def fetch(self, doi: str) -> MetadataPayload:
+        return MetadataPayload(title="GLORYS-driven ocean forecasting", doi=doi, year=2024)
+
+
+def test_metadata_fills_bibliography_the_pdf_pass_could_not_verify(tmp_path: Path) -> None:
+    pdf = tmp_path / "xihe.pdf"
+    pdf.write_bytes(b"%PDF-1.7 fixture")
+    app = create_app(
+        repository=SqlitePaperRepository(tmp_path / "papers.db"), pdf_parser=StubPdfParser(),
+        metadata_provider=_TitleMetadataProvider(),
+        semantic_extractor=SemanticExtractor(client=_CountingSemanticLLMClient()),
+    )
+
+    with TestClient(app) as test_client:
+        response = test_client.post(
+            "/api/papers/ingest", json={"pdf_path": str(pdf), "doi": "10.1234/ocean.1"},
+        )
+
+    paper = response.json()["paper"]["record"]["paper"]
+    assert paper["title"]["value"] == "GLORYS-driven ocean forecasting"
+    assert paper["year"]["value"] == 2024
+
+
+def test_paper_list_summarizes_bibliography_architecture_and_extraction_count(
+    tmp_path: Path,
+) -> None:
+    pdf = tmp_path / "xihe.pdf"
+    pdf.write_bytes(b"%PDF-1.7 fixture")
+    app = create_app(
+        repository=SqlitePaperRepository(tmp_path / "papers.db"), pdf_parser=StubPdfParser(),
+    )
+
+    with TestClient(app) as test_client:
+        test_client.post("/api/papers/ingest", json={"pdf_path": str(pdf)})
+        summary = test_client.get("/api/papers").json()["papers"][0]
+
+    assert summary["architecture"] == ["hierarchical transformer"]
+    assert summary["extracted_field_count"] >= 5
+    assert summary["authors"] == []
+    assert summary["headline"] is None
 
 
 def test_ingestion_notes_when_no_semantic_extractor_is_configured(tmp_path: Path) -> None:

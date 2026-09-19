@@ -175,13 +175,16 @@ def _coerce_value(raw: JsonValue, expected_type: Any) -> Any | None:
 
 
 _EXTRACTABLE_PROVENANCE = {ProvenanceType.AUTHOR_REPORTED_FACT, ProvenanceType.AUTHOR_REPORTED_LIMITATION}
+# Identity-bearing bibliography: a malformed DOI fails ingestion outright, and
+# these come from Crossref or the caller rather than from reading the PDF.
+_NON_SEMANTIC_PATHS = frozenset({"paper.doi", "paper.arxiv", "paper.urls"})
 
 
-def field_catalog(record: PaperRecord, *, exclude_prefix: str = "paper.") -> list[tuple[str, Any]]:
+def field_catalog(record: PaperRecord) -> list[tuple[str, Any]]:
     """Every leaf field path and its declared value type, walked from a live record.
 
-    Bibliography (``paper.*``) is excluded by default: it is sourced from DOI
-    metadata/Crossref, not from semantic reading of the PDF body. Fields whose
+    Title, authors, year and venue are included (a PDF-only ingestion has no
+    other source for them); DOI, arXiv id and URLs are not. Fields whose
     default provenance is AI_INTERPRETATION or TEAM_NOTE (e.g.
     ``limitations.ai_interpretation``, ``limitations.team_note``) are always
     excluded: they hold interpretation or human annotation by construction,
@@ -194,7 +197,7 @@ def field_catalog(record: PaperRecord, *, exclude_prefix: str = "paper.") -> lis
             value = getattr(model, name)
             path = f"{prefix}{name}"
             if isinstance(value, EvidenceField):
-                if path.startswith(exclude_prefix) or value.provenance_type not in _EXTRACTABLE_PROVENANCE:
+                if path in _NON_SEMANTIC_PATHS or value.provenance_type not in _EXTRACTABLE_PROVENANCE:
                     continue
                 generic_args = type(value).__pydantic_generic_metadata__.get("args")
                 expected_type = generic_args[0] if generic_args else str

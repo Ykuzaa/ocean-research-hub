@@ -1,9 +1,19 @@
 # Ocean Research Hub — frontend
 
 Next.js (App Router) + TypeScript + Tailwind CSS client for the FastAPI
-backend in the repository root. Currently a single papers list/browse view
-(`app/page.tsx`); paper detail and comparison still link out to the
-backend's own server-rendered pages (`/papers/{id}`, `/papers/compare`).
+backend in the repository root.
+
+Pages:
+
+- `/` — dashboard: stats, search, one card per paper (title, authors, year,
+  model family, key result)
+- `/papers/[id]` — every technical detail found in the paper, by section;
+  click a value to see the exact sentence and page it was read from
+- `/add` — paste an arXiv link/id or a PDF URL (optional DOI) to extract a
+  new paper (takes 1–3 minutes with the LLM step enabled)
+- `/compare?a=ID&b=ID` — two papers side by side, section by section
+
+Values the extractor could not verify against the PDF are simply not shown.
 
 ## Prerequisites
 
@@ -23,13 +33,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-`API_BASE_URL` in `.env.local` points at the backend (default
-`http://127.0.0.1:8000`); it's a server-only env var since data fetching
-happens in a Server Component, not the browser.
+`NEXT_PUBLIC_API_BASE_URL` in `.env.local` points at the backend (default
+`http://127.0.0.1:8000`). It is public because the add-paper form calls the
+backend directly from the browser (the backend allows this origin via CORS).
 
 ## Validate
 
 ```bash
-npx tsc --noEmit
 npm run build
 ```

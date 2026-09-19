@@ -5,13 +5,16 @@ backend in the repository root.
 
 Pages:
 
-- `/` — dashboard: stats, search, one card per paper (title, authors, year,
-  model family, key result)
+- `/` — hero with instant search (papers and domains), the 19 domain tiles,
+  and a carousel of papers analysed in detail
+- `/domains/[id]` — one domain: its analysed papers as cards, the others
+  (bibliography only) as a list, and a sidebar to switch domain
 - `/papers/[id]` — every technical detail found in the paper, by section;
   click a value to see the exact sentence and page it was read from
-- `/add` — paste an arXiv link/id or a PDF URL (optional DOI) to extract a
-  new paper (takes 1–3 minutes with the LLM step enabled)
-- `/compare?a=ID&b=ID` — two papers side by side, section by section
+- `/compare?a=ID&b=ID` — two analysed papers side by side, section by section
+
+Papers are added through the backend (`uv run ocean-research-hub-seed`, see
+the root README), not from the UI.
 
 Values the extractor could not verify against the PDF are simply not shown.
 
@@ -34,8 +37,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 `NEXT_PUBLIC_API_BASE_URL` in `.env.local` points at the backend (default
-`http://127.0.0.1:8000`). It is public because the add-paper form calls the
-backend directly from the browser (the backend allows this origin via CORS).
+`http://127.0.0.1:8000`).
 
 ## Validate
 

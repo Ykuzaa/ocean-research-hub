@@ -13,3 +13,48 @@
 body {
   @apply bg-slate-50 text-slate-800 antialiased;
 }
+
+/* Hero waves: each layer is two identical periods wide and slides by one. */
+@keyframes wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.wave-layer {
+  animation: wave-drift 22s linear infinite;
+}
+
+.wave-layer-slow {
+  animation-duration: 34s;
+  animation-direction: reverse;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+.reveal {
+  animation: fade-up 0.7s ease both;
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+    animation-delay: 0s !important;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-layer { animation: none; }
+  .reveal { animation: none; }
+}

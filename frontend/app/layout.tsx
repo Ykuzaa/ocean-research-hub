@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Ocean Research Hub",
-  description: "Les détails techniques des papiers de recherche océan × ML, extraits et sourcés.",
+  description: "Les détails techniques des papiers d'IA pour l'océan, lus dans le PDF et classés par domaine.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -23,7 +23,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
       <body className="flex min-h-full flex-col font-sans">
         <NavBar />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
+        <main className="flex-1">{children}</main>
+        <footer className="border-t border-slate-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-slate-500 sm:px-6">
+            Ocean Research Hub — chaque information affichée est retrouvée mot pour mot dans le PDF du papier.
+          </div>
+        </footer>
       </body>
     </html>
   );

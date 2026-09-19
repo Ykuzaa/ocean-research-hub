@@ -1,4 +1,4 @@
-import { getPaper, listPapers, type PaperSummary, type StoredPaper } from "@/app/lib/api";
+import { getPaper, isAnalyzed, listPapers, type PaperSummary, type StoredPaper } from "@/app/lib/api";
 import { SECTIONS, hasContent, paperTitle, sectionEntries, fieldAt } from "@/app/lib/fields";
 import { ComparePicker } from "@/app/components/ComparePicker";
 import { FieldValue } from "@/app/components/FieldValue";
@@ -57,16 +57,16 @@ export default async function ComparePage(props: PageProps<"/compare">) {
   let papers: PaperSummary[];
   let pair: [StoredPaper, StoredPaper] | null = null;
   try {
-    papers = (await listPapers()).papers;
+    papers = (await listPapers()).filter(isAnalyzed);
     if (a && b && a !== b) pair = await Promise.all([getPaper(a), getPaper(b)]);
   } catch {
     return <BackendDown />;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Comparer deux papiers</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Comparer deux papiers</h1>
         <p className="mt-1 text-sm text-slate-500">
           Section par section, uniquement les infos trouvées dans au moins un des deux papiers.
         </p>
@@ -79,7 +79,7 @@ export default async function ComparePage(props: PageProps<"/compare">) {
       ) : (
         <p className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-sm text-slate-500">
           {papers.length < 2
-            ? "Il faut au moins deux papiers pour comparer. Ajoute-en un autre."
+            ? "Il faut au moins deux papiers analysés pour comparer."
             : "Choisis deux papiers pour les voir côte à côte."}
         </p>
       )}

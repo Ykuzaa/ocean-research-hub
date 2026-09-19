@@ -10,8 +10,16 @@ export type PaperSummary = {
   architecture: string[];
   headline: string | null;
   extracted_field_count: number;
+  domains: string[];
   created_at: string;
   updated_at: string;
+};
+
+export type Domain = {
+  id: string;
+  name: string;
+  description: string;
+  paper_count: number;
 };
 
 export type SourceEvidence = {
@@ -36,42 +44,41 @@ export type StoredPaper = {
   id: string;
   doi: string | null;
   record: PaperRecord;
+  domains: string[];
   created_at: string;
   updated_at: string;
 };
 
 export class ApiError extends Error {
-  constructor(message: string, readonly status: number, readonly code?: string) {
+  constructor(message: string, readonly status: number) {
     super(message);
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store", ...init });
+async function request<T>(path: string): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
   if (!response.ok) {
     const body = await response.json().catch(() => null);
-    const code: string | undefined = body?.error?.code;
-    const message: string = body?.error?.message ?? `HTTP ${response.status}`;
-    throw new ApiError(message, response.status, code);
+    throw new ApiError(body?.error?.message ?? `HTTP ${response.status}`, response.status);
   }
   return response.json();
 }
 
-export function listPapers(limit = 100): Promise<{ papers: PaperSummary[]; total: number }> {
-  return request(`/api/papers?limit=${limit}`);
+export async function listPapers(options: { domain?: string; limit?: number } = {}): Promise<PaperSummary[]> {
+  const query = new URLSearchParams({ limit: String(options.limit ?? 200) });
+  if (options.domain) query.set("domain", options.domain);
+  return (await request<{ papers: PaperSummary[] }>(`/api/papers?${query}`)).papers;
+}
+
+export function listDomains(): Promise<Domain[]> {
+  return request("/api/domains");
 }
 
 export function getPaper(id: string): Promise<StoredPaper> {
   return request(`/api/papers/${encodeURIComponent(id)}`);
 }
 
-export function ingestPaper(body: { pdf_url: string; doi?: string }): Promise<{
-  created: boolean;
-  paper: StoredPaper;
-}> {
-  return request("/api/papers/ingest", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
+/** A paper whose technical details have been read from its PDF, not just its bibliography. */
+export function isAnalyzed(paper: PaperSummary): boolean {
+  return paper.extracted_field_count > 0;
 }

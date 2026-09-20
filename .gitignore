@@ -4,6 +4,8 @@ __pycache__/
 .venv/
 .data/
 dist/
+node_modules/
+codex-run.log
 .env
 .env.*
 !.env.example

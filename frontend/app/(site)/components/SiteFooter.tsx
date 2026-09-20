@@ -8,15 +8,15 @@ export function SiteFooter() {
         <div>
           <span className="flex items-center gap-2.5 text-ink-900">
             <BrandMark className="h-6 w-6" />
-            <Wordmark className="text-sm" />
+            <Wordmark className="text-base" />
           </span>
-          <p className="mt-3 max-w-md text-[0.8125rem] leading-relaxed text-ink-400">
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-400">
             A value is only shown when the source paper states it. Missing values stay{" "}
             <span className="font-mono text-ink-600">NOT_REPORTED</span>; disagreements stay{" "}
             <span className="font-mono text-ink-600">CONFLICT</span>.
           </p>
         </div>
-        <nav aria-label="Footer" className="flex gap-6 text-[0.8125rem]">
+        <nav aria-label="Footer" className="flex flex-wrap gap-6 text-sm">
           <Link href="/explore" className="text-ink-600 transition hover:text-tide-600">
             Research workspace
           </Link>

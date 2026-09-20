@@ -52,6 +52,8 @@ class PaperRepository(Protocol):
 
     def domain_counts(self) -> dict[str, int]: ...
 
+    def list_all_papers(self) -> tuple[list[StoredPaper], int, int]: ...
+
 
 class SqlitePaperRepository:
     """Persist canonical records atomically without weakening schema validation."""
@@ -294,6 +296,31 @@ class SqlitePaperRepository:
             for domain in json.loads(row["domains_json"]):
                 counts[domain] = counts.get(domain, 0) + 1
         return counts
+
+    def list_all_papers(self) -> tuple[list[StoredPaper], int, int]:
+        """Return the complete corpus for server-side aggregation.
+
+        Unlike the paginated public listing, this maintenance-oriented read has
+        no presentation cap. Invalid persisted rows are counted rather than
+        making a valid remainder look unavailable; callers can surface a
+        truthful PARTIAL state while repository I/O failures still raise.
+        """
+        try:
+            with self._connect() as connection:
+                rows = connection.execute(
+                    "SELECT * FROM papers ORDER BY updated_at DESC"
+                ).fetchall()
+        except sqlite3.Error as exc:
+            raise PersistenceError("paper database read failed") from exc
+
+        papers: list[StoredPaper] = []
+        invalid = 0
+        for row in rows:
+            try:
+                papers.append(self._from_row(row))
+            except (ValueError, KeyError, TypeError):
+                invalid += 1
+        return papers, len(rows), invalid
 
     def count(self) -> int:
         """Expose a deterministic integration-test and maintenance probe."""

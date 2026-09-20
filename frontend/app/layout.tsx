@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,28 +12,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Display face for the public landing only; the workspace stays on Geist.
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
-});
-
 export const metadata: Metadata = {
   title: {
     default: "Ocean Research Hub — Ocean AI research, structured",
     template: "%s — Ocean Research Hub",
   },
   description:
-    "Ocean Research Hub turns Ocean × AI scientific literature into structured, evidence-grounded research intelligence: models, datasets, experiments, reported limitations — every field traceable to its source page.",
+    "Ocean Research Hub turns Ocean × AI scientific literature into structured, evidence-grounded research intelligence: models, datasets, experiments, and reported limitations, with source evidence and audit status kept visible.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col font-sans">{children}</body>
     </html>

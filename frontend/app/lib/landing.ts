@@ -90,6 +90,9 @@ export type LandingData = {
     readablePapers: number;
     domains: number;
     papersWithFields: number;
+    processedPapers: number;
+    indexedNotProcessed: number;
+    futureDatedPapers: number;
     extractedFields: number;
     recordFields: number;
     sourcedValues: number;
@@ -153,6 +156,9 @@ const ZERO_TOTALS: LandingData["totals"] = {
   readablePapers: 0,
   domains: 0,
   papersWithFields: 0,
+  processedPapers: 0,
+  indexedNotProcessed: 0,
+  futureDatedPapers: 0,
   extractedFields: 0,
   recordFields: 0,
   sourcedValues: 0,
@@ -197,6 +203,9 @@ export async function loadLandingData(): Promise<LandingData> {
       readablePapers: aggregate.totals.readable_papers,
       domains: aggregate.totals.domains,
       papersWithFields: aggregate.totals.papers_with_extracted_fields,
+      processedPapers: aggregate.totals.processed_papers,
+      indexedNotProcessed: aggregate.totals.indexed_not_processed,
+      futureDatedPapers: aggregate.totals.future_dated_papers,
       extractedFields: aggregate.totals.extracted_scientific_fields,
       recordFields: aggregate.totals.scientific_record_fields,
       sourcedValues: aggregate.totals.values_with_exact_evidence,

@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -365,3 +366,94 @@ def test_display_source_uses_qualifying_additional_source(tmp_path: Path) -> Non
     )
     assert optimizer["source"]["evidence"] is None
     assert optimizer["display_source"]["evidence"] == evidence
+
+
+def test_verification_ledger_only_counts_extraction_attempted_papers(tmp_path: Path) -> None:
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    repository.initialize()
+    _insert(repository, 1, scientific=True)
+    bibliography_only_id = _insert(repository, 2, scientific=False)
+    app = create_app(repository=repository, semantic_extractor=False)
+
+    with TestClient(app) as client:
+        body = client.get("/api/landing").json()
+        missing = client.get(
+            "/api/landing/drilldown",
+            params={"dimension": "status", "key": "NOT_REPORTED", "limit": 200},
+        ).json()
+
+    assert body["totals"]["processed_papers"] == 1
+    assert body["totals"]["indexed_not_processed"] == 1
+    assert sum(item["fields"] for item in body["statuses"]) == body["totals"]["scientific_record_fields"]
+    assert all(item["paper"]["id"] != bibliography_only_id for item in missing["evidence_items"])
+
+
+def test_future_dated_records_are_flagged_and_excluded_from_year_chart(tmp_path: Path) -> None:
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    repository.initialize()
+    record = PaperRecord.model_validate(
+        {
+            "paper": {
+                "title": {"value": "Future metadata", "status": "NOT_VERIFIED"},
+                "year": {"value": datetime.now().year + 1, "status": "NOT_VERIFIED"},
+            }
+        }
+    )
+    repository.create_or_get(
+        identity_key="future-year",
+        doi=None,
+        record=record,
+        workflow_status=PaperWorkflowStatus.INGESTED,
+        warnings=[],
+    )
+    app = create_app(repository=repository, semantic_extractor=False)
+
+    with TestClient(app) as client:
+        body = client.get("/api/landing").json()
+
+    assert body["totals"]["future_dated_papers"] == 1
+    assert body["years"] == []
+
+
+def test_conflict_demo_rejects_sentence_fragments_and_uses_plausible_bound_values(
+    tmp_path: Path,
+) -> None:
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    repository.initialize()
+    bad_values = [
+        "the grid is described in a long methods sentence",
+        "another excerpt discussing resolution without a compact value",
+    ]
+    good_values = ["1/12°", "0.25°"]
+
+    def conflict_record(title: str, values: list[str]) -> PaperRecord:
+        return PaperRecord.model_validate(
+            {
+                "paper": {"title": {"value": title, "status": "NOT_VERIFIED"}},
+                "data": {
+                    "spatial_resolution": {
+                        "status": "CONFLICT",
+                        "provenance_type": "AUTHOR_REPORTED_FACT",
+                        "conflict_values": values,
+                        "source": {**_source(f"First excerpt for {values[0]}"), "claimed_value": values[0]},
+                        "sources": [{**_source(f"Second excerpt for {values[1]}"), "claimed_value": values[1]}],
+                    }
+                },
+            }
+        )
+
+    for key, record in (("bad-conflict", conflict_record("Bad", bad_values)), ("good-conflict", conflict_record("Good", good_values))):
+        repository.create_or_get(
+            identity_key=key,
+            doi=None,
+            record=record,
+            workflow_status=PaperWorkflowStatus.EXTRACTED,
+            warnings=[],
+        )
+    app = create_app(repository=repository, semantic_extractor=False)
+
+    with TestClient(app) as client:
+        demo = client.get("/api/landing").json()["conflict_demo"]
+
+    assert demo["paper"]["title"] == "Good"
+    assert demo["field"]["conflict_values"] == good_values

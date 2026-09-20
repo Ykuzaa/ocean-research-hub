@@ -170,6 +170,9 @@ export type LandingAggregate = {
     readable_papers: number;
     domains: number;
     papers_with_extracted_fields: number;
+    processed_papers: number;
+    indexed_not_processed: number;
+    future_dated_papers: number;
     extracted_scientific_fields: number;
     scientific_record_fields: number;
     values_with_exact_evidence: number;

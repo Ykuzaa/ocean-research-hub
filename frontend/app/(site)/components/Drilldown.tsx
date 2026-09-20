@@ -23,19 +23,19 @@ function EvidenceResult({ item }: { item: LandingEvidenceItem }) {
     <li className="border-l-2 border-tide-400 pl-4">
       {source?.evidence ? (
         <>
-          <p className="text-sm font-medium text-ink-400">Stored source evidence</p>
+          <p className="text-base font-medium text-ink-400">Stored source evidence</p>
           <blockquote className="mt-2 font-mono text-[0.9375rem] leading-relaxed text-ink-900">
             “{source.evidence}”
           </blockquote>
         </>
       ) : (
-        <p className="text-sm leading-relaxed text-ink-400">
+        <p className="text-base leading-relaxed text-ink-400">
           No source quotation is attached to this field state.
         </p>
       )}
 
       {hasClaim && (
-        <p className="mt-2 text-sm leading-relaxed text-ink-600">
+        <p className="mt-2 text-base leading-relaxed text-ink-600">
           <span className="font-medium">Stored value:</span>{" "}
           {item.field.status === "CONFLICT"
             ? item.field.conflict_values.map(formatValue).join(" / ")
@@ -43,7 +43,7 @@ function EvidenceResult({ item }: { item: LandingEvidenceItem }) {
         </p>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem] text-ink-400">
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-400">
         <Link
           href={`/papers/${item.paper.id}`}
           className="max-w-full truncate font-medium text-ink-600 underline decoration-rule underline-offset-4 hover:text-tide-600"
@@ -61,7 +61,7 @@ function EvidenceResult({ item }: { item: LandingEvidenceItem }) {
         {item.field.verified_at && <span>{new Date(item.field.verified_at).toLocaleDateString("en")}</span>}
       </div>
       {item.field.status === "NOT_REPORTED" && item.field.absence_search_scope.length > 0 && (
-        <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink-400">
+        <p className="mt-2 text-sm leading-relaxed text-ink-400">
           Absence search scope: {item.field.absence_search_scope.join(" · ")}
         </p>
       )}
@@ -78,7 +78,7 @@ function PaperResult({ paper }: { paper: LandingPaperReference }) {
       >
         {paper.title || "Untitled paper"}
       </Link>
-      <p className="mt-1 text-[0.8125rem] text-ink-400">
+      <p className="mt-1 text-sm text-ink-400">
         {[paper.year, paper.workflow_status].filter(Boolean).join(" · ")}
       </p>
     </li>

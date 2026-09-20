@@ -1,6 +1,6 @@
 import type { LandingData, NamedTally, StatusTally, YearBar } from "@/app/lib/landing";
 import { Drilldown } from "./Drilldown";
-import { Panel, PanelPlaceholder, SectionHeader } from "./primitives";
+import { Panel, PanelPlaceholder } from "./primitives";
 
 function YearColumns({ years }: { years: YearBar[] }) {
   const max = Math.max(1, ...years.map((bar) => bar.extracted + bar.bibliographic));
@@ -9,13 +9,13 @@ function YearColumns({ years }: { years: YearBar[] }) {
   );
 
   return (
-    <figure className="m-0" aria-describedby="year-data">
+    <figure className="m-0 min-w-0" aria-describedby="year-data">
       <div aria-hidden className="flex h-44 items-end gap-1.5 border-b border-rule sm:h-60 sm:gap-2">
         {years.map((bar) => {
           const total = bar.extracted + bar.bibliographic;
           return (
             <div key={bar.year} className="flex h-full min-w-0 flex-1 flex-col justify-end">
-              <span className="mb-1 h-5 text-center font-mono text-[0.8125rem] leading-5 tabular-nums text-ink-900">
+              <span className="mb-1 h-5 text-center font-mono text-sm leading-5 tabular-nums text-ink-900">
                 {bar.year === peak.year ? total : ""}
               </span>
               <span
@@ -41,8 +41,9 @@ function YearColumns({ years }: { years: YearBar[] }) {
       </div>
       <div aria-hidden className="mt-2 flex gap-1.5 sm:gap-2">
         {years.map((bar) => (
-          <span key={bar.year} className="min-w-0 flex-1 text-center font-mono text-[0.8125rem] tabular-nums text-ink-400">
-            {String(bar.year).slice(2)}
+          <span key={bar.year} className="min-w-0 flex-1 text-center font-mono text-sm tabular-nums text-ink-400">
+            <span className="sm:hidden">’{String(bar.year).slice(2)}</span>
+            <span className="hidden sm:inline">{bar.year}</span>
           </span>
         ))}
       </div>
@@ -85,13 +86,19 @@ function StatusLedger({ statuses, total }: { statuses: StatusTally[]; total: num
           <li key={entry.status} className="py-4 first:pt-0 last:pb-0">
             <div className="flex items-baseline justify-between gap-4">
               <span className="font-mono text-[0.8125rem] text-ink-900">{entry.status}</span>
-              <span className="font-mono text-[0.8125rem] tabular-nums text-ink-600">{entry.fields.toLocaleString("en")} · {shareLabel}</span>
+              <span className="shrink-0 font-mono text-sm tabular-nums text-ink-600">{entry.fields.toLocaleString("en")} · {shareLabel}</span>
             </div>
             <span aria-hidden className="mt-2 block h-1.5 bg-sheet-3">
-              <span className="block h-full bg-tide-400" style={{ width: `${Math.max(share, 1)}%` }} />
+              <span className="block h-full bg-tide-400" style={{ width: `${entry.fields === 0 ? 0 : Math.max(share, 1)}%` }} />
             </span>
-            <p className="mt-2 text-sm leading-relaxed text-ink-400">{entry.blurb}</p>
-            <Drilldown path={entry.drilldownPath} total={entry.fields} initialEvidence={entry.items} label={`Inspect ${entry.fields.toLocaleString("en")} field${entry.fields === 1 ? "" : "s"}`} />
+            {entry.fields === 0 ? (
+              <p className="mt-2 text-base leading-relaxed text-ink-400">No field carries this status yet.</p>
+            ) : (
+              <>
+                <p className="mt-2 text-base leading-relaxed text-ink-400">{entry.blurb}</p>
+                <Drilldown path={entry.drilldownPath} total={entry.fields} initialEvidence={entry.items} label={`Inspect ${entry.fields.toLocaleString("en")} field${entry.fields === 1 ? "" : "s"}`} />
+              </>
+            )}
           </li>
         );
       })}
@@ -107,16 +114,16 @@ function NamedList({ title, items, total }: { title: string; items: NamedTally[]
         <ul className="mt-3 divide-y divide-rule">
           {items.map((item) => (
             <li key={item.key} className="py-3 first:pt-0 last:pb-0">
-              <div className="flex items-baseline justify-between gap-4 text-[0.9375rem]">
+              <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-base">
                 <span className="min-w-0 truncate text-ink-600" title={item.name}>{item.name}</span>
-                <span className="shrink-0 font-mono text-[0.8125rem] tabular-nums text-ink-400">{item.papers}/{total} papers</span>
+                <span className="shrink-0 font-mono text-sm tabular-nums text-ink-400">{item.papers}/{total} papers</span>
               </div>
               <Drilldown path={item.drilldownPath} total={item.papers} initialEvidence={item.items} label="View papers and exact evidence" />
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-3 text-sm leading-relaxed text-ink-400">No source-linked candidate extractions qualify yet.</p>
+        <p className="mt-3 text-base leading-relaxed text-ink-400">No entry is named in more than one processed paper yet.</p>
       )}
     </div>
   );
@@ -124,67 +131,71 @@ function NamedList({ title, items, total }: { title: string; items: NamedTally[]
 
 export function IntelligencePanel({ data }: { data: LandingData }) {
   const { statuses, totals, families, datasets, status, gapPreview } = data;
-  const repeatedFamilies = families.filter((item) => item.papers > 1).length;
-  const repeatedDatasets = datasets.filter((item) => item.papers > 1).length;
+  const trendFamilies = families.filter((item) => item.papers >= 2);
+  const trendDatasets = datasets.filter((item) => item.papers >= 2);
+  const hasRepeatedNames = trendFamilies.length > 0 || trendDatasets.length > 0;
 
   return (
-    <section id="intelligence" className="scroll-mt-20 border-t border-rule/60 bg-sheet-1">
+    <section id="intelligence" className="scroll-mt-28 border-t border-rule/60 bg-sheet-1 md:scroll-mt-20">
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
-        <SectionHeader
-          kicker="Research intelligence"
-          title="See what the corpus knows—and what it does not."
-          lede="The same evidence-grounded records can reveal corpus coverage, named methods and datasets, and the audit state of every field. Every displayed count opens back to its papers or evidence."
-        />
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.65fr)] lg:items-end lg:gap-12">
+          <div className="min-w-0">
+            <p className="text-base font-medium text-tide-600">Research intelligence</p>
+            <h2 className="mt-3 max-w-3xl font-display text-4xl font-medium leading-[1.08] tracking-[-0.035em] text-ink-900 sm:text-5xl">See what the corpus knows—and what it does not.</h2>
+          </div>
+          <p className="max-w-[72ch] text-base leading-relaxed text-ink-600 lg:justify-self-end">Every displayed count opens back to its papers or evidence. Insufficient repetition is shown as a result, not disguised as a trend.</p>
+        </div>
 
         <Panel className="mt-8 overflow-hidden sm:mt-10">
-          <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="p-5 sm:p-7 lg:border-r lg:border-rule">
+          <div className="grid min-w-0 xl:grid-cols-[1.1fr_0.9fr]">
+            <div className="min-w-0 p-5 sm:p-7 xl:border-r xl:border-rule">
               <h3 className="text-xl font-semibold text-ink-900">Corpus over time</h3>
-              <p className="mb-7 mt-2 text-[0.9375rem] leading-relaxed text-ink-400">
+              <p className="mb-7 mt-2 max-w-[72ch] text-base leading-relaxed text-ink-400">
                 {status === "ready"
-                  ? `${totals.papers} papers across the full corpus; ${totals.papersWithFields} contain extracted scientific fields.`
+                  ? `${totals.papers} papers indexed; ${totals.processedPapers} have reached a scientific-extraction workflow.`
                   : "Indexed papers by publication year."}
               </p>
               {data.years.length > 0 ? <YearColumns years={data.years} /> : <PanelPlaceholder what="This chart" status={status} />}
+              {totals.futureDatedPapers > 0 && (
+                <p className="mt-4 max-w-[72ch] text-sm leading-relaxed text-ink-400">{totals.futureDatedPapers} future-dated record{totals.futureDatedPapers === 1 ? " is" : "s are"} excluded from the year chart pending metadata correction.</p>
+              )}
             </div>
 
-            <div className="border-t border-rule p-5 sm:p-7 lg:border-t-0">
+            <div className="min-w-0 border-t border-rule p-5 sm:p-7 xl:border-t-0">
               <h3 className="text-xl font-semibold text-ink-900">Methods and datasets named</h3>
-              <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-400">
+              <p className="mt-2 max-w-[72ch] text-base leading-relaxed text-ink-400">
                 Source-linked candidate extractions marked as author-reported facts qualify. Audit status stays visible in each drill-down; counts say what is named, not what performs best. Multi-value fields are excluded unless evidence can be bound safely.
               </p>
-              <div className="mt-7 space-y-8">
-                <NamedList title="Model families" items={families} total={totals.papersWithFields} />
-                <NamedList title="Datasets" items={datasets} total={totals.papersWithFields} />
-              </div>
-              {(families.length > 0 || datasets.length > 0) && (
-                <p className="mt-7 border-t border-rule pt-4 text-sm leading-relaxed text-ink-400">
-                  {repeatedFamilies === 0 && repeatedDatasets === 0
-                    ? "Nothing repeats across enough papers to support a trend claim."
-                    : `${repeatedFamilies} model families and ${repeatedDatasets} datasets appear in more than one paper; that alone does not establish a trend.`}
-                </p>
+              <p className="mt-4 text-base font-medium text-ink-900">{totals.processedPapers} of {totals.papers} papers processed.</p>
+              {hasRepeatedNames ? (
+                <div className="mt-7 space-y-8">
+                  <NamedList title="Model families" items={trendFamilies} total={totals.processedPapers} />
+                  <NamedList title="Datasets" items={trendDatasets} total={totals.processedPapers} />
+                </div>
+              ) : (
+                <p className="mt-7 border-y border-rule py-5 text-base leading-relaxed text-ink-600">No method or dataset is named in more than one processed paper yet.</p>
               )}
             </div>
           </div>
 
-          <div className="grid border-t border-rule lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="p-5 sm:p-7 lg:border-r lg:border-rule">
+          <div className="grid min-w-0 border-t border-rule xl:grid-cols-[0.9fr_1.1fr]">
+            <div className="min-w-0 p-5 sm:p-7 xl:border-r xl:border-rule">
               <h3 className="text-xl font-semibold text-ink-900">Evidence ledger</h3>
-              <p className="mb-6 mt-2 text-[0.9375rem] leading-relaxed text-ink-400">
-                {totals.recordFields.toLocaleString("en")} scientific fields by verification state. {totals.humanAudited.toLocaleString("en")} carry a VERIFIED or PARTIALLY_VERIFIED status.
+              <p className="mb-6 mt-2 max-w-[72ch] text-base leading-relaxed text-ink-400">
+                Verification states across the {totals.processedPapers} papers processed so far. {totals.indexedNotProcessed} additional papers are indexed but not yet processed. {totals.recordFields.toLocaleString("en")} scientific fields are represented; {totals.humanAudited.toLocaleString("en")} carry a VERIFIED or PARTIALLY_VERIFIED status.
               </p>
               {statuses.length > 0 ? <StatusLedger statuses={statuses} total={totals.recordFields} /> : <PanelPlaceholder what="These figures" status={status} />}
             </div>
 
-            <div className="border-t border-rule p-5 sm:p-7 lg:border-t-0">
+            <div className="min-w-0 border-t border-rule p-5 sm:p-7 xl:border-t-0">
               <p className="text-base font-medium text-tide-600">Research-gap candidates · {gapPreview.label}</p>
               <h3 className="mt-3 max-w-xl text-2xl font-semibold leading-tight text-ink-900">Connect task, dataset and architecture coverage.</h3>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-600">{gapPreview.description}</p>
-              <div className="mt-7 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-y border-rule py-5 text-center text-sm font-medium text-ink-600 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
-                <span>Task</span><span aria-hidden className="font-mono text-tide-500">×</span><span>Dataset</span><span aria-hidden className="hidden font-mono text-tide-500 sm:block">×</span><span className="col-span-3 sm:col-span-1">Architecture</span>
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-3 border-y border-rule py-5 text-center text-base font-medium text-ink-600">
+                <span>Task</span><span aria-hidden className="font-mono text-tide-500">×</span><span>Dataset</span><span aria-hidden className="font-mono text-tide-500">×</span><span>Architecture</span>
               </div>
               <p className="mt-5 font-mono text-[0.8125rem] text-ink-400">Analytics state: {gapPreview.analyticsState}</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-400">
+              <p className="mt-2 max-w-[72ch] text-base leading-relaxed text-ink-400">
                 This is a product preview, not a live analytic. It makes no claim that any combination is scientifically valuable or underexplored.
               </p>
             </div>

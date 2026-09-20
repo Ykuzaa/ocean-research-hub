@@ -7,7 +7,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from ocean_research_hub.ingestion.errors import (
@@ -38,6 +38,12 @@ from ocean_research_hub.ingestion.repository import (
     SqlitePaperRepository,
 )
 from ocean_research_hub.ingestion.service import PaperIngestionService
+from ocean_research_hub.landing import (
+    LandingDrilldownResponse,
+    LandingResponse,
+    aggregate_landing,
+    landing_drilldown,
+)
 from ocean_research_hub.rendering import render_paper_comparison, render_paper_detail
 
 
@@ -130,6 +136,53 @@ def create_app(
         if not result.created:
             response.status_code = 200
         return result
+
+    @app.get("/api/landing", response_model=LandingResponse)
+    async def landing_api() -> LandingResponse:
+        """Aggregate the complete corpus in one provenance-preserving response."""
+        try:
+            papers, total, invalid_records = paper_repository.list_all_papers()
+            return aggregate_landing(
+                papers,
+                total=total,
+                invalid_records=invalid_records,
+                domain_count=len(
+                    {
+                        domain
+                        for paper in papers
+                        for domain in paper.record.scientific_framing.domain.value
+                    }
+                ),
+            )
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("landing aggregation failed") from exc
+
+    @app.get("/api/landing/drilldown", response_model=LandingDrilldownResponse)
+    async def landing_drilldown_api(
+        dimension: str = Query(
+            pattern="^(status|section|limitation|architecture|dataset|workflow|year_extracted|year_bibliographic)$"
+        ),
+        key: str = Query(min_length=1, max_length=200),
+        limit: int = Query(default=50, ge=1, le=200),
+        offset: int = Query(default=0, ge=0),
+    ) -> LandingDrilldownResponse:
+        try:
+            papers, total, invalid_records = paper_repository.list_all_papers()
+            return landing_drilldown(
+                papers,
+                corpus_total=total,
+                invalid_records=invalid_records,
+                dimension=dimension,
+                key=key,
+                offset=offset,
+                limit=limit,
+            )
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("landing drill-down failed") from exc
 
     @app.get("/api/papers/compare", response_model=PaperComparisonResponse)
     async def compare_papers_api(

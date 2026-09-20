@@ -45,6 +45,7 @@ export type SourceEvidence = {
   /** The verbatim sentence in the paper. Never the normalised value. */
   evidence: string | null;
   origin: string | null;
+  evidence_url?: string | null;
   claimed_value: unknown;
 };
 
@@ -130,4 +131,110 @@ export function getPaper(id: string): Promise<StoredPaper> {
 /** A paper whose technical details have been read from its PDF, not just its bibliography. */
 export function isAnalyzed(paper: PaperSummary): boolean {
   return paper.extracted_field_count > 0;
+}
+
+export type LandingPaperReference = {
+  id: string;
+  title: string | null;
+  year: number | null;
+  workflow_status: string;
+};
+
+export type LandingField = EvidenceField & {
+  path: string;
+  label: string;
+  absence_search_scope: string[];
+  /** First locatable primary-author source; use this for an evidence quotation. */
+  display_source: SourceEvidence | null;
+};
+
+export type LandingEvidenceItem = {
+  paper: LandingPaperReference;
+  field: LandingField;
+  matched_value: string | null;
+};
+
+export type LandingNamedTally = {
+  key: string;
+  label: string;
+  papers: number;
+  items: LandingEvidenceItem[];
+  drilldown_path: string;
+};
+
+export type LandingAggregate = {
+  state: "ready" | "empty" | "partial";
+  completeness: { missing_records: number; message: string | null };
+  totals: {
+    papers: number;
+    readable_papers: number;
+    domains: number;
+    papers_with_extracted_fields: number;
+    extracted_scientific_fields: number;
+    scientific_record_fields: number;
+    values_with_exact_evidence: number;
+    audited_fields: number;
+  };
+  statuses: Array<{
+    status: VerificationStatus;
+    fields: number;
+    description: string;
+    items: LandingEvidenceItem[];
+    drilldown_path: string;
+  }>;
+  workflows: Array<{
+    status: string;
+    papers: number;
+    items: LandingPaperReference[];
+    drilldown_path: string;
+  }>;
+  years: Array<{
+    year: number;
+    papers_with_extracted_fields: number;
+    bibliography_only: number;
+    extracted_papers: LandingPaperReference[];
+    bibliographic_papers: LandingPaperReference[];
+    extracted_drilldown_path: string;
+    bibliographic_drilldown_path: string;
+  }>;
+  limitations: LandingNamedTally[];
+  sections: Array<{
+    key: string;
+    label: string;
+    fields: number;
+    items: LandingEvidenceItem[];
+    drilldown_path: string;
+  }>;
+  architecture_families: LandingNamedTally[];
+  datasets: LandingNamedTally[];
+  extraction_demo: { paper: LandingPaperReference; fields: LandingField[] } | null;
+  conflict_demo: { paper: LandingPaperReference; field: LandingField } | null;
+  gap_preview: {
+    label: "Product Preview";
+    analytics_state: "NOT_COMPUTED";
+    is_live_analytic: false;
+    description: string;
+  };
+};
+
+/** One server-side aggregation over the full corpus; never a 200-row frontend sample. */
+export function getLandingAggregate(): Promise<LandingAggregate> {
+  return request("/api/landing", { timeoutMs: 15_000 });
+}
+
+export type LandingDrilldown = {
+  state: "ready" | "empty" | "partial";
+  completeness: { missing_records: number; message: string | null };
+  total: number;
+  offset: number;
+  limit: number;
+  evidence_items: LandingEvidenceItem[];
+  paper_items: LandingPaperReference[];
+};
+
+export function getLandingDrilldown(path: string): Promise<LandingDrilldown> {
+  if (!path.startsWith("/api/landing/drilldown?")) {
+    throw new Error("invalid landing drill-down path");
+  }
+  return request(path);
 }

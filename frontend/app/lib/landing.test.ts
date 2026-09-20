@@ -23,6 +23,9 @@ function aggregate(state: "ready" | "empty" | "partial" = "ready") {
       readable_papers: state === "partial" ? 310 : state === "empty" ? 0 : 312,
       domains: state === "empty" ? 0 : 8,
       papers_with_extracted_fields: state === "empty" ? 0 : 250,
+      processed_papers: state === "empty" ? 0 : 250,
+      indexed_not_processed: state === "empty" ? 0 : 62,
+      future_dated_papers: 0,
       extracted_scientific_fields: state === "empty" ? 0 : 900,
       scientific_record_fields: state === "empty" ? 0 : 1100,
       values_with_exact_evidence: state === "empty" ? 0 : 700,
@@ -54,6 +57,8 @@ describe("loadLandingData", () => {
     expect(String(fetch.mock.calls[0][0])).toContain("/api/landing");
     expect(String(fetch.mock.calls[0][0])).not.toContain("/api/papers");
     expect(result.totals.papers).toBe(312);
+    expect(result.totals.processedPapers).toBe(250);
+    expect(result.totals.indexedNotProcessed).toBe(62);
     expect(result.extraction?.rows[0]).toMatchObject({ value: "AdamW", evidence: "  We train with AdamW at 5e-5.  ", provenance: "AUTHOR_REPORTED_FACT", status: "NOT_VERIFIED" });
     expect(result.families[0].items[0].field.display_source?.evidence).toBe("  We train with AdamW at 5e-5.  ");
   });

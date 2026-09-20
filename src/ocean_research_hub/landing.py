@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import datetime
 from enum import StrEnum
+import re
 from typing import Any
 from urllib.parse import quote
 
@@ -135,6 +136,9 @@ class LandingTotals(BaseModel):
     readable_papers: int
     domains: int
     papers_with_extracted_fields: int
+    processed_papers: int
+    indexed_not_processed: int
+    future_dated_papers: int
     extracted_scientific_fields: int
     scientific_record_fields: int
     values_with_exact_evidence: int
@@ -231,7 +235,7 @@ STATUS_DESCRIPTIONS = {
     VerificationStatus.EXTRACTION_ERROR: "Extraction failed for this field.",
     VerificationStatus.NOT_VERIFIED: "Extracted but not confirmed by a scientific auditor.",
     VerificationStatus.NOT_REPORTED: (
-        "No value is stored; an audited absence includes its searched source scope."
+        "No value is stored. A search scope is shown only when an absence audit recorded one."
     ),
     VerificationStatus.CONFLICT: "Conflicting source-backed values are preserved.",
     VerificationStatus.PARTIALLY_VERIFIED: "Partially confirmed by a scientific auditor.",
@@ -254,6 +258,20 @@ EXTRACTION_PATHS = (
     "training.epochs_or_steps",
 )
 
+EXTRACTION_ATTEMPTED_STATUSES = {
+    PaperWorkflowStatus.EXTRACTED,
+    PaperWorkflowStatus.SCIENTIFIC_AUDIT,
+    PaperWorkflowStatus.VERIFIED,
+    PaperWorkflowStatus.PARTIAL,
+    PaperWorkflowStatus.REJECTED,
+}
+
+_RESOLUTION_VALUE = re.compile(
+    r"^[~≈]?[0-9][0-9.\s/+\-]*(?:°|degrees?|deg|km|m|cm|arcmin|arcsec)"
+    r"(?:\s*[x×]\s*[0-9][0-9.\s/+\-]*(?:°|degrees?|deg|km|m|cm|arcmin|arcsec))?$",
+    re.IGNORECASE,
+)
+
 
 def _has_value(field: EvidenceField[Any]) -> bool:
     value = field.value
@@ -273,6 +291,37 @@ def _is_non_error_claim(field: EvidenceField[Any]) -> bool:
         VerificationStatus.PARTIALLY_VERIFIED,
         VerificationStatus.VERIFIED,
     }
+
+
+def _extraction_attempted(paper: StoredPaper) -> bool:
+    return paper.workflow_status in EXTRACTION_ATTEMPTED_STATUSES
+
+
+def _plausible_conflict(path: str, field: EvidenceField[Any]) -> bool:
+    """Keep the public example to compact, field-compatible, bound values."""
+    values = field.conflict_values
+    if not 2 <= len(values) <= 4 or any(isinstance(value, (list, dict, bool)) for value in values):
+        return False
+    if len({type(value) for value in values}) != 1:
+        return False
+    rendered = [str(value).strip() for value in values]
+    if len({value.casefold() for value in rendered}) != len(rendered):
+        return False
+    if any(not value or len(value) > 48 or len(value.split()) > 6 or "\n" in value for value in rendered):
+        return False
+    if any(value.endswith((".", "!", "?", ";", ":")) for value in rendered):
+        return False
+    if "resolution" in path and any(_RESOLUTION_VALUE.fullmatch(value) is None for value in rendered):
+        return False
+
+    bound_values = {
+        str(source.claimed_value).strip().casefold()
+        for source in (field.source, *field.sources)
+        if source.is_locatable
+        and source.is_primary_author_source
+        and source.claimed_value is not None
+    }
+    return {value.casefold() for value in rendered} == bound_values
 
 
 def _walk(model: BaseModel, prefix: str = "") -> list[tuple[str, EvidenceField[Any]]]:
@@ -431,7 +480,7 @@ def _extraction_demo(papers: list[StoredPaper]) -> LandingExtractionDemo | None:
 def _conflict_demo(papers: list[StoredPaper]) -> LandingConflictDemo | None:
     for paper in papers:
         for path, field in _scientific_fields(paper):
-            if field.status is VerificationStatus.CONFLICT:
+            if field.status is VerificationStatus.CONFLICT and _plausible_conflict(path, field):
                 return LandingConflictDemo(paper=_paper(paper), field=_field(path, field))
     return None
 
@@ -440,8 +489,9 @@ def aggregate_landing(
     papers: list[StoredPaper], *, total: int, invalid_records: int, domain_count: int
 ) -> LandingResponse:
     scientific = {paper.id: _scientific_fields(paper) for paper in papers}
+    processed = [paper for paper in papers if _extraction_attempted(paper)]
     status_counts: Counter[VerificationStatus] = Counter(
-        field.status for fields in scientific.values() for _, field in fields
+        field.status for paper in processed for _, field in scientific[paper.id]
     )
     section_counts: Counter[str] = Counter()
     status_items: dict[VerificationStatus, list[LandingEvidenceItem]] = defaultdict(list)
@@ -451,7 +501,7 @@ def aggregate_landing(
             if _has_value(field) or field.conflict_values:
                 section_counts[path.split(".", 1)[0]] += 1
 
-    for paper in papers:
+    for paper in processed:
         for path, field in scientific[paper.id]:
             item = LandingEvidenceItem(paper=_paper(paper), field=_field(path, field))
             status_items[field.status].append(item)
@@ -463,6 +513,8 @@ def aggregate_landing(
     extracted_fields = 0
     exact_evidence = 0
     audited_fields = 0
+    current_year = datetime.now().year
+    future_dated_papers = 0
     for paper in papers:
         fields = scientific[paper.id]
         claims = [field for _, field in fields if _has_value(field) or field.conflict_values]
@@ -480,12 +532,15 @@ def aggregate_landing(
             and _primary_exact_evidence(field)
             for _, field in fields
         )
-        audited_fields += sum(
-            field.status in {VerificationStatus.VERIFIED, VerificationStatus.PARTIALLY_VERIFIED}
-            for _, field in fields
-        )
+        if _extraction_attempted(paper):
+            audited_fields += sum(
+                field.status in {VerificationStatus.VERIFIED, VerificationStatus.PARTIALLY_VERIFIED}
+                for _, field in fields
+            )
         year = paper.record.paper.year.value
-        if year is not None:
+        if year is not None and year > current_year:
+            future_dated_papers += 1
+        elif year is not None:
             year_counts[year][0 if claims else 1] += 1
 
     state = (
@@ -511,8 +566,11 @@ def aggregate_landing(
             readable_papers=len(papers),
             domains=domain_count,
             papers_with_extracted_fields=papers_with_fields,
+            processed_papers=len(processed),
+            indexed_not_processed=max(len(papers) - len(processed), 0),
+            future_dated_papers=future_dated_papers,
             extracted_scientific_fields=extracted_fields,
-            scientific_record_fields=sum(len(fields) for fields in scientific.values()),
+            scientific_record_fields=sum(len(scientific[paper.id]) for paper in processed),
             values_with_exact_evidence=exact_evidence,
             audited_fields=audited_fields,
         ),
@@ -620,7 +678,7 @@ def landing_drilldown(
             include = False
             matched_value: str | None = None
             if dimension == "status" and field.status.value == key:
-                include = True
+                include = _extraction_attempted(paper)
             elif dimension == "section" and path.split(".", 1)[0] == key:
                 include = _has_value(field) or bool(field.conflict_values)
             elif dimension == "limitation" and path == f"limitations.{key}":

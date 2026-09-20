@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ExtractionRow, LandingData } from "@/app/lib/landing";
-import { MetaChip, Panel, PanelPlaceholder, SectionHeader } from "./primitives";
+import { MetaChip, Panel, PanelPlaceholder } from "./primitives";
 
 /** A short arrow that turns into a vertical tick when the row stacks on phones. */
 function Connector() {
@@ -28,15 +28,17 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
   const demo = data.extraction;
   const conflict = data.conflict;
   const groups = demo ? groupByEvidence(demo.rows) : [];
+  const defaultStatus = demo?.rows.every((row) => row.status === "NOT_VERIFIED")
+    ? "NOT_VERIFIED"
+    : null;
 
   return (
-    <section id="extraction" className="scroll-mt-20 border-t border-rule/60">
+    <section id="extraction" className="scroll-mt-28 border-t border-rule/60 md:scroll-mt-20">
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
-        <SectionHeader
-          kicker="Structured extraction"
-          title="One excerpt from the PDF. One field you can check."
-          lede="Each technical value keeps its stored evidence excerpt, page and section — so a reader can disagree with the extraction, not just with the summary."
-        />
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)] lg:items-end lg:gap-12">
+          <h2 className="max-w-3xl font-display text-4xl font-medium leading-[1.08] tracking-[-0.035em] text-ink-900 sm:text-5xl">One excerpt from the PDF. One field you can check.</h2>
+          <p className="max-w-[72ch] text-base leading-relaxed text-ink-600 lg:justify-self-end">Each technical value keeps its stored evidence excerpt, page and section—so a reader can inspect the extraction rather than trust a summary.</p>
+        </div>
 
         {demo ? (
           <Panel className="mt-8 overflow-hidden sm:mt-10">
@@ -44,7 +46,7 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
               <MetaChip>source</MetaChip>
               <Link
                 href={`/papers/${demo.paperId}`}
-                className="min-w-0 flex-1 truncate text-sm text-ink-900 underline decoration-mute underline-offset-4 transition hover:text-tide-600"
+                className="min-w-0 flex-1 truncate text-base text-ink-900 underline decoration-mute underline-offset-4 transition hover:text-tide-600"
               >
                 {demo.paperTitle}
               </Link>
@@ -66,29 +68,33 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
                   key={group.evidence}
                   className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_2rem_minmax(0,0.9fr)] sm:items-center sm:gap-4 sm:px-6"
                 >
-                  <p className="font-mono text-[0.9375rem] leading-relaxed text-ink-600">
+                  <div className="min-w-0">
+                    <p className="mb-2 text-sm font-medium text-ink-400 sm:hidden">Evidence in the paper</p>
+                  <p className="font-mono text-base leading-relaxed text-ink-600">
                     <span className="bg-tide-200/60 decoration-tide-500 underline-offset-4 [text-decoration-line:underline]">
                       {group.evidence}
                     </span>
                   </p>
+                  </div>
                   <Connector />
                   <div className="min-w-0 space-y-3">
+                    <p className="text-sm font-medium text-ink-400 sm:hidden">Structured field</p>
                     {group.fields.map((row) => (
                       <div key={row.label}>
                         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                          <span className="text-sm text-ink-400">{row.label}</span>
-                          <span className="font-mono text-[0.9375rem] text-ink-900">{row.value}</span>
+                          <span className="text-base text-ink-400">{row.label}</span>
+                          <span className="font-mono text-base text-ink-900">{row.value}</span>
                         </p>
-                        <p className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5">
                           {row.page !== null && <MetaChip>p.{row.page}</MetaChip>}
                           {row.section && (
                             <MetaChip>
                               <span className="max-w-[12rem] truncate">§ {row.section}</span>
                             </MetaChip>
                           )}
-                          {row.provenance && <MetaChip>{row.provenance}</MetaChip>}
-                          <MetaChip tone="accent">{row.status}</MetaChip>
-                        </p>
+                          {row.provenance && <span className="font-mono text-sm text-ink-400">{row.provenance}</span>}
+                          {row.status !== defaultStatus && <MetaChip tone="accent">{row.status}</MetaChip>}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -96,10 +102,8 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
               ))}
             </div>
 
-            <p className="border-t border-rule px-5 py-4 text-sm leading-relaxed text-ink-400 sm:px-6">
-              Read live from the stored record. <span className="font-mono">NOT_VERIFIED</span> means
-              extracted with evidence and not yet confirmed by a human auditor — the status is shown
-              rather than rounded up to fact.
+            <p className="max-w-[75ch] border-t border-rule px-5 py-4 text-base leading-relaxed text-ink-400 sm:px-6">
+              Read live from the stored record. {defaultStatus === "NOT_VERIFIED" && <><span className="font-mono text-[0.8125rem]">NOT_VERIFIED</span> applies to every row: </>}these are source-linked extractions, not values confirmed by a scientific auditor.
             </p>
           </Panel>
         ) : (
@@ -115,7 +119,7 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
         <div className="mt-8 grid border-y border-rule sm:grid-cols-2">
           <div className="py-5 sm:pr-8">
             <p className="text-lg font-semibold text-ink-900">Never guessed</p>
-            <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-600">
+            <p className="mt-2 text-base leading-relaxed text-ink-600">
               A value the paper does not state is stored as{" "}
               <span className="font-mono text-ink-900">NOT_REPORTED</span>. A Transformer paper that
               never names its activation does not acquire one.
@@ -124,12 +128,12 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
           <div className="border-t border-rule py-5 sm:border-l sm:border-t-0 sm:pl-8">
             <p className="text-lg font-semibold text-ink-900">Conflicts stay visible</p>
             {conflict ? (
-              <div className="mt-2 text-[0.9375rem] leading-relaxed text-ink-600">
+              <div className="mt-2 text-base leading-relaxed text-ink-600">
                 <p>
-                  Two places in one paper give a different {conflict.label} —{" "}
+                  Two excerpts produced different extracted values for {conflict.label}—{" "}
                   {conflict.values.map((value, index) => (
                     <span key={value}>{index > 0 && " and "}<span className="font-mono text-ink-900">{value}</span></span>
-                  ))}. Both are kept, flagged <span className="font-mono text-ink-900">CONFLICT</span>.
+                  ))}. Both are kept and flagged <span className="font-mono text-ink-900">CONFLICT</span> rather than one being chosen.
                 </p>
                 {conflict.sources.length > 0 && (
                   <details className="group mt-3">
@@ -140,9 +144,9 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
                     <ul className="mt-3 space-y-3">
                       {conflict.sources.map((source, index) => (
                         <li key={`${source.claimedValue}-${index}`} className="border-l-2 border-tide-400 pl-3">
-                          <p className="font-mono text-[0.8125rem] text-ink-900">{source.claimedValue}</p>
-                          <blockquote className="mt-1 text-sm leading-relaxed text-ink-600">“{source.evidence}”</blockquote>
-                          <p className="mt-1 text-[0.8125rem] text-ink-400">{[source.page !== null ? `p.${source.page}` : null, source.section, source.locator].filter(Boolean).join(" · ")}</p>
+                          <p className="font-mono text-sm text-ink-900">{source.claimedValue}</p>
+                          <blockquote className="mt-1 text-base leading-relaxed text-ink-600">“{source.evidence}”</blockquote>
+                          <p className="mt-1 text-sm text-ink-400">{[source.page !== null ? `p.${source.page}` : null, source.section, source.locator].filter(Boolean).join(" · ")}</p>
                         </li>
                       ))}
                     </ul>
@@ -150,11 +154,7 @@ export function ExtractionPanel({ data }: { data: LandingData }) {
                 )}
               </div>
             ) : (
-              <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-600">
-                When two places in a paper disagree, both values are kept and the field is flagged{" "}
-                <span className="font-mono text-ink-900">CONFLICT</span> instead of one being picked
-                silently.
-              </p>
+              <div className="mt-3"><PanelPlaceholder what="A trustworthy conflict example" status={data.status} empty="No conflict currently has concise, field-compatible values with a primary-source binding for every alternative." /></div>
             )}
           </div>
         </div>

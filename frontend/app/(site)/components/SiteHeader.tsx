@@ -38,6 +38,13 @@ export function SiteHeader() {
           Workspace
         </Link>
       </div>
+      <nav aria-label="Page sections" className="no-scrollbar flex h-10 items-center justify-center gap-5 overflow-x-auto border-t border-rule/60 px-4 md:hidden">
+        {ANCHORS.map((anchor) => (
+          <a key={anchor.href} href={anchor.href} className="shrink-0 text-sm font-medium text-ink-600 hover:text-ink-900">
+            {anchor.label}
+          </a>
+        ))}
+      </nav>
     </header>
   );
 }

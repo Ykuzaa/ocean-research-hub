@@ -44,7 +44,7 @@ export function Hero({ data }: { data: LandingData }) {
           </p>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-400 sm:text-lg">
             Literature becomes structured research knowledge, with extracted values kept separate
-            from their exact source evidence and audit status.
+            from their stored source excerpts and audit status.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -58,6 +58,9 @@ export function Hero({ data }: { data: LandingData }) {
         </div>
 
         <figure className="relative overflow-hidden rounded-lg border border-rule bg-sheet-2">
+          <p className="absolute right-4 top-4 z-10 text-sm font-medium text-ink-400">
+            Scientific illustration
+          </p>
           <BathymetryField className="mx-auto w-full max-w-[19rem] sm:max-w-[32rem] lg:max-w-none" />
           <figcaption className="grid border-t border-rule sm:grid-cols-3">
             {[

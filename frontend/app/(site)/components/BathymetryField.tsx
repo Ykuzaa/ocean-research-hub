@@ -35,9 +35,10 @@ export function BathymetryField({ className = "" }: { className?: string }) {
     <svg
       viewBox={`0 0 ${VIEW} ${VIEW}`}
       role="img"
-      aria-label="Bathymetric contour field crossed by two satellite ground tracks, with the stations sampled along them marked."
+      aria-label="Scientific illustration: bathymetric contours crossed by two satellite ground tracks and sampled stations."
       className={className}
     >
+      <title>Scientific illustration of a bathymetric field and satellite tracks</title>
       <clipPath id="field-clip">
         <rect x="0" y="0" width={VIEW} height={VIEW} rx="8" />
       </clipPath>
@@ -109,7 +110,7 @@ export function BathymetryField({ className = "" }: { className?: string }) {
         ))}
 
         {/* Depth annotations, the way a chart labels its isobaths */}
-        <g className="fill-ink-400 font-mono" fontSize="9.5" letterSpacing="0.08em">
+        <g className="fill-ink-400 font-mono" fontSize="14">
           <text x="16" y="26">
             0 m
           </text>

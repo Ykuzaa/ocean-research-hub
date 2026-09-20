@@ -45,7 +45,7 @@ export function SearchBox({ papers, domains }: { papers: PaperSummary[]; domains
           if (results[0]) router.push(results[0].href);
         }}
       >
-        <Search aria-hidden className="pointer-events-none absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-cyan-700" />
+        <Search aria-hidden className="pointer-events-none absolute left-4 top-1/2 z-10 h-4.5 w-4.5 -translate-y-1/2 text-slate-400" />
         <input
           type="search"
           value={query}
@@ -54,12 +54,12 @@ export function SearchBox({ papers, domains }: { papers: PaperSummary[]; domains
           onBlur={() => setTimeout(() => setFocused(false), 150)}
           placeholder="Un modèle, un auteur, un sujet : GLONET, 4DVarNet, SST, Zanna…"
           aria-label="Rechercher un papier ou un domaine"
-          className="w-full rounded-full border border-slate-200 bg-white/90 py-4 pl-14 pr-6 text-base text-slate-900 shadow-lg shadow-cyan-900/5 backdrop-blur placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-100"
+          className="w-full rounded-lg border border-slate-300 bg-white py-3 pl-12 pr-5 text-[0.9375rem] text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
         />
       </form>
 
       {open && (
-        <div className="absolute inset-x-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-xl">
+        <div className="absolute inset-x-0 top-full z-20 mt-2 overflow-hidden rounded-lg border border-slate-200 bg-white text-left shadow-xl">
           {results.length === 0 ? (
             <p className="px-5 py-4 text-sm text-slate-500">Rien trouvé pour « {query} ».</p>
           ) : (

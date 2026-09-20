@@ -48,13 +48,13 @@ export default async function PaperPage(props: PageProps<"/papers/[id]">) {
   const arxivLink = paper.doi?.startsWith("10.48550/arxiv.")
     ? `https://arxiv.org/abs/${paper.doi.slice("10.48550/arxiv.".length)}`
     : null;
-  const backHref = paperDomains[0] ? `/domains/${paperDomains[0].id}` : "/";
+  const backHref = paperDomains[0] ? `/domains/${paperDomains[0].id}` : "/explore";
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:px-6">
       <Link href={backHref} className="inline-flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-cyan-700">
         <ArrowLeft aria-hidden className="h-4 w-4" />
-        {paperDomains[0] ? paperDomains[0].name : "Accueil"}
+        {paperDomains[0] ? paperDomains[0].name : "Corpus"}
       </Link>
 
       <Reveal>

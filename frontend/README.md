@@ -3,10 +3,21 @@
 Next.js (App Router) + TypeScript + Tailwind CSS client for the FastAPI
 backend in the repository root.
 
+Two surfaces, split by route group:
+
+- `app/(site)` — the public landing. Dark, English, editorial; one page.
+- `app/(workspace)` — the research workspace. Light, French, dense; persistent
+  navigation.
+
 Pages:
 
-- `/` — hero with instant search (papers and domains), the 19 domain tiles,
-  and a carousel of papers analysed in detail
+- `/` — public landing: positioning, live corpus counters, and three product
+  previews (limitation aggregate, extraction walkthrough, corpus intelligence).
+  Every figure on it is aggregated from the live corpus at request time by
+  `app/lib/landing.ts`; when the API is unreachable each panel says so instead
+  of showing a number.
+- `/explore` — workspace entry: instant search (papers and domains), the 19
+  domain tiles, and a carousel of papers analysed in detail
 - `/domains/[id]` — one domain: its analysed papers as cards, the others
   (bibliography only) as a list, and a sidebar to switch domain
 - `/papers/[id]` — every technical detail found in the paper, by section;
@@ -42,5 +53,6 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Validate
 
 ```bash
+npm run typecheck
 npm run build
 ```

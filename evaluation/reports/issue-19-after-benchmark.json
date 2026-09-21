@@ -4,24 +4,24 @@
   "field_count": 52,
   "overall": {
     "precision": {
-      "numerator": 34,
-      "denominator": 34,
-      "value": 1.0
+      "numerator": 4,
+      "denominator": 28,
+      "value": 0.142857
     },
     "recall": {
-      "numerator": 34,
+      "numerator": 4,
       "denominator": 44,
-      "value": 0.772727
+      "value": 0.090909
     },
     "exact_match": {
-      "numerator": 34,
+      "numerator": 4,
       "denominator": 52,
-      "value": 0.653846
+      "value": 0.076923
     },
     "unsupported_claim_rate": {
-      "numerator": 0,
-      "denominator": 34,
-      "value": 0.0
+      "numerator": 24,
+      "denominator": 28,
+      "value": 0.857143
     },
     "not_reported_accuracy": {
       "numerator": 0,
@@ -29,32 +29,32 @@
       "value": 0.0
     },
     "evidence_location_accuracy": {
-      "numerator": 34,
+      "numerator": 0,
       "denominator": 44,
-      "value": 0.772727
+      "value": 0.0
     }
   },
   "by_field_family": {
     "data": {
       "precision": {
-        "numerator": 14,
-        "denominator": 14,
-        "value": 1.0
-      },
-      "recall": {
-        "numerator": 14,
-        "denominator": 19,
-        "value": 0.736842
-      },
-      "exact_match": {
-        "numerator": 14,
-        "denominator": 21,
-        "value": 0.666667
-      },
-      "unsupported_claim_rate": {
         "numerator": 0,
         "denominator": 14,
         "value": 0.0
+      },
+      "recall": {
+        "numerator": 0,
+        "denominator": 19,
+        "value": 0.0
+      },
+      "exact_match": {
+        "numerator": 0,
+        "denominator": 21,
+        "value": 0.0
+      },
+      "unsupported_claim_rate": {
+        "numerator": 14,
+        "denominator": 14,
+        "value": 1.0
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -62,31 +62,31 @@
         "value": 0.0
       },
       "evidence_location_accuracy": {
-        "numerator": 14,
+        "numerator": 0,
         "denominator": 19,
-        "value": 0.736842
+        "value": 0.0
       }
     },
     "architecture": {
       "precision": {
-        "numerator": 4,
-        "denominator": 4,
-        "value": 1.0
+        "numerator": 0,
+        "denominator": 3,
+        "value": 0.0
       },
       "recall": {
-        "numerator": 4,
-        "denominator": 4,
-        "value": 1.0
-      },
-      "exact_match": {
-        "numerator": 4,
-        "denominator": 6,
-        "value": 0.666667
-      },
-      "unsupported_claim_rate": {
         "numerator": 0,
         "denominator": 4,
         "value": 0.0
+      },
+      "exact_match": {
+        "numerator": 0,
+        "denominator": 6,
+        "value": 0.0
+      },
+      "unsupported_claim_rate": {
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -94,31 +94,31 @@
         "value": 0.0
       },
       "evidence_location_accuracy": {
-        "numerator": 4,
+        "numerator": 0,
         "denominator": 4,
-        "value": 1.0
+        "value": 0.0
       }
     },
     "training": {
       "precision": {
-        "numerator": 3,
-        "denominator": 3,
-        "value": 1.0
-      },
-      "recall": {
-        "numerator": 3,
-        "denominator": 3,
-        "value": 1.0
-      },
-      "exact_match": {
-        "numerator": 3,
-        "denominator": 6,
+        "numerator": 1,
+        "denominator": 2,
         "value": 0.5
       },
-      "unsupported_claim_rate": {
-        "numerator": 0,
+      "recall": {
+        "numerator": 1,
         "denominator": 3,
-        "value": 0.0
+        "value": 0.333333
+      },
+      "exact_match": {
+        "numerator": 1,
+        "denominator": 6,
+        "value": 0.166667
+      },
+      "unsupported_claim_rate": {
+        "numerator": 1,
+        "denominator": 2,
+        "value": 0.5
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -126,31 +126,31 @@
         "value": 0.0
       },
       "evidence_location_accuracy": {
-        "numerator": 3,
+        "numerator": 0,
         "denominator": 3,
-        "value": 1.0
+        "value": 0.0
       }
     },
     "objective": {
       "precision": {
-        "numerator": 3,
+        "numerator": 1,
         "denominator": 3,
-        "value": 1.0
+        "value": 0.333333
       },
       "recall": {
-        "numerator": 3,
+        "numerator": 1,
         "denominator": 3,
-        "value": 1.0
+        "value": 0.333333
       },
       "exact_match": {
-        "numerator": 3,
+        "numerator": 1,
         "denominator": 3,
-        "value": 1.0
+        "value": 0.333333
       },
       "unsupported_claim_rate": {
-        "numerator": 0,
+        "numerator": 2,
         "denominator": 3,
-        "value": 0.0
+        "value": 0.666667
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -158,31 +158,31 @@
         "value": null
       },
       "evidence_location_accuracy": {
-        "numerator": 3,
+        "numerator": 0,
         "denominator": 3,
-        "value": 1.0
+        "value": 0.0
       }
     },
     "evaluation": {
       "precision": {
-        "numerator": 6,
-        "denominator": 6,
-        "value": 1.0
+        "numerator": 2,
+        "denominator": 4,
+        "value": 0.5
       },
       "recall": {
-        "numerator": 6,
+        "numerator": 2,
         "denominator": 9,
-        "value": 0.666667
+        "value": 0.222222
       },
       "exact_match": {
-        "numerator": 6,
+        "numerator": 2,
         "denominator": 10,
-        "value": 0.6
+        "value": 0.2
       },
       "unsupported_claim_rate": {
-        "numerator": 0,
-        "denominator": 6,
-        "value": 0.0
+        "numerator": 2,
+        "denominator": 4,
+        "value": 0.5
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -190,31 +190,31 @@
         "value": 0.0
       },
       "evidence_location_accuracy": {
-        "numerator": 6,
+        "numerator": 0,
         "denominator": 9,
-        "value": 0.666667
+        "value": 0.0
       }
     },
     "results": {
       "precision": {
-        "numerator": 2,
-        "denominator": 2,
-        "value": 1.0
-      },
-      "recall": {
-        "numerator": 2,
-        "denominator": 3,
-        "value": 0.666667
-      },
-      "exact_match": {
-        "numerator": 2,
-        "denominator": 3,
-        "value": 0.666667
-      },
-      "unsupported_claim_rate": {
         "numerator": 0,
         "denominator": 2,
         "value": 0.0
+      },
+      "recall": {
+        "numerator": 0,
+        "denominator": 3,
+        "value": 0.0
+      },
+      "exact_match": {
+        "numerator": 0,
+        "denominator": 3,
+        "value": 0.0
+      },
+      "unsupported_claim_rate": {
+        "numerator": 2,
+        "denominator": 2,
+        "value": 1.0
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -222,31 +222,31 @@
         "value": null
       },
       "evidence_location_accuracy": {
-        "numerator": 2,
+        "numerator": 0,
         "denominator": 3,
-        "value": 0.666667
+        "value": 0.0
       }
     },
     "limitations": {
       "precision": {
-        "numerator": 2,
-        "denominator": 2,
-        "value": 1.0
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
       },
       "recall": {
-        "numerator": 2,
+        "numerator": 0,
         "denominator": 3,
-        "value": 0.666667
+        "value": 0.0
       },
       "exact_match": {
-        "numerator": 2,
+        "numerator": 0,
         "denominator": 3,
-        "value": 0.666667
+        "value": 0.0
       },
       "unsupported_claim_rate": {
         "numerator": 0,
-        "denominator": 2,
-        "value": 0.0
+        "denominator": 0,
+        "value": null
       },
       "not_reported_accuracy": {
         "numerator": 0,
@@ -254,9 +254,9 @@
         "value": null
       },
       "evidence_location_accuracy": {
-        "numerator": 2,
+        "numerator": 0,
         "denominator": 3,
-        "value": 0.666667
+        "value": 0.0
       }
     }
   }

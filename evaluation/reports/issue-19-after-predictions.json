@@ -7,46 +7,35 @@
         {
           "path": "data.datasets",
           "value": [
-            "NATL60 nature run",
-            "simulated four-nadir altimetry",
-            "simulated one-SWOT-plus-four-nadir altimetry"
+            "NATL60",
+            "BOOST-SWOT 2020 data challenge"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "4.1 NATL60 dataset and case study regions",
-            "page": 2124,
-            "locator": "opening paragraph",
-            "evidence": "nature run (NR) corresponds to the NATL60 configuration",
+            "section": "2 Background and related work",
+            "page": 2121,
+            "locator": "LLM-proposed evidence",
+            "evidence": "The BOOST-SWOT 2020 data challenge (https://github.com/ocean-data-challenges/2020a_ SSH_mapping_NATL60, last access: 2022) provides a representative benchmarking framework",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
-          "sources": [
-            {
-              "section": "4.2 Simulated altimetry datasets",
-              "page": 2126,
-              "locator": "opening paragraph",
-              "evidence": "two observational datasets used to train 4DVarNet, namely the four nadir and one SWOT plus four nadir configurations",
-              "origin": "PRIMARY_PAPER",
-              "evidence_url": null,
-              "claimed_value": null
-            }
-          ]
+          "sources": []
         },
         {
           "path": "data.inputs",
           "value": [
             "raw satellite altimeter data",
-            "optimally interpolated SSH fields"
+            "optimally interpolated fields"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "1 Introduction",
             "page": 2120,
-            "locator": "contributions bullet 1",
-            "evidence": "using raw satellite altimeter data and optimally interpolated fields as input",
+            "locator": "LLM-proposed evidence",
+            "evidence": "The proposed 4DVarNet-SSH scheme delivers an endto-end neural architecture using raw satellite altimeter data and optimally interpolated fields as input.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -56,15 +45,15 @@
         {
           "path": "data.outputs",
           "value": [
-            "reconstructed sea surface height fields"
+            "reconstructed SSH state"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "6 Conclusion and discussion",
-            "page": 2133,
-            "locator": "opening sentence",
-            "evidence": "space-time interpolation of SSH fields from nadir and wide-swath satellite altimetry data",
+            "section": "3.1 4DVarNet framework",
+            "page": 2122,
+            "locator": "LLM-proposed evidence",
+            "evidence": "input raw observation data and an initial guess and directly provides as output the reconstructed state.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -73,15 +62,15 @@
         },
         {
           "path": "data.splits.train",
-          "value": "2013-02-04 through 2013-09-30",
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.3 Evaluation framework",
-            "page": 2126,
-            "locator": "Training and evaluation setting bullet",
-            "evidence": "train all learning-based models Figure 6. SSH Gradient (DUACS OI and 4DVarNet reconstruction) on 25 October 2012 for the GULFSTREAM domain. using the time period from 4 February to 30 September 2013",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -89,14 +78,14 @@
         },
         {
           "path": "data.splits.validation",
-          "value": "2013-01-01 through 2013-02-02",
+          "value": "1 January to 2 February 2013",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.3 Evaluation framework",
             "page": 2126,
-            "locator": "Training and evaluation setting bullet",
-            "evidence": "validation period from 1 January to 2 February 2013",
+            "locator": "LLM-proposed evidence",
+            "evidence": "we select the best model according to the metrics computed over the validation period from 1 January to 2 February 2013.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -105,14 +94,14 @@
         },
         {
           "path": "data.splits.test",
-          "value": "2012-10-22 through 2012-12-02 (42 days)",
+          "value": "22 October to 2 December 2012 (42 d)",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.3 Evaluation framework",
             "page": 2127,
-            "locator": "test-period paragraph",
-            "evidence": "test period from 22 October to 2 December 2012, which is 42 d",
+            "locator": "LLM-proposed evidence",
+            "evidence": "we evaluate the performance metrics over the test period from 22 October to 2 December 2012, which is 42 d",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -121,14 +110,14 @@
         },
         {
           "path": "data.spatial_resolution",
-          "value": "NATL60 SSH downgraded to 1/20 degree for experiments",
+          "value": "1/20°",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.1 NATL60 dataset and case study regions",
             "page": 2125,
-            "locator": "final paragraph",
-            "evidence": "SSH resolution of the nature run is downgraded to 1 /20◦",
+            "locator": "LLM-proposed evidence",
+            "evidence": "Over these regions, the SSH resolution of the nature run is downgraded to 1 /20◦",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -137,18 +126,15 @@
         },
         {
           "path": "architecture.family",
-          "value": [
-            "end-to-end neural variational data assimilation",
-            "4DVarNet"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "6 Conclusion and discussion",
-            "page": 2133,
-            "locator": "opening paragraph",
-            "evidence": "endto-end neural architecture for the space-time interpolation of SSH fields from nadir and wide-swath satellite altimetry data. The 4DVarNet-SSH scheme draws from recent methodological development to bridge data assimilation and deep learning with a view to training 4D-Var DA models and solvers from data",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -158,15 +144,15 @@
           "path": "architecture.activations",
           "value": [
             "linear",
-            "ReLU"
+            "rectified linear unit (ReLU)"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "3.2 4DVarNet-SSH parameterization",
             "page": 2123,
-            "locator": "operator Phi paragraph",
-            "evidence": "two hidden convolutional layers, respectively, with linear and rectified linear unit (ReLU) activations",
+            "locator": "LLM-proposed evidence",
+            "evidence": "spectively, with linear and rectified linear unit (ReLU) activations",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -181,8 +167,8 @@
           "source": {
             "section": "3.3 Learning setting",
             "page": 2124,
-            "locator": "training configuration paragraph",
-            "evidence": "use a single GPU and Adam optimizer with a batch size of 2 over 200 epochs",
+            "locator": "PDF paragraph 1",
+            "evidence": "Adam optimizer",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -207,14 +193,14 @@
         },
         {
           "path": "objective.primary_loss",
-          "value": "weighted sum of SSH reconstruction L2 loss, gradient reconstruction L2 loss, and two prior regularization losses",
+          "value": "L2 norm of the difference between the state x and reconstruction x⋆",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "3.3 Learning setting",
-            "page": 2123,
-            "locator": "equations (7)-(8)",
-            "evidence": "training loss L combines reconstruction losses and additional regularization terms as follows: L(x,x⋆)=λ1 N∑ i=1 wi||x-x⋆||2+λ2| N∑ i=1 wi|∇x-∇x⋆||2 (7) +λ3 N∑ i=1 wi||x-8(x⋆)||2+λ4 N∑ i=1 wi||x-8(x)||2, (8)",
+            "page": 2124,
+            "locator": "LLM-proposed evidence",
+            "evidence": "i.e., the L2 norm of the difference between the state x and reconstruction x⋆",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -239,21 +225,15 @@
         },
         {
           "path": "evaluation.baselines",
-          "value": [
-            "DUACS OI",
-            "BFN",
-            "DYMOST",
-            "MIOST",
-            "fixed-point 4DVarNet"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "5.1 Benchmarking experiments",
-            "page": 2126,
-            "locator": "Table 2",
-            "evidence": "4DVarNet-SSH performance on the GULFSTREAM domain compared to DUACS OI (traditional covariance-based optimal interpolation), BFN (back-and-forth nudging of a QG model), MIOST (multiscale OI), DYMOST (dynamic OI accounting for nonlinear temporal propagation of the SSH fields), fixed-point",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -261,20 +241,15 @@
         },
         {
           "path": "evaluation.metrics",
-          "value": [
-            "mean normalized RMSE",
-            "temporal standard deviation of normalized RMSE",
-            "minimum resolved spatial wavelength",
-            "minimum resolved temporal wavelength"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.3 Evaluation framework",
-            "page": 2127,
-            "locator": "Evaluation metrics bullet",
-            "evidence": "RMSEs(t), for the mean RMSE score (normalized RMSE), - σ [ RMSEs(t) ] , for the RMSE(t) standard deviation of the RMSE(t), which gives some information regarding the temporal stability of the reconstruction, - λx, for which the minimum spatial scale is resolved (wavelength in degrees), - λt, for which the minimum temporal scale is resolved",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -282,14 +257,17 @@
         },
         {
           "path": "results.headline",
-          "value": "The paper reports a 30%-60% relative reconstruction-error improvement over operational optimal interpolation.",
+          "value": [
+            "relative improvement with respect to the operational optimal interpolation between 30 % and 60 % in terms of the reconstruction error",
+            "for the nadir plus SWOT altimeter configuration, resolved space–timescales below 70 km and 7 d"
+          ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "Abstract",
             "page": 2119,
-            "locator": "abstract",
-            "evidence": "relative improvement with respect to the operational optimal interpolation between 30 % and 60 % in terms of the reconstruction error",
+            "locator": "LLM-proposed evidence",
+            "evidence": "We report a relative improvement with respect to the operational optimal interpolation between 30 % and 60 % in terms of the reconstruction error. Interestingly, for the nadir plus SWOT altimeter configuration, we reach resolved space-timescales below 70 km and 7 d.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -298,15 +276,15 @@
         },
         {
           "path": "limitations.author_reported",
-          "value": "Scaling from regional domains to basin or global scale remains a challenge and may require more complex dynamical-prior parameterizations.",
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "6 Conclusion and discussion",
-            "page": 2134,
-            "locator": "Scaling up bullet",
-            "evidence": "Scaling up to a basin scale or even the global scale naturally arises as a key challenge for future work. Through the built-in features of the PyTorch framework and its associated packages, our open-source code can leverage multiGPU distribution learning schemes and on-the-fly minibatch generation tools to deal with larger-scale datasets from a computational point of view. To account for a greater diversity in the dynamical regimes at play on the global scale, or even on a basin scale, it also seems necessary to explore more complex 4DVarNet-SSH parameterizations",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -320,15 +298,19 @@
         {
           "path": "data.datasets",
           "value": [
-            "high-resolution northwest Atlantic regional ocean reanalysis produced with ROMS and EnKF"
+            "northwest Atlantic regional ocean reanalysis (ROMS with EnKF)",
+            "ERA5",
+            "GLORYS",
+            "OSU TPXO tide database",
+            "National Water Model"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.1 Reanalysis Data",
             "page": 11,
-            "locator": "opening paragraph",
-            "evidence": "utilized high-resolution northwest Atlantic regional ocean reanalysis data to train OceanNet. This reanalysis was generated using a regional implementation of ROMS with the ensemble Kalman filter data assimilation method (EnKF)",
+            "locator": "LLM-proposed evidence",
+            "evidence": "This reanalysis was generated using a regional implementation of ROMS with the ensemble Kalman filter data assimilation method (EnKF). It features a horizontal resolution of 4 km with 50 vertical layers. For surface atmospheric forcing, we employed data from the European Center for Medium-Range Weather Forecasting (ECMWF) Reanalysis v5 (ERA5), while open boundary conditions were derived from the Copernicus Global Ocean Physics Reanalysis (GLORYS). Ten major tidal constituents from the OSU TPXO tide database were used. The model incorporated 120 river inputs, sourced from the National Water Model and climatology datasets.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -337,17 +319,15 @@
         },
         {
           "path": "data.inputs",
-          "value": [
-            "historical 5-day mean sea surface height"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.2.1 Fourier Neural Operator (FNO)",
-            "page": 12,
-            "locator": "opening paragraph",
-            "evidence": "Training utilizes labeled pairs of historical 5-day mean SSH data in the GoM (section 4.1), X(t) (input)",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -355,17 +335,15 @@
         },
         {
           "path": "data.outputs",
-          "value": [
-            "future sea surface height"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.2.1 Fourier Neural Operator (FNO)",
-            "page": 12,
-            "locator": "opening paragraph",
-            "evidence": "Training utilizes labeled pairs of historical 5-day mean SSH data in the GoM (section 4.1), X(t) (input), X(t + 5∆t) (label), and X(t + 10∆t) (label), where ∆t = 1 day. For training OceanNet in the northwest Atlantic region, the labels are X(t + 4∆t) and X(t + 8",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -373,14 +351,14 @@
         },
         {
           "path": "data.splits.train",
-          "value": "1993 through 2018",
+          "value": "26 years of reanalysis data from 1993 through 2018",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.1 Reanalysis Data",
             "page": 11,
-            "locator": "final paragraph",
-            "evidence": "training datasets consist of 26 years of reanalysis data from 1993 through 2018",
+            "locator": "LLM-proposed evidence",
+            "evidence": "Both training datasets consist of 26 years of reanalysis data from 1993 through 2018.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -405,14 +383,14 @@
         },
         {
           "path": "data.splits.test",
-          "value": "2019 through 2020",
+          "value": "2019-2020",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.1 Reanalysis Data",
             "page": 11,
-            "locator": "final paragraph",
-            "evidence": "SSH Forecasting was conducted for 2019-2020",
+            "locator": "LLM-proposed evidence",
+            "evidence": "SSH Forecasting was conducted for 2019-2020.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -421,14 +399,14 @@
         },
         {
           "path": "data.spatial_resolution",
-          "value": "4 km horizontal resolution with 50 vertical layers in the source reanalysis",
+          "value": "4 km horizontal resolution",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.1 Reanalysis Data",
             "page": 11,
-            "locator": "opening paragraph",
-            "evidence": "horizontal resolution of 4 km with 50 vertical layers",
+            "locator": "LLM-proposed evidence",
+            "evidence": "It features a horizontal resolution of 4 km with 50 vertical layers.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -438,16 +416,15 @@
         {
           "path": "architecture.family",
           "value": [
-            "Fourier neural operator",
-            "predictor-evaluate-corrector integrator"
+            "Fourier neural operator"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "1 Introduction",
-            "page": 3,
-            "locator": "OceanNet overview paragraph",
-            "evidence": "relies on a Fourier neural operator (FNO), which incorporates a predictor-evaluatecorrector (PEC) integration scheme",
+            "section": "4.2.1 Fourier Neural Operator (FNO)",
+            "page": 12,
+            "locator": "LLM-proposed evidence",
+            "evidence": "OceanNet is built upon the FNO [25].",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -504,14 +481,14 @@
         },
         {
           "path": "objective.primary_loss",
-          "value": "two-time-step sum of mean squared error and a spectral regularizer",
+          "value": "mean squared error loss (MSE) computed over ocean grid points",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "4.2.3 Fourier Regularizer and 2-time-step Loss Function",
-            "page": 14,
-            "locator": "equations (6)-(8)",
-            "evidence": "loss functions for t + 5∆t and t + 10∆t are given by L (t + 5∆t,θ ): L (t + 5∆t,θ ) = t=TX t=0 ∥X (t + 5∆t)- H [N (X (t),θ )]∥2 2 +λμ(t + 5∆t,θ ). (6) L (t + 10∆t,θ ) = t=TX t=0 ∥X (t + 10∆t)- H [H [N (X (t),θ )]]∥2 2 +λμ(t + 10∆t,θ ). (7) The total loss is given by: L (θ) = L (t + 5∆t,θ ) + L (t + 10∆t,θ ). (8) The spectral regularizer ensures that the high wavenumbers",
+            "section": "4.2.3",
+            "page": 13,
+            "locator": "LLM-proposed evidence",
+            "evidence": "This is in addition to the standard mean squared error loss (MSE) function, which is computed exclusively for grid points located over the ocean.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -526,8 +503,8 @@
           "source": {
             "section": "2.1 Performance of OceanNet in the GoM",
             "page": 4,
-            "locator": "opening sentence",
-            "evidence": "seasonal (up to 120 days) forecasting performance",
+            "locator": "LLM-proposed evidence",
+            "evidence": "We present an evaluation of OceanNet’s seasonal (up to 120 days) forecasting performance",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -536,72 +513,35 @@
         },
         {
           "path": "evaluation.baselines",
-          "value": [
-            "regional ocean dynamical model forecast, identified as ROMS-based",
-            "persistence forecast",
-            "1,000 random training-sample pairs used as a saturation reference",
-            "baseline U-NET trained on the same data as OceanNet"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "2.1 Performance of OceanNet in the GoM",
-            "page": 6,
-            "locator": "Figure 3 caption",
-            "evidence": "1,000 random pairs sourced from the training data spanning 1993-2018 (means shown by black horizontal lines). The performance statistics, calculated based on forecasts of 0-120 days for eddies Sverdrup (middle column) and Thor (right column), are displayed as mean values (lines) with standard deviations (shading). The black horizontal dashed lines in these columns denote saturation values determined as 95% of the means derived from the random pairs. In the middle and right columns, solid blue lines are OceanNet, dashed red lines are the regional ocean dynamical forecast model, and gray dots are persistence",
-            "origin": "PRIMARY_PAPER",
-            "evidence_url": "https://arxiv.org/pdf/2310.00813v2",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
+            "evidence_url": null,
             "claimed_value": null
           },
-          "sources": [
-            {
-              "section": "1 Introduction",
-              "page": 3,
-              "locator": "OceanNet overview paragraph",
-              "evidence": "competitive with SSH prediction made by a regional ocean dynamical prediction that is based on the state-of-the-art Regional Ocean Modeling System (ROMS)",
-              "origin": "PRIMARY_PAPER",
-              "evidence_url": "https://arxiv.org/pdf/2310.00813v2",
-              "claimed_value": null
-            },
-            {
-              "section": "1 Performance of an U-NET on the GS",
-              "page": 1,
-              "locator": "opening paragraph and Figure S1",
-              "evidence": "baseline U-NET trained on the same data as OceanNet",
-              "origin": "SUPPLEMENTARY_MATERIAL",
-              "evidence_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf",
-              "claimed_value": null
-            }
-          ]
+          "sources": []
         },
         {
           "path": "evaluation.ablations",
-          "value": [
-            "FNO without the spectral regularizer or PEC integrator",
-            "FNO with a geostrophic constraint and without the spectral regularizer or PEC integrator"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "2 FNO without spectral regularizer or PEC integrator",
-            "page": 2,
-            "locator": "section opening and Figure S2",
-            "evidence": "FNO model without the spectral regularizer and PEC integrator in the GoM. This model was trained on one day lead time with 3 channels: SSH, depth-averaged zonal velocity ( ̄ u), and depth-averaged meridional velocity ( ̄v). (a) Prediction after 20 days. (b) Reanalysis data at 20 days. (c) Zonal Fourier spectrum present in (a) and (b). (d) same as (c) but at 99 days. 2 FNO without spectral regularizer or PEC integrator In Fig. S2, we show that the FNO trained on SSH, depth-averaged zonal velocity ̄u, and depth-averaged meridional velocity ̄ v, without the spectral regularizer or the PEC integrator",
-            "origin": "SUPPLEMENTARY_MATERIAL",
-            "evidence_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
+            "evidence_url": null,
             "claimed_value": null
           },
-          "sources": [
-            {
-              "section": "3 FNO with a geostrophic constraint without spectral regularization or the PEC integrator",
-              "page": 2,
-              "locator": "section paragraph continuing to Figure S3 on page 3",
-              "evidence": "geostrophic constraint without spectral regularization or the PEC integrator Several studies in the past have conjectured that certain conservation laws, relevant to the system, may be useful for improving the accuracy of data-driven models [1, 2]. In the FNO model, even without any regularization or PEC integration scheme, the geostrophic constraint-the only relevant conservation law in this system-is satisfied up to O(10-6). Hence, conserving geostrophy did not yield fruitful results",
-              "origin": "SUPPLEMENTARY_MATERIAL",
-              "evidence_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf",
-              "claimed_value": null
-            }
-          ]
+          "sources": []
         },
         {
           "path": "evaluation.metrics",
@@ -615,8 +555,8 @@
           "source": {
             "section": "2 Results",
             "page": 3,
-            "locator": "metrics paragraph",
-            "evidence": "metrics for evaluating predictive accuracy of SSH include root mean squared error (RMSE) and correlation coefficient (CC), which are widely recognized and employed in forecasting [1-3, 18]. In addition, we incorporate a specialized object-tracking metric to evaluate the prediction of major ocean features delineated by SSH contours: the modified Hausdorff distance (MHD",
+            "locator": "LLM-proposed evidence",
+            "evidence": "The metrics for evaluating predictive accuracy of SSH include root mean squared error (RMSE) and correlation coefficient (CC), which are widely recognized and employed in forecasting [1-3, 18]. In addition, we incorporate a specialized object-tracking metric to evaluate the prediction of major ocean features delineated by SSH contours: the modified Hausdorff distance (MHD, [19]).",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -625,41 +565,31 @@
         },
         {
           "path": "results.headline",
-          "value": "OceanNet remained competitive with the regional dynamical model forecast while running approximately 500,000 times faster.",
+          "value": "OceanNet demonstrates competitive forecast skill compared to a state-of-the-art dynamical ocean model forecast, reducing computation by 500,000 times",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "1 Introduction",
-            "page": 3,
-            "locator": "OceanNet overview paragraph",
-            "evidence": "demonstrates long-term stability and competitive skills. It remains competitive with SSH prediction made by a regional ocean dynamical prediction",
+            "section": "Abstract",
+            "page": 1,
+            "locator": "LLM-proposed evidence",
+            "evidence": "Trained using historical sea surface height (SSH) data, OceanNet demonstrates competitive forecast skill compared to a state-of-the-art dynamical ocean model forecast, reducing computation by 500,000 times.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
-          "sources": [
-            {
-              "section": "2.1 Performance of OceanNet in the GoM",
-              "page": 6,
-              "locator": "paragraph after Figure 3",
-              "evidence": "OceanNet predictions have a “wall-clock” execution time of microseconds, approximately 500,000 times faster than regional dynamical model forecasts",
-              "origin": "PRIMARY_PAPER",
-              "evidence_url": null,
-              "claimed_value": null
-            }
-          ]
+          "sources": []
         },
         {
           "path": "limitations.author_reported",
-          "value": "OceanNet was trained and tested only on reanalysis data for mesoscale eddies and meanders, so performance across real-world ocean applications needs investigation.",
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "3 Discussion",
-            "page": 10,
-            "locator": "limitations paragraph",
-            "evidence": "exclusively trained and tested OceanNet using reanalysis data pertaining to mesoscale ocean eddies and meanders. Real-world ocean forecasting systems operate with dynamical ocean models and real-time ocean observational data, covering dynamic processes across diverse spatial scales. The disparities between these data sources and scales necessitate further investigation",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -672,19 +602,15 @@
       "fields": [
         {
           "path": "data.datasets",
-          "value": [
-            "GLORYS12",
-            "ERA5",
-            "OSTIA"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "3.1 Training Dataset",
-            "page": 3,
-            "locator": "paragraphs 1-3",
-            "evidence": "main training data of XiHe is the GLORYS12 reanalysis which is designed and implemented in the framework of the Copernicus Marine Environment Monitoring Service (CMEMS) [28]. The GLORYS12 is a global reanalysis at 1/12◦ horizontal resolution with 50 vertical levels. In this dataset, along track altimeter Sea Level Anomaly (SLA), SST, and Sea Ice Concentration (SIC), as well as in situ Temperature and Salinity (T/S) profiles are jointly assimilated. The GLORYS12 dataset we utilized spans from Jan. 1993 to Dec. 2020. GLORYS12 is one of the state-of-the-art reanalyses [29]. Due to its high resolution, time continuity, long coverage, and excellent quality, we choose it as the main training dataset. Considering the impact of the sea surface wind on ocean dynamics, we incorporate the 10m u-component of wind (U10) and 10m v-component of wind (V10) into the training data of XiHe. The wind field data for training is from the Fifth Generation Global Atmospheric Reanalysis data (ERA5) produced by the European Centre for MediumRange Weather Forecasts (ECMWF) [30]. Their spatial resolution is 0.25° with 137 model levels. In order to standardize the data dimensions, we interpolated the wind data to the same spatial and temporal resolution as the GLORYS12 reanalysis data. To improve the forecasting accuracy of SST, we introduce the satellite SST data from the Operational Sea Surface Temperature and Ice Analysis (OSTIA",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -692,15 +618,19 @@
         },
         {
           "path": "data.inputs",
-          "value": null,
+          "value": [
+            "2 sea surface variables (sea surface temperature and sea surface height)",
+            "4 ocean variables with 23 layers (ocean temperature, sea salinity, zonal and meridional component of ocean currents)",
+            "2 atmospheric variables of sea surface (zonal and meridional component of sea surface wind)"
+          ],
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "4.1 Problem Statement",
+            "page": 4,
+            "locator": "LLM-proposed evidence",
+            "evidence": "the input variables of our XiHe model include 2 sea surface variables (sea surface temperature and sea surface height), 4 ocean variables with 23 layers (ocean temperature, sea salinity, zonal and meridional component of ocean currents), and 2 atmospheric variables of sea surface (zonal and meridional component of sea surface wind), a total of 96 variables.",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -708,15 +638,15 @@
         },
         {
           "path": "data.outputs",
-          "value": null,
+          "value": "4320× 2041× 94 (2 atmospheric variables are excluded)",
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "4.1 Problem Statement",
+            "page": 4,
+            "locator": "LLM-proposed evidence",
+            "evidence": "The data dimensions of the output ˆXt+τ are 4320× 2041× 94 (2 atmospheric variables are excluded).",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -756,15 +686,15 @@
         },
         {
           "path": "data.splits.test",
-          "value": null,
+          "value": "January 2019 to December 2020",
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "Abstract",
+            "page": 1,
+            "locator": "LLM-proposed evidence",
+            "evidence": "the IV-TT Class 4 evaluation framework of the world’s leading operational GOFSs from January 2019 to December 2020",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -772,15 +702,15 @@
         },
         {
           "path": "data.spatial_resolution",
-          "value": null,
+          "value": "1/12◦ (4320× 2041 longitude-latitude grid points)",
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "4.1 Problem Statement",
+            "page": 4,
+            "locator": "LLM-proposed evidence",
+            "evidence": "The GLORYS12 global reanalysis data has a spatial resolution of 1/12◦ (4320× 2041 longitude-latitude grid points) and a temporal resolution of one day.",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -789,16 +719,15 @@
         {
           "path": "architecture.family",
           "value": [
-            "hierarchical transformer",
-            "ocean-specific transformer"
+            "hierarchical transformer-based framework"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "4.2 Framework Overview",
-            "page": 4,
-            "locator": "paragraph 1",
-            "evidence": "hierarchical transformerbased machine learning framework, which contains three components: the patch partition module, ocean-specific transformer",
+            "section": "Abstract",
+            "page": 1,
+            "locator": "LLM-proposed evidence",
+            "evidence": "XiHe is a hierarchical transformer-based framework coupled with two special setups.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -823,15 +752,15 @@
         },
         {
           "path": "training.optimizer",
-          "value": "AdamW",
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.6 Optimization Details",
-            "page": 6,
-            "locator": "final paragraph continuing on page 7",
-            "evidence": "use the AdamW [42], [43] optimizer",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -839,14 +768,14 @@
         },
         {
           "path": "training.learning_rate",
-          "value": "5e-5",
+          "value": "5e−5",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
             "section": "4.6 Optimization Details",
             "page": 7,
-            "locator": "first line",
-            "evidence": "learning rate 5e-5",
+            "locator": "LLM-proposed evidence",
+            "evidence": "the parametersβ1 = 0.9,β2 = 0.95 and a learning rate 5e-5.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -861,8 +790,8 @@
           "source": {
             "section": "4.6 Optimization Details",
             "page": 6,
-            "locator": "equation (9)",
-            "evidence": "loss function used is the Mean Square Error (MSE) loss",
+            "locator": "PDF paragraph 3",
+            "evidence": "loss function used is the Mean Square Error (MSE) loss.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -871,15 +800,15 @@
         },
         {
           "path": "evaluation.forecast_horizon",
-          "value": null,
+          "value": "lead times ranging from 1 day to 10 days, extended to 20, 30, and 60 days",
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "5.1.2 Overall Evaluation",
+            "page": 7,
+            "locator": "LLM-proposed evidence",
+            "evidence": "with the lead times ranging from 1 day to 10 days. To further understand the XiHe forecasting capabilities, we extended the forecast lead times to 20, 30, and 60 days.",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -887,15 +816,20 @@
         },
         {
           "path": "evaluation.baselines",
-          "value": null,
+          "value": [
+            "PSY4",
+            "GIOPS",
+            "FOAM",
+            "BLUElink OceanMAPS (BLK)"
+          ],
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "5.1.1 The IV-TT Class 4 Framework",
+            "page": 7,
+            "locator": "LLM-proposed evidence",
+            "evidence": "We compare XiHe with the four state-of-the-art global ocean forecasting systems, including PSY4 [17], GIOPS [15], FOAM [16], and BLUElink OceanMAPS (BLK).",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },

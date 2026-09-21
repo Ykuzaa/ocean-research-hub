@@ -463,7 +463,16 @@ class SemanticExtractor:
             accepted.add(claim.path)
 
         pending_paths = {path for path, _ in pending}
-        errored = pending_paths - accepted - rejected
-        for path in (rejected | errored) - accepted:
+        # A field the deterministic absence probe already established, with a
+        # recorded search scope, is a finding in its own right. The model
+        # declining to propose a value for it is agreement, not a new failure,
+        # so it must not be overwritten with EXTRACTION_ERROR.
+        established_absence = {
+            path for path in pending_paths
+            if (field := resolve_field_target(record, path)[2]).status
+            is VerificationStatus.NOT_REPORTED and field.absence_search_scope
+        }
+        errored = pending_paths - accepted - rejected - established_absence
+        for path in (rejected | errored) - accepted - established_absence:
             mark_extraction_error(record, path, path.startswith("limitations."))
         return SemanticExtractionResult(sorted(accepted), sorted(rejected - accepted), sorted(errored))

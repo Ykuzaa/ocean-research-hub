@@ -158,8 +158,10 @@ def test_profile_cannot_emit_hard_coded_hardware_roles_when_source_reverses_them
 
     field = ScientificExtractor().extract(parsed).record.training.hardware
 
-    assert field.status.name == "NOT_REPORTED"
     assert field.value is None
+    # The page does discuss GPUs, so absence is unprovable here; the extractor
+    # must report that it could not ground a claim rather than assert absence.
+    assert field.status.name == "EXTRACTION_ERROR"
 
 
 def test_profile_cannot_emit_hardware_claim_when_large_domain_gpu_is_negated() -> None:
@@ -179,8 +181,10 @@ def test_profile_cannot_emit_hardware_claim_when_large_domain_gpu_is_negated() -
 
     field = ScientificExtractor().extract(parsed).record.training.hardware
 
-    assert field.status.name == "NOT_REPORTED"
     assert field.value is None
+    # The page does discuss GPUs, so absence is unprovable here; the extractor
+    # must report that it could not ground a claim rather than assert absence.
+    assert field.status.name == "EXTRACTION_ERROR"
 
 
 def test_profile_cannot_emit_training_time_when_domain_duration_roles_reverse() -> None:

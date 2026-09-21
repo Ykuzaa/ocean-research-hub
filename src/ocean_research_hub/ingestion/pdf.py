@@ -343,6 +343,151 @@ def mark_extraction_error(record: PaperRecord, path: str, limitation: bool = Fal
     }))
 
 
+# A lexical absence probe may only be written for a field whose reporting
+# vocabulary is near-closed: a paper that reports the field is overwhelmingly
+# likely to use one of the listed terms. Narrative fields (the scientific
+# problem, dataset inventories, architecture prose, baselines, ablations,
+# headline results, author limitations) are deliberately absent from this
+# table. The OceanNet supplement is the governing counter-example: it reports
+# two ablation experiments without ever writing "ablation", so lexical silence
+# there would have produced a false scientific absence. Fields without a probe
+# stay EXTRACTION_ERROR, which is the conservative outcome.
+ABSENCE_PROBES: dict[str, tuple[str, ...]] = {
+    "data.splits.validation": (
+        r"\bvalidat", r"\bheld[- ]?out\b", r"\bdevelopment set\b", r"\btuning set\b",
+    ),
+    "data.preprocessing.missing_data": (
+        r"\bmissing\b", r"\bgap", r"\bNaN\b", r"\bincomplete\b", r"\bcloud",
+        r"\bfill(?:ed)? value", r"\bunobserved\b", r"\bimput", r"\bdata voids?\b",
+    ),
+    "data.preprocessing.masking": (
+        r"\bmask", r"\bland\b", r"\bcoastline", r"\bocean (?:points|grid points|pixels)\b",
+        r"\bover the ocean\b", r"\bvalid (?:points|pixels|values)\b", r"\bexclud",
+    ),
+    "data.preprocessing.regridding": (
+        r"\bre-?grid", r"\bremap", r"\binterpolat", r"\bcoars", r"\bresampl",
+        r"\bsubsampl", r"\bupscal", r"\bdownscal", r"\bbilinear\b",
+        r"nearest[- ]neighbou?r", r"\bconservative remapping\b",
+    ),
+    "data.preprocessing.normalization": (
+        r"\bnormali[sz]", r"\bstandardi[sz]", r"\bz-?score\b", r"\banomal",
+        r"\bdetrend", r"\brescal", r"\bscaled\b", r"\bmin-?max\b",
+        r"\bmean[- ]remov", r"\bunit variance\b",
+    ),
+    "architecture.activations": (
+        r"\bactivation", r"\bReLU\b", r"\bGELU\b", r"\btanh\b", r"\bsigmoid\b",
+        r"\bSiLU\b", r"\bSwish\b", r"\bsoftplus\b", r"\bsoftmax\b", r"\bELU\b",
+        r"\bleaky\b", r"\bnonlinearit", r"\bnon-linearit",
+    ),
+    "architecture.normalization_layers": (
+        r"\bbatch\s*norm", r"\blayer\s*norm", r"\bgroup\s*norm", r"\binstance\s*norm",
+        r"normali[sz]ation layer", r"\bBatchNorm\b", r"\bLayerNorm\b", r"\bGroupNorm\b",
+        r"\bRMSNorm\b", r"\bweight normali[sz]ation\b",
+    ),
+    "training.optimizer": (
+        r"\boptimi[sz]er\b", r"\bAdam\b", r"\bAdamW\b", r"\bSGD\b", r"\bRMSProp\b",
+        r"\bL-?BFGS\b", r"\bAdagrad\b", r"\bAdadelta\b", r"stochastic gradient",
+    ),
+    "training.learning_rate": (
+        r"learning[- ]rate", r"\blearning rates\b", r"\bstep size\b",
+    ),
+    "training.scheduler": (
+        r"\bschedul", r"\bdecay", r"\banneal", r"\bwarm-?up\b", r"\bplateau\b",
+        r"\bcosine\b", r"\bstep size\b", r"\bramp",
+    ),
+    "training.batch_size": (
+        r"\bbatch\b", r"\bmini-?batch", r"\bbatches\b",
+    ),
+    "training.epochs_or_steps": (
+        r"\bepoch", r"training (?:steps|iterations)", r"\biteration", r"\bgradient steps\b",
+        r"\bupdates\b",
+    ),
+    "training.hardware": (
+        r"\bGPU", r"\bTPU", r"\bCPU", r"\bNVIDIA\b", r"\bA100\b", r"\bV100\b",
+        r"\bH100\b", r"\bP100\b", r"\bcluster\b", r"\bcompute node", r"\bhardware\b",
+        r"\bworkstation\b", r"\bsupercomputer\b",
+    ),
+    "training.training_time": (
+        r"training time", r"wall[- ]?clock", r"time to train", r"\bcomputational cost\b",
+        r"\bruntime\b", r"\bGPU-?hours?\b", r"train\w*\s+(?:took|requires?|takes?)\b",
+        r"(?:hours|days|minutes)\s+(?:of|to)\s+train",
+    ),
+    "objective.auxiliary_losses": (
+        r"auxiliary", r"\bregulari[sz]", r"\bpenalt", r"loss term", r"additional loss",
+        r"second(?:ary)? loss", r"combined loss", r"weighted sum", r"\bconstraint\b",
+    ),
+    "evaluation.forecast_horizon": (
+        r"\bforecast", r"\blead time", r"\bhorizon\b", r"days? ahead",
+        r"prediction (?:range|window|window length)",
+    ),
+}
+
+
+def probe_absence(parsed: ParsedPdf, path: str) -> list[str] | None:
+    """Return a documented absence scope, or ``None`` when absence is unprovable.
+
+    ``None`` means one of two things and the caller must not distinguish them
+    in favour of absence: either the field has no near-closed vocabulary to
+    probe, or the vocabulary *is* present in the searched text and the field
+    therefore failed to extract rather than being unreported.
+    """
+    patterns = ABSENCE_PROBES.get(path)
+    if patterns is None:
+        return None
+    primary = normalize_text(parsed.text)
+    supplement = normalize_text(
+        "\n".join(page.text for page in parsed.supplementary_pages)
+    )
+    searched = f"{primary} {supplement}"
+    if any(re.search(pattern, searched, re.I) for pattern in patterns):
+        return None
+    supplement_scope = (
+        "supplementary material searched: "
+        + "; ".join(parsed.supplementary_search_scope)
+        + f" ({len(parsed.supplementary_pages)} extractable pages)"
+        if parsed.supplementary_search_scope
+        else "no supplementary material was supplied to this run; "
+        "absence is scoped to the primary document only"
+    )
+    return [
+        f"full text of all {len(parsed.pages)} extractable pages of {parsed.source_name}",
+        "field-specific lexical absence probe found no occurrence of any of: "
+        + ", ".join(patterns),
+        supplement_scope,
+    ]
+
+
+def resolve_absences(record: PaperRecord, parsed: ParsedPdf) -> list[str]:
+    """Convert unresolved fields into a documented absence where provable.
+
+    Runs last, after every extraction path has had its chance, so an absence is
+    only asserted for a field no mechanism populated. A field left unresolved
+    without a provable absence keeps ``EXTRACTION_ERROR``: a failure to extract
+    is never reported as the paper not reporting the value.
+    """
+    asserted: list[str] = []
+    for path in ABSENCE_PROBES:
+        target, name, current = resolve_field_target(record, path)
+        if current.status not in {
+            VerificationStatus.NOT_REPORTED, VerificationStatus.EXTRACTION_ERROR,
+        }:
+            continue
+        scope = probe_absence(parsed, path)
+        if scope is None:
+            if current.status is VerificationStatus.NOT_REPORTED:
+                mark_extraction_error(record, path, path.startswith("limitations."))
+            continue
+        setattr(target, name, current.__class__.model_validate({
+            "status": VerificationStatus.NOT_REPORTED,
+            "value": None,
+            "provenance_type": current.provenance_type,
+            "confidence": 0.6,
+            "absence_search_scope": scope,
+        }))
+        asserted.append(path)
+    return sorted(asserted)
+
+
 def iter_evidence_fields(record: PaperRecord) -> Iterable[EvidenceField[Any]]:
     def walk(model: BaseModel) -> Iterable[EvidenceField[Any]]:
         for name in type(model).model_fields:
@@ -376,6 +521,7 @@ class ScientificExtractor:
             "all shared deterministic capture rules; no paper-specific value registry was used",
             "supplementary material was not searched" if not parsed.supplementary_search_scope else "supplementary search: " + "; ".join(parsed.supplementary_search_scope),
         ]
+        resolve_absences(record, parsed)
         return ExtractionResult(record, scope, warnings, sorted(rejected))
 
     @staticmethod

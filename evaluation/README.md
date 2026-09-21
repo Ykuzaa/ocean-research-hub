@@ -72,22 +72,66 @@ uv run ocean-research-hub-real-pdf-benchmark \
   --semantic-provider claude \
   --validation-manifest evaluation/issue-19-validation-papers.json \
   --validation-report-out evaluation/reports/issue-19-four-paper-validation.md \
-  --validation-json-out evaluation/reports/issue-19-four-paper-extraction.json
+  --validation-json-out evaluation/reports/issue-19-four-paper-extraction.json \
+  --extraction-cache evaluation/reports/issue-19-extraction-cache.json
 ```
+
+Semantic extraction is a paid, non-deterministic network call, so a fresh run
+will not reproduce the committed artifacts byte-for-byte. `--extraction-cache`
+writes the run's extracted records beside the reports; re-running the same
+command **without** `--semantic-provider` then replays that cache and
+regenerates every report with no API key and no network. The cached SHA-256 is
+re-checked against the PDF on disk first, so a stale cache cannot stand in for
+a different document.
+
+### Re-verify the evidence independently
+
+The reports above are written by the same code an auditor is being asked to
+trust. `ocean-research-hub-verify-evidence` closes that loop: it reads only the
+published artifact, re-hashes and re-parses each pinned PDF, and checks whether
+each asserted claim's stored snippet is literally on the page it cites. It
+imports no extraction rule and no provider.
+
+```bash
+uv run ocean-research-hub-verify-evidence \
+  evaluation/reports/issue-19-four-paper-extraction.json \
+  --report-out evaluation/reports/issue-19-evidence-reverification.md \
+  --json-out evaluation/reports/issue-19-evidence-reverification.json
+```
+
+Outcomes stay distinct rather than collapsing into pass/fail: `LOCATED`,
+`NOT_LOCATED`, `PAGE_NOT_FOUND`, `NO_EVIDENCE`. `--offline` turns a missing
+cached PDF into a visible failure instead of a silent download.
 
 Downloaded PDFs are kept under the ignored `.data/golden-pdfs/` directory. The
 runner never marks an extracted scientific claim `VERIFIED`; the audit report has
-an explicit Scientific Auditor confirmation column for the independent gate. A
-PDF-only run has no supplementary-material search scope, so unset fields are
-benchmarked as `EXTRACTION_ERROR`, not credited as `NOT_REPORTED`.
+an explicit Scientific Auditor confirmation column for the independent gate.
+`--semantic-provider` is explicit so tests and routine benchmark inspection
+never make a paid network call. Choose `claude` (preferred) or `gemini` only
+when the matching API key is configured; omitting it records a
+deterministic-only provider path in the generated report.
 The four-paper report adds the required heterogeneous non-golden checks (GLONET
 and DINCAE 2.0). It remains explicitly pending until an independent auditor
 supplies `--validation-decisions`; the runner never self-promotes claims to
 `VERIFIED` or manufactures expected values.
-`--semantic-provider` is explicit so tests and routine benchmark inspection
-never make a paid network call. Choose `claude` (preferred) or `gemini` only
-when the matching API key is configured; `none` records a deterministic-only
-provider path in the generated report.
+
+### Absence versus extraction failure
+
+`NOT_REPORTED` is asserted only when a field-specific lexical probe finds none
+of that field's near-closed reporting vocabulary anywhere in the searched text.
+The scope that establishes the absence -- the source and page count, the exact
+probe patterns that found nothing, and whether supplementary material was
+searched -- is stored on the field and printed in its own report column. When
+the vocabulary *is* present but no value could be grounded, the field stays
+`EXTRACTION_ERROR`: the concept is discussed, so absence is unprovable.
+
+Open-vocabulary fields are deliberately unprobed and can never be declared
+absent this way. The OceanNet supplement is the governing counter-example: it
+reports two ablation experiments without ever writing "ablation".
+
+Where a run was given no supplementary material, an absence means "not in the
+primary document" and the recorded scope says exactly that, so an auditor can
+see how far the search reached.
 
 For a no-extraction smoke run (all fields intentionally missing), use:
 

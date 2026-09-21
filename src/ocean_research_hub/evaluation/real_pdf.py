@@ -317,8 +317,8 @@ def render_audit(
         ),
         (f"Independent auditor: `{decisions.auditor}`." if decisions else "Extraction status is pre-audit. `PENDING_INDEPENDENT_AUDIT` must be replaced only from an auditor-authored decision artifact."),
         "",
-        "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Evidence snippet | Evidence URL | Absence search scope | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor evidence location | Auditor reason |",
-        "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|---|",
+        "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Locator | Evidence snippet | Evidence URL | Absence search scope | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor evidence location | Auditor reason |",
+        "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for path in AUDIT_PATHS:
         item = field_at(record, path)
@@ -356,6 +356,7 @@ def render_audit(
                 path, cell(value), effective_status, str(item.provenance_type),
                 str(item.source.origin) if item.source.is_supplied else "—",
                 cell(item.source.page), cell(item.source.section),
+                cell(item.source.locator),
                 cell(item.source.evidence), cell(item.source.evidence_url),
                 cell("; ".join(item.absence_search_scope) or None),
                 cell(expected), preflight, mismatch,
@@ -429,8 +430,8 @@ def render_validation_report(
             f"Targeted fields: **{len(paths)}**; populated: **{populated}**; `NOT_REPORTED`: **{not_reported}**; `EXTRACTION_ERROR`: **{extraction_errors}**; conflicts: **{conflicts}**; unsupported proposals rejected: **{len(metadata.rejected)}**.  ",
             f"Semantic accepted: **{len(metadata.accepted)}**; semantic/unresolved errors: **{len(metadata.errored)}**.  ",
             "",
-            "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Exact evidence | Evidence URL/origin | Absence search scope | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor reason |",
-            "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|",
+            "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Locator | Exact evidence | Evidence URL/origin | Absence search scope | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor reason |",
+            "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|---|",
         ))
         for path in paths:
             field = fields[path]
@@ -469,6 +470,7 @@ def render_validation_report(
                 field.source.origin if field.source.is_supplied else None,
                 field.source.page if field.source.is_supplied else None,
                 field.source.section if field.source.is_supplied else None,
+                field.source.locator if field.source.is_supplied else None,
                 field.source.evidence if field.source.is_supplied else None,
                 field.source.evidence_url if field.source.is_supplied else None,
                 "; ".join(field.absence_search_scope) or None,

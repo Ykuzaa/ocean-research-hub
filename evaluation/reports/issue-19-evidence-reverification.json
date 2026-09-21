@@ -1,0 +1,634 @@
+{
+  "schema_version": 1,
+  "source_artifact": "evaluation/reports/issue-19-four-paper-extraction.json",
+  "hashes": [
+    {
+      "id": "4dvarnet-ssh-2023",
+      "recorded_primary_sha256": "bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88",
+      "recomputed_primary_sha256": "bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88",
+      "primary_sha256_matches": true,
+      "recorded_supplement_sha256": null,
+      "recomputed_supplement_sha256": null,
+      "supplement_sha256_matches": null
+    },
+    {
+      "id": "oceannet-2023",
+      "recorded_primary_sha256": "be82ff557769aff04b119490d6a2ebb718887a1e3962355ab10cc9a7291802e9",
+      "recomputed_primary_sha256": "be82ff557769aff04b119490d6a2ebb718887a1e3962355ab10cc9a7291802e9",
+      "primary_sha256_matches": true,
+      "recorded_supplement_sha256": "c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf",
+      "recomputed_supplement_sha256": "c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf",
+      "supplement_sha256_matches": true
+    },
+    {
+      "id": "glonet-2025",
+      "recorded_primary_sha256": "bc9627304aefb8c29b1eb069a3362996c1b240940e7f7411585987445ad7b76f",
+      "recomputed_primary_sha256": "bc9627304aefb8c29b1eb069a3362996c1b240940e7f7411585987445ad7b76f",
+      "primary_sha256_matches": true,
+      "recorded_supplement_sha256": null,
+      "recomputed_supplement_sha256": null,
+      "supplement_sha256_matches": null
+    },
+    {
+      "id": "dincae-2-2022",
+      "recorded_primary_sha256": "017757e5a2394713d7c18f9b68de0559d003c4843c63d3c84ecc16a5d05d9bf0",
+      "recomputed_primary_sha256": "017757e5a2394713d7c18f9b68de0559d003c4843c63d3c84ecc16a5d05d9bf0",
+      "primary_sha256_matches": true,
+      "recorded_supplement_sha256": null,
+      "recomputed_supplement_sha256": null,
+      "supplement_sha256_matches": null
+    }
+  ],
+  "checks": [
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "scientific_framing.problem",
+      "origin": "PRIMARY_PAPER",
+      "page": 2119,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "scientific_framing.objective",
+      "origin": "PRIMARY_PAPER",
+      "page": 2119,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "scientific_framing.task_type",
+      "origin": "PRIMARY_PAPER",
+      "page": 2119,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.inputs",
+      "origin": "PRIMARY_PAPER",
+      "page": 2120,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.outputs",
+      "origin": "PRIMARY_PAPER",
+      "page": 2122,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.variables",
+      "origin": "PRIMARY_PAPER",
+      "page": 2119,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.spatial_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 2125,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.temporal_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 2126,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.splits.validation",
+      "origin": "PRIMARY_PAPER",
+      "page": 2126,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.splits.test",
+      "origin": "PRIMARY_PAPER",
+      "page": 2127,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.preprocessing.missing_data",
+      "origin": "PRIMARY_PAPER",
+      "page": 2123,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.preprocessing.regridding",
+      "origin": "PRIMARY_PAPER",
+      "page": 2125,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "data.preprocessing.interpolation",
+      "origin": "PRIMARY_PAPER",
+      "page": 2126,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "architecture.activations",
+      "origin": "PRIMARY_PAPER",
+      "page": 2123,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "training.optimizer",
+      "origin": "PRIMARY_PAPER",
+      "page": 2124,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "training.batch_size",
+      "origin": "PRIMARY_PAPER",
+      "page": 2124,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "training.epochs_or_steps",
+      "origin": "PRIMARY_PAPER",
+      "page": 2124,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "training.training_time",
+      "origin": "PRIMARY_PAPER",
+      "page": 2124,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "evaluation.evaluation_datasets",
+      "origin": "PRIMARY_PAPER",
+      "page": 2127,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "4dvarnet-ssh-2023",
+      "path": "results.headline",
+      "origin": "PRIMARY_PAPER",
+      "page": 2119,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "scientific_framing.problem",
+      "origin": "PRIMARY_PAPER",
+      "page": 1,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "scientific_framing.objective",
+      "origin": "PRIMARY_PAPER",
+      "page": 1,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "scientific_framing.task_type",
+      "origin": "PRIMARY_PAPER",
+      "page": 1,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.outputs",
+      "origin": "PRIMARY_PAPER",
+      "page": 12,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.variables",
+      "origin": "PRIMARY_PAPER",
+      "page": 1,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.spatial_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 11,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.temporal_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 11,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.splits.train",
+      "origin": "PRIMARY_PAPER",
+      "page": 11,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.splits.test",
+      "origin": "PRIMARY_PAPER",
+      "page": 11,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "data.preprocessing.masking",
+      "origin": "PRIMARY_PAPER",
+      "page": 13,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "architecture.family",
+      "origin": "PRIMARY_PAPER",
+      "page": 1,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "architecture.summary",
+      "origin": "PRIMARY_PAPER",
+      "page": 11,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "architecture.encoder",
+      "origin": "PRIMARY_PAPER",
+      "page": 12,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "architecture.decoder",
+      "origin": "PRIMARY_PAPER",
+      "page": 12,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "architecture.blocks",
+      "origin": "PRIMARY_PAPER",
+      "page": 13,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "evaluation.metrics",
+      "origin": "PRIMARY_PAPER",
+      "page": 3,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "oceannet-2023",
+      "path": "results.headline",
+      "origin": "PRIMARY_PAPER",
+      "page": 1,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "scientific_framing.problem",
+      "origin": "PRIMARY_PAPER",
+      "page": 2,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "scientific_framing.objective",
+      "origin": "PRIMARY_PAPER",
+      "page": 2,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "data.spatial_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 8,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "data.temporal_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 7,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "data.splits.train",
+      "origin": "PRIMARY_PAPER",
+      "page": 8,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "data.preprocessing.interpolation",
+      "origin": "PRIMARY_PAPER",
+      "page": 8,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "architecture.encoder",
+      "origin": "PRIMARY_PAPER",
+      "page": 6,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "architecture.decoder",
+      "origin": "PRIMARY_PAPER",
+      "page": 6,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "architecture.blocks",
+      "origin": "PRIMARY_PAPER",
+      "page": 5,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "training.optimizer",
+      "origin": "PRIMARY_PAPER",
+      "page": 9,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "training.learning_rate",
+      "origin": "PRIMARY_PAPER",
+      "page": 9,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "training.training_time",
+      "origin": "PRIMARY_PAPER",
+      "page": 9,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "evaluation.baselines",
+      "origin": "PRIMARY_PAPER",
+      "page": 4,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "evaluation.ablations",
+      "origin": "PRIMARY_PAPER",
+      "page": 31,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "glonet-2025",
+      "path": "results.headline",
+      "origin": "PRIMARY_PAPER",
+      "page": 2,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.inputs",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.temporal_resolution",
+      "origin": "PRIMARY_PAPER",
+      "page": 2186,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.splits.train",
+      "origin": "PRIMARY_PAPER",
+      "page": 2186,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.splits.validation",
+      "origin": "PRIMARY_PAPER",
+      "page": 2186,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.preprocessing.missing_data",
+      "origin": "PRIMARY_PAPER",
+      "page": 2185,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.preprocessing.masking",
+      "origin": "PRIMARY_PAPER",
+      "page": 2185,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.preprocessing.interpolation",
+      "origin": "PRIMARY_PAPER",
+      "page": 2186,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "data.preprocessing.normalization",
+      "origin": "PRIMARY_PAPER",
+      "page": 2188,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "architecture.family",
+      "origin": "PRIMARY_PAPER",
+      "page": 2184,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "architecture.summary",
+      "origin": "PRIMARY_PAPER",
+      "page": 2184,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "architecture.encoder",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "architecture.decoder",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "architecture.blocks",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "architecture.activations",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "training.optimizer",
+      "origin": "PRIMARY_PAPER",
+      "page": 2188,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "training.learning_rate",
+      "origin": "PRIMARY_PAPER",
+      "page": 2188,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "training.batch_size",
+      "origin": "PRIMARY_PAPER",
+      "page": 2188,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "training.epochs_or_steps",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "training.hardware",
+      "origin": "PRIMARY_PAPER",
+      "page": 2186,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "training.training_time",
+      "origin": "PRIMARY_PAPER",
+      "page": 2187,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    },
+    {
+      "paper_id": "dincae-2-2022",
+      "path": "objective.primary_loss",
+      "origin": "PRIMARY_PAPER",
+      "page": 2185,
+      "outcome": "LOCATED",
+      "detail": "snippet found verbatim on the cited page"
+    }
+  ],
+  "totals": {
+    "LOCATED": 73,
+    "NOT_LOCATED": 0,
+    "PAGE_NOT_FOUND": 0,
+    "NO_EVIDENCE": 0
+  }
+}

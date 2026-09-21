@@ -4,29 +4,29 @@
   "field_count": 52,
   "overall": {
     "precision": {
-      "numerator": 4,
-      "denominator": 28,
-      "value": 0.142857
+      "numerator": 6,
+      "denominator": 25,
+      "value": 0.24
     },
     "recall": {
-      "numerator": 4,
+      "numerator": 6,
       "denominator": 44,
-      "value": 0.090909
+      "value": 0.136364
     },
     "exact_match": {
-      "numerator": 4,
+      "numerator": 9,
       "denominator": 52,
-      "value": 0.076923
+      "value": 0.173077
     },
     "unsupported_claim_rate": {
-      "numerator": 24,
-      "denominator": 28,
-      "value": 0.857143
+      "numerator": 19,
+      "denominator": 25,
+      "value": 0.76
     },
     "not_reported_accuracy": {
-      "numerator": 0,
+      "numerator": 3,
       "denominator": 8,
-      "value": 0.0
+      "value": 0.375
     },
     "evidence_location_accuracy": {
       "numerator": 0,
@@ -38,7 +38,7 @@
     "data": {
       "precision": {
         "numerator": 0,
-        "denominator": 14,
+        "denominator": 13,
         "value": 0.0
       },
       "recall": {
@@ -47,19 +47,19 @@
         "value": 0.0
       },
       "exact_match": {
-        "numerator": 0,
+        "numerator": 1,
         "denominator": 21,
-        "value": 0.0
+        "value": 0.047619
       },
       "unsupported_claim_rate": {
-        "numerator": 14,
-        "denominator": 14,
+        "numerator": 13,
+        "denominator": 13,
         "value": 1.0
       },
       "not_reported_accuracy": {
-        "numerator": 0,
+        "numerator": 1,
         "denominator": 2,
-        "value": 0.0
+        "value": 0.5
       },
       "evidence_location_accuracy": {
         "numerator": 0,
@@ -70,7 +70,7 @@
     "architecture": {
       "precision": {
         "numerator": 0,
-        "denominator": 3,
+        "denominator": 2,
         "value": 0.0
       },
       "recall": {
@@ -84,8 +84,8 @@
         "value": 0.0
       },
       "unsupported_claim_rate": {
-        "numerator": 3,
-        "denominator": 3,
+        "numerator": 2,
+        "denominator": 2,
         "value": 1.0
       },
       "not_reported_accuracy": {
@@ -101,29 +101,29 @@
     },
     "training": {
       "precision": {
-        "numerator": 1,
-        "denominator": 2,
-        "value": 0.5
+        "numerator": 3,
+        "denominator": 3,
+        "value": 1.0
       },
       "recall": {
-        "numerator": 1,
+        "numerator": 3,
         "denominator": 3,
-        "value": 0.333333
+        "value": 1.0
       },
       "exact_match": {
-        "numerator": 1,
+        "numerator": 5,
         "denominator": 6,
-        "value": 0.166667
+        "value": 0.833333
       },
       "unsupported_claim_rate": {
-        "numerator": 1,
-        "denominator": 2,
-        "value": 0.5
-      },
-      "not_reported_accuracy": {
         "numerator": 0,
         "denominator": 3,
         "value": 0.0
+      },
+      "not_reported_accuracy": {
+        "numerator": 2,
+        "denominator": 3,
+        "value": 0.666667
       },
       "evidence_location_accuracy": {
         "numerator": 0,
@@ -134,8 +134,8 @@
     "objective": {
       "precision": {
         "numerator": 1,
-        "denominator": 3,
-        "value": 0.333333
+        "denominator": 1,
+        "value": 1.0
       },
       "recall": {
         "numerator": 1,
@@ -148,9 +148,9 @@
         "value": 0.333333
       },
       "unsupported_claim_rate": {
-        "numerator": 2,
-        "denominator": 3,
-        "value": 0.666667
+        "numerator": 0,
+        "denominator": 1,
+        "value": 0.0
       },
       "not_reported_accuracy": {
         "numerator": 0,

@@ -6,18 +6,15 @@
       "fields": [
         {
           "path": "data.datasets",
-          "value": [
-            "NATL60",
-            "BOOST-SWOT 2020 data challenge"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "2 Background and related work",
-            "page": 2121,
-            "locator": "LLM-proposed evidence",
-            "evidence": "The BOOST-SWOT 2020 data challenge (https://github.com/ocean-data-challenges/2020a_ SSH_mapping_NATL60, last access: 2022) provides a representative benchmarking framework",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -45,7 +42,7 @@
         {
           "path": "data.outputs",
           "value": [
-            "reconstructed SSH state"
+            "reconstructed state"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
@@ -53,7 +50,7 @@
             "section": "3.1 4DVarNet framework",
             "page": 2122,
             "locator": "LLM-proposed evidence",
-            "evidence": "input raw observation data and an initial guess and directly provides as output the reconstructed state.",
+            "evidence": "input raw observation data and an initial guess and directly provides as output the reconstructed state",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -110,7 +107,7 @@
         },
         {
           "path": "data.spatial_resolution",
-          "value": "1/20°",
+          "value": "1/20◦",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
@@ -193,15 +190,15 @@
         },
         {
           "path": "objective.primary_loss",
-          "value": "L2 norm of the difference between the state x and reconstruction x⋆",
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "3.3 Learning setting",
-            "page": 2124,
-            "locator": "LLM-proposed evidence",
-            "evidence": "i.e., the L2 norm of the difference between the state x and reconstruction x⋆",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -259,7 +256,7 @@
           "path": "results.headline",
           "value": [
             "relative improvement with respect to the operational optimal interpolation between 30 % and 60 % in terms of the reconstruction error",
-            "for the nadir plus SWOT altimeter configuration, resolved space–timescales below 70 km and 7 d"
+            "for the nadir plus SWOT altimeter configuration, resolved space-timescales below 70 km and 7 d"
           ],
           "conflict_values": [],
           "status": "NOT_VERIFIED",
@@ -297,21 +294,15 @@
       "fields": [
         {
           "path": "data.datasets",
-          "value": [
-            "northwest Atlantic regional ocean reanalysis (ROMS with EnKF)",
-            "ERA5",
-            "GLORYS",
-            "OSU TPXO tide database",
-            "National Water Model"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.1 Reanalysis Data",
-            "page": 11,
-            "locator": "LLM-proposed evidence",
-            "evidence": "This reanalysis was generated using a regional implementation of ROMS with the ensemble Kalman filter data assimilation method (EnKF). It features a horizontal resolution of 4 km with 50 vertical layers. For surface atmospheric forcing, we employed data from the European Center for Medium-Range Weather Forecasting (ECMWF) Reanalysis v5 (ERA5), while open boundary conditions were derived from the Copernicus Global Ocean Physics Reanalysis (GLORYS). Ten major tidal constituents from the OSU TPXO tide database were used. The model incorporated 120 river inputs, sourced from the National Water Model and climatology datasets.",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -335,15 +326,18 @@
         },
         {
           "path": "data.outputs",
-          "value": null,
+          "value": [
+            "X(t + 5∆t)",
+            "X(t + 10∆t)"
+          ],
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "4.2.1 Fourier Neural Operator (FNO)",
+            "page": 12,
+            "locator": "LLM-proposed evidence",
+            "evidence": "X(t) (input), X(t + 5∆t) (label), and X(t + 10∆t) (label), where ∆t = 1 day.",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -369,7 +363,7 @@
           "path": "data.splits.validation",
           "value": null,
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_REPORTED",
           "source": {
             "section": null,
             "page": null,
@@ -399,7 +393,7 @@
         },
         {
           "path": "data.spatial_resolution",
-          "value": "4 km horizontal resolution",
+          "value": "4 km",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
@@ -421,10 +415,10 @@
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "4.2.1 Fourier Neural Operator (FNO)",
-            "page": 12,
+            "section": "Abstract",
+            "page": 1,
             "locator": "LLM-proposed evidence",
-            "evidence": "OceanNet is built upon the FNO [25].",
+            "evidence": "OceanNet uses a Fourier neural operator and predictor-evaluatecorrector integration scheme",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -451,7 +445,7 @@
           "path": "training.optimizer",
           "value": null,
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_REPORTED",
           "source": {
             "section": null,
             "page": null,
@@ -467,7 +461,7 @@
           "path": "training.learning_rate",
           "value": null,
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_REPORTED",
           "source": {
             "section": null,
             "page": null,
@@ -481,15 +475,15 @@
         },
         {
           "path": "objective.primary_loss",
-          "value": "mean squared error loss (MSE) computed over ocean grid points",
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "4.2.3",
-            "page": 13,
-            "locator": "LLM-proposed evidence",
-            "evidence": "This is in addition to the standard mean squared error loss (MSE) function, which is computed exclusively for grid points located over the ocean.",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -553,7 +547,7 @@
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
-            "section": "2 Results",
+            "section": "Results",
             "page": 3,
             "locator": "LLM-proposed evidence",
             "evidence": "The metrics for evaluating predictive accuracy of SSH include root mean squared error (RMSE) and correlation coefficient (CC), which are widely recognized and employed in forecasting [1-3, 18]. In addition, we incorporate a specialized object-tracking metric to evaluate the prediction of major ocean features delineated by SSH contours: the modified Hausdorff distance (MHD, [19]).",
@@ -572,7 +566,7 @@
             "section": "Abstract",
             "page": 1,
             "locator": "LLM-proposed evidence",
-            "evidence": "Trained using historical sea surface height (SSH) data, OceanNet demonstrates competitive forecast skill compared to a state-of-the-art dynamical ocean model forecast, reducing computation by 500,000 times.",
+            "evidence": "OceanNet demonstrates competitive forecast skill compared to a state-of-the-art dynamical ocean model forecast, reducing computation by 500,000 times.",
             "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
@@ -702,7 +696,7 @@
         },
         {
           "path": "data.spatial_resolution",
-          "value": "1/12◦ (4320× 2041 longitude-latitude grid points)",
+          "value": "1/12° (4320× 2041 longitude-latitude grid points)",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {
@@ -718,17 +712,15 @@
         },
         {
           "path": "architecture.family",
-          "value": [
-            "hierarchical transformer-based framework"
-          ],
+          "value": null,
           "conflict_values": [],
-          "status": "NOT_VERIFIED",
+          "status": "EXTRACTION_ERROR",
           "source": {
-            "section": "Abstract",
-            "page": 1,
-            "locator": "LLM-proposed evidence",
-            "evidence": "XiHe is a hierarchical transformer-based framework coupled with two special setups.",
-            "origin": "PRIMARY_PAPER",
+            "section": null,
+            "page": null,
+            "locator": null,
+            "evidence": null,
+            "origin": null,
             "evidence_url": null,
             "claimed_value": null
           },
@@ -752,15 +744,15 @@
         },
         {
           "path": "training.optimizer",
-          "value": null,
+          "value": "AdamW",
           "conflict_values": [],
-          "status": "EXTRACTION_ERROR",
+          "status": "NOT_VERIFIED",
           "source": {
-            "section": null,
-            "page": null,
-            "locator": null,
-            "evidence": null,
-            "origin": null,
+            "section": "4.6 Optimization Details",
+            "page": 6,
+            "locator": "LLM-proposed evidence",
+            "evidence": "We use the AdamW [42], [43] optimizer with",
+            "origin": "PRIMARY_PAPER",
             "evidence_url": null,
             "claimed_value": null
           },
@@ -768,7 +760,7 @@
         },
         {
           "path": "training.learning_rate",
-          "value": "5e−5",
+          "value": "5e-5",
           "conflict_values": [],
           "status": "NOT_VERIFIED",
           "source": {

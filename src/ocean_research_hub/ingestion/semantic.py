@@ -328,7 +328,13 @@ class SemanticExtractor:
                 evidence = (
                     self.validator.locate_free_text(
                         parsed, page=claim.page, section=claim.section,
-                        evidence=claim.evidence, origin=origin, evidence_url=None,
+                        evidence=claim.evidence, origin=origin,
+                        evidence_url=(
+                            parsed.supplementary_search_scope[0]
+                            if origin is SourceOrigin.SUPPLEMENTARY_MATERIAL
+                            and len(parsed.supplementary_search_scope) == 1
+                            else None
+                        ),
                     )
                     if value is not None else None
                 )

@@ -6,17 +6,21 @@ import argparse
 import hashlib
 import json
 import urllib.request
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
+from dotenv import load_dotenv
 
 from ocean_research_hub.evaluation.benchmark import benchmark, load_golden
 from ocean_research_hub.evaluation.models import (
     GoldenPaper, PaperPrediction, PredictedField, PredictionSet,
 )
-from ocean_research_hub.ingestion.pdf import PdfParser, ScientificExtractor
+from ocean_research_hub.ingestion.pdf import ParsedPdf, PdfParser, ScientificExtractor
+from ocean_research_hub.ingestion.semantic import (
+    AnthropicClient, GeminiClient, SemanticExtractionError, SemanticExtractor,
+)
 from ocean_research_hub.schemas.paper_record import EvidenceField, PaperRecord
 
 
@@ -80,6 +84,7 @@ class ValidationPaper(BaseModel):
 
     id: str
     title: str
+    doi: str | None = None
     pdf_url: str
     supplement_url: str | None = None
 
@@ -94,6 +99,65 @@ class ValidationDecisionBundle(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     papers: list[AuditDecisionSet]
+
+
+@dataclass(frozen=True)
+class ExtractionMetadata:
+    provider_path: str
+    accepted: list[str]
+    rejected: list[str]
+    errored: list[str]
+    supplement_sha256: str | None = None
+
+
+@dataclass(frozen=True)
+class ExtractedPaper:
+    record: PaperRecord
+    primary_sha256: str
+    metadata: ExtractionMetadata
+
+
+def _effective_status(field: EvidenceField[Any]) -> str:
+    """Do not render a schema default as a scientifically searched absence."""
+    if str(field.status) == "NOT_REPORTED" and not field.absence_search_scope:
+        return "EXTRACTION_ERROR"
+    return str(field.status)
+
+
+def extract_parsed(
+    parsed: ParsedPdf,
+    digest: str,
+    *,
+    semantic_extractor: SemanticExtractor | None = None,
+    provider_name: str = "none",
+    supplement_digest: str | None = None,
+) -> ExtractedPaper:
+    deterministic = ScientificExtractor().extract(parsed)
+    accepted: list[str] = []
+    rejected = list(deterministic.rejected_claims)
+    errored: list[str] = []
+    provider_path = "deterministic shared rules; semantic disabled"
+    if semantic_extractor is not None:
+        provider_path = f"deterministic shared rules -> {provider_name} semantic proposals -> evidence/value validation"
+        try:
+            semantic = semantic_extractor.extract(parsed, deterministic.record)
+        except SemanticExtractionError as exc:
+            # The report records failure without converting it to absence or
+            # losing the deterministic results.
+            provider_path += f" (provider failure: {type(exc).__name__})"
+            errored = ["semantic-provider-call"]
+        else:
+            accepted = semantic.accepted
+            rejected.extend(semantic.rejected)
+            errored = semantic.errored
+    return ExtractedPaper(
+        deterministic.record,
+        digest,
+        ExtractionMetadata(
+            provider_path, sorted(set(accepted)), sorted(set(rejected)),
+            sorted(set(errored)), supplement_digest,
+        ),
+    )
 
 
 def field_at(record: PaperRecord, path: str) -> EvidenceField[Any]:
@@ -166,6 +230,7 @@ def render_audit(
         if set(decision_paths) != set(AUDIT_PATHS):
             raise ValueError("auditor decisions must cover every human-audit field")
     by_path = {decision.path: decision for decision in decisions.decisions} if decisions else {}
+    golden_by_path = {item.path: item for item in paper.fields}
     rows = [
         "# 4DVarNet-SSH extraction audit",
         "",
@@ -174,20 +239,48 @@ def render_audit(
         "Supplement coverage: not supplied to this PDF-only run; absence claims therefore remain `EXTRACTION_ERROR`.",
         (f"Independent auditor: `{decisions.auditor}`." if decisions else "Extraction status is pre-audit. `PENDING_INDEPENDENT_AUDIT` must be replaced only from an auditor-authored decision artifact."),
         "",
-        "| Field path | Extracted value | Status | Provenance | Page | Section | Evidence snippet | Auditor decision | Auditor expected value | Auditor evidence location | Auditor reason |",
-        "|---|---|---|---|---:|---|---|---|---|---|---|",
+        "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Evidence snippet | Evidence URL | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor evidence location | Auditor reason |",
+        "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|",
     ]
     for path in AUDIT_PATHS:
         item = field_at(record, path)
         value = item.conflict_values if item.status == "CONFLICT" else item.value
         decision = by_path.get(path)
+        golden = golden_by_path.get(path)
+        effective_status = _effective_status(item)
+        expected = None if golden is None else (
+            golden.conflict_values if str(golden.status) == "CONFLICT" else golden.value
+        )
+        if golden is None:
+            preflight, mismatch = "NOT_AUDITED", "No audited golden label exists for this path."
+        elif str(golden.status) == "VERIFIED":
+            exact = (
+                effective_status == "NOT_VERIFIED"
+                and json.dumps(value, sort_keys=True) == json.dumps(expected, sort_keys=True)
+                and item.source.is_locatable
+            )
+            preflight = "PASS" if exact else "FAIL"
+            mismatch = "—" if exact else "Value/status/evidence does not exactly match the audited golden label."
+        elif str(golden.status) == "CONFLICT":
+            exact = (
+                effective_status == "CONFLICT"
+                and {json.dumps(v, sort_keys=True) for v in item.conflict_values}
+                == {json.dumps(v, sort_keys=True) for v in golden.conflict_values}
+            )
+            preflight = "PASS" if exact else "FAIL"
+            mismatch = "—" if exact else "Conflict alternatives do not exactly match the audited golden label."
+        else:
+            exact = effective_status == "NOT_REPORTED" and bool(item.absence_search_scope)
+            preflight = "PASS" if exact else "FAIL"
+            mismatch = "—" if exact else "Absence was not established with a documented adequate search scope."
         rows.append(
             "| " + " | ".join((
-                path, cell(value), str(item.status), str(item.provenance_type),
+                path, cell(value), effective_status, str(item.provenance_type),
+                str(item.source.origin) if item.source.is_supplied else "—",
                 cell(item.source.page), cell(item.source.section),
-                cell(item.source.evidence),
+                cell(item.source.evidence), cell(item.source.evidence_url),
+                cell(expected), preflight, mismatch,
                 decision.decision if decision else "PENDING_INDEPENDENT_AUDIT",
-                cell(decision.expected_value) if decision else "—",
                 cell(decision.evidence_location) if decision else "—",
                 cell(decision.reason) if decision else "—",
             )) + " |"
@@ -205,6 +298,8 @@ def render_audit(
 def render_validation_report(
     results: list[tuple[ValidationPaper, PaperRecord, str]],
     decisions: ValidationDecisionBundle | None = None,
+    metadata_by_paper: dict[str, ExtractionMetadata] | None = None,
+    golden_by_paper: dict[str, GoldenPaper] | None = None,
 ) -> str:
     """Render source-grounded claims without pretending developer review is audit."""
 
@@ -221,43 +316,88 @@ def render_validation_report(
         "",
     ]
     for paper, record, digest in results:
+        metadata = (metadata_by_paper or {}).get(
+            paper.id,
+            ExtractionMetadata("deterministic shared rules; semantic disabled", [], [], []),
+        )
         decision_set = decision_sets.get(paper.id)
         if decision_set and decision_set.source_pdf_sha256 != digest:
             raise ValueError(f"auditor decisions do not match PDF digest for {paper.id}")
         by_path = {
             decision.path: decision for decision in decision_set.decisions
         } if decision_set else {}
+        golden_fields = {
+            field.path: field
+            for field in (golden_by_paper or {}).get(paper.id, GoldenPaper).fields
+        } if paper.id in (golden_by_paper or {}) else {}
         fields = evidence_fields(record)
-        paths = sorted({
-            path for path, field in fields.items()
-            if field.value is not None or field.conflict_values
-        } | set(by_path))
+        paths = list(AUDIT_PATHS)
+        statuses = [_effective_status(fields[path]) for path in paths]
+        populated = sum(status == "NOT_VERIFIED" for status in statuses)
+        conflicts = sum(status == "CONFLICT" for status in statuses)
+        not_reported = sum(status == "NOT_REPORTED" for status in statuses)
+        extraction_errors = sum(status == "EXTRACTION_ERROR" for status in statuses)
         rows.extend((
             f"## {paper.title}",
             "",
             f"Paper ID: `{paper.id}`  ",
+            f"DOI: `{paper.doi}`  " if paper.doi else "DOI: not reported  ",
             f"Primary PDF: [{paper.pdf_url}]({paper.pdf_url})  ",
             f"SHA-256: `{digest}`  ",
             (f"Supplement: [{paper.supplement_url}]({paper.supplement_url})  " if paper.supplement_url else "Supplement: not supplied  "),
+            (f"Supplement SHA-256: `{metadata.supplement_sha256}`  " if metadata.supplement_sha256 else "Supplement SHA-256: not available  "),
+            f"Extraction provider/path: `{metadata.provider_path}`  ",
+            f"Targeted fields: **{len(paths)}**; populated: **{populated}**; `NOT_REPORTED`: **{not_reported}**; `EXTRACTION_ERROR`: **{extraction_errors}**; conflicts: **{conflicts}**; unsupported proposals rejected: **{len(metadata.rejected)}**.  ",
+            f"Semantic accepted: **{len(metadata.accepted)}**; semantic/unresolved errors: **{len(metadata.errored)}**.  ",
             "",
-            "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Exact evidence | Expected value | Decision | Mismatch reason |",
-            "|---|---|---|---|---|---:|---|---|---|---|---|",
+            "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Exact evidence | Evidence URL/origin | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor reason |",
+            "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|",
         ))
         for path in paths:
             field = fields[path]
             decision = by_path.get(path)
             value = field.conflict_values if field.status == "CONFLICT" else field.value
+            golden = golden_fields.get(path)
+            if golden is None:
+                expected, preflight = None, "NOT_AUDITED"
+                preflight_reason = "No audited golden label exists for this path."
+            else:
+                expected = golden.conflict_values if str(golden.status) == "CONFLICT" else golden.value
+                if str(golden.status) == "VERIFIED":
+                    matched = (
+                        _effective_status(field) == "NOT_VERIFIED"
+                        and json.dumps(value, sort_keys=True) == json.dumps(expected, sort_keys=True)
+                        and field.source.is_locatable
+                    )
+                elif str(golden.status) == "CONFLICT":
+                    matched = (
+                        _effective_status(field) == "CONFLICT"
+                        and {json.dumps(v, sort_keys=True) for v in field.conflict_values}
+                        == {json.dumps(v, sort_keys=True) for v in golden.conflict_values}
+                    )
+                else:
+                    matched = (
+                        _effective_status(field) == "NOT_REPORTED"
+                        and bool(field.absence_search_scope)
+                    )
+                preflight = "PASS" if matched else "FAIL"
+                preflight_reason = "—" if matched else "Extracted value/status/evidence does not exactly match the audited golden label."
             cells = (
                 path,
                 value,
-                field.status,
+                _effective_status(field),
                 field.provenance_type,
-                field.source.origin,
-                field.source.page,
-                field.source.section,
-                field.source.evidence,
-                decision.expected_value if decision else None,
-                decision.decision if decision else "PENDING_INDEPENDENT_AUDIT",
+                field.source.origin if field.source.is_supplied else None,
+                field.source.page if field.source.is_supplied else None,
+                field.source.section if field.source.is_supplied else None,
+                field.source.evidence if field.source.is_supplied else None,
+                field.source.evidence_url if field.source.is_supplied else None,
+                expected,
+                preflight,
+                preflight_reason,
+                decision.decision if decision else (
+                    "NOT_AUDITED" if decisions is not None else "PENDING_INDEPENDENT_AUDIT"
+                ),
                 decision.reason if decision else None,
             )
             rendered = []
@@ -274,71 +414,146 @@ def render_validation_report(
     return "\n".join(rows)
 
 
+def validation_json_artifact(
+    results: list[tuple[ValidationPaper, PaperRecord, str]],
+    metadata_by_paper: dict[str, ExtractionMetadata],
+) -> dict[str, Any]:
+    """Machine-readable handoff; contains evidence, not developer conclusions."""
+    papers: list[dict[str, Any]] = []
+    for paper, record, digest in results:
+        metadata = metadata_by_paper[paper.id]
+        fields: list[dict[str, Any]] = []
+        for path in AUDIT_PATHS:
+            field = field_at(record, path)
+            item = field.model_dump(mode="json")
+            item["status"] = _effective_status(field)
+            fields.append({"path": path, **item})
+        papers.append({
+            "id": paper.id,
+            "title": paper.title,
+            "doi": paper.doi,
+            "primary_pdf_url": paper.pdf_url,
+            "primary_pdf_sha256": digest,
+            "supplement_url": paper.supplement_url,
+            "supplement_sha256": metadata.supplement_sha256,
+            "provider_path": metadata.provider_path,
+            "accepted_paths": metadata.accepted,
+            "rejected_paths": metadata.rejected,
+            "errored_paths": metadata.errored,
+            "fields": fields,
+        })
+    return {"schema_version": 1, "audit_state": "PENDING_INDEPENDENT_AUDIT", "papers": papers}
+
+
 def run_validation(
     pdf_dir: Path,
     manifest: ValidationManifest,
     decisions: ValidationDecisionBundle | None = None,
+    *,
+    semantic_extractor: SemanticExtractor | None = None,
+    provider_name: str = "none",
+    cache: dict[str, ExtractedPaper] | None = None,
+    json_out: Path | None = None,
+    golden_by_paper: dict[str, GoldenPaper] | None = None,
 ) -> str:
     results: list[tuple[ValidationPaper, PaperRecord, str]] = []
+    metadata: dict[str, ExtractionMetadata] = {}
     for paper in manifest.papers:
+        if cache is not None and paper.id in cache:
+            extracted = cache[paper.id]
+            results.append((paper, extracted.record, extracted.primary_sha256))
+            metadata[paper.id] = extracted.metadata
+            continue
         target = pdf_dir / f"{paper.id}.pdf"
         if not target.exists():
             with urllib.request.urlopen(paper.pdf_url, timeout=120) as response:
                 target.write_bytes(response.read())
         content = target.read_bytes()
         parsed = PdfParser().parse(content, source_name=target.name)
+        supplement_digest: str | None = None
         if paper.supplement_url:
             supplement_target = pdf_dir / f"{paper.id}-supplement.pdf"
             if not supplement_target.exists():
                 with urllib.request.urlopen(paper.supplement_url, timeout=120) as response:
                     supplement_target.write_bytes(response.read())
-            supplement = PdfParser().parse(
-                supplement_target.read_bytes(), source_name=supplement_target.name,
-            )
+            supplement_content = supplement_target.read_bytes()
+            supplement_digest = hashlib.sha256(supplement_content).hexdigest()
+            supplement = PdfParser().parse(supplement_content, source_name=supplement_target.name)
             parsed = replace(
                 parsed,
                 supplementary_pages=supplement.pages,
                 supplementary_search_scope=[paper.supplement_url],
             )
-        record = ScientificExtractor().extract(parsed).record
-        results.append((paper, record, hashlib.sha256(content).hexdigest()))
-    return render_validation_report(results, decisions)
+        extracted = extract_parsed(
+            parsed, hashlib.sha256(content).hexdigest(),
+            semantic_extractor=semantic_extractor, provider_name=provider_name,
+            supplement_digest=supplement_digest,
+        )
+        if cache is not None:
+            cache[paper.id] = extracted
+        results.append((paper, extracted.record, extracted.primary_sha256))
+        metadata[paper.id] = extracted.metadata
+    report = render_validation_report(results, decisions, metadata, golden_by_paper)
+    if json_out is not None:
+        json_out.parent.mkdir(parents=True, exist_ok=True)
+        json_out.write_text(
+            json.dumps(validation_json_artifact(results, metadata), indent=2) + "\n",
+            encoding="utf-8",
+        )
+    return report
 
 
 def run(
     pdf_dir: Path,
     golden_dir: Path,
     audit_decisions: AuditDecisionSet | None = None,
+    *,
+    semantic_extractor: SemanticExtractor | None = None,
+    provider_name: str = "none",
+    cache: dict[str, ExtractedPaper] | None = None,
 ) -> tuple[PredictionSet, dict[str, Any], str]:
     golden = load_golden(golden_dir)
     pdf_dir.mkdir(parents=True, exist_ok=True)
     predictions: list[PaperPrediction] = []
     audit = ""
     for paper in golden:
+        if cache is not None and paper.paper.id in cache:
+            extracted = cache[paper.paper.id]
+            predictions.append(prediction_for(paper, extracted.record))
+            if paper.paper.id == "4dvarnet-ssh-2023":
+                audit = render_audit(paper, extracted.record, extracted.primary_sha256, audit_decisions)
+            continue
         target = pdf_dir / f"{paper.paper.id}.pdf"
         if not target.exists():
             with urllib.request.urlopen(str(paper.paper.pdf_url), timeout=120) as response:
                 target.write_bytes(response.read())
         content = target.read_bytes()
         parsed = PdfParser().parse(content, source_name=target.name)
+        supplement_digest: str | None = None
         if paper.paper.id == "oceannet-2023":
             supplement_target = pdf_dir / "oceannet-2023-supplement.pdf"
             if not supplement_target.exists():
                 with urllib.request.urlopen(OCEANNET_SUPPLEMENT_URL, timeout=120) as response:
                     supplement_target.write_bytes(response.read())
-            supplement = PdfParser().parse(
-                supplement_target.read_bytes(), source_name=supplement_target.name
-            )
+            supplement_content = supplement_target.read_bytes()
+            supplement_digest = hashlib.sha256(supplement_content).hexdigest()
+            supplement = PdfParser().parse(supplement_content, source_name=supplement_target.name)
             parsed = replace(
                 parsed,
                 supplementary_pages=supplement.pages,
                 supplementary_search_scope=[OCEANNET_SUPPLEMENT_URL],
             )
-        record = ScientificExtractor().extract(parsed).record
-        predictions.append(prediction_for(paper, record))
+        extracted = extract_parsed(
+            parsed, hashlib.sha256(content).hexdigest(),
+            semantic_extractor=semantic_extractor, provider_name=provider_name,
+            supplement_digest=supplement_digest,
+        )
+        if cache is not None:
+            cache[paper.paper.id] = extracted
+        predictions.append(prediction_for(paper, extracted.record))
         if paper.paper.id == "4dvarnet-ssh-2023":
             audit = render_audit(
-                paper, record, hashlib.sha256(content).hexdigest(), audit_decisions
+                paper, extracted.record, extracted.primary_sha256, audit_decisions
             )
     prediction_set = PredictionSet(predictions=predictions)
     report = benchmark(golden, prediction_set).model_dump(mode="json")
@@ -355,19 +570,39 @@ def main() -> None:
     parser.add_argument("--audit-decisions", type=Path)
     parser.add_argument("--validation-manifest", type=Path)
     parser.add_argument("--validation-report-out", type=Path)
+    parser.add_argument("--validation-json-out", type=Path)
     parser.add_argument("--validation-decisions", type=Path)
+    parser.add_argument(
+        "--semantic-provider", choices=("none", "claude", "gemini"), default="none",
+        help="Explicit semantic proposal provider; default is network-free deterministic extraction",
+    )
     args = parser.parse_args()
+    load_dotenv()
+    semantic_extractor: SemanticExtractor | None = None
+    if args.semantic_provider == "claude":
+        semantic_extractor = SemanticExtractor(client=AnthropicClient())
+    elif args.semantic_provider == "gemini":
+        semantic_extractor = SemanticExtractor(client=GeminiClient())
     decisions = (
         AuditDecisionSet.model_validate_json(args.audit_decisions.read_text(encoding="utf-8"))
         if args.audit_decisions else None
     )
-    predictions, report, audit = run(args.pdf_dir, args.golden_dir, decisions)
+    extraction_cache: dict[str, ExtractedPaper] = {}
+    predictions, report, audit = run(
+        args.pdf_dir, args.golden_dir, decisions,
+        semantic_extractor=semantic_extractor,
+        provider_name=args.semantic_provider,
+        cache=extraction_cache,
+    )
     for path in (args.predictions_out, args.benchmark_out, args.audit_out):
         path.parent.mkdir(parents=True, exist_ok=True)
     args.predictions_out.write_text(predictions.model_dump_json(indent=2) + "\n", encoding="utf-8")
     args.benchmark_out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     args.audit_out.write_text(audit, encoding="utf-8")
-    if args.validation_manifest or args.validation_report_out or args.validation_decisions:
+    if (
+        args.validation_manifest or args.validation_report_out
+        or args.validation_json_out or args.validation_decisions
+    ):
         if not args.validation_manifest or not args.validation_report_out:
             parser.error("--validation-manifest and --validation-report-out are required together")
         manifest = ValidationManifest.model_validate_json(
@@ -381,6 +616,11 @@ def main() -> None:
         )
         validation_report = run_validation(
             args.pdf_dir, manifest, validation_decisions,
+            semantic_extractor=semantic_extractor,
+            provider_name=args.semantic_provider,
+            cache=extraction_cache,
+            json_out=args.validation_json_out,
+            golden_by_paper={paper.paper.id: paper for paper in load_golden(args.golden_dir)},
         )
         args.validation_report_out.parent.mkdir(parents=True, exist_ok=True)
         args.validation_report_out.write_text(validation_report, encoding="utf-8")

@@ -155,9 +155,9 @@ material, so fields requiring that scope stay `EXTRACTION_ERROR`.
 # Semantic (LLM-assisted) extraction
 
 The deterministic rules above (`ScientificExtractor`) only cover fields for
-which a maintainer has hand-written a regex/section-heading rule; that is
-enough for the three audited golden papers but does not generalize to an
-arbitrary paper. `SemanticExtractor`
+which a conservative shared text pattern can bind the value to an explicit
+reported-system relation. They intentionally leave ambiguous scientific fields
+unresolved; they are not a paper-specific golden registry. `SemanticExtractor`
 (`src/ocean_research_hub/ingestion/semantic.py`) is a second pass, run only
 against fields the deterministic pass left unresolved (`NOT_REPORTED` or
 `EXTRACTION_ERROR`), that asks an LLM (Claude or Google Gemini) to propose a

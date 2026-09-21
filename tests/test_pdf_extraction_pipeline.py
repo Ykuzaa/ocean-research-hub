@@ -35,12 +35,11 @@ def test_pdf_path_populates_claims_with_page_evidence_and_explicit_absence_scope
     assert response.status_code == 201
     result = response.json()["paper"]
     assert result["workflow_status"] == "EXTRACTED"
-    assert result["record"]["data"]["spatial_resolution"]["value"] == "1/12 degree"
-    assert result["record"]["data"]["spatial_resolution"]["status"] == "NOT_VERIFIED"
-    assert result["record"]["data"]["spatial_resolution"]["source"]["page"] == 1
+    assert result["record"]["data"]["spatial_resolution"]["value"] is None
+    assert result["record"]["data"]["spatial_resolution"]["status"] == "EXTRACTION_ERROR"
     assert result["record"]["training"]["optimizer"]["value"] == "AdamW"
     assert result["record"]["training"]["batch_size"]["value"] == 16
-    assert result["record"]["architecture"]["family"]["value"] == ["hierarchical transformer"]
+    assert result["record"]["architecture"]["family"]["value"] is None
     assert any("scientific search scope" in warning for warning in result["warnings"])
 
 
@@ -98,7 +97,7 @@ def test_third_explicit_value_extends_conflict_instead_of_overwriting_it() -> No
     }
 
 
-def test_generic_fallback_preserves_decimal_resolution() -> None:
+def test_generic_fallback_leaves_entity_scoped_resolution_to_semantic_extraction() -> None:
     parsed = ParsedPdf(
         pages=[ParsedPage(1, "The spatial resolution is 0.25° × 0.25° on a global grid. Other text.")],
         source_name="paper.pdf",
@@ -106,7 +105,8 @@ def test_generic_fallback_preserves_decimal_resolution() -> None:
 
     field = ScientificExtractor().extract(parsed).record.data.spatial_resolution
 
-    assert field.value == "0.25° × 0.25° on a global grid"
+    assert field.value is None
+    assert field.status == "NOT_REPORTED"
 
 
 def test_malformed_pdf_is_not_reported_as_an_empty_scientific_record(tmp_path: Path) -> None:
@@ -247,9 +247,8 @@ def test_ingestion_reports_fields_populated_by_the_configured_semantic_extractor
     client = _FakeSemanticLLMClient([
         {
             # data.time_coverage is untouched by ScientificExtractor's generic
-            # fallback (unlike data.spatial_resolution, which the same source
-            # sentence would already satisfy), so this exercises the semantic
-            # path specifically rather than the deterministic one.
+            # pass, so this exercises the semantic path specifically rather
+            # than the deterministic one.
             "path": "data.time_coverage", "value": "1/12 degree", "page": 1, "section": None,
             "evidence": "The spatial resolution is 1/12 degree.", "origin": "PRIMARY_PAPER",
         },

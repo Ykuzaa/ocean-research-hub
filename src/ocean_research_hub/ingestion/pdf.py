@@ -88,16 +88,48 @@ class PdfParser:
                 else physical_page
             )
             blocks: list[ParsedBlock] = []
-            for number, paragraph in enumerate(re.split(r"\n\s*\n", text), 1):
-                cleaned = normalize_text(paragraph)
+            buffered: list[str] = []
+            buffered_section = current_section
+
+            def flush() -> None:
+                nonlocal buffered
+                cleaned = normalize_text("\n".join(buffered))
                 if not cleaned:
-                    continue
-                for line in paragraph.splitlines():
-                    heading = self._heading.match(normalize_text(line))
-                    if heading:
-                        current_section = f"{heading.group(1)} {heading.group(2)}"
-                kind = "caption" if re.match(r"^(?:Figure|Fig\.|Table)\s+\d+", cleaned) else "paragraph"
-                blocks.append(ParsedBlock(page, current_section, f"PDF {kind} {number}", cleaned))
+                    buffered = []
+                    return
+                kind = (
+                    "caption"
+                    if re.match(r"^(?:Figure|Fig\.|Table)\s+\d+", cleaned)
+                    else "paragraph"
+                )
+                blocks.append(ParsedBlock(
+                    page, buffered_section, f"PDF {kind} {len(blocks) + 1}", cleaned,
+                ))
+                buffered = []
+
+            # pypdf often emits a full page without blank paragraphs. Scan in
+            # source order and split at headings so evidence before a later
+            # heading is not mislabeled with that later section.
+            for line in text.splitlines():
+                cleaned_line = normalize_text(line)
+                heading = self._heading.match(cleaned_line)
+                # Running headers such as ``2124 A. Author et al.`` are not
+                # numbered scientific section headings.
+                if heading and not (
+                    heading.group(1).isdigit() and int(heading.group(1)) == page
+                ):
+                    flush()
+                    current_section = f"{heading.group(1)} {heading.group(2)}"
+                    buffered_section = current_section
+                    buffered.append(line)
+                elif not cleaned_line:
+                    flush()
+                    buffered_section = current_section
+                else:
+                    if not buffered:
+                        buffered_section = current_section
+                    buffered.append(line)
+            flush()
             pages.append(ParsedPage(page, text, physical_page, blocks))
         return ParsedPdf(pages, source_name)
 
@@ -107,6 +139,7 @@ class ExtractionResult:
     record: PaperRecord
     search_scope: list[str]
     warnings: list[str]
+    rejected_claims: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -329,7 +362,12 @@ class ScientificExtractor:
 
     def extract(self, parsed: ParsedPdf) -> ExtractionResult:
         record, warnings = PaperRecord(), []
-        self._generic_extract(record, parsed)
+        rejected = self._generic_extract(record, parsed)
+        if rejected:
+            warnings.append(
+                "deterministic candidates rejected as ambiguous or non-identity claims: "
+                + ", ".join(sorted(rejected))
+            )
         if not any(field.status is VerificationStatus.NOT_VERIFIED for field in self._fields(record)):
             warnings.append("scientific extraction found no explicit supported claims")
         scope = [
@@ -338,7 +376,7 @@ class ScientificExtractor:
             "all shared deterministic capture rules; no paper-specific value registry was used",
             "supplementary material was not searched" if not parsed.supplementary_search_scope else "supplementary search: " + "; ".join(parsed.supplementary_search_scope),
         ]
-        return ExtractionResult(record, scope, warnings)
+        return ExtractionResult(record, scope, warnings, sorted(rejected))
 
     @staticmethod
     def _target(record: PaperRecord, path: str) -> tuple[BaseModel, str, EvidenceField[Any]]:
@@ -353,7 +391,8 @@ class ScientificExtractor:
         mark_extraction_error(record, path, limitation)
 
     @classmethod
-    def _generic_extract(cls, record: PaperRecord, parsed: ParsedPdf) -> None:
+    def _generic_extract(cls, record: PaperRecord, parsed: ParsedPdf) -> set[str]:
+        rejected: set[str] = set()
         pages = [
             (page, SourceOrigin.PRIMARY_PAPER) for page in parsed.pages
         ] + [
@@ -363,41 +402,93 @@ class ScientificExtractor:
         for page, origin in pages:
             text = normalize_text(page.text)
             mappings = (
-                (r"\b(AdamW|Adam|SGD|RMSProp)\s+optimizer\b", "training.optimizer", str),
+                # Bind the value to explicit use in the reported experiments;
+                # a bare optimizer mention in related work is not a claim.
+                (r"(?:\bwe\b[^.;]{0,100}?\b(?:use|used|employ|employed)\b|\b(?:training|experiments?|reproduction)\b[^.;]{0,100}?\b(?:use|used|employ|employed)\b)[^.;]{0,100}?\b(AdamW|Adam|SGD|RMSProp)(?:\s*\[[^\]]+\])?\s+optimizer\b", "training.optimizer", str),
                 (r"(?:initial\s+)?learning rate\s+(?:of|is|was|=|:)\s*([0-9.eE×^−-]+)", "training.learning_rate", str),
-                # A sentence-ending period is followed by whitespace/end; a
-                # decimal period (0.25 degrees) must stay in the evidence.
-                (r"(?:spatial|horizontal) resolution\s+(?:of|is|was|=|:)\s*(.+?)(?:\.(?=\s|$)|;)", "data.spatial_resolution", str),
                 (r"batch size\s+(?:of|is|was|=|:)\s*([0-9]+)", "training.batch_size", int),
                 (r"(?:trained (?:for|over)|for)\s+([0-9]+\s+(?:epochs?|steps?|iterations?))", "training.epochs_or_steps", str),
                 (r"weight decay\s+(?:of|is|was|=|:)\s*([0-9.eE×^−-]+)", "training.weight_decay", str),
                 (r"dropout(?: rate)?\s+(?:of|is|was|=|:)\s*(0(?:\.\d+)?|1(?:\.0+)?)", "architecture.dropout", float),
-                (r"(?:loss function|training loss)\s+(?:used\s+)?(?:is|was|of|=|:)\s*([^.;]{3,120})(?:\.(?=\s|$)|;)", "objective.primary_loss", str),
+                # Scope/evaluation phrases such as "loss is computed on" and
+                # "loss was also tested" do not identify a loss function.
+                (r"loss function\s+used\s+is\s+([^.;]{3,120})(?:\.(?=\s|$)|;)", "objective.primary_loss", str),
             )
             for pattern, path, value_type in mappings:
                 match = re.search(pattern, text, re.I)
                 if match:
+                    context = text[max(0, match.start() - 140):min(len(text), match.end() + 80)]
+                    if path in {
+                        "training.learning_rate", "training.batch_size",
+                        "training.epochs_or_steps", "training.weight_decay",
+                        "architecture.dropout",
+                    } and (
+                        re.search(r"\b(?:baseline|related work|for comparison)\b", context, re.I)
+                        or not re.search(
+                            r"\b(?:we|our|training|trained|model|network|experiments?|"
+                            r"optimization|optimizer)\b", context, re.I,
+                        )
+                    ):
+                        rejected.add(path)
+                        continue
                     value: Any = match.group(1).strip(" ;:,. ")
+                    if path == "objective.primary_loss" and re.fullmatch(
+                        r"(?:the\s+)?mean square error\s*\(MSE\)(?:\s+loss)?",
+                        value, re.I,
+                    ):
+                        value = "mean square error (MSE)"
                     if value_type is int:
                         value = int(value)
                     elif value_type is float:
                         value = float(value)
-                    cls._set(record, path, value, [cls._source(page, match, origin)])
+                    evidence_match = match
+                    if path == "training.optimizer":
+                        optimizer_match = re.search(
+                            r"\b(?:AdamW|Adam|SGD|RMSProp)(?:\s*\[[^\]]+\])?\s+optimizer\b",
+                            match.group(0), re.I,
+                        )
+                        if optimizer_match is not None:
+                            evidence_match = optimizer_match
+                    cls._set(record, path, value, [cls._source(
+                        page, evidence_match, origin,
+                        evidence_url=(
+                            parsed.supplementary_search_scope[0]
+                            if origin is SourceOrigin.SUPPLEMENTARY_MATERIAL
+                            and len(parsed.supplementary_search_scope) == 1
+                            else None
+                        ),
+                    )])
+            resolution_match = re.search(
+                r"(?:spatial|horizontal) resolution\s+(?:of|is|was|=|:)\s*"
+                r"(.+?)(?:\.(?=\s|$)|;)", text, re.I,
+            )
+            if resolution_match:
+                rejected.add("data.spatial_resolution")
             family_match = re.search(
                 r"\b(hierarchical transformer|Fourier neural operator|"
                 r"convolutional neural network|convolutional LSTM|"
-                r"graph neural network|U-?Net|4DVarNet(?:-SSH)?)\b",
+                r"graph neural network|U-?Net)\b",
                 text, re.I,
             )
             if family_match:
-                cls._set(
-                    record, "architecture.family", [family_match.group(1)],
-                    [cls._source(page, family_match, origin)],
-                )
+                context_start = max(0, family_match.start() - 120)
+                context_end = min(len(text), family_match.end() + 120)
+                context = text[context_start:context_end]
+                if re.search(r"\b(?:baseline|related work|for comparison|compared (?:to|with))\b", context, re.I):
+                    rejected.add("architecture.family")
+                    continue
+                rejected.add("architecture.family")
+            if (
+                re.search(r"(?:loss function|training loss)", text, re.I)
+                and record.objective.primary_loss.value is None
+            ):
+                rejected.add("objective.primary_loss")
+        return rejected
 
     @staticmethod
     def _source(
         page: ParsedPage, match: re.Match[str], origin: SourceOrigin,
+        evidence_url: str | None = None,
     ) -> SourceEvidence:
         snippet = match.group(0)
         block = next(
@@ -413,6 +504,7 @@ class ScientificExtractor:
             section=block.section if block else None,
             locator=block.locator if block else "PDF page text",
             evidence=snippet,
+            evidence_url=evidence_url,
         )
 
     @staticmethod

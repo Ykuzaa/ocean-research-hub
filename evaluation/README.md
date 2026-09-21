@@ -69,8 +69,10 @@ uv run ocean-research-hub-real-pdf-benchmark \
   --predictions-out evaluation/reports/issue-19-after-predictions.json \
   --benchmark-out evaluation/reports/issue-19-after-benchmark.json \
   --audit-out evaluation/reports/4dvarnet-ssh-extraction-audit.md \
+  --semantic-provider claude \
   --validation-manifest evaluation/issue-19-validation-papers.json \
-  --validation-report-out evaluation/reports/issue-19-four-paper-validation.md
+  --validation-report-out evaluation/reports/issue-19-four-paper-validation.md \
+  --validation-json-out evaluation/reports/issue-19-four-paper-extraction.json
 ```
 
 Downloaded PDFs are kept under the ignored `.data/golden-pdfs/` directory. The
@@ -82,6 +84,10 @@ The four-paper report adds the required heterogeneous non-golden checks (GLONET
 and DINCAE 2.0). It remains explicitly pending until an independent auditor
 supplies `--validation-decisions`; the runner never self-promotes claims to
 `VERIFIED` or manufactures expected values.
+`--semantic-provider` is explicit so tests and routine benchmark inspection
+never make a paid network call. Choose `claude` (preferred) or `gemini` only
+when the matching API key is configured; `none` records a deterministic-only
+provider path in the generated report.
 
 For a no-extraction smoke run (all fields intentionally missing), use:
 

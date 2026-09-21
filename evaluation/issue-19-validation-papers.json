@@ -3,22 +3,26 @@
     {
       "id": "4dvarnet-ssh-2023",
       "title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry",
+      "doi": "10.5194/gmd-16-2119-2023",
       "pdf_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf"
     },
     {
       "id": "oceannet-2023",
       "title": "OceanNet: A principled neural operator-based digital twin for regional oceans",
+      "doi": "10.1038/s41598-024-72145-0",
       "pdf_url": "https://arxiv.org/pdf/2310.00813v2",
       "supplement_url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf"
     },
     {
       "id": "glonet-2025",
       "title": "GLONET: Mercator's End-to-End Neural Global Ocean Forecasting System",
+      "doi": "10.1029/2025JH000686",
       "pdf_url": "https://arxiv.org/pdf/2412.05454v3"
     },
     {
       "id": "dincae-2-2022",
       "title": "DINCAE 2.0: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations",
+      "doi": "10.5194/gmd-15-2183-2022",
       "pdf_url": "https://gmd.copernicus.org/articles/15/2183/2022/gmd-15-2183-2022.pdf"
     }
   ]

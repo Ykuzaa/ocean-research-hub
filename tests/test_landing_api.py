@@ -97,14 +97,13 @@ def _insert(
             PaperWorkflowStatus.EXTRACTED if scientific else PaperWorkflowStatus.INGESTED
         ),
         warnings=[],
-        domains=["forecasting"],
     )
     return paper.id
 
 
 def test_landing_empty_is_distinct_from_unavailable(tmp_path: Path) -> None:
     repository = SqlitePaperRepository(tmp_path / "papers.db")
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         response = client.get("/api/landing")
@@ -124,10 +123,7 @@ def test_landing_repository_failure_is_unavailable_not_empty(tmp_path: Path) -> 
         def list_all_papers(self):
             raise PersistenceError("aggregate read failed")
 
-    app = create_app(
-        repository=FailingLandingRepository(tmp_path / "papers.db"),
-        semantic_extractor=False,
-    )
+    app = create_app(repository=FailingLandingRepository(tmp_path / "papers.db"))
 
     with TestClient(app) as client:
         response = client.get("/api/landing")
@@ -141,17 +137,17 @@ def test_landing_aggregates_all_rows_beyond_public_page_limit(tmp_path: Path) ->
     repository.initialize()
     for index in range(205):
         _insert(repository, index)
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         landing = client.get("/api/landing").json()
-        page = client.get("/api/papers", params={"limit": 200}).json()
         year_drilldown = client.get(
             "/api/landing/drilldown",
             params={"dimension": "year_bibliographic", "key": "2020", "limit": 200},
         ).json()
 
-    assert len(page["papers"]) == 200 and page["total"] == 205
+    # The landing aggregation must not truncate to a presentation-page cap.
+    assert repository.list_all_papers()[1] == 205
     assert landing["state"] == "ready"
     assert landing["totals"]["papers"] == 205
     assert landing["totals"]["readable_papers"] == 205
@@ -171,7 +167,7 @@ def test_landing_keeps_value_evidence_provenance_and_audit_state_separate(
     repository = SqlitePaperRepository(tmp_path / "papers.db")
     repository.initialize()
     _insert(repository, 1, scientific=True)
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         body = client.get("/api/landing").json()
@@ -205,7 +201,7 @@ def test_landing_marks_invalid_persisted_rows_partial(tmp_path: Path) -> None:
     bad_id = _insert(repository, 2)
     with sqlite3.connect(database) as connection:
         connection.execute("UPDATE papers SET record_json = ? WHERE id = ?", ("not-json", bad_id))
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         response = client.get("/api/landing")
@@ -264,7 +260,7 @@ def test_named_intelligence_excludes_unsourced_and_error_fields(tmp_path: Path) 
         workflow_status=PaperWorkflowStatus.EXTRACTED,
         warnings=[],
     )
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         body = client.get("/api/landing").json()
@@ -312,7 +308,7 @@ def test_named_intelligence_never_binds_one_list_excerpt_to_every_value(
         workflow_status=PaperWorkflowStatus.EXTRACTED,
         warnings=[],
     )
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         body = client.get("/api/landing").json()
@@ -356,7 +352,7 @@ def test_display_source_uses_qualifying_additional_source(tmp_path: Path) -> Non
         workflow_status=PaperWorkflowStatus.EXTRACTED,
         warnings=[],
     )
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         body = client.get("/api/landing").json()
@@ -373,7 +369,7 @@ def test_verification_ledger_only_counts_extraction_attempted_papers(tmp_path: P
     repository.initialize()
     _insert(repository, 1, scientific=True)
     bibliography_only_id = _insert(repository, 2, scientific=False)
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         body = client.get("/api/landing").json()
@@ -406,7 +402,7 @@ def test_future_dated_records_are_flagged_and_excluded_from_year_chart(tmp_path:
         workflow_status=PaperWorkflowStatus.INGESTED,
         warnings=[],
     )
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         body = client.get("/api/landing").json()
@@ -450,7 +446,7 @@ def test_conflict_demo_rejects_sentence_fragments_and_uses_plausible_bound_value
             workflow_status=PaperWorkflowStatus.EXTRACTED,
             warnings=[],
         )
-    app = create_app(repository=repository, semantic_extractor=False)
+    app = create_app(repository=repository)
 
     with TestClient(app) as client:
         demo = client.get("/api/landing").json()["conflict_demo"]

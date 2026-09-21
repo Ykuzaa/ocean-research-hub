@@ -150,7 +150,7 @@ def create_app(
                     {
                         domain
                         for paper in papers
-                        for domain in paper.record.scientific_framing.domain.value
+                        for domain in (paper.record.scientific_framing.domain.value or [])
                     }
                 ),
             )

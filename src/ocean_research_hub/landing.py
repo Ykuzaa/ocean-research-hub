@@ -367,7 +367,9 @@ def _field(
         source=field.source,
         sources=field.sources,
         display_source=display_source,
-        absence_search_scope=field.absence_search_scope,
+        # Older, valid records predate explicit absence-audit scopes. Their
+        # absence must remain unknown rather than being fabricated.
+        absence_search_scope=getattr(field, "absence_search_scope", []),
         verified_by=field.verified_by,
         verified_at=field.verified_at,
     )

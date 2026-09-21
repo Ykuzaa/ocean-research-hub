@@ -44,7 +44,7 @@ def test_pdf_path_populates_claims_with_page_evidence_and_explicit_absence_scope
     assert any("scientific search scope" in warning for warning in result["warnings"])
 
 
-def test_oceannet_profile_marks_unmatched_supplement_dependent_claims_as_extraction_error() -> None:
+def test_paper_identity_never_activates_paper_specific_claims() -> None:
     parsed = ParsedPdf(
         pages=[
             ParsedPage(1, "OceanNet: A principled neural operator-based forecasting model."),
@@ -54,13 +54,10 @@ def test_oceannet_profile_marks_unmatched_supplement_dependent_claims_as_extract
 
     result = ScientificExtractor().extract(parsed)
 
-    assert result.record.evaluation.baselines.status == "EXTRACTION_ERROR"
-    assert result.record.evaluation.ablations.status == "EXTRACTION_ERROR"
+    assert result.record.evaluation.baselines.status == "NOT_REPORTED"
+    assert result.record.evaluation.ablations.status == "NOT_REPORTED"
     assert result.record.evaluation.baselines.value is None
-    assert any(
-        "evaluation.baselines" in warning and "evaluation.ablations" in warning
-        for warning in result.warnings
-    )
+    assert any("no explicit supported claims" in warning for warning in result.warnings)
 
 
 def test_repeated_explicit_values_are_retained_as_conflict() -> None:
@@ -79,6 +76,37 @@ def test_repeated_explicit_values_are_retained_as_conflict() -> None:
     assert len(field.sources) == 1
     assert field.source.claimed_value == "Adam"
     assert field.sources[0].claimed_value == "AdamW"
+
+
+def test_third_explicit_value_extends_conflict_instead_of_overwriting_it() -> None:
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(1, "We use the Adam optimizer."),
+            ParsedPage(2, "We use the AdamW optimizer."),
+            ParsedPage(3, "We use the SGD optimizer."),
+        ],
+        source_name="conflict.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.training.optimizer
+
+    assert field.status == "CONFLICT"
+    assert field.value is None
+    assert field.conflict_values == ["Adam", "AdamW", "SGD"]
+    assert {source.claimed_value for source in [field.source, *field.sources]} == {
+        "Adam", "AdamW", "SGD",
+    }
+
+
+def test_generic_fallback_preserves_decimal_resolution() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(1, "The spatial resolution is 0.25° × 0.25° on a global grid. Other text.")],
+        source_name="paper.pdf",
+    )
+
+    field = ScientificExtractor().extract(parsed).record.data.spatial_resolution
+
+    assert field.value == "0.25° × 0.25° on a global grid"
 
 
 def test_malformed_pdf_is_not_reported_as_an_empty_scientific_record(tmp_path: Path) -> None:
@@ -130,7 +158,7 @@ def test_profile_cannot_emit_hard_coded_hardware_roles_when_source_reverses_them
 
     field = ScientificExtractor().extract(parsed).record.training.hardware
 
-    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.status.name == "NOT_REPORTED"
     assert field.value is None
 
 
@@ -151,7 +179,7 @@ def test_profile_cannot_emit_hardware_claim_when_large_domain_gpu_is_negated() -
 
     field = ScientificExtractor().extract(parsed).record.training.hardware
 
-    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.status.name == "NOT_REPORTED"
     assert field.value is None
 
 
@@ -172,7 +200,7 @@ def test_profile_cannot_emit_training_time_when_domain_duration_roles_reverse() 
 
     field = ScientificExtractor().extract(parsed).record.training.training_time
 
-    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.status.name == "NOT_REPORTED"
     assert field.value is None
 
 
@@ -193,7 +221,7 @@ def test_profile_cannot_emit_specific_loss_components_from_generic_loss_phrase()
 
     field = ScientificExtractor().extract(parsed).record.objective.primary_loss
 
-    assert field.status.name == "EXTRACTION_ERROR"
+    assert field.status.name == "NOT_REPORTED"
     assert field.value is None
 
 

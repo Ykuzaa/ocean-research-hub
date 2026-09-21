@@ -43,7 +43,13 @@ def test_qa_false_and_zero_are_valid_verified_claims() -> None:
 def test_qa_partial_record_keeps_missing_metadata_and_fields_unreported() -> None:
     record = PaperRecord.model_validate(
         {
-            "paper": {"title": {"value": "Partial extraction without a DOI", "status": "NOT_VERIFIED"}},
+            "paper": {"title": {
+                "value": "Partial extraction without a DOI", "status": "NOT_VERIFIED",
+                "source": {
+                    "page": 1, "locator": "title", "origin": "PRIMARY_PAPER",
+                    "evidence": "Partial extraction without a DOI",
+                },
+            }},
             "architecture": {
                 "activations": {
                     "value": ["GELU"],

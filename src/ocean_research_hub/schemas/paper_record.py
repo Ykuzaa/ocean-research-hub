@@ -194,6 +194,7 @@ class EvidenceField(BaseModel, Generic[T]):
     @model_validator(mode="after")
     def enforce_evidence_rules(self) -> "EvidenceField[T]":
         evidence_records = [self.source, *self.sources]
+        locatable_records = [record for record in evidence_records if record.is_locatable]
         qualifying_records = [
             record for record in evidence_records
             if record.is_locatable and record.is_primary_author_source
@@ -210,6 +211,18 @@ class EvidenceField(BaseModel, Generic[T]):
                 or (isinstance(self.value, (Collection, Mapping)) and not self.value)
             ):
                 raise ValueError(f"{self.status} fields require a non-empty claim value")
+            if (
+                self.status is VerificationStatus.NOT_VERIFIED
+                and self.provenance_type in {
+                    ProvenanceType.AUTHOR_REPORTED_FACT,
+                    ProvenanceType.AUTHOR_REPORTED_LIMITATION,
+                }
+                and not self.conflict_values
+                and not locatable_records
+            ):
+                raise ValueError(
+                    f"{self.status} fields require locatable source evidence"
+                )
         if self.status is VerificationStatus.VERIFIED:
             if self.provenance_type not in {
                 ProvenanceType.AUTHOR_REPORTED_FACT,

@@ -68,7 +68,9 @@ benchmark, and generates the human-readable 4DVarNet-SSH audit table:
 uv run ocean-research-hub-real-pdf-benchmark \
   --predictions-out evaluation/reports/issue-19-after-predictions.json \
   --benchmark-out evaluation/reports/issue-19-after-benchmark.json \
-  --audit-out evaluation/reports/4dvarnet-ssh-extraction-audit.md
+  --audit-out evaluation/reports/4dvarnet-ssh-extraction-audit.md \
+  --validation-manifest evaluation/issue-19-validation-papers.json \
+  --validation-report-out evaluation/reports/issue-19-four-paper-validation.md
 ```
 
 Downloaded PDFs are kept under the ignored `.data/golden-pdfs/` directory. The
@@ -76,6 +78,10 @@ runner never marks an extracted scientific claim `VERIFIED`; the audit report ha
 an explicit Scientific Auditor confirmation column for the independent gate. A
 PDF-only run has no supplementary-material search scope, so unset fields are
 benchmarked as `EXTRACTION_ERROR`, not credited as `NOT_REPORTED`.
+The four-paper report adds the required heterogeneous non-golden checks (GLONET
+and DINCAE 2.0). It remains explicitly pending until an independent auditor
+supplies `--validation-decisions`; the runner never self-promotes claims to
+`VERIFIED` or manufactures expected values.
 
 For a no-extraction smoke run (all fields intentionally missing), use:
 

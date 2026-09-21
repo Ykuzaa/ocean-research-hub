@@ -3,11 +3,15 @@ from pathlib import Path
 from ocean_research_hub.evaluation.benchmark import load_golden
 from ocean_research_hub.evaluation.models import PredictionStatus
 from ocean_research_hub.evaluation.real_pdf import (
-    AUDIT_PATHS, AuditDecision, AuditDecisionSet, prediction_for, render_audit,
+    AUDIT_PATHS, AuditDecision, AuditDecisionSet, ValidationDecisionBundle,
+    ValidationPaper, prediction_for, render_audit, render_validation_report,
 )
 from ocean_research_hub.schemas.paper_record import PaperRecord, SourceOrigin, VerificationStatus
 from ocean_research_hub.schemas.paper_record import TextField
-from ocean_research_hub.ingestion.pdf import EvidenceSelector, EvidenceValidator, ParsedPage, ParsedPdf
+from ocean_research_hub.ingestion.pdf import (
+    EvidenceSelector, EvidenceValidator, ParsedPage, ParsedPdf, set_extracted_field,
+)
+from ocean_research_hub.schemas.paper_record import SourceEvidence
 from pydantic import ValidationError
 import pytest
 
@@ -178,3 +182,34 @@ def test_audit_report_renders_a_fail_decision_and_rejects_incomplete_or_duplicat
     )
     with pytest.raises(ValueError, match="unique"):
         render_audit(golden, PaperRecord(), "a" * 64, duplicate_path)
+
+
+def test_four_paper_report_keeps_audit_pending_or_renders_bound_decisions() -> None:
+    paper = ValidationPaper(
+        id="non-golden", title="A non-golden paper",
+        pdf_url="https://example.test/paper.pdf",
+    )
+    record = PaperRecord()
+    set_extracted_field(
+        record, "training.optimizer", "Adam",
+        [SourceEvidence(
+            origin="PRIMARY_PAPER", page=4, section="Methods",
+            locator="PDF paragraph 2", evidence="We used the Adam optimizer.",
+        )],
+    )
+    pending = render_validation_report([(paper, record, "a" * 64)])
+    assert "PENDING_INDEPENDENT_AUDIT" in pending
+    assert "We used the Adam optimizer." in pending
+
+    decisions = ValidationDecisionBundle(papers=[AuditDecisionSet(
+        paper_id=paper.id, source_pdf_sha256="a" * 64,
+        auditor="scientific-auditor:test",
+        decisions=[AuditDecision(
+            path="training.optimizer", decision="PASS", expected_value="Adam",
+            extracted_value="Adam", evidence_location="Methods, p. 4",
+            reason="Exact value and evidence match.",
+        )],
+    )])
+    audited = render_validation_report([(paper, record, "a" * 64)], decisions)
+    assert "PENDING_INDEPENDENT_AUDIT" not in audited
+    assert "Exact value and evidence match." in audited

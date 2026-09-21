@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass
 from typing import Any, Protocol, get_args, get_origin
 
@@ -175,13 +176,17 @@ def _coerce_value(raw: JsonValue, expected_type: Any) -> Any | None:
 
 
 _EXTRACTABLE_PROVENANCE = {ProvenanceType.AUTHOR_REPORTED_FACT, ProvenanceType.AUTHOR_REPORTED_LIMITATION}
+# Identity-bearing bibliography is deliberately excluded from semantic reading:
+# malformed identifiers fail ingestion, and URLs/identifiers come from callers
+# or metadata providers. Human-readable bibliography can be grounded in a PDF.
+_NON_SEMANTIC_PATHS = frozenset({"paper.doi", "paper.arxiv", "paper.urls"})
 
 
-def field_catalog(record: PaperRecord, *, exclude_prefix: str = "paper.") -> list[tuple[str, Any]]:
+def field_catalog(record: PaperRecord) -> list[tuple[str, Any]]:
     """Every leaf field path and its declared value type, walked from a live record.
 
-    Bibliography (``paper.*``) is excluded by default: it is sourced from DOI
-    metadata/Crossref, not from semantic reading of the PDF body. Fields whose
+    Title, authors, year and venue are included because PDF-only ingestion has
+    no other source for them. DOI, arXiv id and URLs are excluded. Fields whose
     default provenance is AI_INTERPRETATION or TEAM_NOTE (e.g.
     ``limitations.ai_interpretation``, ``limitations.team_note``) are always
     excluded: they hold interpretation or human annotation by construction,
@@ -194,7 +199,7 @@ def field_catalog(record: PaperRecord, *, exclude_prefix: str = "paper.") -> lis
             value = getattr(model, name)
             path = f"{prefix}{name}"
             if isinstance(value, EvidenceField):
-                if path.startswith(exclude_prefix) or value.provenance_type not in _EXTRACTABLE_PROVENANCE:
+                if path in _NON_SEMANTIC_PATHS or value.provenance_type not in _EXTRACTABLE_PROVENANCE:
                     continue
                 generic_args = type(value).__pydantic_generic_metadata__.get("args")
                 expected_type = generic_args[0] if generic_args else str
@@ -311,14 +316,26 @@ class SemanticExtractor:
             try:
                 origin = SourceOrigin(claim.origin)
             except ValueError:
-                origin = SourceOrigin.PRIMARY_PAPER
-            evidence = (
-                self.validator.locate_free_text(
-                    parsed, page=claim.page, section=claim.section, evidence=claim.evidence,
-                    origin=origin, evidence_url=None,
+                rejected.add(claim.path)
+                continue
+            if origin not in {
+                SourceOrigin.PRIMARY_PAPER,
+                SourceOrigin.SUPPLEMENTARY_MATERIAL,
+            }:
+                rejected.add(claim.path)
+                continue
+            try:
+                evidence = (
+                    self.validator.locate_free_text(
+                        parsed, page=claim.page, section=claim.section,
+                        evidence=claim.evidence, origin=origin, evidence_url=None,
+                    )
+                    if value is not None else None
                 )
-                if value is not None else None
-            )
+            except ValidationError:
+                # A malformed locator (for example page 0) invalidates only
+                # this proposed claim, never the rest of the paper extraction.
+                evidence = None
             # A correctly-located quote only proves the TEXT is real and on
             # the cited page - unlike the deterministic path, where a regex's
             # captured group physically IS the value, the LLM's `value` is
@@ -329,16 +346,48 @@ class SemanticExtractor:
             if evidence is None or not self.validator.supports_normalization(value, [evidence]):
                 rejected.add(claim.path)
                 continue
+            evidence_text = normalize_text(evidence.evidence or "")
+            # A mentioned example, possibility, or candidate is not evidence
+            # that the paper actually selected that configuration. This guard
+            # is intentionally conservative because token overlap alone would
+            # turn e.g. "a suitable loss (e.g., MSE)" into a false MSE claim.
+            if re.search(
+                r"\b(?:e\.?\s*g\.?|for example|such as|could|may|might)\b",
+                evidence_text,
+                re.I,
+            ):
+                rejected.add(claim.path)
+                continue
+            value_numbers = set(re.findall(r"\d+(?:\.\d+)?", str(value)))
+            evidence_numbers = set(re.findall(r"\d+(?:\.\d+)?", evidence_text))
+            if not value_numbers <= evidence_numbers:
+                rejected.add(claim.path)
+                continue
+            if (
+                claim.path == "objective.primary_loss"
+                and re.search(
+                    r"loss (?:function )?(?:is |was )?(?:computed|evaluated|applied)\s+(?:only\s+)?(?:on|over|at)\b",
+                    evidence_text,
+                    re.I,
+                )
+            ):
+                rejected.add(claim.path)
+                continue
             # Token overlap alone is too coarse for numbers: "0.5" and "0.2"
             # share the token "0" and would otherwise pass. A numeric claim's
             # literal written form must appear in the quote, not just overlap
             # with it.
-            if expected_type in (int, float) and str(value) not in normalize_text(evidence.evidence or ""):
+            if expected_type in (int, float) and str(value) not in evidence_text:
                 rejected.add(claim.path)
                 continue
-            set_extracted_field(
-                record, claim.path, value, [evidence], claim.path.startswith("limitations."),
-            )
+            try:
+                set_extracted_field(
+                    record, claim.path, value, [evidence],
+                    claim.path.startswith("limitations."),
+                )
+            except ValidationError:
+                rejected.add(claim.path)
+                continue
             accepted.add(claim.path)
 
         pending_paths = {path for path, _ in pending}

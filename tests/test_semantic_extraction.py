@@ -39,9 +39,13 @@ def _parsed_pdf() -> ParsedPdf:
     )
 
 
-def test_field_catalog_excludes_bibliography_and_reports_declared_types() -> None:
+def test_field_catalog_includes_readable_bibliography_but_not_identifiers() -> None:
     catalog = dict(field_catalog(PaperRecord()))
-    assert "paper.title" not in catalog
+    assert catalog["paper.title"] is str
+    assert catalog["paper.year"] is int
+    assert "paper.doi" not in catalog
+    assert "paper.arxiv" not in catalog
+    assert "paper.urls" not in catalog
     assert catalog["architecture.dropout"] is float
     assert catalog["training.gpu_count"] is int
     assert catalog["architecture.family"] == list[str]
@@ -118,6 +122,64 @@ def test_claim_with_correctly_located_evidence_but_an_inconsistent_value_is_reje
     assert record.architecture.dropout.value is None
 
 
+def test_illustrative_example_is_not_accepted_as_selected_configuration() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(
+            9,
+            "Training minimizes a suitable loss function, e.g., mean squared error.",
+        )],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "objective.primary_loss", "value": "mean squared error", "page": 9,
+        "section": None,
+        "evidence": "a suitable loss function, e.g., mean squared error",
+        "origin": "PRIMARY_PAPER",
+    }])
+    record = PaperRecord()
+
+    result = SemanticExtractor(client=client).extract(parsed, record)
+
+    assert result.rejected == ["objective.primary_loss"]
+    assert record.objective.primary_loss.status == VerificationStatus.EXTRACTION_ERROR
+
+
+def test_composite_claim_requires_evidence_for_every_numeric_component() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(8, "Wind fields have 6 h temporal and 1/4° spatial resolution.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "data.spatial_resolution",
+        "value": "4 km SST and chlorophyll, 1/4° winds, and 0.25° altimetry",
+        "page": 8, "section": None,
+        "evidence": "Wind fields have 6 h temporal and 1/4° spatial resolution",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.rejected == ["data.spatial_resolution"]
+
+
+def test_loss_evaluation_scope_is_not_accepted_as_loss_identity() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(8, "The loss function is computed only on tracks from the current date.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "objective.primary_loss",
+        "value": "loss function computed only on tracks from the current date",
+        "page": 8, "section": None,
+        "evidence": "The loss function is computed only on tracks from the current date",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.rejected == ["objective.primary_loss"]
+
+
 def test_claim_citing_the_wrong_page_is_rejected() -> None:
     parsed = _parsed_pdf()
     client = FakeLLMClient([
@@ -131,6 +193,23 @@ def test_claim_citing_the_wrong_page_is_rejected() -> None:
     record = PaperRecord()
 
     result = extractor.extract(parsed, record)
+
+    assert result.rejected == ["architecture.dropout"]
+    assert record.architecture.dropout.status == VerificationStatus.EXTRACTION_ERROR
+
+
+@pytest.mark.parametrize("origin", ["SECONDARY_SOURCE", "NOT_A_REAL_ORIGIN"])
+def test_claim_with_non_author_source_origin_is_rejected(origin: str) -> None:
+    client = FakeLLMClient([
+        {
+            "path": "architecture.dropout", "value": 0.2, "page": 1,
+            "section": None, "evidence": "a dropout rate of 0.2 throughout the network",
+            "origin": origin,
+        },
+    ])
+    record = PaperRecord()
+
+    result = SemanticExtractor(client=client).extract(_parsed_pdf(), record)
 
     assert result.rejected == ["architecture.dropout"]
     assert record.architecture.dropout.status == VerificationStatus.EXTRACTION_ERROR
@@ -249,6 +328,34 @@ def test_claims_wrapped_in_a_markdown_fence_are_still_parsed() -> None:
     result = extractor.extract(parsed, PaperRecord())
 
     assert result.accepted == ["architecture.dropout"]
+
+
+def test_invalid_page_rejects_only_that_claim() -> None:
+    parsed = ParsedPdf(
+        pages=[
+            ParsedPage(0, "Cover page. We use a dropout rate of 0.2 throughout the network."),
+            ParsedPage(1, "Training used 4 NVIDIA A100 GPUs for 12 hours."),
+        ],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([
+        {
+            "path": "architecture.dropout", "value": 0.2, "page": 0,
+            "section": None, "evidence": "a dropout rate of 0.2 throughout the network",
+            "origin": "PRIMARY_PAPER",
+        },
+        {
+            "path": "training.gpu_count", "value": 4, "page": 1,
+            "section": None, "evidence": "Training used 4 NVIDIA A100 GPUs for 12 hours",
+            "origin": "PRIMARY_PAPER",
+        },
+    ])
+    record = PaperRecord()
+
+    result = SemanticExtractor(client=client).extract(parsed, record)
+
+    assert result.rejected == ["architecture.dropout"]
+    assert result.accepted == ["training.gpu_count"]
 
 
 def test_malformed_response_shape_yields_zero_claims_not_a_crash() -> None:

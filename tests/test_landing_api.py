@@ -24,8 +24,14 @@ def _source(evidence: str) -> dict[str, object]:
 def _record(index: int, *, scientific: bool = False) -> PaperRecord:
     record: dict[str, object] = {
         "paper": {
-            "title": {"value": f"Paper {index}", "status": "NOT_VERIFIED"},
-            "year": {"value": 2020 + index % 3, "status": "NOT_VERIFIED"},
+            "title": {
+                "value": f"Paper {index}", "status": "NOT_VERIFIED",
+                "source": _source(f"Title: Paper {index}"),
+            },
+            "year": {
+                "value": 2020 + index % 3, "status": "NOT_VERIFIED",
+                "source": _source(f"Year: {2020 + index % 3}"),
+            },
         }
     }
     if scientific:
@@ -227,7 +233,10 @@ def test_named_intelligence_excludes_unsourced_and_error_fields(tmp_path: Path) 
     repository.initialize()
     record = PaperRecord.model_validate(
         {
-            "paper": {"title": {"value": "Unsafe summary", "status": "NOT_VERIFIED"}},
+            "paper": {"title": {
+                "value": "Unsafe summary", "status": "NOT_VERIFIED",
+                "source": _source("Title: Unsafe summary"),
+            }},
             "architecture": {
                 "family": {
                     "value": ["Transformer"],
@@ -287,7 +296,10 @@ def test_named_intelligence_never_binds_one_list_excerpt_to_every_value(
     repository.initialize()
     record = PaperRecord.model_validate(
         {
-            "paper": {"title": {"value": "Several datasets", "status": "NOT_VERIFIED"}},
+            "paper": {"title": {
+                "value": "Several datasets", "status": "NOT_VERIFIED",
+                "source": _source("Title: Several datasets"),
+            }},
             "data": {
                 "datasets": {
                     "value": ["NATL60", "OSTIA", "Argo"],
@@ -322,7 +334,10 @@ def test_display_source_uses_qualifying_additional_source(tmp_path: Path) -> Non
     evidence = "The paper explicitly states that the model uses the Adam optimizer."
     record = PaperRecord.model_validate(
         {
-            "paper": {"title": {"value": "Additional evidence", "status": "NOT_VERIFIED"}},
+            "paper": {"title": {
+                "value": "Additional evidence", "status": "NOT_VERIFIED",
+                "source": _source("Title: Additional evidence"),
+            }},
             "training": {
                 "optimizer": {
                     "value": "Adam",
@@ -416,8 +431,14 @@ def test_future_dated_records_are_flagged_and_excluded_from_year_chart(tmp_path:
     record = PaperRecord.model_validate(
         {
             "paper": {
-                "title": {"value": "Future metadata", "status": "NOT_VERIFIED"},
-                "year": {"value": datetime.now().year + 1, "status": "NOT_VERIFIED"},
+                "title": {
+                    "value": "Future metadata", "status": "NOT_VERIFIED",
+                    "source": _source("Title: Future metadata"),
+                },
+                "year": {
+                    "value": datetime.now().year + 1, "status": "NOT_VERIFIED",
+                    "source": _source(f"Year: {datetime.now().year + 1}"),
+                },
             }
         }
     )
@@ -451,7 +472,10 @@ def test_conflict_demo_rejects_sentence_fragments_and_uses_plausible_bound_value
     def conflict_record(title: str, values: list[str]) -> PaperRecord:
         return PaperRecord.model_validate(
             {
-                "paper": {"title": {"value": title, "status": "NOT_VERIFIED"}},
+                "paper": {"title": {
+                    "value": title, "status": "NOT_VERIFIED",
+                    "source": _source(f"Title: {title}"),
+                }},
                 "data": {
                     "spatial_resolution": {
                         "status": "CONFLICT",

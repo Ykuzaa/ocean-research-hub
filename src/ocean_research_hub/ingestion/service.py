@@ -37,11 +37,23 @@ from .models import (
     PaperWorkflowStatus,
 )
 from .providers import MetadataProvider, ParsedPaperProvider
-from .pdf import PdfParser, ScientificExtractor, read_pdf_path
+from .pdf import (
+    PdfParser,
+    ScientificExtractor,
+    mark_extraction_error,
+    read_pdf_path,
+    resolve_field_target,
+)
 from .repository import PaperRepository
-from .semantic import SemanticExtractionError, SemanticExtractor
+from .semantic import SemanticExtractionError, SemanticExtractor, field_catalog
 
 DOI_PATTERN = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
+# A bibliography field unsuccessfully searched in the PDF may be filled by
+# explicit metadata. Existing supported PDF values remain authoritative.
+_METADATA_REPLACEABLE = {
+    VerificationStatus.NOT_REPORTED,
+    VerificationStatus.EXTRACTION_ERROR,
+}
 
 
 def normalize_doi(value: str) -> str:
@@ -143,6 +155,12 @@ class PaperIngestionService:
                             + ", ".join(semantic_result.rejected)
                         )
             else:
+                for path, _ in field_catalog(record):
+                    field = resolve_field_target(record, path)[2]
+                    if field.status is VerificationStatus.NOT_REPORTED:
+                        mark_extraction_error(
+                            record, path, path.startswith("limitations."),
+                        )
                 extraction_warnings.append("semantic extraction skipped: no LLM client configured")
             workflow_status = PaperWorkflowStatus.EXTRACTED
         elif request.parsed_paper is None:
@@ -225,7 +243,7 @@ class PaperIngestionService:
         ) -> None:
             if incoming is None or incoming == []:
                 return
-            if field.status is VerificationStatus.NOT_REPORTED:
+            if field.status in _METADATA_REPLACEABLE:
                 replacement: EvidenceField[Any]
                 source = evidence(field_name, incoming)
                 if isinstance(incoming, list):
@@ -286,7 +304,7 @@ class PaperIngestionService:
             else None
         )
         if urls is not None:
-            if bibliography.urls.status is VerificationStatus.NOT_REPORTED:
+            if bibliography.urls.status in _METADATA_REPLACEABLE:
                 bibliography.urls = EvidenceField[PaperUrls](
                     value=urls,
                     status=VerificationStatus.NOT_VERIFIED,
@@ -307,7 +325,7 @@ class PaperIngestionService:
         origin: SourceOrigin | None = None,
     ) -> None:
         source_origin = origin or SourceOrigin.SECONDARY_SOURCE
-        if bibliography.doi.status is VerificationStatus.NOT_REPORTED:
+        if bibliography.doi.status in _METADATA_REPLACEABLE:
             bibliography.doi = TextField(
                 value=doi,
                 status=VerificationStatus.NOT_VERIFIED,

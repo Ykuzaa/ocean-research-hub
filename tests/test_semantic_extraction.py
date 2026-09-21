@@ -180,6 +180,130 @@ def test_loss_evaluation_scope_is_not_accepted_as_loss_identity() -> None:
     assert result.rejected == ["objective.primary_loss"]
 
 
+def test_single_loss_component_is_not_accepted_as_the_primary_objective() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(8, "The first term is the L2 norm of the difference between states.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "objective.primary_loss", "value": "L2 norm of the difference",
+        "page": 8, "section": None,
+        "evidence": "The first term is the L2 norm of the difference between states",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.rejected == ["objective.primary_loss"]
+
+
+def test_full_selected_training_loss_identity_is_accepted() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(8, "The training loss combines reconstruction and regularization losses.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "objective.primary_loss",
+        "value": "reconstruction and regularization losses", "page": 8,
+        "section": None,
+        "evidence": "The training loss combines reconstruction and regularization losses",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.accepted == ["objective.primary_loss"]
+
+
+def test_positive_reproducibility_statement_is_not_a_limitation() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(10, "The code is open source to enable reproducibility of all experiments.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "limitations.reproducibility",
+        "value": ["code is open source to enable reproducibility"], "page": 10,
+        "section": None,
+        "evidence": "The code is open source to enable reproducibility of all experiments",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.rejected == ["limitations.reproducibility"]
+
+
+def test_reported_limitation_requires_an_explicit_limitation_cue() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(10, "Scaling to the global ocean remains a key challenge for this model.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "limitations.author_reported",
+        "value": ["scaling to the global ocean remains a key challenge"], "page": 10,
+        "section": None,
+        "evidence": "Scaling to the global ocean remains a key challenge for this model",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.accepted == ["limitations.author_reported"]
+
+
+def test_metric_acronym_must_appear_literally_in_evidence() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(6, "Metrics include root mean square error and mean absolute error (MAE).")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "evaluation.metrics",
+        "value": ["root mean square error (RMSE)", "mean absolute error (MAE)"],
+        "page": 6, "section": None,
+        "evidence": "Metrics include root mean square error and mean absolute error (MAE)",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.rejected == ["evaluation.metrics"]
+
+
+def test_evaluation_dataset_requires_a_data_or_evaluation_relation() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(7, "We use BOOST-SWOT DC metrics for comparison with prior methods.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "evaluation.evaluation_datasets", "value": ["BOOST-SWOT DC"],
+        "page": 7, "section": None,
+        "evidence": "We use BOOST-SWOT DC metrics for comparison with prior methods",
+        "origin": "PRIMARY_PAPER",
+    }])
+
+    result = SemanticExtractor(client=client).extract(parsed, PaperRecord())
+
+    assert result.rejected == ["evaluation.evaluation_datasets"]
+
+
+def test_unicode_scientific_minus_is_normalized_in_accepted_string_values() -> None:
+    parsed = ParsedPdf(
+        pages=[ParsedPage(7, "We train the model with a learning rate of 5e−5 throughout.")],
+        source_name="paper.pdf",
+    )
+    client = FakeLLMClient([{
+        "path": "training.learning_rate", "value": "5e−5", "page": 7,
+        "section": None, "evidence": "a learning rate of 5e−5 throughout",
+        "origin": "PRIMARY_PAPER",
+    }])
+    record = PaperRecord()
+
+    result = SemanticExtractor(client=client).extract(parsed, record)
+
+    assert result.accepted == ["training.learning_rate"]
+    assert record.training.learning_rate.value == "5e-5"
+
+
 def test_claim_citing_the_wrong_page_is_rejected() -> None:
     parsed = _parsed_pdf()
     client = FakeLLMClient([

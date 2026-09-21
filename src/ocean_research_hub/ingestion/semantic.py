@@ -158,10 +158,10 @@ def _coerce_value(raw: JsonValue, expected_type: Any) -> Any | None:
         if item_type is str:
             if any(not isinstance(item, str) or not item.strip() for item in raw):
                 return None
-            return list(raw)
+            return [normalize_text(item) for item in raw]
         return None
     if expected_type is str:
-        return raw if isinstance(raw, str) and raw.strip() else None
+        return normalize_text(raw) if isinstance(raw, str) and raw.strip() else None
     if expected_type is int:
         return raw if isinstance(raw, int) and not isinstance(raw, bool) else None
     if expected_type is float:
@@ -180,6 +180,56 @@ _EXTRACTABLE_PROVENANCE = {ProvenanceType.AUTHOR_REPORTED_FACT, ProvenanceType.A
 # malformed identifiers fail ingestion, and URLs/identifiers come from callers
 # or metadata providers. Human-readable bibliography can be grounded in a PDF.
 _NON_SEMANTIC_PATHS = frozenset({"paper.doi", "paper.arxiv", "paper.urls"})
+
+
+def _supports_field_role(path: str, evidence: str) -> bool:
+    """Require evidence to entail the field's semantic role, not just its tokens.
+
+    Literal relocation and value overlap cannot distinguish a positive
+    reproducibility statement from a reproducibility *limitation*, or one loss
+    term from the complete training objective. These conservative discourse
+    cues fail closed and leave uncertain cases for independent review.
+    """
+    if path == "limitations.author_reported":
+        return bool(re.search(
+            r"\b(?:limit(?:ation|ed)?|challenge|drawback|shortcoming|cannot|"
+            r"unable|fail(?:s|ed|ure)?|restricted|remains?|difficult|"
+            r"necessitate(?:s|d)? further)\b",
+            evidence, re.I,
+        ))
+    if path == "limitations.future_work":
+        return bool(re.search(
+            r"\b(?:future work|further (?:work|investigation|research)|"
+            r"remain(?:s)? to|should|plan(?:ned)? to|next step|will explore|"
+            r"could be (?:extended|improved|explored))\b",
+            evidence, re.I,
+        ))
+    if path == "limitations.reproducibility":
+        reproducibility_subject = re.search(
+            r"\b(?:reproducib\w*|code|implementation|source|dataset|data|"
+            r"hyperparameters?|seeds?)\b", evidence, re.I,
+        )
+        negative_gap = re.search(
+            r"\b(?:not|no|lack(?:s|ed|ing)?|missing|unavailable|without|"
+            r"cannot|limited|omitted|undisclosed)\b|\bonly\s+(?:one|\d+)\b",
+            evidence, re.I,
+        )
+        return bool(reproducibility_subject and negative_gap)
+    if path == "objective.primary_loss":
+        return bool(re.search(
+            r"\b(?:(?:training|primary|total|overall|our)\s+)?loss(?: function)?"
+            r"\s+(?:used\s+is|is|was|=|combines?|comprises?|consists? of|"
+            r"incorporates?|includes?)\b|"
+            r"\bwe\s+(?:use|used|minimi[sz]e|optimi[sz]e)\b[^.;]{0,100}\bloss\b",
+            evidence, re.I,
+        ))
+    if path == "evaluation.evaluation_datasets":
+        return bool(re.search(
+            r"\b(?:datasets?|data|case stud(?:y|ies)|test set|validation set|"
+            r"evaluat(?:e|ed|ing|ion)\s+(?:on|using|against))\b",
+            evidence, re.I,
+        ))
+    return True
 
 
 def field_catalog(record: PaperRecord) -> list[tuple[str, Any]]:
@@ -353,6 +403,22 @@ class SemanticExtractor:
                 rejected.add(claim.path)
                 continue
             evidence_text = normalize_text(evidence.evidence or "")
+            if not _supports_field_role(claim.path, evidence_text):
+                rejected.add(claim.path)
+                continue
+            # Acronyms in normalized list/text components are exact scientific
+            # identifiers, not fuzzy synonyms. If the model adds ``(RMSE)``
+            # while the quote only reports RMSD/MAE, token overlap must not
+            # allow the unsupported metric through.
+            components = value if isinstance(value, list) else [value]
+            acronyms = {
+                acronym
+                for component in components
+                for acronym in re.findall(r"\(([A-Z][A-Z0-9-]{1,})\)", str(component))
+            }
+            if any(re.search(rf"\b{re.escape(acronym)}\b", evidence_text) is None for acronym in acronyms):
+                rejected.add(claim.path)
+                continue
             # A mentioned example, possibility, or candidate is not evidence
             # that the paper actually selected that configuration. This guard
             # is intentionally conservative because token overlap alone would

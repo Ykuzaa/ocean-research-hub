@@ -117,6 +117,74 @@ class ExtractedPaper:
     metadata: ExtractionMetadata
 
 
+def _assert_cache_matches_source(pdf_path: Path, extracted: ExtractedPaper) -> None:
+    if not pdf_path.exists():
+        return
+    digest = hashlib.sha256(pdf_path.read_bytes()).hexdigest()
+    if digest != extracted.primary_sha256:
+        raise ValueError(
+            f"cached extraction for {pdf_path.name} was produced from a different "
+            f"document (cached {extracted.primary_sha256}, on disk {digest})"
+        )
+
+
+def load_extraction_cache(path: Path) -> dict[str, ExtractedPaper]:
+    """Rehydrate a previous run's extracted records.
+
+    Semantic extraction is a paid, non-deterministic network call, so a report
+    regenerated from a cache is the only way an auditor without provider
+    credentials can reproduce the exact artifacts under review. The cached
+    digest is re-checked against the source PDF at use time, so a cache can
+    never quietly stand in for a different document.
+    """
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    cache: dict[str, ExtractedPaper] = {}
+    for paper_id, item in payload["papers"].items():
+        cache[paper_id] = ExtractedPaper(
+            PaperRecord.model_validate(item["record"]),
+            item["primary_sha256"],
+            ExtractionMetadata(
+                item["metadata"]["provider_path"],
+                item["metadata"]["accepted"],
+                item["metadata"]["rejected"],
+                item["metadata"]["errored"],
+                item["metadata"].get("supplement_sha256"),
+            ),
+        )
+    return cache
+
+
+def dump_extraction_cache(cache: dict[str, ExtractedPaper], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "schema_version": 1,
+        "papers": {
+            paper_id: {
+                "primary_sha256": item.primary_sha256,
+                "metadata": {
+                    "provider_path": item.metadata.provider_path,
+                    "accepted": item.metadata.accepted,
+                    "rejected": item.metadata.rejected,
+                    "errored": item.metadata.errored,
+                    "supplement_sha256": item.metadata.supplement_sha256,
+                },
+                "record": item.record.model_dump(mode="json"),
+            }
+            for paper_id, item in cache.items()
+        },
+    }, indent=2) + "\n", encoding="utf-8")
+
+
+def _supplement_statement(url: str | None, digest: str | None) -> str:
+    """State plainly whether absence in this run could see supplementary material."""
+    if url and digest:
+        return f"supplementary material was fetched and searched ({url}, SHA-256 `{digest}`)"
+    return (
+        "no supplementary material was supplied to this run, so every absence below is "
+        "scoped to the primary document only"
+    )
+
+
 def _effective_status(field: EvidenceField[Any]) -> str:
     """Do not render a schema default as a scientifically searched absence."""
     if str(field.status) == "NOT_REPORTED" and not field.absence_search_scope:
@@ -211,6 +279,7 @@ def render_audit(
     record: PaperRecord,
     digest: str,
     decisions: AuditDecisionSet | None = None,
+    supplement_statement: str | None = None,
 ) -> str:
     def cell(value: Any) -> str:
         if value is None:
@@ -231,16 +300,25 @@ def render_audit(
             raise ValueError("auditor decisions must cover every human-audit field")
     by_path = {decision.path: decision for decision in decisions.decisions} if decisions else {}
     golden_by_path = {item.path: item for item in paper.fields}
+    statuses = [_effective_status(field_at(record, path)) for path in AUDIT_PATHS]
+    counts = {
+        status: statuses.count(status)
+        for status in ("NOT_VERIFIED", "NOT_REPORTED", "CONFLICT", "EXTRACTION_ERROR")
+    }
     rows = [
         "# 4DVarNet-SSH extraction audit",
         "",
         f"Primary PDF: [{paper.paper.pdf_url}]({paper.paper.pdf_url})  ",
         f"SHA-256: `{digest}`  ",
-        "Supplement coverage: not supplied to this PDF-only run; absence claims therefore remain `EXTRACTION_ERROR`.",
+        f"Supplement coverage: {supplement_statement or 'no supplementary material was supplied to this run'}.  ",
+        "Targeted fields: **{total}**; populated: **{NOT_VERIFIED}**; `NOT_REPORTED`: **{NOT_REPORTED}**; "
+        "`CONFLICT`: **{CONFLICT}**; `EXTRACTION_ERROR`: **{EXTRACTION_ERROR}**.  ".format(
+            total=len(AUDIT_PATHS), **counts,
+        ),
         (f"Independent auditor: `{decisions.auditor}`." if decisions else "Extraction status is pre-audit. `PENDING_INDEPENDENT_AUDIT` must be replaced only from an auditor-authored decision artifact."),
         "",
-        "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Evidence snippet | Evidence URL | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor evidence location | Auditor reason |",
-        "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|",
+        "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Evidence snippet | Evidence URL | Absence search scope | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor evidence location | Auditor reason |",
+        "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|---|",
     ]
     for path in AUDIT_PATHS:
         item = field_at(record, path)
@@ -279,6 +357,7 @@ def render_audit(
                 str(item.source.origin) if item.source.is_supplied else "—",
                 cell(item.source.page), cell(item.source.section),
                 cell(item.source.evidence), cell(item.source.evidence_url),
+                cell("; ".join(item.absence_search_scope) or None),
                 cell(expected), preflight, mismatch,
                 decision.decision if decision else "PENDING_INDEPENDENT_AUDIT",
                 cell(decision.evidence_location) if decision else "—",
@@ -288,7 +367,7 @@ def render_audit(
     rows.extend((
         "", "## Status interpretation", "",
         "- `NOT_VERIFIED`: a claim passed the literal page-evidence gate but has not been scientifically certified.",
-        "- `NOT_REPORTED`: requires a recorded field-specific full-document and applicable-supplement search scope; this run emits none.",
+        "- `NOT_REPORTED`: asserted only when a field-specific lexical absence probe found none of the field's reporting vocabulary in the searched scope; the scope that establishes it is printed in its own column.",
         "- `EXTRACTION_ERROR`: a configured claim could not be grounded at its expected source location; it is not treated as absence.",
         "", "Generated by `ocean-research-hub-real-pdf-benchmark`; do not edit extracted values by hand.", "",
     ))
@@ -350,8 +429,8 @@ def render_validation_report(
             f"Targeted fields: **{len(paths)}**; populated: **{populated}**; `NOT_REPORTED`: **{not_reported}**; `EXTRACTION_ERROR`: **{extraction_errors}**; conflicts: **{conflicts}**; unsupported proposals rejected: **{len(metadata.rejected)}**.  ",
             f"Semantic accepted: **{len(metadata.accepted)}**; semantic/unresolved errors: **{len(metadata.errored)}**.  ",
             "",
-            "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Exact evidence | Evidence URL/origin | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor reason |",
-            "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|",
+            "| Field path | Extracted value | Status | Provenance | Origin | Page | Section | Exact evidence | Evidence URL/origin | Absence search scope | Golden expected value | Implementation pre-flight | Pre-flight mismatch reason | Independent auditor decision | Auditor reason |",
+            "|---|---|---|---|---|---:|---|---|---|---|---|---|---|---|---|",
         ))
         for path in paths:
             field = fields[path]
@@ -392,6 +471,7 @@ def render_validation_report(
                 field.source.section if field.source.is_supplied else None,
                 field.source.evidence if field.source.is_supplied else None,
                 field.source.evidence_url if field.source.is_supplied else None,
+                "; ".join(field.absence_search_scope) or None,
                 expected,
                 preflight,
                 preflight_reason,
@@ -461,6 +541,7 @@ def run_validation(
     for paper in manifest.papers:
         if cache is not None and paper.id in cache:
             extracted = cache[paper.id]
+            _assert_cache_matches_source(pdf_dir / f"{paper.id}.pdf", extracted)
             results.append((paper, extracted.record, extracted.primary_sha256))
             metadata[paper.id] = extracted.metadata
             continue
@@ -519,9 +600,13 @@ def run(
     for paper in golden:
         if cache is not None and paper.paper.id in cache:
             extracted = cache[paper.paper.id]
+            _assert_cache_matches_source(pdf_dir / f"{paper.paper.id}.pdf", extracted)
             predictions.append(prediction_for(paper, extracted.record))
             if paper.paper.id == "4dvarnet-ssh-2023":
-                audit = render_audit(paper, extracted.record, extracted.primary_sha256, audit_decisions)
+                audit = render_audit(
+                    paper, extracted.record, extracted.primary_sha256, audit_decisions,
+                    _supplement_statement(None, extracted.metadata.supplement_sha256),
+                )
             continue
         target = pdf_dir / f"{paper.paper.id}.pdf"
         if not target.exists():
@@ -553,7 +638,11 @@ def run(
         predictions.append(prediction_for(paper, extracted.record))
         if paper.paper.id == "4dvarnet-ssh-2023":
             audit = render_audit(
-                paper, extracted.record, extracted.primary_sha256, audit_decisions
+                paper, extracted.record, extracted.primary_sha256, audit_decisions,
+                _supplement_statement(
+                    OCEANNET_SUPPLEMENT_URL if paper.paper.id == "oceannet-2023" else None,
+                    supplement_digest,
+                ),
             )
     prediction_set = PredictionSet(predictions=predictions)
     report = benchmark(golden, prediction_set).model_dump(mode="json")
@@ -573,6 +662,11 @@ def main() -> None:
     parser.add_argument("--validation-json-out", type=Path)
     parser.add_argument("--validation-decisions", type=Path)
     parser.add_argument(
+        "--extraction-cache", type=Path,
+        help="Reuse this run's extracted records, or replay a previous run's cache "
+             "to regenerate every report without calling a semantic provider",
+    )
+    parser.add_argument(
         "--semantic-provider", choices=("none", "claude", "gemini"), default="none",
         help="Explicit semantic proposal provider; default is network-free deterministic extraction",
     )
@@ -587,7 +681,11 @@ def main() -> None:
         AuditDecisionSet.model_validate_json(args.audit_decisions.read_text(encoding="utf-8"))
         if args.audit_decisions else None
     )
-    extraction_cache: dict[str, ExtractedPaper] = {}
+    extraction_cache: dict[str, ExtractedPaper] = (
+        load_extraction_cache(args.extraction_cache)
+        if args.extraction_cache and args.extraction_cache.exists()
+        else {}
+    )
     predictions, report, audit = run(
         args.pdf_dir, args.golden_dir, decisions,
         semantic_extractor=semantic_extractor,
@@ -624,6 +722,8 @@ def main() -> None:
         )
         args.validation_report_out.parent.mkdir(parents=True, exist_ok=True)
         args.validation_report_out.write_text(validation_report, encoding="utf-8")
+    if args.extraction_cache:
+        dump_extraction_cache(extraction_cache, args.extraction_cache)
     print(json.dumps(report, indent=2))
 
 

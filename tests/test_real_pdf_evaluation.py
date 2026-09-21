@@ -213,3 +213,44 @@ def test_four_paper_report_keeps_audit_pending_or_renders_bound_decisions() -> N
     audited = render_validation_report([(paper, record, "a" * 64)], decisions)
     assert "PENDING_INDEPENDENT_AUDIT" not in audited
     assert "Exact value and evidence match." in audited
+
+
+def test_extraction_cache_round_trips_records_and_metadata(tmp_path) -> None:
+    """A replayed cache must reproduce the record an auditor is reviewing."""
+    from ocean_research_hub.evaluation.real_pdf import (
+        ExtractedPaper, ExtractionMetadata, dump_extraction_cache, load_extraction_cache,
+    )
+
+    record = PaperRecord()
+    record.training.optimizer.absence_search_scope = ["full text of demo.pdf"]
+    record.training.optimizer.confidence = 0.6
+    original = {"demo": ExtractedPaper(
+        record, "a" * 64,
+        ExtractionMetadata("deterministic -> claude", ["a.b"], ["c.d"], ["e.f"], "b" * 64),
+    )}
+
+    target = tmp_path / "cache.json"
+    dump_extraction_cache(original, target)
+    replayed = load_extraction_cache(target)
+
+    assert replayed["demo"].primary_sha256 == "a" * 64
+    assert replayed["demo"].metadata.provider_path == "deterministic -> claude"
+    assert replayed["demo"].metadata.supplement_sha256 == "b" * 64
+    assert replayed["demo"].metadata.rejected == ["c.d"]
+    assert replayed["demo"].record.training.optimizer.absence_search_scope == [
+        "full text of demo.pdf"
+    ]
+
+
+def test_cache_from_a_different_document_is_rejected(tmp_path) -> None:
+    """A stale cache must never silently stand in for another source PDF."""
+    from ocean_research_hub.evaluation.real_pdf import (
+        ExtractedPaper, ExtractionMetadata, _assert_cache_matches_source,
+    )
+
+    pdf = tmp_path / "paper.pdf"
+    pdf.write_bytes(b"%PDF-1.4 real bytes")
+    stale = ExtractedPaper(PaperRecord(), "0" * 64, ExtractionMetadata("x", [], [], []))
+
+    with pytest.raises(ValueError, match="different"):
+        _assert_cache_matches_source(pdf, stale)

@@ -498,8 +498,8 @@ def aggregate_landing(
     section_counts: Counter[str] = Counter()
     status_items: dict[VerificationStatus, list[LandingEvidenceItem]] = defaultdict(list)
     section_items: dict[str, list[LandingEvidenceItem]] = defaultdict(list)
-    for fields in scientific.values():
-        for path, field in fields:
+    for paper in processed:
+        for path, field in scientific[paper.id]:
             if _has_value(field) or field.conflict_values:
                 section_counts[path.split(".", 1)[0]] += 1
 
@@ -517,6 +517,8 @@ def aggregate_landing(
     audited_fields = 0
     current_year = datetime.now().year
     future_dated_papers = 0
+    # Corpus coverage and chronology deliberately include bibliography-only
+    # records; only verification/intelligence tallies are scoped to processed.
     for paper in papers:
         fields = scientific[paper.id]
         claims = [field for _, field in fields if _has_value(field) or field.conflict_values]
@@ -632,7 +634,7 @@ def aggregate_landing(
             )
             for year, counts in sorted(year_counts.items())
         ],
-        limitations=_limitation_tallies(papers),
+        limitations=_limitation_tallies(processed),
         sections=[
             LandingFieldTally(
                 key=key,
@@ -646,11 +648,11 @@ def aggregate_landing(
             )
         ],
         architecture_families=_named_tallies(
-            papers, "architecture.family", dimension="architecture"
+            processed, "architecture.family", dimension="architecture"
         ),
-        datasets=_named_tallies(papers, "data.datasets", dimension="dataset"),
-        extraction_demo=_extraction_demo(papers),
-        conflict_demo=_conflict_demo(papers),
+        datasets=_named_tallies(processed, "data.datasets", dimension="dataset"),
+        extraction_demo=_extraction_demo(processed),
+        conflict_demo=_conflict_demo(processed),
     )
 
 
@@ -682,9 +684,11 @@ def landing_drilldown(
             if dimension == "status" and field.status.value == key:
                 include = _extraction_attempted(paper)
             elif dimension == "section" and path.split(".", 1)[0] == key:
-                include = _has_value(field) or bool(field.conflict_values)
+                include = _extraction_attempted(paper) and (
+                    _has_value(field) or bool(field.conflict_values)
+                )
             elif dimension == "limitation" and path == f"limitations.{key}":
-                include = (
+                include = _extraction_attempted(paper) and (
                     _has_value(field)
                     and field.provenance_type is ProvenanceType.AUTHOR_REPORTED_LIMITATION
                     and _is_non_error_claim(field)
@@ -693,7 +697,7 @@ def landing_drilldown(
             elif dimension in {"architecture", "dataset"}:
                 wanted_path = "architecture.family" if dimension == "architecture" else "data.datasets"
                 values = field.value if isinstance(field.value, list) else [field.value]
-                include = (
+                include = _extraction_attempted(paper) and (
                     path == wanted_path
                     and key in {str(value).strip() for value in values if value is not None}
                     and field.provenance_type is ProvenanceType.AUTHOR_REPORTED_FACT

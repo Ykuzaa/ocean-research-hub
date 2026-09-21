@@ -384,6 +384,32 @@ def test_verification_ledger_only_counts_extraction_attempted_papers(tmp_path: P
     assert all(item["paper"]["id"] != bibliography_only_id for item in missing["evidence_items"])
 
 
+def test_named_intelligence_excludes_unprocessed_source_linked_claims(tmp_path: Path) -> None:
+    repository = SqlitePaperRepository(tmp_path / "papers.db")
+    repository.initialize()
+    record = _record(3, scientific=True)
+    repository.create_or_get(
+        identity_key="unprocessed-source-linked",
+        doi=None,
+        record=record,
+        workflow_status=PaperWorkflowStatus.INGESTED,
+        warnings=[],
+    )
+    app = create_app(repository=repository)
+
+    with TestClient(app) as client:
+        landing = client.get("/api/landing").json()
+        drilldown = client.get(
+            "/api/landing/drilldown",
+            params={"dimension": "architecture", "key": "Encoder-decoder"},
+        ).json()
+
+    assert landing["totals"]["processed_papers"] == 0
+    assert landing["architecture_families"] == []
+    assert landing["limitations"] == []
+    assert drilldown["total"] == 0
+
+
 def test_future_dated_records_are_flagged_and_excluded_from_year_chart(tmp_path: Path) -> None:
     repository = SqlitePaperRepository(tmp_path / "papers.db")
     repository.initialize()

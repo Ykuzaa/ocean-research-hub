@@ -10,6 +10,8 @@ from pathlib import Path
 from fastapi import FastAPI, Query, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 
+from ocean_research_hub.corpus.repository import CorpusRepository
+from ocean_research_hub.corpus.web import register_corpus_routes
 from ocean_research_hub.ingestion.errors import (
     IngestionConflictError,
     IngestionError,
@@ -54,6 +56,7 @@ def create_app(
     parsed_paper_provider: ParsedPaperProvider | None = None,
     pdf_parser: PdfParser | None = None,
     scientific_extractor: ScientificExtractor | None = None,
+    corpus_repository: CorpusRepository | None = None,
 ) -> FastAPI:
     database_path = Path(os.getenv("OCEAN_HUB_DB_PATH", ".data/ocean-research-hub.db"))
     paper_repository = repository or SqlitePaperRepository(database_path)
@@ -222,6 +225,10 @@ def create_app(
         # Lookups intentionally follow request order so both the API and view
         # retain stable left/right semantics.
         return get_stored_paper(left_id), get_stored_paper(right_id)
+
+    # Issue #13 staging corpus: separate tables in the same database, never
+    # written into the canonical `papers` table.
+    register_corpus_routes(app, corpus_repository or CorpusRepository(database_path))
 
     return app
 

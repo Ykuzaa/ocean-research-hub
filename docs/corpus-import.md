@@ -67,17 +67,60 @@ It has no `PAPER_RECORDS`, `FIELD_CONTRACT` or document sheets. It adds
 - START_HERE and NEW_DETAILED_PAPERS are stored as documents keyed by workbook
   name, so the base package's documents are not replaced.
 
+## Supplement workbook: ENRICHED (batches B03-B07)
+
+`import_staging/Ocean_Research_Intelligence_ENRICHED.xlsx` (SHA-256
+`7265fd1674ff7810706f5984cd3cace364e06b3cedf9344355a20d7c5ca6b65f`) is imported
+on top of V1 and EXPANDED_V2. It has 1497 SCIENTIFIC_CLAIMS rows: the 258 earlier
+claims (unchanged), 1187 new extracted claims, and 52 field-status markers. The
+import result is `claims.created = 1187`, `claims.unchanged = 258`,
+`field_markers.created = 52`, `research_gaps.created = 9`, `papers.updated = 67`
+(the PAPER_INDEX extraction status and notes changed; nothing is audited) and no
+aliases. A second import changes nothing. Totals: 115 papers, 1445 claims,
+87 papers with claims, 17 research-gap candidates.
+
+- **New claim columns** `unit`, `extraction_status`, `extracted_on` and
+  `batch_id` are served on each claim. An empty optional column is ignored by the
+  fingerprint, so the 258 earlier claims stay unchanged.
+- **Field-status markers.** The 52 B03 rows whose `extraction_status` is
+  `NOT_EXTRACTED` (46) or `NOT_REPORTED` (6) are not claims. Their value is the
+  status itself. They are stored in `staging_corpus_field_markers` and served as
+  `markers` on the field, never as values. The field status is computed as follows:
+  - only `NOT_EXTRACTED` markers: `NOT_EXTRACTED`;
+  - only `NOT_REPORTED` markers: `NOT_REPORTED_CANDIDATE`, which stays
+    `NOT_VERIFIED` and carries its `search_scope`
+    (for example "main text and appendices; code not inspected");
+  - a `NOT_REPORTED` marker beside an extracted claim: `CONFLICT|NOT_VERIFIED`
+    (OAI-0010 `training.training_time`).
+
+  A marker that carries a value other than its status is refused. So is an
+  unknown `extraction_status`. The COVERAGE `claim_count` excludes markers, as
+  START_HERE says.
+- **Shifted research-gap rows.** B04-G01..G04 are stored as
+  (gap id, paper id, question, status, "URL | section") under the
+  (topic, question, basis, status, qualification) header. Only that exact shape
+  is realigned. The original cells are kept in `realigned_from`, and the import
+  reports the change. Any other malformed gap is still refused. A gap whose
+  status says `AI_INTERPRETATION` is served with that provenance, not `TEAM_NOTE`.
+- **PDF pages.** 291 claims carry a `pdf_page` supplied by the package. It is
+  stored as supplied and is unchecked. No verbatim quotation is present.
+- **Outside the contract.** 955 claims use 672 field paths that are not in the
+  162-field contract (for example `loss.total`, `architecture.family`,
+  `datasets.split`). They are served as `uncontracted_claims`. None is mapped.
+- `SOURCE_ACCESS`, `FIELD_COVERAGE` and `NEW_DETAILED_PAPERS` are stored whole, as
+  documents keyed by workbook name.
+
 ## Scientific integrity rules the importer enforces
 
-- **Nothing is promoted.** All claims (144 base, 258 after V2) arrive `NOT_VERIFIED` /
+- **Nothing is promoted.** All claims (144 base, 258 after V2, 1445 after ENRICHED) arrive `NOT_VERIFIED` /
   `PENDING_INDEPENDENT_AUDIT` and stay that way. A workbook row claiming
   `VERIFIED`, `PARTIALLY_VERIFIED` or `NOT_REPORTED` is **refused**: a staging
   package has neither an independent attestation nor a documented search scope.
 - **Missing is `NOT_EXTRACTED`.** A field whose record slot lists no claim is
   served as `NOT_EXTRACTED`, never `NOT_REPORTED`.
 - **No invented evidence.** `pdf_page` and `verbatim_evidence` are stored exactly
-  as supplied. They are null for all 144 rows because the package performed no
-  PDF alignment.
+  as supplied. They are null for the 258 V1/V2 claims. ENRICHED supplies pages for
+  291 claims and quotations for none.
 - **Disagreements stay visible.** For 7 papers, PAPER_INDEX says `NOT_AUDITED`
   and PAPER_RECORDS says `PENDING_INDEPENDENT_AUDIT`. Both values are stored and
   served, and each import reports the disagreement. The claim type

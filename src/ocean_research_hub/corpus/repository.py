@@ -30,8 +30,8 @@ from typing import Any
 from uuid import uuid4
 
 from .workbook import (
-    SUPPLEMENT, StagingWorkbook, WorkbookValidationError, normalize_doi, normalize_title,
-    parse_claim_value,
+    SUPPLEMENT, StagingWorkbook, WorkbookValidationError, claim_fingerprint_payload, is_marker,
+    normalize_doi, normalize_title, parse_claim_value,
 )
 
 # States that mean an independent reviewer has attested the row. A row in one
@@ -46,6 +46,7 @@ UNATTESTED_AUDIT_MARKERS = frozenset({
 })
 
 NOT_EXTRACTED = "NOT_EXTRACTED"
+NOT_REPORTED_CANDIDATE = "NOT_REPORTED_CANDIDATE"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS staging_corpus_import_runs (
@@ -108,6 +109,20 @@ CREATE TABLE IF NOT EXISTS staging_corpus_research_gaps (
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS staging_corpus_field_markers (
+    marker_id TEXT PRIMARY KEY,
+    paper_id TEXT NOT NULL REFERENCES staging_corpus_papers(paper_id),
+    field_path TEXT NOT NULL,
+    extraction_status TEXT NOT NULL,
+    scientific_status TEXT NOT NULL,
+    independent_audit TEXT,
+    row_json TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    import_run_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS staging_corpus_field_markers_paper ON staging_corpus_field_markers(paper_id);
 CREATE TABLE IF NOT EXISTS staging_corpus_paper_coverage (
     coverage_key TEXT PRIMARY KEY,
     paper_id TEXT NOT NULL REFERENCES staging_corpus_papers(paper_id),
@@ -166,6 +181,7 @@ class ImportReport:
     research_gaps: EntityCounts = field(default_factory=EntityCounts)
     documents: EntityCounts = field(default_factory=EntityCounts)
     coverage: EntityCounts = field(default_factory=EntityCounts)
+    field_markers: EntityCounts = field(default_factory=EntityCounts)
     aliases_created: list[dict[str, str]] = field(default_factory=list)
     linked_paper_records: int = 0
     absent_from_source: dict[str, list[str]] = field(default_factory=dict)
@@ -176,7 +192,7 @@ class ImportReport:
             "papers": self.papers.as_dict(), "claims": self.claims.as_dict(),
             "field_contract": self.field_contract.as_dict(),
             "research_gaps": self.research_gaps.as_dict(), "documents": self.documents.as_dict(),
-            "coverage": self.coverage.as_dict(),
+            "coverage": self.coverage.as_dict(), "field_markers": self.field_markers.as_dict(),
             "aliases_created": len(self.aliases_created),
             "linked_paper_records": self.linked_paper_records,
             "absent_from_source": {key: len(value) for key, value in self.absent_from_source.items()},
@@ -319,12 +335,25 @@ class CorpusRepository:
         if errors:
             raise WorkbookValidationError(errors)
         outside = sorted(
-            f"{row['claim_id']} ({row['field_path']})" for row in book.claims if row["field_path"] not in contract
+            f"{row['claim_id']} ({row['field_path']})" for row in book.claims
+            if row["field_path"] not in contract and not is_marker(row)
         )
         if outside:
+            paths = sorted({row["field_path"] for row in book.claims if row["field_path"] not in contract})
             report.warnings.append(
-                f"claim(s) whose field_path is outside the stored FIELD_CONTRACT are preserved verbatim, "
-                f"served as uncontracted_claims and mapped to no field: {outside}"
+                f"{len(outside)} claim(s) using {len(paths)} field_path(s) outside the stored FIELD_CONTRACT "
+                f"are preserved verbatim, served as uncontracted_claims and mapped to no field: "
+                f"{outside[:20]}{' ...' if len(outside) > 20 else ''}"
+            )
+        extracted = {(row["paper_id"], row["field_path"]) for row in book.claims if not is_marker(row)}
+        overlaps = sorted(
+            f"{row['claim_id']} {row['extraction_status']} {row['paper_id']} {row['field_path']}"
+            for row in book.claims if is_marker(row) and (row["paper_id"], row["field_path"]) in extracted
+        )
+        if overlaps:
+            report.warnings.append(
+                f"field-status marker(s) on a field that also has an extracted claim are both kept; a "
+                f"NOT_REPORTED marker there is served as CONFLICT: {overlaps}"
             )
 
     def _resolve_paper(
@@ -429,6 +458,9 @@ class CorpusRepository:
         paper_map: dict[str, str], now: str,
     ) -> None:
         for row in book.claims:
+            if is_marker(row):
+                self._import_marker(connection, row, report, paper_map, now)
+                continue
             claim_id = row["claim_id"]
             existing = connection.execute(
                 "SELECT scientific_status, independent_audit FROM staging_corpus_claims WHERE claim_id = ?",
@@ -438,7 +470,8 @@ class CorpusRepository:
                 existing["scientific_status"], existing["independent_audit"],
             )
             self._upsert(
-                connection, "staging_corpus_claims", "claim_id", claim_id, _fingerprint(row),
+                connection, "staging_corpus_claims", "claim_id", claim_id,
+                _fingerprint(claim_fingerprint_payload(row)),
                 {
                     "paper_id": paper_map[row["paper_id"]], "experiment_id": row.get("experiment_id"),
                     "field_path": row["field_path"], "scientific_status": row["scientific_status"],
@@ -447,11 +480,37 @@ class CorpusRepository:
                 },
                 report.claims, protected=protected, report=report,
             )
-        incoming = {row["claim_id"] for row in book.claims}
+        incoming = {row["claim_id"] for row in book.claims if not is_marker(row)}
         stored = {item["claim_id"] for item in connection.execute("SELECT claim_id FROM staging_corpus_claims")}
         absent = sorted(stored - incoming)
         if absent:
             report.absent_from_source["claims"] = absent
+        incoming = {row["claim_id"] for row in book.claims if is_marker(row)}
+        stored = {item["marker_id"] for item in connection.execute("SELECT marker_id FROM staging_corpus_field_markers")}
+        absent = sorted(stored - incoming)
+        if absent:
+            report.absent_from_source["field_markers"] = absent
+
+    def _import_marker(
+        self, connection: sqlite3.Connection, row: dict[str, Any], report: ImportReport,
+        paper_map: dict[str, str], now: str,
+    ) -> None:
+        existing = connection.execute(
+            "SELECT scientific_status, independent_audit FROM staging_corpus_field_markers WHERE marker_id = ?",
+            (row["claim_id"],),
+        ).fetchone()
+        protected = existing is not None and is_attested(existing["scientific_status"], existing["independent_audit"])
+        self._upsert(
+            connection, "staging_corpus_field_markers", "marker_id", row["claim_id"],
+            _fingerprint(claim_fingerprint_payload(row)),
+            {
+                "paper_id": paper_map[row["paper_id"]], "field_path": row["field_path"],
+                "extraction_status": row["extraction_status"], "scientific_status": row["scientific_status"],
+                "independent_audit": row.get("independent_audit"), "row_json": _canonical(row),
+                "import_run_id": report.run_id, "created_at": now, "updated_at": now,
+            },
+            report.field_markers, protected=protected, report=report,
+        )
 
     def _import_gaps(
         self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport, now: str,
@@ -474,6 +533,10 @@ class CorpusRepository:
             documents = {
                 f"{book.source_name}:START_HERE": _canonical(book.start_here),
                 f"{book.source_name}:NEW_DETAILED_PAPERS": _canonical(book.new_detailed_papers),
+                **{
+                    f"{book.source_name}:{name}": _canonical(rows)
+                    for name, rows in book.supplement_documents.items() if name != "NEW_DETAILED_PAPERS"
+                },
             }
         for name, text in documents.items():
             self._upsert(
@@ -528,6 +591,16 @@ class CorpusRepository:
                 "aliases": count("staging_corpus_paper_aliases"),
                 "claim_statuses": statuses,
                 "claim_independent_audit": audits,
+                "field_status_markers": {
+                    row["extraction_status"]: row["n"]
+                    for row in connection.execute(
+                        "SELECT extraction_status, COUNT(*) AS n FROM staging_corpus_field_markers GROUP BY 1"
+                    )
+                },
+                "claims_with_supplied_pdf_page": int(connection.execute(
+                    "SELECT COUNT(*) AS n FROM staging_corpus_claims "
+                    "WHERE json_extract(row_json, '$.pdf_page') IS NOT NULL"
+                ).fetchone()["n"]),
                 "last_import": None if last is None else self._run(last),
             }
 
@@ -630,6 +703,11 @@ class CorpusRepository:
                     "SELECT * FROM staging_corpus_paper_aliases WHERE paper_id = ?", (row["paper_id"],)
                 )
             ]
+            markers: dict[str, list[dict[str, Any]]] = {}
+            for item in connection.execute(
+                "SELECT * FROM staging_corpus_field_markers WHERE paper_id = ? ORDER BY marker_id", (row["paper_id"],)
+            ):
+                markers.setdefault(item["field_path"], []).append(self._marker(item))
             coverage = [
                 {"source_name": item["source_name"], **json.loads(item["row_json"])}
                 for item in connection.execute(
@@ -654,13 +732,12 @@ class CorpusRepository:
                 *by_path.get(definition["field_path"], []),
             ]
             field_claims = [claims[claim_id] for claim_id in claim_ids if claim_id in claims]
-            statuses = sorted({claim["scientific_status"] for claim in field_claims})
+            field_markers = markers.get(definition["field_path"], [])
             fields.append({
                 "field_path": definition["field_path"], "group": definition["field_group"],
                 "field_name": definition["field_name"],
-                # An empty slot means nobody looked, not that the paper is silent.
-                "status": NOT_EXTRACTED if not field_claims else "|".join(statuses),
-                "claim_ids": claim_ids, "claims": field_claims,
+                "status": self._field_status(field_claims, field_markers),
+                "claim_ids": claim_ids, "claims": field_claims, "markers": field_markers,
             })
         experiments = sorted({claim["experiment_id"] for claim in claims.values() if claim["experiment_id"]})
         return {
@@ -677,10 +754,45 @@ class CorpusRepository:
                 claims[claim_id] for path, ids in sorted(by_path.items())
                 if path not in contract_paths for claim_id in ids
             ],
+            "uncontracted_markers": [
+                marker for path, items in sorted(markers.items()) if path not in contract_paths for marker in items
+            ],
             "coverage": coverage,
             "populated_field_count": sum(1 for item in fields if item["claims"]),
             "not_extracted_field_count": sum(1 for item in fields if not item["claims"]),
             "import_run_id": row["import_run_id"],
+        }
+
+    @staticmethod
+    def _field_status(claims: list[dict[str, Any]], markers: list[dict[str, Any]]) -> str:
+        """A field's display status. Markers never become values.
+
+        No claim and no marker, or only NOT_EXTRACTED markers: NOT_EXTRACTED
+        (nobody found it; an empty slot never means the paper is silent). Only
+        NOT_REPORTED markers: NOT_REPORTED_CANDIDATE, an unverified absence
+        limited to the marker's search scope. Claims plus a NOT_REPORTED marker:
+        the disagreement stays visible as CONFLICT.
+        """
+        reported_absent = any(marker["extraction_status"] == "NOT_REPORTED" for marker in markers)
+        if not claims:
+            return NOT_REPORTED_CANDIDATE if reported_absent else NOT_EXTRACTED
+        statuses = {claim["scientific_status"] for claim in claims}
+        if reported_absent:
+            statuses.add("CONFLICT")
+        return "|".join(sorted(statuses))
+
+    @staticmethod
+    def _marker(row: sqlite3.Row) -> dict[str, Any]:
+        source = json.loads(row["row_json"])
+        return {
+            "marker_id": row["marker_id"], "paper_id": row["paper_id"], "field_path": row["field_path"],
+            "extraction_status": row["extraction_status"], "scientific_status": row["scientific_status"],
+            "independent_audit": row["independent_audit"], "claim_type": source.get("claim_type"),
+            # The scope within which the field was looked for.
+            "search_scope": source.get("source_section"),
+            "source_url": source.get("evidence_source_url"), "source_edition": source.get("source_edition"),
+            "evidence_review": source.get("evidence_review"), "notes": source.get("notes"),
+            "batch_id": source.get("batch_id"), "import_run_id": row["import_run_id"],
         }
 
     @staticmethod
@@ -696,6 +808,10 @@ class CorpusRepository:
             "value_raw": source.get("value"),
             "subject_scope": source.get("subject_scope"),
             "claim_type": source.get("claim_type"),
+            "unit": source.get("unit"),
+            "extraction_status": source.get("extraction_status"),
+            "extracted_on": source.get("extracted_on"),
+            "batch_id": source.get("batch_id"),
             "scientific_status": row["scientific_status"],
             "independent_audit": row["independent_audit"],
             "evidence": {
@@ -704,8 +820,7 @@ class CorpusRepository:
                 "source_edition": source.get("source_edition"),
                 "section": source.get("source_section"),
                 "locator": source.get("source_locator"),
-                # Stored exactly as supplied; never synthesised. Null in the
-                # staging package because no PDF alignment was performed.
+                # Stored exactly as supplied; never synthesised or checked here.
                 "verbatim_evidence": source.get("verbatim_evidence"),
                 "pdf_page": source.get("pdf_page"),
                 "evidence_review": source.get("evidence_review"),
@@ -757,9 +872,14 @@ class CorpusRepository:
                 ],
                 "status": source.get("status"),
                 "qualification": source.get("qualification"),
-                # A research-gap candidate is a team hypothesis, never an
+                # A research-gap candidate is a team hypothesis or an AI
+                # interpretation, as the package labels it; never an
                 # author-reported limitation and never established novelty.
-                "provenance_type": "TEAM_NOTE",
+                "provenance_type": (
+                    "AI_INTERPRETATION" if str(source.get("status") or "").startswith("AI_INTERPRETATION")
+                    else "TEAM_NOTE"
+                ),
+                "realigned_from": source.get("realigned_from"),
                 "import_run_id": row["import_run_id"],
             })
         return gaps

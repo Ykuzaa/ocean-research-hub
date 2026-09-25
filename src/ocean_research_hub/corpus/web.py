@@ -18,8 +18,10 @@ from .repository import CorpusNotFoundError, CorpusRepository
 
 STAGING_NOTICE = (
     "Staging corpus - NOT independently verified. Candidate claims are NOT_VERIFIED; "
-    "empty fields are NOT_EXTRACTED (nobody looked), never NOT_REPORTED. No PDF page "
-    "or quotation has been aligned for these records."
+    "empty fields are NOT_EXTRACTED (nobody looked), never NOT_REPORTED; a field the package "
+    "looked for and did not find is at most a NOT_REPORTED_CANDIDATE within its stated search scope. "
+    "PDF page numbers, where present, are as supplied by the package and unchecked; no verbatim "
+    "quotation has been aligned."
 )
 
 
@@ -75,8 +77,8 @@ def register_corpus_routes(app: FastAPI, repository: CorpusRepository) -> None:
     async def corpus_gaps() -> dict[str, Any]:
         gaps = repository.research_gaps()
         return {
-            "notice": "Research-gap candidates are team hypotheses, not author-reported "
-                      "limitations and not established novelty.",
+            "notice": "Research-gap candidates are team hypotheses or AI interpretations, not "
+                      "author-reported limitations and not established novelty.",
             "total": len(gaps), "research_gaps": gaps,
         }
 
@@ -167,6 +169,16 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
             + "</div>"
         )
 
+    def marker_block(marker: dict[str, Any]) -> str:
+        return (
+            f"<div><code>{escape(marker['marker_id'])}</code> <span class=\"status\">marker "
+            f"{escape(marker['extraction_status'])} · {escape(marker['scientific_status'])}</span><br>"
+            f"<span class=\"muted\">searched: {_cell(marker['search_scope'])} · {_cell(marker['source_edition'])} · "
+            f"<a href=\"{escape(marker['source_url'] or '#')}\">source</a>"
+            + (f" · note: {_cell(marker['notes'])}" if marker["notes"] else "")
+            + "</span></div>"
+        )
+
     groups: dict[str, list[dict[str, Any]]] = {}
     for item in paper["fields"]:
         groups.setdefault(item["group"], []).append(item)
@@ -175,7 +187,9 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
         populated = sum(1 for item in items if item["claims"])
         rows = "".join(
             f"<tr><td><code>{escape(item['field_path'])}</code></td><td class=\"status\">{escape(item['status'])}</td>"
-            f"<td>{''.join(claim_block(claim) for claim in item['claims']) or '<span class=\"muted\">not extracted</span>'}</td></tr>"
+            f"<td>{''.join(claim_block(claim) for claim in item['claims'])}"
+            f"{''.join(marker_block(marker) for marker in item['markers'])}"
+            f"{'' if item['claims'] or item['markers'] else '<span class=\"muted\">not extracted</span>'}</td></tr>"
             for item in items
         )
         sections.append(
@@ -183,7 +197,7 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
             f"{populated} of {len(items)} fields with candidate claims</summary>"
             f"<table><thead><tr><th>Field</th><th>Status</th><th>Candidate claims</th></tr></thead><tbody>{rows}</tbody></table></details>"
         )
-    if paper["uncontracted_claims"]:
+    if paper["uncontracted_claims"] or paper["uncontracted_markers"]:
         sections.append(
             "<details open><summary><strong>Outside the field contract</strong> — "
             f"{len(paper['uncontracted_claims'])} candidate claim(s) whose field path is not one of the "
@@ -192,6 +206,10 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
             + "".join(
                 f"<tr><td><code>{escape(claim['field_path'])}</code></td><td>{claim_block(claim)}</td></tr>"
                 for claim in paper["uncontracted_claims"]
+            )
+            + "".join(
+                f"<tr><td><code>{escape(marker['field_path'])}</code></td><td>{marker_block(marker)}</td></tr>"
+                for marker in paper["uncontracted_markers"]
             )
             + "</tbody></table></details>"
         )

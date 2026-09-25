@@ -39,6 +39,21 @@ SUPPLEMENT = "supplement"
 SUPPLEMENT_SHEETS: tuple[str, ...] = (
     "START_HERE", "PAPER_INDEX", "SCIENTIFIC_CLAIMS", "RESEARCH_GAPS", "COVERAGE",
 )
+# Supplement sheets kept whole, as documents, when present.
+SUPPLEMENT_DOCUMENT_SHEETS: tuple[str, ...] = ("NEW_DETAILED_PAPERS", "SOURCE_ACCESS", "FIELD_COVERAGE")
+
+# A SCIENTIFIC_CLAIMS row whose extraction_status is one of these records that a
+# field was looked for and not found (within the scope in source_section). It
+# is a field-status marker, not a claim: its value is the status itself, never
+# a scientific value. A NOT_REPORTED marker stays a NOT_VERIFIED candidate.
+MARKER_EXTRACTION_STATUSES = frozenset({"NOT_EXTRACTED", "NOT_REPORTED"})
+ALLOWED_EXTRACTION_STATUSES = frozenset({None, "EXTRACTED"}) | MARKER_EXTRACTION_STATUSES
+# Claim columns added by later packages. An empty one is not content, so its
+# arrival does not change the fingerprint of an otherwise identical row.
+OPTIONAL_CLAIM_COLUMNS = frozenset({"unit", "extraction_status", "extracted_on", "batch_id"})
+
+_GAP_ID = re.compile(r"^B\d+-G\d+$")
+_PAPER_IDS = re.compile(r"^OAI-\d+(?:\s*;\s*OAI-\d+)*$")
 
 REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
     "PAPER_INDEX": (
@@ -89,6 +104,12 @@ SUPPLEMENT_DECLARED_COUNTS = {
     "Claims total": "SCIENTIFIC_CLAIMS",
     "Detailed papers now": "DETAILED_PAPERS",
     "New detailed papers": "NEW_DETAILED_PAPERS",
+    # ENRICHED labels its counts in French.
+    "Lignes SCIENTIFIC_CLAIMS": "SCIENTIFIC_CLAIMS",
+    "Lignes extraites / historiques": "EXTRACTED_ROWS",
+    "Champs manquants hérités": "MARKERS",
+    "Papiers avec extraction": "DETAILED_PAPERS",
+    "INDEX_ONLY restants": "INDEX_ONLY",
 }
 
 
@@ -116,6 +137,15 @@ class StagingWorkbook:
     kind: str = BASE
     coverage: list[dict[str, Any]] = field(default_factory=list)
     new_detailed_papers: list[dict[str, Any]] = field(default_factory=list)
+    supplement_documents: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+
+
+def is_marker(row: dict[str, Any]) -> bool:
+    return row.get("extraction_status") in MARKER_EXTRACTION_STATUSES
+
+
+def claim_fingerprint_payload(row: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in row.items() if value is not None or key not in OPTIONAL_CLAIM_COLUMNS}
 
 
 def normalize_doi(doi: str | None) -> str | None:
@@ -222,12 +252,17 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
         record_rows = table("PAPER_RECORDS") if kind == BASE else []
         contract = table("FIELD_CONTRACT") if kind == BASE else []
         coverage = table("COVERAGE") if kind == SUPPLEMENT else []
-        new_detailed = (
-            table("NEW_DETAILED_PAPERS")
-            if kind == SUPPLEMENT and "NEW_DETAILED_PAPERS" in sheet_names else []
-        )
+        supplement_documents = {
+            name: table(name) for name in SUPPLEMENT_DOCUMENT_SHEETS
+            if kind == SUPPLEMENT and name in sheet_names
+        }
+        new_detailed = supplement_documents.get("NEW_DETAILED_PAPERS", [])
     finally:
         workbook.close()
+
+    warnings: list[str] = []
+    if kind == SUPPLEMENT:
+        gaps = _realign_gaps(gaps, warnings)
 
     records: list[dict[str, Any]] = []
     for position, row in enumerate(record_rows, start=2):
@@ -260,6 +295,8 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
         kind=kind,
         coverage=coverage,
         new_detailed_papers=new_detailed,
+        supplement_documents=supplement_documents,
+        warnings=warnings,
     )
     if kind == SUPPLEMENT:
         errors.extend(_supplement_errors(staged))
@@ -431,7 +468,49 @@ def _claim_row_errors(book: StagingWorkbook) -> list[str]:
             errors.append(f"claim {claim_id} has unknown scientific_status {status!r}")
         if row.get("value") is None:
             errors.append(f"claim {claim_id} has no value")
+        extraction = row.get("extraction_status")
+        if extraction not in ALLOWED_EXTRACTION_STATUSES:
+            errors.append(f"claim {claim_id} has unknown extraction_status {extraction!r}")
+        elif extraction in MARKER_EXTRACTION_STATUSES and row.get("value") != extraction:
+            errors.append(
+                f"claim {claim_id} is a {extraction} marker but carries the value {row.get('value')!r}"
+            )
     return errors
+
+
+def _realign_gaps(gaps: list[dict[str, Any]], warnings: list[str]) -> list[dict[str, Any]]:
+    """Put back one exact, recognised column shift in RESEARCH_GAPS.
+
+    ENRICHED stores its B04 gap rows as (gap id, paper id, question, status,
+    "URL | section") under the (topic, question, basis, status, qualification)
+    header. Only a row matching that shape exactly - a ``Bnn-Gnn`` id, a paper
+    id list where the question belongs, and no paper id where the basis
+    belongs - is realigned; the original cells are kept in ``realigned_from``
+    and the change is reported. Any other malformed row still fails validation.
+    """
+    fixed: list[dict[str, Any]] = []
+    moved: list[str] = []
+    for row in gaps:
+        topic, question, basis = row.get("candidate_topic"), row.get("testable_question"), row.get("basis_paper_ids")
+        if (
+            isinstance(topic, str) and _GAP_ID.match(topic)
+            and isinstance(question, str) and _PAPER_IDS.match(question)
+            and not (isinstance(basis, str) and _PAPER_IDS.match(basis))
+        ):
+            fixed.append({
+                **row, "testable_question": basis, "basis_paper_ids": question,
+                "realigned_from": dict(row),
+            })
+            moved.append(topic)
+        else:
+            fixed.append(row)
+    if moved:
+        warnings.append(
+            f"RESEARCH_GAPS row(s) {moved} had testable_question and basis_paper_ids swapped; they were "
+            f"realigned (paper ids -> basis_paper_ids, question -> testable_question) and the original "
+            f"cells are kept in realigned_from"
+        )
+    return fixed
 
 
 def _supplement_errors(book: StagingWorkbook) -> list[str]:
@@ -441,12 +520,17 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
     paths inside the stored contract) run in ``CorpusRepository.import_workbook``.
     """
     errors = _paper_identity_errors(book) + _claim_row_errors(book) + _gap_errors(book)
+    # Markers are not extracted content; the package's own counts exclude them.
     per_paper: dict[Any, int] = {}
     for row in book.claims:
-        per_paper[row.get("paper_id")] = per_paper.get(row.get("paper_id"), 0) + 1
+        if not is_marker(row):
+            per_paper[row.get("paper_id")] = per_paper.get(row.get("paper_id"), 0) + 1
+    markers = sum(1 for row in book.claims if is_marker(row))
     counts = {
         "PAPER_INDEX": len(book.paper_index), "SCIENTIFIC_CLAIMS": len(book.claims),
         "DETAILED_PAPERS": len(per_paper), "NEW_DETAILED_PAPERS": len(book.new_detailed_papers),
+        "EXTRACTED_ROWS": len(book.claims) - markers, "MARKERS": markers,
+        "INDEX_ONLY": sum(1 for row in book.coverage if row.get("coverage_level") == "INDEX_ONLY"),
     }
     for label, sheet in SUPPLEMENT_DECLARED_COUNTS.items():
         declared = book.start_here.get(label)
@@ -513,6 +597,16 @@ def _integrity_warnings(book: StagingWorkbook) -> list[str]:
                 f"{row.get('scientific_audit_status')!r} differs from PAPER_RECORDS "
                 f"{record.get('scientific_audit_status')!r}; both are preserved, neither is chosen"
             )
+    marker_counts: dict[str, int] = {}
+    for row in book.claims:
+        if is_marker(row):
+            marker_counts[row["extraction_status"]] = marker_counts.get(row["extraction_status"], 0) + 1
+    if marker_counts:
+        warnings.append(
+            f"SCIENTIFIC_CLAIMS row(s) whose extraction_status marks a missing field {marker_counts} are "
+            f"stored as field-status markers, never as values; NOT_REPORTED markers stay NOT_VERIFIED "
+            f"candidates limited to the scope in source_section"
+        )
     other = sorted({
         str(row.get("claim_type")) for row in book.claims
         if row.get("claim_type") not in PROJECT_PROVENANCE

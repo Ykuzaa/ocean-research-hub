@@ -622,3 +622,125 @@ def test_api_serves_the_enriched_corpus(tmp_path: Path, book: StagingWorkbook, s
         assert client.get("/api/corpus/papers/OAI-0063").json()["uncontracted_claims"]
         page = client.get("/corpus/papers/OAI-0063")
         assert "Outside the field contract" in page.text and "rl.action" in page.text
+
+
+# --- supplement workbook (ENRICHED: B03-B07, field-status markers) -----------
+
+ENRICHED_WORKBOOK = WORKBOOK.with_name("Ocean_Research_Intelligence_ENRICHED.xlsx")
+
+
+@pytest.fixture(scope="module")
+def enriched_book() -> StagingWorkbook:
+    return read_workbook(ENRICHED_WORKBOOK)
+
+
+@pytest.fixture()
+def full(enriched: CorpusRepository, enriched_book: StagingWorkbook) -> CorpusRepository:
+    enriched.import_workbook(enriched_book)
+    return enriched
+
+
+def test_enriched_is_read_with_its_declared_counts(enriched_book: StagingWorkbook) -> None:
+    assert enriched_book.kind == "supplement"
+    assert (len(enriched_book.paper_index), len(enriched_book.claims), len(enriched_book.research_gaps)) == (115, 1497, 17)
+    assert sum(1 for row in enriched_book.claims if row.get("extraction_status") in {"NOT_EXTRACTED", "NOT_REPORTED"}) == 52
+    assert set(enriched_book.supplement_documents) == {"NEW_DETAILED_PAPERS", "SOURCE_ACCESS", "FIELD_COVERAGE"}
+
+
+def test_enriched_adds_claims_markers_and_gaps_on_top_of_v2(enriched: CorpusRepository, enriched_book: StagingWorkbook) -> None:
+    counts = enriched.import_workbook(enriched_book).counts()
+    # The 258 earlier claims gain only empty new columns: unchanged, not rewritten.
+    assert counts["claims"] == {"created": 1187, "updated": 0, "unchanged": 258, "skipped_protected": 0}
+    assert counts["field_markers"]["created"] == 52
+    assert counts["research_gaps"] == {"created": 9, "updated": 0, "unchanged": 8, "skipped_protected": 0}
+    assert counts["papers"] == {"created": 0, "updated": 67, "unchanged": 48, "skipped_protected": 0}
+    assert counts["aliases_created"] == 0 and counts["absent_from_source"] == {}
+    summary = enriched.summary()
+    assert (summary["papers"], summary["claims"], summary["research_gap_candidates"]) == (115, 1445, 17)
+    assert summary["claim_statuses"] == {"NOT_VERIFIED": 1445}
+    assert summary["field_status_markers"] == {"NOT_EXTRACTED": 46, "NOT_REPORTED": 6}
+
+
+def test_reimporting_enriched_is_a_no_op(full: CorpusRepository, enriched_book: StagingWorkbook) -> None:
+    counts = full.import_workbook(enriched_book).counts()
+    for entity, total in (("papers", 115), ("claims", 1445), ("field_markers", 52), ("research_gaps", 17), ("coverage", 115)):
+        assert counts[entity] == {"created": 0, "updated": 0, "unchanged": total, "skipped_protected": 0}
+
+
+def test_markers_are_never_served_as_values(full: CorpusRepository) -> None:
+    fields = {item["field_path"]: item for item in full.get_paper("OAI-0010")["fields"]}
+    activation = fields["architecture.activation"]
+    assert activation["status"] == "NOT_REPORTED_CANDIDATE" and activation["claims"] == []
+    marker = activation["markers"][0]
+    assert marker["scientific_status"] == "NOT_VERIFIED"
+    assert "appendices" in marker["search_scope"]
+    # A NOT_REPORTED marker beside an extracted value is a visible conflict.
+    assert fields["training.training_time"]["status"] == "CONFLICT|NOT_VERIFIED"
+    fields = {item["field_path"]: item for item in full.get_paper("OAI-0011")["fields"]}
+    assert {item["status"] for item in fields.values() if item["markers"] and not item["claims"]} <= {"NOT_EXTRACTED"}
+    assert all(claim["value_raw"] not in ("NOT_EXTRACTED", "NOT_REPORTED") for claim in full.list_claims(limit=2000)[0])
+
+
+def test_supplied_pdf_pages_and_units_are_kept_as_supplied(full: CorpusRepository) -> None:
+    claim = full.get_claim("B03-0001")
+    assert claim["evidence"]["pdf_page"] == 6 and claim["batch_id"] == "B03"
+    assert claim["evidence"]["verbatim_evidence"] is None
+    assert full.summary()["claims_with_supplied_pdf_page"] == 291
+
+
+def test_shifted_gap_rows_are_realigned_and_traced(full: CorpusRepository) -> None:
+    gap = next(item for item in full.research_gaps() if item["candidate_topic"] == "B04-G01")
+    assert gap["basis_paper_ids"] == ["OAI-0031"]
+    assert gap["testable_question"].startswith("Test tail-sensitive losses")
+    assert gap["realigned_from"]["testable_question"] == "OAI-0031"
+    assert gap["provenance_type"] == "AI_INTERPRETATION"
+    assert next(item for item in full.research_gaps() if item["candidate_topic"] == "Cross-regime robustness")["provenance_type"] == "TEAM_NOTE"
+
+
+def _edited_enriched(tmp_path: Path, sheet_name: str, row: int, column: str, value) -> Path:
+    workbook = load_workbook(ENRICHED_WORKBOOK)
+    sheet = workbook[sheet_name]
+    sheet.cell(row=row, column=_column(sheet, column), value=value)
+    target = tmp_path / "edited.xlsx"
+    workbook.save(target)
+    return target
+
+
+def test_a_gap_malformed_in_any_other_way_is_still_refused(tmp_path: Path) -> None:
+    workbook = load_workbook(ENRICHED_WORKBOOK)
+    sheet = workbook["RESEARCH_GAPS"]
+    last = sheet.max_row
+    sheet.cell(row=last, column=_column(sheet, "candidate_topic"), value="Not a gap id")
+    target = tmp_path / "edited.xlsx"
+    workbook.save(target)
+    with pytest.raises(WorkbookValidationError) as caught:
+        read_workbook(target)
+    assert any("cites unknown papers" in error for error in caught.value.errors)
+
+
+def test_a_marker_carrying_a_value_is_refused(tmp_path: Path, enriched_book: StagingWorkbook) -> None:
+    row = 1 + next(position for position, claim in enumerate(enriched_book.claims, start=1) if claim["claim_id"] == "B03-0218")
+    with pytest.raises(WorkbookValidationError) as caught:
+        read_workbook(_edited_enriched(tmp_path, "SCIENTIFIC_CLAIMS", row, "value", "GELU"))
+    assert any("NOT_REPORTED marker but carries the value 'GELU'" in error for error in caught.value.errors)
+
+
+def test_an_unknown_extraction_status_is_refused(tmp_path: Path) -> None:
+    with pytest.raises(WorkbookValidationError) as caught:
+        read_workbook(_edited_enriched(tmp_path, "SCIENTIFIC_CLAIMS", 300, "extraction_status", "VERIFIED"))
+    assert any("unknown extraction_status 'VERIFIED'" in error for error in caught.value.errors)
+
+
+def test_api_serves_the_full_enriched_corpus(tmp_path: Path, book: StagingWorkbook, supplement: StagingWorkbook, enriched_book: StagingWorkbook) -> None:
+    database = tmp_path / "hub.db"
+    corpus = CorpusRepository(database)
+    for workbook in (book, supplement, enriched_book):
+        corpus.import_workbook(workbook)
+    app = create_app(repository=SqlitePaperRepository(database), corpus_repository=corpus)
+    with TestClient(app) as client:
+        summary = client.get("/api/corpus").json()
+        assert (summary["papers"], summary["claims"], summary["research_gap_candidates"]) == (115, 1445, 17)
+        assert client.get("/api/corpus/claims", params={"limit": 1000, "offset": 1000}).json()["total"] == 1445
+        assert "NOT_REPORTED_CANDIDATE" in summary["notice"]
+        page = client.get("/corpus/papers/OAI-0010")
+        assert page.status_code == 200 and "marker NOT_REPORTED" in page.text and "CONFLICT" in page.text

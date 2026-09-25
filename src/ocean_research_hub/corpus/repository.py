@@ -131,6 +131,13 @@ CREATE TABLE IF NOT EXISTS staging_corpus_paper_coverage (
     fingerprint TEXT NOT NULL,
     import_run_id TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS staging_corpus_row_versions (
+    table_name TEXT NOT NULL,
+    row_key TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    import_run_id TEXT NOT NULL,
+    PRIMARY KEY (table_name, row_key, fingerprint)
+);
 CREATE TABLE IF NOT EXISTS staging_corpus_documents (
     name TEXT PRIMARY KEY,
     text TEXT NOT NULL,
@@ -138,6 +145,20 @@ CREATE TABLE IF NOT EXISTS staging_corpus_documents (
     import_run_id TEXT NOT NULL
 );
 """
+
+
+# Tables whose rows are upserted by fingerprint; their current fingerprints
+# are recorded as versions so a later import cannot revert a row to an older one.
+VERSIONED_TABLES = {
+    "staging_corpus_field_contract": "field_path", "staging_corpus_papers": "paper_id",
+    "staging_corpus_claims": "claim_id", "staging_corpus_field_markers": "marker_id",
+    "staging_corpus_research_gaps": "gap_key", "staging_corpus_documents": "name",
+    "staging_corpus_paper_coverage": "coverage_key",
+}
+
+
+class _DryRun(Exception):
+    """Raised inside the import transaction to roll a dry run back."""
 
 
 class CorpusNotFoundError(LookupError):
@@ -182,6 +203,7 @@ class ImportReport:
     documents: EntityCounts = field(default_factory=EntityCounts)
     coverage: EntityCounts = field(default_factory=EntityCounts)
     field_markers: EntityCounts = field(default_factory=EntityCounts)
+    stale: list[str] = field(default_factory=list)
     aliases_created: list[dict[str, str]] = field(default_factory=list)
     linked_paper_records: int = 0
     absent_from_source: dict[str, list[str]] = field(default_factory=dict)
@@ -218,6 +240,15 @@ class CorpusRepository:
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
             connection.executescript(SCHEMA)
+            # Rows stored before versions were recorded: their current state
+            # becomes a known version (idempotent).
+            with connection:
+                for table, key in VERSIONED_TABLES.items():
+                    connection.execute(
+                        f"INSERT OR IGNORE INTO staging_corpus_row_versions "
+                        f"SELECT ?, {key}, fingerprint, import_run_id FROM {table}",
+                        (table,),
+                    )
         self._initialized = True
 
     def _connect(self) -> sqlite3.Connection:
@@ -233,8 +264,14 @@ class CorpusRepository:
 
     # -- import ------------------------------------------------------------
 
-    def import_workbook(self, book: StagingWorkbook) -> ImportReport:
-        """Import a validated workbook in one transaction. All or nothing."""
+    def import_workbook(self, book: StagingWorkbook, *, dry_run: bool = False) -> ImportReport:
+        """Import a validated workbook in one transaction. All or nothing.
+
+        ``dry_run`` performs every check, including those against the stored
+        corpus, and reports what would change, then rolls everything back.
+        Raises ``WorkbookValidationError`` if the workbook conflicts with the
+        stored corpus; nothing is then written.
+        """
         report = ImportReport(str(uuid4()), book.source_name, book.sha256)
         report.warnings.extend(book.warnings)
         now = datetime.now(UTC).isoformat()
@@ -250,6 +287,12 @@ class CorpusRepository:
                 self._import_gaps(connection, book, report, now)
                 self._import_documents(connection, book, report)
                 self._import_coverage(connection, book, report, paper_map)
+                if report.stale:
+                    raise WorkbookValidationError([
+                        f"{len(report.stale)} row(s) would be reverted to content an earlier import already "
+                        f"replaced; this workbook is older than the stored corpus (for example "
+                        f"{report.stale[:5]}). Import the newest package instead."
+                    ])
                 connection.execute(
                     "INSERT INTO staging_corpus_import_runs VALUES (?, ?, ?, ?, ?, ?)",
                     (
@@ -257,6 +300,10 @@ class CorpusRepository:
                         _canonical(report.counts()), _canonical(report.warnings),
                     ),
                 )
+                if dry_run:
+                    raise _DryRun
+        except _DryRun:
+            pass
         finally:
             connection.close()
         return report
@@ -271,6 +318,13 @@ class CorpusRepository:
         row = connection.execute(
             f"SELECT fingerprint FROM {table} WHERE {key_column} = ?", (key,)
         ).fetchone()
+        def remember() -> None:
+            if report is not None:
+                connection.execute(
+                    "INSERT OR IGNORE INTO staging_corpus_row_versions VALUES (?, ?, ?, ?)",
+                    (table, key, fingerprint, report.run_id),
+                )
+
         if row is None:
             columns = [key_column, "fingerprint", *values]
             connection.execute(
@@ -278,6 +332,7 @@ class CorpusRepository:
                 (key, fingerprint, *values.values()),
             )
             counts.created += 1
+            remember()
             return "created"
         if row["fingerprint"] == fingerprint:
             counts.unchanged += 1
@@ -290,6 +345,13 @@ class CorpusRepository:
                     f"different content was NOT applied"
                 )
             return "skipped_protected"
+        if report is not None and connection.execute(
+            "SELECT 1 FROM staging_corpus_row_versions WHERE table_name = ? AND row_key = ? AND fingerprint = ?",
+            (table, key, fingerprint),
+        ).fetchone():
+            # This exact content was stored before and later replaced.
+            report.stale.append(f"{table}:{key}")
+            return "stale"
         updates = {key: value for key, value in values.items() if key != "created_at"}
         connection.execute(
             f"UPDATE {table} SET fingerprint = ?, {', '.join(f'{column} = ?' for column in updates)} "
@@ -297,6 +359,7 @@ class CorpusRepository:
             (fingerprint, *updates.values(), key),
         )
         counts.updated += 1
+        remember()
         return "updated"
 
     def _import_contract(self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport) -> None:
@@ -309,7 +372,7 @@ class CorpusRepository:
                     "field_group": row["group"], "field_name": row["field_name"],
                     "position": position, "import_run_id": report.run_id,
                 },
-                report.field_contract,
+                report.field_contract, report=report,
             )
 
     def _check_supplement(
@@ -323,14 +386,32 @@ class CorpusRepository:
         if not contract:
             errors.append("a supplement workbook needs a base corpus; import the base workbook first")
         for row in book.paper_index:
-            canonical_id, _ = self._resolve_paper(
-                connection, row["paper_id"], normalize_doi(row.get("doi")), normalize_title(row.get("title")),
-                None if row.get("year") is None else str(row.get("year")),
-            )
-            if canonical_id is None:
+            # A supplement names papers by their stored ID (or a known alias)
+            # only, and may not change their identity: it has no record to
+            # justify a new work, a new ID, or a corrected title/DOI/year.
+            stored = connection.execute(
+                "SELECT p.* FROM staging_corpus_papers p WHERE p.paper_id = ? UNION ALL "
+                "SELECT p.* FROM staging_corpus_papers p JOIN staging_corpus_paper_aliases a "
+                "ON a.paper_id = p.paper_id WHERE a.alias_id = ?",
+                (row["paper_id"], row["paper_id"]),
+            ).fetchone()
+            if stored is None:
                 errors.append(
-                    f"supplement paper {row['paper_id']} is not in the stored corpus; a supplement "
-                    f"carries no PAPER_RECORDS and cannot introduce a paper"
+                    f"supplement paper {row['paper_id']} is not in the stored corpus under that ID; a "
+                    f"supplement carries no PAPER_RECORDS and cannot introduce a paper or a new ID"
+                )
+                continue
+            incoming = {
+                "doi": normalize_doi(row.get("doi")), "title": normalize_title(row.get("title")),
+                "year": None if row.get("year") is None else str(row.get("year")),
+            }
+            current = {"doi": stored["doi_key"], "title": stored["title_key"], "year": stored["year"]}
+            changed = [column for column in incoming if incoming[column] != current[column]]
+            if changed:
+                errors.append(
+                    f"supplement changes the identity of {row['paper_id']} ({', '.join(changed)}: stored "
+                    f"{[current[c] for c in changed]}, incoming {[incoming[c] for c in changed]}); "
+                    f"identity corrections need a base workbook"
                 )
         if errors:
             raise WorkbookValidationError(errors)
@@ -352,8 +433,9 @@ class CorpusRepository:
         )
         if overlaps:
             report.warnings.append(
-                f"field-status marker(s) on a field that also has an extracted claim are both kept; a "
-                f"NOT_REPORTED marker there is served as CONFLICT: {overlaps}"
+                f"field-status marker(s) on a field that also has an extracted claim are both kept and "
+                f"served side by side (NOT_VERIFIED|NOT_REPORTED_CANDIDATE when the marker is "
+                f"NOT_REPORTED): {overlaps}"
             )
 
     def _resolve_paper(
@@ -422,6 +504,16 @@ class CorpusRepository:
                 )
             target_id = canonical_id or incoming_id
             paper_map[incoming_id] = target_id
+            if doi_key:
+                owner = connection.execute(
+                    "SELECT paper_id FROM staging_corpus_papers WHERE doi_key = ? AND paper_id != ?",
+                    (doi_key, target_id),
+                ).fetchone()
+                if owner is not None:
+                    raise WorkbookValidationError([
+                        f"{incoming_id}: DOI {doi_key} already belongs to stored paper {owner['paper_id']}; "
+                        f"deduplicate before import"
+                    ])
             linked = self._linked_paper_record(connection, doi_key)
             if linked:
                 report.linked_paper_records += 1
@@ -457,6 +549,7 @@ class CorpusRepository:
         self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport,
         paper_map: dict[str, str], now: str,
     ) -> None:
+        self._check_claim_identity(connection, book, paper_map)
         for row in book.claims:
             if is_marker(row):
                 self._import_marker(connection, row, report, paper_map, now)
@@ -491,6 +584,37 @@ class CorpusRepository:
         if absent:
             report.absent_from_source["field_markers"] = absent
 
+    @staticmethod
+    def _check_claim_identity(
+        connection: sqlite3.Connection, book: StagingWorkbook, paper_map: dict[str, str],
+    ) -> None:
+        """A stored claim or marker keeps its paper, field and kind.
+
+        Re-sending an ID under another paper or field_path, or turning a claim
+        into a marker (or back), would leave the record's slots and the served
+        field disagreeing; it is refused instead of applied.
+        """
+        errors: list[str] = []
+        stored = {
+            row["id"]: (row["kind"], row["paper_id"], row["field_path"])
+            for row in connection.execute(
+                "SELECT claim_id AS id, 'claim' AS kind, paper_id, field_path FROM staging_corpus_claims "
+                "UNION ALL SELECT marker_id, 'marker', paper_id, field_path FROM staging_corpus_field_markers"
+            )
+        }
+        for row in book.claims:
+            previous = stored.get(row["claim_id"])
+            if previous is None:
+                continue
+            incoming = ("marker" if is_marker(row) else "claim", paper_map[row["paper_id"]], row["field_path"])
+            if incoming != previous:
+                errors.append(
+                    f"{row['claim_id']} is stored as {previous[0]} of {previous[1]} at {previous[2]!r} but "
+                    f"arrives as {incoming[0]} of {incoming[1]} at {incoming[2]!r}; a new ID is needed"
+                )
+        if errors:
+            raise WorkbookValidationError(errors)
+
     def _import_marker(
         self, connection: sqlite3.Connection, row: dict[str, Any], report: ImportReport,
         paper_map: dict[str, str], now: str,
@@ -517,14 +641,18 @@ class CorpusRepository:
     ) -> None:
         for row in book.research_gaps:
             key = normalize_title(row["candidate_topic"]) or ""
-            self._upsert(
+            action = self._upsert(
                 connection, "staging_corpus_research_gaps", "gap_key", key, _fingerprint(row),
                 {
                     "row_json": _canonical(row), "import_run_id": report.run_id,
                     "created_at": now, "updated_at": now,
                 },
-                report.research_gaps,
+                report.research_gaps, report=report,
             )
+            if action == "updated":
+                report.warnings.append(
+                    f"research-gap candidate {row['candidate_topic']!r} was replaced by this workbook's version"
+                )
 
     def _import_documents(self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport) -> None:
         documents = {**book.documents, "START_HERE": _canonical(book.start_here)}
@@ -542,7 +670,7 @@ class CorpusRepository:
             self._upsert(
                 connection, "staging_corpus_documents", "name", name, _fingerprint(text),
                 {"text": text, "import_run_id": report.run_id},
-                report.documents,
+                report.documents, report=report,
             )
 
     def _import_coverage(
@@ -558,7 +686,7 @@ class CorpusRepository:
                     "paper_id": paper_id, "source_name": book.source_name,
                     "row_json": _canonical(row), "import_run_id": report.run_id,
                 },
-                report.coverage,
+                report.coverage, report=report,
             )
 
     # -- reads -------------------------------------------------------------
@@ -759,7 +887,7 @@ class CorpusRepository:
             ],
             "coverage": coverage,
             "populated_field_count": sum(1 for item in fields if item["claims"]),
-            "not_extracted_field_count": sum(1 for item in fields if not item["claims"]),
+            "not_extracted_field_count": sum(1 for item in fields if item["status"] == NOT_EXTRACTED),
             "import_run_id": row["import_run_id"],
         }
 
@@ -768,17 +896,23 @@ class CorpusRepository:
         """A field's display status. Markers never become values.
 
         No claim and no marker, or only NOT_EXTRACTED markers: NOT_EXTRACTED
-        (nobody found it; an empty slot never means the paper is silent). Only
-        NOT_REPORTED markers: NOT_REPORTED_CANDIDATE, an unverified absence
-        limited to the marker's search scope. Claims plus a NOT_REPORTED marker:
-        the disagreement stays visible as CONFLICT.
+        (nobody found it; an empty slot never means the paper is silent). A
+        NOT_REPORTED marker adds NOT_REPORTED_CANDIDATE, an unverified absence
+        limited to the marker's scope. Beside an extracted claim both are shown
+        (NOT_VERIFIED|NOT_REPORTED_CANDIDATE), not CONFLICT: the two usually
+        cover different scopes (OAI-0010: fine-tuning time extracted, total
+        training time not found), and CONFLICT is reserved for the paper
+        disagreeing with itself.
         """
         reported_absent = any(marker["extraction_status"] == "NOT_REPORTED" for marker in markers)
-        if not claims:
-            return NOT_REPORTED_CANDIDATE if reported_absent else NOT_EXTRACTED
-        statuses = {claim["scientific_status"] for claim in claims}
+        # A marker's own non-default status (EXTRACTION_ERROR, CONFLICT) stays visible.
+        statuses = {claim["scientific_status"] for claim in claims} | {
+            marker["scientific_status"] for marker in markers if marker["scientific_status"] != "NOT_VERIFIED"
+        }
         if reported_absent:
-            statuses.add("CONFLICT")
+            statuses.add(NOT_REPORTED_CANDIDATE)
+        if not statuses:
+            return NOT_EXTRACTED
         return "|".join(sorted(statuses))
 
     @staticmethod
@@ -788,8 +922,9 @@ class CorpusRepository:
             "marker_id": row["marker_id"], "paper_id": row["paper_id"], "field_path": row["field_path"],
             "extraction_status": row["extraction_status"], "scientific_status": row["scientific_status"],
             "independent_audit": row["independent_audit"], "claim_type": source.get("claim_type"),
-            # The scope within which the field was looked for.
-            "search_scope": source.get("source_section"),
+            # Section or scope text exactly as supplied; the extractor's own
+            # statement of what was searched is usually in ``notes``.
+            "section_or_scope": source.get("source_section"),
             "source_url": source.get("evidence_source_url"), "source_edition": source.get("source_edition"),
             "evidence_review": source.get("evidence_review"), "notes": source.get("notes"),
             "batch_id": source.get("batch_id"), "import_run_id": row["import_run_id"],
@@ -833,6 +968,13 @@ class CorpusRepository:
         self, *, paper_id: str | None = None, field_path: str | None = None,
         experiment_id: str | None = None, limit: int = 200, offset: int = 0,
     ) -> tuple[list[dict[str, Any]], int]:
+        if paper_id is not None:
+            with closing(self._ready()) as connection:
+                alias = connection.execute(
+                    "SELECT paper_id FROM staging_corpus_paper_aliases WHERE alias_id = ?", (paper_id,)
+                ).fetchone()
+            if alias is not None:
+                paper_id = alias["paper_id"]
         clauses, parameters = [], []
         for column, value in (("paper_id", paper_id), ("field_path", field_path), ("experiment_id", experiment_id)):
             if value is not None:

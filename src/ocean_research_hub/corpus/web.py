@@ -2,7 +2,7 @@
 
 Everything served here is labelled as staging material: candidate claims that
 are ``NOT_VERIFIED``, empty fields that are ``NOT_EXTRACTED``, and research-gap
-candidates that are team hypotheses. Nothing is promoted by being displayed.
+candidates that are team hypotheses or AI interpretations. Nothing is promoted by being displayed.
 """
 
 from __future__ import annotations
@@ -113,6 +113,12 @@ details summary{{cursor:pointer}}a{{color:#0b5c8a}}
 </style></head><body>{body}</body></html>"""
 
 
+def _href(url: Any) -> str:
+    """Only http(s) sources become links; anything else points nowhere."""
+    text = str(url or "").strip()
+    return escape(text) if text.lower().startswith(("http://", "https://")) else "#"
+
+
 def _cell(value: Any) -> str:
     if value is None:
         return '<span class="muted">—</span>'
@@ -134,7 +140,8 @@ def render_corpus_index(
     )
     gap_rows = "".join(
         f"<tr><td>{_cell(gap['candidate_topic'])}</td><td>{_cell(gap['testable_question'])}</td>"
-        f"<td>{_cell(gap['basis_paper_ids'])}</td><td class=\"status\">{_cell(gap['status'])}</td>"
+        f"<td>{_cell(gap['basis_paper_ids'])}</td><td class=\"status\">{_cell(gap['provenance_type'])}</td>"
+        f"<td class=\"status\">{_cell(gap['status'])}</td>"
         f"<td>{_cell(gap['qualification'])}</td></tr>"
         for gap in gaps
     )
@@ -148,8 +155,8 @@ Last import: <code>{_cell(last.get('source_name'))}</code> (SHA-256 <code>{_cell
 <p class="muted">Showing {len(papers)} of {total}.</p>
 <table><thead><tr><th>ID</th><th>Title</th><th>Year</th><th>DOI</th><th>Domain</th><th>Review stage</th><th>Extraction</th><th>Claims</th></tr></thead>
 <tbody>{rows}</tbody></table>
-<h2>Research-gap candidates (team hypotheses)</h2>
-<table><thead><tr><th>Topic</th><th>Testable question</th><th>Basis papers</th><th>Status</th><th>Qualification</th></tr></thead>
+<h2>Research-gap candidates (team hypotheses and AI interpretations)</h2>
+<table><thead><tr><th>Topic</th><th>Testable question</th><th>Basis papers</th><th>Provenance</th><th>Status</th><th>Qualification</th></tr></thead>
 <tbody>{gap_rows}</tbody></table>"""
     return _page("Staging corpus", body)
 
@@ -159,12 +166,14 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
         evidence = claim["evidence"]
         return (
             f"<div><code>{escape(claim['claim_id'])}</code> <span class=\"status\">{escape(claim['scientific_status'])}"
-            f" · {_cell(claim['independent_audit'])}</span><br>{_cell(claim['value'])}<br>"
+            f" · {_cell(claim['independent_audit'])}</span><br>{_cell(claim['value'])}"
+            + (f" <strong>{_cell(claim['unit'])}</strong>" if claim.get("unit") else "")
+            + "<br>"
             f"<span class=\"muted\">subject {_cell(claim['subject_scope'])} · {_cell(claim['claim_type'])} · "
             f"experiment {_cell(claim['experiment_id'])} · {_cell(evidence['source_edition'])} · "
             f"section {_cell(evidence['section'])} · locator {_cell(evidence['locator'])} · "
             f"PDF page {_cell(evidence['pdf_page'])} · quotation {_cell(evidence['verbatim_evidence'])} · "
-            f"<a href=\"{escape(evidence['source_url'] or '#')}\">source</a></span>"
+            f"<a href=\"{_href(evidence['source_url'])}\">source</a></span>"
             + (f"<br><span class=\"muted\">note: {_cell(claim['notes'])}</span>" if claim["notes"] else "")
             + "</div>"
         )
@@ -173,8 +182,9 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
         return (
             f"<div><code>{escape(marker['marker_id'])}</code> <span class=\"status\">marker "
             f"{escape(marker['extraction_status'])} · {escape(marker['scientific_status'])}</span><br>"
-            f"<span class=\"muted\">searched: {_cell(marker['search_scope'])} · {_cell(marker['source_edition'])} · "
-            f"<a href=\"{escape(marker['source_url'] or '#')}\">source</a>"
+            f"<span class=\"muted\">section/scope (as supplied): {_cell(marker['section_or_scope'])} · "
+            f"{_cell(marker['source_edition'])} · "
+            f"<a href=\"{_href(marker['source_url'])}\">source</a>"
             + (f" · note: {_cell(marker['notes'])}" if marker["notes"] else "")
             + "</span></div>"
         )
@@ -226,7 +236,7 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
 <table>
 <tr><th>Staging ID</th><td><code>{escape(paper['paper_id'])}</code></td></tr>
 <tr><th>Year · DOI</th><td>{_cell(paper['year'])} · {_cell(paper['doi'])}</td></tr>
-<tr><th>Source</th><td><a href="{escape(paper['source_url'] or '#')}">{_cell(paper['source_url'])}</a> ({_cell(paper['source_edition'])})</td></tr>
+<tr><th>Source</th><td><a href="{_href(paper['source_url'])}">{_cell(paper['source_url'])}</a> ({_cell(paper['source_edition'])})</td></tr>
 <tr><th>Domain · kind · tags</th><td>{_cell(paper['domain'])} · {_cell(paper['record_kind'])} · {_cell(paper['tags'])}</td></tr>
 <tr><th>Review stage</th><td class="status">{_cell(paper['review_stage'])}</td></tr>
 <tr><th>Extraction</th><td class="status">{_cell(paper['scientific_extraction_status'])} / {_cell(paper['detail_extraction_status'])}</td></tr>

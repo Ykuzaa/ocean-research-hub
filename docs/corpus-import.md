@@ -88,10 +88,15 @@ aliases. A second import changes nothing. Totals: 115 papers, 1445 claims,
   `markers` on the field, never as values. The field status is computed as follows:
   - only `NOT_EXTRACTED` markers: `NOT_EXTRACTED`;
   - only `NOT_REPORTED` markers: `NOT_REPORTED_CANDIDATE`, which stays
-    `NOT_VERIFIED` and carries its `search_scope`
-    (for example "main text and appendices; code not inspected");
-  - a `NOT_REPORTED` marker beside an extracted claim: `CONFLICT|NOT_VERIFIED`
-    (OAI-0010 `training.training_time`).
+    `NOT_VERIFIED` and carries its `section_or_scope` and `notes` as supplied
+    (the notes usually state what was searched, for example "main text and
+    appendices; code not inspected");
+  - a `NOT_REPORTED` marker beside an extracted claim:
+    `NOT_REPORTED_CANDIDATE|NOT_VERIFIED`. Both are shown. This is not `CONFLICT`:
+    the two usually cover different scopes. In OAI-0010 `training.training_time`,
+    the fine-tuning time was extracted and the total training time was not found.
+    `CONFLICT` is reserved for the paper disagreeing with itself.
+  - a marker's own `EXTRACTION_ERROR` or `CONFLICT` status is added to the field status.
 
   A marker that carries a value other than its status is refused. So is an
   unknown `extraction_status`. The COVERAGE `claim_count` excludes markers, as
@@ -110,6 +115,24 @@ aliases. A second import changes nothing. Totals: 115 papers, 1445 claims,
 - `SOURCE_ACCESS`, `FIELD_COVERAGE` and `NEW_DETAILED_PAPERS` are stored whole, as
   documents keyed by workbook name.
 
+## Supplement workbook: ENRICHED_B08
+
+`import_staging/Ocean_Research_Intelligence_ENRICHED_B08.xlsx` (SHA-256
+`e9fbd101d0af507a8b33013ba9eb914d8057c7acb2d35f7634a7107003f1b7b1`) is
+ENRICHED plus batch B08: 82 rows, of which 75 are claims and 7 are markers
+(5 `NOT_REPORTED`, 2 `NOT_EXTRACTED`). It updates 6 papers
+(OAI-0021/0022/0058/0093/0095/0112) and adds the `CHANGE_LOG` and `BATCH_LOG`
+sheets, which are stored as documents. The import result is `claims.created = 75`,
+`field_markers.created = 7`, `papers.updated = 6`, and a second import changes
+nothing. Totals: 115 papers, 1520 claims, 59 markers, 93 papers with claims,
+17 gaps.
+
+The package counts its 7 new markers as extracted rows (1527 + 52 = 1579),
+both in START_HERE and in COVERAGE, while it excludes the 52 inherited B03 markers.
+A declared count is accepted when marker rows alone explain the difference, and
+the import reports it. A difference that marker rows cannot explain is still
+refused.
+
 ## Scientific integrity rules the importer enforces
 
 - **Nothing is promoted.** All claims (144 base, 258 after V2, 1445 after ENRICHED) arrive `NOT_VERIFIED` /
@@ -118,18 +141,27 @@ aliases. A second import changes nothing. Totals: 115 papers, 1445 claims,
   package has neither an independent attestation nor a documented search scope.
 - **Missing is `NOT_EXTRACTED`.** A field whose record slot lists no claim is
   served as `NOT_EXTRACTED`, never `NOT_REPORTED`.
-- **No invented evidence.** `pdf_page` and `verbatim_evidence` are stored exactly
-  as supplied. They are null for the 258 V1/V2 claims. ENRICHED supplies pages for
-  291 claims and quotations for none.
+- **No invented evidence.** `pdf_page` and `verbatim_evidence` are stored as
+  supplied, with surrounding whitespace trimmed (a whitespace-only cell is empty).
+  They are null for the 258 V1/V2 claims. ENRICHED and B08 supply pages for 334
+  claims and quotations for none.
 - **Disagreements stay visible.** For 7 papers, PAPER_INDEX says `NOT_AUDITED`
   and PAPER_RECORDS says `PENDING_INDEPENDENT_AUDIT`. Both values are stored and
   served, and each import reports the disagreement. The claim type
   `AUTHOR_REPORTED_FUTURE_WORK`, which is not an AGENTS.md provenance class, is
   preserved verbatim and reported, not remapped.
-- **Research-gap candidates are team hypotheses** (`TEAM_NOTE`), served from
-  their own endpoint, never mixed into claims or author-reported limitations.
-- **Audited rows are never overwritten.** A staging paper or claim that carries an
-  audit attestation (`VERIFIED`, `PARTIALLY_VERIFIED`, `AUDITED`,
+- **Research-gap candidates are team hypotheses** (`TEAM_NOTE`) **or AI
+  interpretations** (`AI_INTERPRETATION`, when the row's status says so). They
+  are served from their own endpoint with a provenance column, never mixed into
+  claims or author-reported limitations. A gap replaced by a later workbook is
+  reported.
+- **A workbook cannot carry an attestation.** Only pending audit markers are
+  accepted: `NOT_AUDITED`, `PENDING_INDEPENDENT_AUDIT`, `PENDING_PDF_AUDIT` or
+  `PDF_AUDIT_PENDING`, in a claim's or marker's `independent_audit` and in a paper's
+  `scientific_audit_status`. Anything else is refused. Otherwise the row would be
+  locked against correction.
+- **Audited rows are never overwritten.** A staging paper or claim that received
+  an audit attestation after import (`VERIFIED`, `PARTIALLY_VERIFIED`, `AUDITED`,
   `INDEPENDENTLY_AUDITED`, `AUDIT_PASSED`, or any non-pending `independent_audit`)
   is skipped on re-import, and the skip is reported.
 - **The canonical `papers` table (PaperRecord) is never written.** A staging
@@ -145,8 +177,21 @@ A workbook is refused, and nothing is written, if any of these hold:
 - two paper IDs share a DOI or a title+year;
 - a record's fields differ from FIELD_CONTRACT;
 - a claim is dangling or filed under the wrong record slot, or a claim uses a path outside the contract;
-- a claim has a refused or unknown status;
-- a gap cites an unknown paper.
+- a claim has a refused or unknown status, a non-pending `independent_audit`, an
+  unknown `extraction_status`, or a status word (`NOT_REPORTED`, ...) as its value;
+- a worksheet repeats a column header;
+- a gap cites an unknown paper, has no testable question, or has a status that
+  claims validation.
+
+Checks against the stored corpus (also run by `--dry-run`, on a throwaway copy of
+the database):
+- a supplement names a paper that is not stored under that ID or a known alias,
+  or changes a stored paper's title, DOI or year;
+- a DOI already belongs to another stored paper;
+- a stored claim or marker ID arrives with another paper, another field path, or
+  the other kind (claim versus marker);
+- the workbook would revert a row to content that an earlier import already
+  replaced (see below).
 
 The import runs in a single transaction.
 
@@ -162,6 +207,11 @@ The import runs in a single transaction.
   carry a DOI. A new ID that resolves to an existing work becomes an alias, so
   the work is never duplicated and the alias resolves in the API.
 - Every run is logged in `staging_corpus_import_runs` with the workbook SHA-256.
+- **Older packages are refused.** Every fingerprint a row has ever had is kept in
+  `staging_corpus_row_versions`. An import that would set a row back to an earlier
+  version is refused. Examples: re-importing V1 after ENRICHED, or V2 after
+  ENRICHED or B08, would revert 67 papers. The live database was backfilled with
+  the V1 paper versions, which ENRICHED had already replaced.
 
 ## API and website
 
@@ -173,7 +223,7 @@ The import runs in a single transaction.
 | `GET /api/corpus/claims?paper_id=&field_path=&experiment_id=` | claims |
 | `GET /api/corpus/claims/{claim_id}` | one claim with source URL, DOI, edition, section, locator, page, quotation, notes |
 | `GET /api/corpus/fields` | the 162-field contract |
-| `GET /api/corpus/research-gaps` | the 8 team hypotheses |
+| `GET /api/corpus/research-gaps` | the 17 research-gap candidates with their provenance |
 | `GET /api/corpus/import-runs` | import history |
 | `GET /corpus`, `GET /corpus/papers/{paper_id}` | server-rendered pages, each with the staging notice |
 

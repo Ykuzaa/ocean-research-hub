@@ -244,6 +244,8 @@ def test_a_new_id_for_an_existing_doi_becomes_an_alias(imported: CorpusRepositor
     assert imported.get_paper("EXT-9002")["paper_id"] == "OAI-0002"
     # Claims of the aliased id stay attached to the one canonical paper.
     assert {claim["paper_id"] for claim in imported.list_claims(paper_id="OAI-0002", limit=500)[0]} == {"OAI-0002"}
+    # The alias resolves in the claim listing too.
+    assert imported.list_claims(paper_id="EXT-9002")[1] == imported.list_claims(paper_id="OAI-0002")[1] > 0
 
 
 def test_title_and_year_deduplicate_only_when_a_doi_is_missing(imported: CorpusRepository, book: StagingWorkbook) -> None:
@@ -673,9 +675,9 @@ def test_markers_are_never_served_as_values(full: CorpusRepository) -> None:
     assert activation["status"] == "NOT_REPORTED_CANDIDATE" and activation["claims"] == []
     marker = activation["markers"][0]
     assert marker["scientific_status"] == "NOT_VERIFIED"
-    assert "appendices" in marker["search_scope"]
+    assert "appendices" in marker["section_or_scope"]
     # A NOT_REPORTED marker beside an extracted value is a visible conflict.
-    assert fields["training.training_time"]["status"] == "CONFLICT|NOT_VERIFIED"
+    assert fields["training.training_time"]["status"] == "NOT_REPORTED_CANDIDATE|NOT_VERIFIED"
     fields = {item["field_path"]: item for item in full.get_paper("OAI-0011")["fields"]}
     assert {item["status"] for item in fields.values() if item["markers"] and not item["claims"]} <= {"NOT_EXTRACTED"}
     assert all(claim["value_raw"] not in ("NOT_EXTRACTED", "NOT_REPORTED") for claim in full.list_claims(limit=2000)[0])
@@ -743,4 +745,151 @@ def test_api_serves_the_full_enriched_corpus(tmp_path: Path, book: StagingWorkbo
         assert client.get("/api/corpus/claims", params={"limit": 1000, "offset": 1000}).json()["total"] == 1445
         assert "NOT_REPORTED_CANDIDATE" in summary["notice"]
         page = client.get("/corpus/papers/OAI-0010")
-        assert page.status_code == 200 and "marker NOT_REPORTED" in page.text and "CONFLICT" in page.text
+        assert page.status_code == 200 and "marker NOT_REPORTED" in page.text and "NOT_REPORTED_CANDIDATE" in page.text
+
+
+# --- review fixes (QA + Scientific Auditor on PR #27) -----------------------
+
+def _snapshot(repository: CorpusRepository) -> dict:
+    return {**{k: v for k, v in repository.summary().items() if k != "last_import"}, "runs": len(repository.import_runs())}
+
+
+def test_a_workbook_cannot_carry_an_audit_attestation(enriched_book: StagingWorkbook, book: StagingWorkbook, tmp_path: Path) -> None:
+    claims = copy.deepcopy(enriched_book.claims)
+    claims[-1]["independent_audit"] = "AUDITED_BY_TEAM"
+    from ocean_research_hub.corpus import workbook as module
+    assert any("AUDITED_BY_TEAM" in error for error in module._claim_row_errors(_mutated(enriched_book, claims=claims)))
+    index = copy.deepcopy(book.paper_index)
+    index[0]["scientific_audit_status"] = "VERIFIED"
+    assert any("not a pending state" in error for error in module._paper_identity_errors(_mutated(book, paper_index=index)))
+
+
+def test_a_supplement_cannot_change_a_paper_identity(enriched: CorpusRepository, enriched_book: StagingWorkbook) -> None:
+    before = _snapshot(enriched)
+    for change in ({"doi": "10.9999/fake"}, {"doi": None}, {"title": "Another title"}, {"paper_id": "NEW-1"}):
+        index = copy.deepcopy(enriched_book.paper_index)
+        target = next(row for row in index if row["paper_id"] == "OAI-0001")
+        target.update(change)
+        claims = [
+            {**row, "paper_id": "NEW-1"} if change.get("paper_id") and row["paper_id"] == "OAI-0001" else row
+            for row in enriched_book.claims
+        ]
+        with pytest.raises(WorkbookValidationError):
+            enriched.import_workbook(_mutated(enriched_book, paper_index=index, claims=claims))
+    assert _snapshot(enriched) == before
+    assert enriched.get_paper("OAI-0001")["doi"] == "10.5194/gmd-16-2119-2023"
+
+
+def test_an_older_workbook_cannot_revert_newer_content(full: CorpusRepository, book: StagingWorkbook, supplement: StagingWorkbook) -> None:
+    before = _snapshot(full)
+    for older in (book, supplement):
+        with pytest.raises(WorkbookValidationError) as caught:
+            full.import_workbook(older)
+        assert "older than the stored corpus" in caught.value.errors[0]
+    assert _snapshot(full) == before
+    assert full.get_paper("OAI-0098")["scientific_extraction_status"] == "PARTIALLY_EXTRACTED"
+
+
+def test_a_claim_cannot_move_to_another_field_paper_or_kind(full: CorpusRepository, enriched_book: StagingWorkbook) -> None:
+    before = _snapshot(full)
+    edits = (
+        {"claim_id": "ORI-0001", "field_path": "identity.title"},
+        {"claim_id": "ORI-0001", "paper_id": "OAI-0002"},
+        {"claim_id": "B03-0001", "extraction_status": "NOT_EXTRACTED", "value": "NOT_EXTRACTED"},
+    )
+    for edit in edits:
+        claims = copy.deepcopy(enriched_book.claims)
+        next(row for row in claims if row["claim_id"] == edit["claim_id"]).update(edit)
+        with pytest.raises(WorkbookValidationError) as caught:
+            full.import_workbook(_mutated(enriched_book, claims=claims))
+        assert "a new ID is needed" in caught.value.errors[0]
+    assert _snapshot(full) == before
+
+
+def test_a_status_word_is_never_a_claim_value(enriched_book: StagingWorkbook) -> None:
+    from ocean_research_hub.corpus import workbook as module
+    claims = copy.deepcopy(enriched_book.claims)
+    next(row for row in claims if row["claim_id"] == "B03-0001").update(value="NOT_REPORTED")
+    assert any("status word 'NOT_REPORTED'" in error for error in module._claim_row_errors(_mutated(enriched_book, claims=claims)))
+
+
+def test_a_duplicated_column_is_refused(tmp_path: Path) -> None:
+    workbook = load_workbook(ENRICHED_WORKBOOK)
+    sheet = workbook["SCIENTIFIC_CLAIMS"]
+    sheet.cell(row=1, column=sheet.max_column + 1, value="value")
+    target = tmp_path / "edited.xlsx"
+    workbook.save(target)
+    with pytest.raises(WorkbookValidationError) as caught:
+        read_workbook(target)
+    assert "worksheet SCIENTIFIC_CLAIMS has the column 'value' more than once" in caught.value.errors
+
+
+def test_a_gap_must_keep_a_question_and_a_not_validated_status(enriched_book: StagingWorkbook) -> None:
+    from ocean_research_hub.corpus import workbook as module
+    for change in ({"testable_question": None}, {"status": "VALIDATED_BY_TEAM"}):
+        gaps = copy.deepcopy(enriched_book.research_gaps)
+        gaps[0].update(change)
+        assert module._gap_errors(_mutated(enriched_book, research_gaps=gaps))
+
+
+def test_the_page_shows_units_and_never_links_a_non_http_source(full: CorpusRepository) -> None:
+    from ocean_research_hub.corpus.web import _href, render_corpus_paper
+    page = render_corpus_paper(full.get_paper("OAI-0010"))
+    assert "244.08 <strong>m²/s²</strong>" in page
+    assert _href("javascript:alert(1)") == "#" and _href("https://example.org/a") == "https://example.org/a"
+
+
+def test_dry_run_checks_against_the_stored_corpus_and_writes_nothing(tmp_path: Path, capsys) -> None:
+    database = tmp_path / "hub.db"
+    assert cli_main([str(WORKBOOK), "--database", str(database)]) == 0
+    capsys.readouterr()
+    before = CorpusRepository(database).summary()
+    assert cli_main([str(SUPPLEMENT_WORKBOOK), "--database", str(database), "--dry-run"]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["status"] == "VALID_NOT_IMPORTED" and report["counts"]["claims"]["created"] == 114
+    assert CorpusRepository(database).summary() == before
+    # A supplement without its base is refused by the dry run too.
+    assert cli_main([str(SUPPLEMENT_WORKBOOK), "--database", str(tmp_path / "empty.db"), "--dry-run"]) == 2
+
+
+# --- supplement workbook (ENRICHED_B08) --------------------------------------
+
+B08_WORKBOOK = WORKBOOK.with_name("Ocean_Research_Intelligence_ENRICHED_B08.xlsx")
+
+
+@pytest.fixture(scope="module")
+def b08_book() -> StagingWorkbook:
+    return read_workbook(B08_WORKBOOK)
+
+
+def test_b08_counts_later_markers_as_extracted_rows_and_that_is_reported(b08_book: StagingWorkbook) -> None:
+    assert len(b08_book.claims) == 1579
+    assert sum(1 for row in b08_book.claims if row.get("extraction_status") in {"NOT_EXTRACTED", "NOT_REPORTED"}) == 59
+    assert any("counts 7 marker row(s) as extracted rows" in warning for warning in b08_book.warnings)
+    assert set(b08_book.supplement_documents) >= {"CHANGE_LOG", "BATCH_LOG"}
+
+
+def test_a_count_that_markers_cannot_explain_is_still_refused(tmp_path: Path) -> None:
+    workbook = load_workbook(B08_WORKBOOK)
+    sheet = workbook["COVERAGE"]
+    row = next(r for r in range(2, sheet.max_row + 1) if sheet.cell(row=r, column=_column(sheet, "paper_id")).value == "OAI-0093")
+    sheet.cell(row=row, column=_column(sheet, "claim_count"), value=25)
+    target = tmp_path / "edited.xlsx"
+    workbook.save(target)
+    with pytest.raises(WorkbookValidationError) as caught:
+        read_workbook(target)
+    assert any("COVERAGE declares 25 claims for OAI-0093" in error for error in caught.value.errors)
+
+
+def test_b08_adds_its_batch_and_is_idempotent(full: CorpusRepository, b08_book: StagingWorkbook, enriched_book: StagingWorkbook) -> None:
+    counts = full.import_workbook(b08_book).counts()
+    assert counts["claims"] == {"created": 75, "updated": 0, "unchanged": 1445, "skipped_protected": 0}
+    assert counts["field_markers"] == {"created": 7, "updated": 0, "unchanged": 52, "skipped_protected": 0}
+    assert counts["papers"]["updated"] == 6 and counts["aliases_created"] == 0
+    summary = full.summary()
+    assert (summary["papers"], summary["claims"]) == (115, 1520)
+    assert summary["field_status_markers"] == {"NOT_EXTRACTED": 48, "NOT_REPORTED": 11}
+    again = full.import_workbook(b08_book).counts()
+    assert again["claims"]["unchanged"] == 1520 and again["papers"]["unchanged"] == 115
+    with pytest.raises(WorkbookValidationError):
+        full.import_workbook(enriched_book)

@@ -40,7 +40,9 @@ SUPPLEMENT_SHEETS: tuple[str, ...] = (
     "START_HERE", "PAPER_INDEX", "SCIENTIFIC_CLAIMS", "RESEARCH_GAPS", "COVERAGE",
 )
 # Supplement sheets kept whole, as documents, when present.
-SUPPLEMENT_DOCUMENT_SHEETS: tuple[str, ...] = ("NEW_DETAILED_PAPERS", "SOURCE_ACCESS", "FIELD_COVERAGE")
+SUPPLEMENT_DOCUMENT_SHEETS: tuple[str, ...] = (
+    "NEW_DETAILED_PAPERS", "SOURCE_ACCESS", "FIELD_COVERAGE", "CHANGE_LOG", "BATCH_LOG",
+)
 
 # A SCIENTIFIC_CLAIMS row whose extraction_status is one of these records that a
 # field was looked for and not found (within the scope in source_section). It
@@ -51,6 +53,17 @@ ALLOWED_EXTRACTION_STATUSES = frozenset({None, "EXTRACTED"}) | MARKER_EXTRACTION
 # Claim columns added by later packages. An empty one is not content, so its
 # arrival does not change the fingerprint of an otherwise identical row.
 OPTIONAL_CLAIM_COLUMNS = frozenset({"unit", "extraction_status", "extracted_on", "batch_id"})
+
+# Audit markers a staging package may carry: all mean "not yet audited". Any
+# other value would be an attestation the package cannot make, and it would
+# lock the row against later correction (see repository.is_attested).
+PENDING_AUDIT_MARKERS = frozenset({
+    None, "NOT_AUDITED", "PENDING_INDEPENDENT_AUDIT", "PENDING_PDF_AUDIT", "PDF_AUDIT_PENDING",
+})
+# A non-marker claim may not carry a status word as its value.
+STATUS_TOKENS = frozenset({"NOT_REPORTED", "NOT_EXTRACTED", "VERIFIED", "NOT_VERIFIED"})
+# A research-gap status may say NOT_VERIFIED / NOT_VALIDATED, never the opposite.
+_ASSERTS_VALIDATION = re.compile(r"(?<!NOT_)(?:VERIFIED|VALIDATED)")
 
 _GAP_ID = re.compile(r"^B\d+-G\d+$")
 _PAPER_IDS = re.compile(r"^OAI-\d+(?:\s*;\s*OAI-\d+)*$")
@@ -208,10 +221,13 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
             f"missing worksheet {name}" for name in REQUIRED_SHEETS if name not in sheet_names
         ]
         kind = BASE
-        if errors and all(name in sheet_names for name in SUPPLEMENT_SHEETS) and not (
-            {"PAPER_RECORDS", "FIELD_CONTRACT"} & set(sheet_names)
-        ):
-            kind, errors = SUPPLEMENT, []
+        if errors and not ({"PAPER_RECORDS", "FIELD_CONTRACT"} & set(sheet_names)):
+            # No record or contract sheet: this can only be a supplement.
+            kind = SUPPLEMENT
+            errors = [
+                f"missing worksheet {name} (supplement workbook)"
+                for name in SUPPLEMENT_SHEETS if name not in sheet_names
+            ]
         if errors:
             raise WorkbookValidationError(errors)
 
@@ -228,6 +244,8 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
                 errors.append(f"worksheet {name} is empty")
                 return []
             header = [str(value) if value is not None else "" for value in data[0]]
+            for column in _duplicates([column for column in header if column]):
+                errors.append(f"worksheet {name} has the column {column!r} more than once")
             missing = [column for column in REQUIRED_COLUMNS.get(name, ()) if column not in header]
             if missing:
                 errors.append(f"worksheet {name} lacks column(s) {missing}")
@@ -436,6 +454,20 @@ def _paper_identity_errors(book: StagingWorkbook) -> list[str]:
     for doi in _duplicates([key for key in doi_keys if key]):
         owners = [row.get("paper_id") for row in book.paper_index if normalize_doi(row.get("doi")) == doi]
         errors.append(f"DOI {doi} is assigned to several paper_ids {owners}; deduplicate before import")
+    for row in book.paper_index:
+        if row.get("scientific_audit_status") not in PENDING_AUDIT_MARKERS:
+            errors.append(
+                f"{row.get('paper_id')}: PAPER_INDEX scientific_audit_status "
+                f"{row.get('scientific_audit_status')!r} is not a pending state; a staging package "
+                f"cannot carry an audit attestation"
+            )
+    for record in book.paper_records:
+        if record.get("scientific_audit_status") not in PENDING_AUDIT_MARKERS:
+            errors.append(
+                f"{record.get('paper_id')}: PAPER_RECORDS scientific_audit_status "
+                f"{record.get('scientific_audit_status')!r} is not a pending state; a staging package "
+                f"cannot carry an audit attestation"
+            )
     title_keys = [(normalize_title(row.get("title")), str(row.get("year"))) for row in book.paper_index]
     for key in _duplicates([key for key in title_keys if key[0]]):
         owners = [
@@ -468,12 +500,22 @@ def _claim_row_errors(book: StagingWorkbook) -> list[str]:
             errors.append(f"claim {claim_id} has unknown scientific_status {status!r}")
         if row.get("value") is None:
             errors.append(f"claim {claim_id} has no value")
+        if row.get("independent_audit") not in PENDING_AUDIT_MARKERS:
+            errors.append(
+                f"claim {claim_id} has independent_audit {row.get('independent_audit')!r}, which is not a "
+                f"pending state; a staging package cannot carry an audit attestation"
+            )
         extraction = row.get("extraction_status")
         if extraction not in ALLOWED_EXTRACTION_STATUSES:
             errors.append(f"claim {claim_id} has unknown extraction_status {extraction!r}")
         elif extraction in MARKER_EXTRACTION_STATUSES and row.get("value") != extraction:
             errors.append(
                 f"claim {claim_id} is a {extraction} marker but carries the value {row.get('value')!r}"
+            )
+        elif extraction not in MARKER_EXTRACTION_STATUSES and str(row.get("value")).strip() in STATUS_TOKENS:
+            errors.append(
+                f"claim {claim_id} carries the status word {row.get('value')!r} as its value; a missing "
+                f"field must be a marker row (extraction_status NOT_EXTRACTED / NOT_REPORTED)"
             )
     return errors
 
@@ -518,24 +560,57 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
 
     Checks that need the stored base corpus (every paper already known, field
     paths inside the stored contract) run in ``CorpusRepository.import_workbook``.
+
+    Counting markers: ENRICHED excludes its 52 inherited B03 markers from its
+    "extracted" counts but counts later markers (7 in B08) as extracted rows,
+    both in START_HERE and in COVERAGE. A declared count is therefore accepted
+    when it differs from the extracted-claim count by marker rows only, and the
+    difference is reported. A difference that marker rows cannot explain - a
+    truncated or edited sheet - is still refused.
     """
     errors = _paper_identity_errors(book) + _claim_row_errors(book) + _gap_errors(book)
-    # Markers are not extracted content; the package's own counts exclude them.
     per_paper: dict[Any, int] = {}
+    markers_per_paper: dict[Any, int] = {}
     for row in book.claims:
-        if not is_marker(row):
-            per_paper[row.get("paper_id")] = per_paper.get(row.get("paper_id"), 0) + 1
-    markers = sum(1 for row in book.claims if is_marker(row))
+        target = markers_per_paper if is_marker(row) else per_paper
+        target[row.get("paper_id")] = target.get(row.get("paper_id"), 0) + 1
+    markers = sum(markers_per_paper.values())
+    extracted = len(book.claims) - markers
     counts = {
         "PAPER_INDEX": len(book.paper_index), "SCIENTIFIC_CLAIMS": len(book.claims),
         "DETAILED_PAPERS": len(per_paper), "NEW_DETAILED_PAPERS": len(book.new_detailed_papers),
-        "EXTRACTED_ROWS": len(book.claims) - markers, "MARKERS": markers,
+        "EXTRACTED_ROWS": extracted, "MARKERS": markers,
         "INDEX_ONLY": sum(1 for row in book.coverage if row.get("coverage_level") == "INDEX_ONLY"),
     }
+    declared_counts = {
+        label: int(book.start_here[label]) for label in SUPPLEMENT_DECLARED_COUNTS
+        if book.start_here.get(label, "").strip().isdigit()
+    }
+    if "Papers indexed" not in declared_counts or not (
+        {"Claims total", "Lignes SCIENTIFIC_CLAIMS"} & set(declared_counts)
+    ):
+        errors.append(
+            "START_HERE must declare the paper count (Papers indexed) and the claim-row total "
+            "(Claims total or Lignes SCIENTIFIC_CLAIMS); without them a truncated sheet cannot be detected"
+        )
+    declared_extracted = declared_counts.get("Lignes extraites / historiques")
+    declared_markers = declared_counts.get("Champs manquants hérités")
+    marker_convention = (
+        declared_extracted is not None and declared_markers is not None
+        and (declared_extracted, declared_markers) != (extracted, markers)
+        and declared_extracted + declared_markers == len(book.claims) and declared_markers <= markers
+    )
+    if marker_convention:
+        book.warnings.append(
+            f"START_HERE counts {markers - declared_markers} marker row(s) as extracted rows "
+            f"({declared_extracted} extracted + {declared_markers} inherited markers = {len(book.claims)} rows); "
+            f"they are imported as markers ({extracted} claims + {markers} markers)"
+        )
     for label, sheet in SUPPLEMENT_DECLARED_COUNTS.items():
-        declared = book.start_here.get(label)
-        if declared is not None and declared.strip().isdigit() and int(declared) != counts[sheet]:
-            errors.append(f"START_HERE declares {label} = {declared} but the workbook has {counts[sheet]}")
+        if label not in declared_counts or (marker_convention and sheet in {"EXTRACTED_ROWS", "MARKERS"}):
+            continue
+        if declared_counts[label] != counts[sheet]:
+            errors.append(f"START_HERE declares {label} = {declared_counts[label]} but the workbook has {counts[sheet]}")
     before, added, total = (book.start_here.get(label, "") for label in ("Claims before", "Claims added", "Claims total"))
     if all(value.strip().isdigit() for value in (before, added, total)) and int(before) + int(added) != int(total):
         errors.append(f"START_HERE declares Claims before {before} + Claims added {added} != Claims total {total}")
@@ -550,13 +625,24 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
             f"{sorted(map(str, set(coverage_ids) - index_ids))}, only in PAPER_INDEX "
             f"{sorted(map(str, index_ids - set(coverage_ids)))}"
         )
+    markers_counted: list[str] = []
     for row in book.coverage:
         actual = per_paper.get(row.get("paper_id"), 0)
-        if str(row.get("claim_count")) != str(actual):
-            errors.append(
-                f"COVERAGE declares {row.get('claim_count')} claims for {row.get('paper_id')} "
-                f"but SCIENTIFIC_CLAIMS has {actual}"
-            )
+        declared = row.get("claim_count")
+        if str(declared) == str(actual):
+            continue
+        if isinstance(declared, int) and actual < declared <= actual + markers_per_paper.get(row.get("paper_id"), 0):
+            markers_counted.append(str(row.get("paper_id")))
+            continue
+        errors.append(
+            f"COVERAGE declares {declared} claims for {row.get('paper_id')} "
+            f"but SCIENTIFIC_CLAIMS has {actual} (+{markers_per_paper.get(row.get('paper_id'), 0)} marker rows)"
+        )
+    if markers_counted:
+        book.warnings.append(
+            f"COVERAGE claim_count includes marker rows for {markers_counted}; stored as supplied, "
+            f"the markers are not served as claims"
+        )
     for row in book.new_detailed_papers:
         if row.get("paper_id") not in index_ids:
             errors.append(f"NEW_DETAILED_PAPERS lists unknown paper {row.get('paper_id')!r}")
@@ -573,6 +659,18 @@ def _gap_errors(book: StagingWorkbook) -> list[str]:
         unknown = [item for item in basis if item not in paper_set]
         if unknown:
             errors.append(f"research gap {row.get('candidate_topic')!r} cites unknown papers {unknown}")
+        question = row.get("testable_question")
+        if not question or _PAPER_IDS.match(str(question)):
+            errors.append(
+                f"research gap {row.get('candidate_topic')!r} has no testable_question "
+                f"(found {question!r}); columns may be shifted"
+            )
+        status = row.get("status")
+        if not status or _ASSERTS_VALIDATION.search(str(status)):
+            errors.append(
+                f"research gap {row.get('candidate_topic')!r} has status {status!r}; a gap candidate "
+                f"must carry a not-validated status"
+            )
     for topic in _duplicates([normalize_title(row.get("candidate_topic")) for row in book.research_gaps]):
         errors.append(f"RESEARCH_GAPS lists the candidate topic {topic!r} more than once")
     return errors

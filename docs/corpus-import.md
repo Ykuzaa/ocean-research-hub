@@ -6,7 +6,7 @@
 application database and serves it through the API and website.
 
 ```bash
-uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Hub_COMPLET.xlsx --dry-run
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Hub_COMPLET.xlsx --dry-run  # checks against the DB, writes nothing
 uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Hub_COMPLET.xlsx \
   --database .data/ocean-research-hub.db --report-out .data/corpus-import-report.json
 ```
@@ -210,8 +210,27 @@ The import runs in a single transaction.
 - **Older packages are refused.** Every fingerprint a row has ever had is kept in
   `staging_corpus_row_versions`. An import that would set a row back to an earlier
   version is refused. Examples: re-importing V1 after ENRICHED, or V2 after
-  ENRICHED or B08, would revert 67 papers. The live database was backfilled with
-  the V1 paper versions, which ENRICHED had already replaced.
+  ENRICHED or B08, would revert 67 papers.
+  - `--allow-revert` applies such rows anyway: for a newer package that
+    deliberately returns to an earlier value, or to undo a mistaken import. Every
+    reverted row is listed in the run's warnings.
+  - A database built before versions were kept only knows its rows' *current*
+    state. The versions it replaced earlier are unknown, so the older packages it
+    was built from would not be caught. `--record-versions WORKBOOK` records the
+    versions of an already-imported workbook without importing it. A workbook that
+    is not in the import history is refused, so a newer package cannot be blocked
+    in advance. The live database was treated this way for V1, V2 and ENRICHED.
+  - Versions are recorded during imports only. Reading the corpus never writes.
+
+Known limitations (confirmed by QA and deliberately not handled):
+- Swapping the DOIs of two stored papers in one base workbook is refused as a
+  collision, because the unique DOI index is checked row by row. Such a
+  correction needs a manual migration.
+- The count checks catch missing or truncated rows. When a package counts
+  markers as extracted rows (see ENRICHED_B08), they cannot tell a claim from a
+  marker within a new batch. A marker must still carry its status word as its
+  value, so it can never pass for a value. A stored claim that turns into a
+  marker is refused.
 
 ## API and website
 

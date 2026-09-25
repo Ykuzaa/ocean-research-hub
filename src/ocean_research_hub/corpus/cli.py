@@ -16,7 +16,7 @@ from .workbook import WorkbookValidationError, read_workbook
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("workbook", type=Path, help="staging workbook (.xlsx) with all 9 worksheets")
+    parser.add_argument("workbook", type=Path, help="base (9 worksheets) or supplement staging workbook (.xlsx)")
     parser.add_argument(
         "--database", type=Path,
         default=Path(os.getenv("OCEAN_HUB_DB_PATH", ".data/ocean-research-hub.db")),
@@ -25,6 +25,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--dry-run", action="store_true",
         help="run every check, including those against the stored corpus, report what would change; write nothing",
+    )
+    parser.add_argument(
+        "--allow-revert", action="store_true",
+        help="apply rows that return to an earlier stored version (refused by default); each is reported",
+    )
+    parser.add_argument(
+        "--record-versions", action="store_true",
+        help="do not import: record the row versions of this already-imported workbook, so the "
+             "stale-import guard covers a database built before versions were kept",
     )
     parser.add_argument("--report-out", type=Path, help="write the import report as JSON")
     args = parser.parse_args(argv)
@@ -36,15 +45,19 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
+        if args.record_versions:
+            added = CorpusRepository(args.database).record_versions(book)
+            print(json.dumps({"status": "VERSIONS_RECORDED", "workbook_sha256": book.sha256, "versions_added": added}, indent=2))
+            return 0
         if args.dry_run:
             # Check against a throwaway copy, so not even the schema is written.
             with tempfile.TemporaryDirectory() as scratch:
                 database = Path(scratch) / "dry-run.db"
                 if args.database.exists():
                     shutil.copyfile(args.database, database)
-                report = CorpusRepository(database).import_workbook(book, dry_run=True)
+                report = CorpusRepository(database).import_workbook(book, dry_run=True, allow_revert=args.allow_revert)
         else:
-            report = CorpusRepository(args.database).import_workbook(book)
+            report = CorpusRepository(args.database).import_workbook(book, allow_revert=args.allow_revert)
     except WorkbookValidationError as exc:
         print(json.dumps({"status": "REJECTED", "errors": exc.errors}, indent=2), file=sys.stderr)
         return 2

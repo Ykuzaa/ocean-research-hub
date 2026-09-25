@@ -30,7 +30,7 @@ from typing import Any
 from uuid import uuid4
 
 from .workbook import (
-    SUPPLEMENT, StagingWorkbook, WorkbookValidationError, claim_fingerprint_payload, is_marker,
+    PENDING_AUDIT_MARKERS, SUPPLEMENT, StagingWorkbook, WorkbookValidationError, claim_fingerprint_payload, is_marker,
     normalize_doi, normalize_title, parse_claim_value,
 )
 
@@ -41,9 +41,8 @@ from .workbook import (
 ATTESTED_STATES = frozenset({
     "VERIFIED", "PARTIALLY_VERIFIED", "AUDITED", "INDEPENDENTLY_AUDITED", "AUDIT_PASSED",
 })
-UNATTESTED_AUDIT_MARKERS = frozenset({
-    None, "", "PENDING_INDEPENDENT_AUDIT", "PENDING_PDF_AUDIT", "NOT_AUDITED",
-})
+# One definition of "not yet audited", shared with the workbook reader.
+UNATTESTED_AUDIT_MARKERS = PENDING_AUDIT_MARKERS | {""}
 
 NOT_EXTRACTED = "NOT_EXTRACTED"
 NOT_REPORTED_CANDIDATE = "NOT_REPORTED_CANDIDATE"
@@ -203,7 +202,10 @@ class ImportReport:
     documents: EntityCounts = field(default_factory=EntityCounts)
     coverage: EntityCounts = field(default_factory=EntityCounts)
     field_markers: EntityCounts = field(default_factory=EntityCounts)
+    allow_revert: bool = False
     stale: list[str] = field(default_factory=list)
+    reverted: list[str] = field(default_factory=list)
+    seen_versions: list[tuple[str, str, str]] = field(default_factory=list)
     aliases_created: list[dict[str, str]] = field(default_factory=list)
     linked_paper_records: int = 0
     absent_from_source: dict[str, list[str]] = field(default_factory=dict)
@@ -240,16 +242,24 @@ class CorpusRepository:
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
             connection.executescript(SCHEMA)
-            # Rows stored before versions were recorded: their current state
-            # becomes a known version (idempotent).
-            with connection:
-                for table, key in VERSIONED_TABLES.items():
-                    connection.execute(
-                        f"INSERT OR IGNORE INTO staging_corpus_row_versions "
-                        f"SELECT ?, {key}, fingerprint, import_run_id FROM {table}",
-                        (table,),
-                    )
         self._initialized = True
+
+    @staticmethod
+    def _record_current_versions(connection: sqlite3.Connection) -> None:
+        """Record every stored row's current fingerprint as a known version.
+
+        Runs inside an import transaction (never on read). A database built
+        before versions existed only gains its *current* state this way; the
+        versions it replaced earlier are unknown, so re-importing those older
+        workbooks would not be caught. ``record_versions`` records them from
+        the workbooks themselves.
+        """
+        for table, key in VERSIONED_TABLES.items():
+            connection.execute(
+                f"INSERT OR IGNORE INTO staging_corpus_row_versions "
+                f"SELECT ?, {key}, fingerprint, import_run_id FROM {table}",
+                (table,),
+            )
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.database_path)
@@ -264,20 +274,29 @@ class CorpusRepository:
 
     # -- import ------------------------------------------------------------
 
-    def import_workbook(self, book: StagingWorkbook, *, dry_run: bool = False) -> ImportReport:
+    def import_workbook(
+        self, book: StagingWorkbook, *, dry_run: bool = False, allow_revert: bool = False,
+    ) -> ImportReport:
         """Import a validated workbook in one transaction. All or nothing.
 
         ``dry_run`` performs every check, including those against the stored
         corpus, and reports what would change, then rolls everything back.
         Raises ``WorkbookValidationError`` if the workbook conflicts with the
         stored corpus; nothing is then written.
+
+        A row whose incoming content equals one of its earlier versions is a
+        revert, and by default the import is refused as older than the stored
+        corpus. ``allow_revert`` applies such rows anyway (for a newer package
+        that deliberately returns to an earlier value, or to undo a mistaken
+        import) and lists every reverted row in the run's warnings.
         """
-        report = ImportReport(str(uuid4()), book.source_name, book.sha256)
+        report = ImportReport(str(uuid4()), book.source_name, book.sha256, allow_revert=allow_revert)
         report.warnings.extend(book.warnings)
         now = datetime.now(UTC).isoformat()
         connection = self._ready()
         try:
             with connection:
+                self._record_current_versions(connection)
                 if book.kind == SUPPLEMENT:
                     self._check_supplement(connection, book, report)
                 else:
@@ -290,9 +309,15 @@ class CorpusRepository:
                 if report.stale:
                     raise WorkbookValidationError([
                         f"{len(report.stale)} row(s) would be reverted to content an earlier import already "
-                        f"replaced; this workbook is older than the stored corpus (for example "
-                        f"{report.stale[:5]}). Import the newest package instead."
+                        f"replaced; this workbook looks older than the stored corpus (for example "
+                        f"{report.stale[:5]}). Import the newest package, or pass --allow-revert if "
+                        f"returning to that content is intended."
                     ])
+                if report.reverted:
+                    report.warnings.append(
+                        f"--allow-revert: {len(report.reverted)} row(s) returned to an earlier version: "
+                        f"{report.reverted[:50]}{' ...' if len(report.reverted) > 50 else ''}"
+                    )
                 connection.execute(
                     "INSERT INTO staging_corpus_import_runs VALUES (?, ?, ?, ?, ?, ?)",
                     (
@@ -308,6 +333,33 @@ class CorpusRepository:
             connection.close()
         return report
 
+    def record_versions(self, book: StagingWorkbook) -> int:
+        """Record the fingerprints an already-imported workbook wrote, without importing it.
+
+        For a database built before row versions existed: recording the older
+        packages it was built from lets the stale guard refuse them later.
+        Only a workbook whose SHA-256 appears in the import history is
+        accepted, so a newer package can never be pre-emptively blocked.
+        Returns the number of versions added.
+        """
+        with closing(self._ready()) as connection:
+            known = connection.execute(
+                "SELECT 1 FROM staging_corpus_import_runs WHERE workbook_sha256 = ?", (book.sha256,)
+            ).fetchone()
+        if known is None:
+            raise WorkbookValidationError([
+                f"{book.source_name} ({book.sha256[:12]}) was never imported into this database; "
+                f"only versions of already-imported workbooks can be recorded"
+            ])
+        report = self.import_workbook(book, dry_run=True, allow_revert=True)
+        with closing(self._connect()) as connection, connection:
+            before = connection.execute("SELECT COUNT(*) FROM staging_corpus_row_versions").fetchone()[0]
+            connection.executemany(
+                "INSERT OR IGNORE INTO staging_corpus_row_versions VALUES (?, ?, ?, ?)",
+                [(table, key, fingerprint, f"recorded:{book.sha256}") for table, key, fingerprint in report.seen_versions],
+            )
+            return connection.execute("SELECT COUNT(*) FROM staging_corpus_row_versions").fetchone()[0] - before
+
     @staticmethod
     def _upsert(
         connection: sqlite3.Connection, table: str, key_column: str, key: str,
@@ -318,6 +370,9 @@ class CorpusRepository:
         row = connection.execute(
             f"SELECT fingerprint FROM {table} WHERE {key_column} = ?", (key,)
         ).fetchone()
+        if report is not None:
+            report.seen_versions.append((table, key, fingerprint))
+
         def remember() -> None:
             if report is not None:
                 connection.execute(
@@ -350,8 +405,10 @@ class CorpusRepository:
             (table, key, fingerprint),
         ).fetchone():
             # This exact content was stored before and later replaced.
-            report.stale.append(f"{table}:{key}")
-            return "stale"
+            if not report.allow_revert:
+                report.stale.append(f"{table}:{key}")
+                return "stale"
+            report.reverted.append(f"{table}:{key}")
         updates = {key: value for key, value in values.items() if key != "created_at"}
         connection.execute(
             f"UPDATE {table} SET fingerprint = ?, {', '.join(f'{column} = ?' for column in updates)} "
@@ -532,7 +589,13 @@ class CorpusRepository:
                 connection, "staging_corpus_papers", "paper_id", target_id, _fingerprint(payload),
                 {
                     "doi_key": doi_key, "title_key": title_key, "year": year,
-                    "index_json": _canonical(index_row), "record_json": _canonical(record),
+                    # An aliased row is stored under the canonical ID; the ID the
+                    # workbook used is kept as source_paper_id.
+                    "index_json": _canonical(
+                        index_row if target_id == incoming_id
+                        else {**index_row, "paper_id": target_id, "source_paper_id": incoming_id}
+                    ),
+                    "record_json": _canonical(record),
                     "linked_paper_record_id": linked, "import_run_id": report.run_id,
                     "created_at": now, "updated_at": now,
                 },

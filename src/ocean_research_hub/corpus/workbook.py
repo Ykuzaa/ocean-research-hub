@@ -60,10 +60,19 @@ OPTIONAL_CLAIM_COLUMNS = frozenset({"unit", "extraction_status", "extracted_on",
 PENDING_AUDIT_MARKERS = frozenset({
     None, "NOT_AUDITED", "PENDING_INDEPENDENT_AUDIT", "PENDING_PDF_AUDIT", "PDF_AUDIT_PENDING",
 })
-# A non-marker claim may not carry a status word as its value.
-STATUS_TOKENS = frozenset({"NOT_REPORTED", "NOT_EXTRACTED", "VERIFIED", "NOT_VERIFIED"})
-# A research-gap status may say NOT_VERIFIED / NOT_VALIDATED, never the opposite.
-_ASSERTS_VALIDATION = re.compile(r"(?<!NOT_)(?:VERIFIED|VALIDATED)")
+# A non-marker claim may not carry a status word as its value (compared after
+# normalising case, spaces and hyphens to "NOT_REPORTED" form).
+STATUS_TOKENS = frozenset({
+    "NOT_REPORTED", "NOT_EXTRACTED", "VERIFIED", "NOT_VERIFIED", "PARTIALLY_VERIFIED",
+    "CONFLICT", "EXTRACTION_ERROR",
+})
+# A research-gap status may say NOT_VERIFIED / UNVALIDATED, never the opposite
+# (checked on the upper-cased status, spaces normalised to underscores).
+_ASSERTS_VALIDATION = re.compile(r"(?<![A-Z])(?<!NOT_)(?<!UN)(?:VERIFIED|VALIDATED|CONFIRMED)")
+
+
+def status_token(value: Any) -> str:
+    return re.sub(r"[\s\-]+", "_", str(value).strip().upper())
 
 _GAP_ID = re.compile(r"^B\d+-G\d+$")
 _PAPER_IDS = re.compile(r"^OAI-\d+(?:\s*;\s*OAI-\d+)*$")
@@ -512,7 +521,7 @@ def _claim_row_errors(book: StagingWorkbook) -> list[str]:
             errors.append(
                 f"claim {claim_id} is a {extraction} marker but carries the value {row.get('value')!r}"
             )
-        elif extraction not in MARKER_EXTRACTION_STATUSES and str(row.get("value")).strip() in STATUS_TOKENS:
+        elif extraction not in MARKER_EXTRACTION_STATUSES and status_token(row.get("value")) in STATUS_TOKENS:
             errors.append(
                 f"claim {claim_id} carries the status word {row.get('value')!r} as its value; a missing "
                 f"field must be a marker row (extraction_status NOT_EXTRACTED / NOT_REPORTED)"
@@ -666,7 +675,7 @@ def _gap_errors(book: StagingWorkbook) -> list[str]:
                 f"(found {question!r}); columns may be shifted"
             )
         status = row.get("status")
-        if not status or _ASSERTS_VALIDATION.search(str(status)):
+        if not status or _ASSERTS_VALIDATION.search(status_token(status)):
             errors.append(
                 f"research gap {row.get('candidate_topic')!r} has status {status!r}; a gap candidate "
                 f"must carry a not-validated status"

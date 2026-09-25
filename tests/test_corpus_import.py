@@ -893,3 +893,89 @@ def test_b08_adds_its_batch_and_is_idempotent(full: CorpusRepository, b08_book: 
     assert again["claims"]["unchanged"] == 1520 and again["papers"]["unchanged"] == 115
     with pytest.raises(WorkbookValidationError):
         full.import_workbook(enriched_book)
+
+
+# --- QA re-run fixes ----------------------------------------------------------
+
+def test_every_pending_audit_marker_stays_correctable(full: CorpusRepository, b08_book: StagingWorkbook) -> None:
+    full.import_workbook(b08_book)
+    for marker in ("PDF_AUDIT_PENDING", "PENDING_PDF_AUDIT", "NOT_AUDITED"):
+        claims = copy.deepcopy(b08_book.claims)
+        target = next(row for row in claims if row["claim_id"] == "B08-0023")
+        target.update(independent_audit=marker, notes=f"pending as {marker}")
+        report = full.import_workbook(_mutated(b08_book, claims=claims), allow_revert=True)
+        assert report.claims.skipped_protected == 0
+        assert full.get_claim("B08-0023")["notes"] == f"pending as {marker}"
+
+
+def test_a_deliberate_revert_needs_allow_revert_and_is_reported(full: CorpusRepository, enriched_book: StagingWorkbook) -> None:
+    claims = copy.deepcopy(enriched_book.claims)
+    next(row for row in claims if row["claim_id"] == "B03-0001").update(notes="B09 correction")
+    full.import_workbook(_mutated(enriched_book, claims=claims))
+    with pytest.raises(WorkbookValidationError) as caught:
+        full.import_workbook(enriched_book)
+    assert "--allow-revert" in caught.value.errors[0]
+    report = full.import_workbook(enriched_book, allow_revert=True)
+    assert report.claims.updated == 1
+    assert any("returned to an earlier version" in warning and "B03-0001" in warning for warning in report.warnings)
+    assert full.get_claim("B03-0001")["notes"] == enriched_book.claims[
+        next(i for i, row in enumerate(enriched_book.claims) if row["claim_id"] == "B03-0001")
+    ]["notes"]
+
+
+def test_a_database_built_before_versions_can_be_protected(full: CorpusRepository, book: StagingWorkbook, supplement: StagingWorkbook) -> None:
+    # Simulate a database built by the pre-versioning importer.
+    with sqlite3.connect(full.database_path) as connection:
+        connection.execute("DELETE FROM staging_corpus_row_versions")
+    with pytest.raises(WorkbookValidationError):
+        full.record_versions(read_workbook(B08_WORKBOOK))  # never imported here
+    assert full.record_versions(book) > 0
+    before = _snapshot(full)
+    for older in (book, supplement):
+        with pytest.raises(WorkbookValidationError):
+            full.import_workbook(older)
+    assert _snapshot(full) == before
+
+
+def test_reading_the_corpus_never_writes(full: CorpusRepository, tmp_path: Path) -> None:
+    import os
+    import stat
+    os.chmod(full.database_path, stat.S_IRUSR)
+    try:
+        reader = CorpusRepository(full.database_path)
+        assert reader.summary()["claims"] == 1445
+        assert reader.get_paper("OAI-0010")["claim_count"] == 69
+    finally:
+        os.chmod(full.database_path, stat.S_IRUSR | stat.S_IWUSR)
+
+
+@pytest.mark.parametrize("value", ["not reported", "NOT REPORTED", "Not-Extracted", "CONFLICT", "partially verified"])
+def test_status_words_are_refused_in_any_spelling(enriched_book: StagingWorkbook, value: str) -> None:
+    from ocean_research_hub.corpus import workbook as module
+    claims = copy.deepcopy(enriched_book.claims)
+    next(row for row in claims if row["claim_id"] == "B03-0001").update(value=value)
+    assert any("status word" in error for error in module._claim_row_errors(_mutated(enriched_book, claims=claims)))
+
+
+@pytest.mark.parametrize("status,refused", [
+    ("verified", True), ("CONFIRMED", True), ("Validated by team", True),
+    ("UNVERIFIED", False), ("NOT VERIFIED", False), ("TEAM_HYPOTHESIS_NOT_VALIDATED", False),
+    ("AI_INTERPRETATION — NOT_VERIFIED", False),
+])
+def test_gap_status_validation_words(enriched_book: StagingWorkbook, status: str, refused: bool) -> None:
+    from ocean_research_hub.corpus import workbook as module
+    gaps = copy.deepcopy(enriched_book.research_gaps)
+    gaps[0]["status"] = status
+    assert bool(module._gap_errors(_mutated(enriched_book, research_gaps=gaps))) is refused
+
+
+def test_an_aliased_base_row_keeps_the_canonical_id(imported: CorpusRepository, book: StagingWorkbook) -> None:
+    index = copy.deepcopy(book.paper_index)
+    records = copy.deepcopy(book.paper_records)
+    claims = copy.deepcopy(book.claims)
+    for row in (*index, *records, *claims):
+        if row["paper_id"] == "OAI-0002":
+            row["paper_id"] = "EXT-9002"
+    imported.import_workbook(_mutated(book, paper_index=index, paper_records=records, claims=claims), allow_revert=True)
+    stored = imported.get_paper("OAI-0002")["paper_index"]
+    assert stored["paper_id"] == "OAI-0002" and stored["source_paper_id"] == "EXT-9002"

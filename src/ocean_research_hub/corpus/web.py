@@ -183,6 +183,23 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
             f"{populated} of {len(items)} fields with candidate claims</summary>"
             f"<table><thead><tr><th>Field</th><th>Status</th><th>Candidate claims</th></tr></thead><tbody>{rows}</tbody></table></details>"
         )
+    if paper["uncontracted_claims"]:
+        sections.append(
+            "<details open><summary><strong>Outside the field contract</strong> — "
+            f"{len(paper['uncontracted_claims'])} candidate claim(s) whose field path is not one of the "
+            "contract's fields; kept verbatim, mapped to no field</summary><table><thead><tr><th>Field path</th>"
+            "<th>Candidate claim</th></tr></thead><tbody>"
+            + "".join(
+                f"<tr><td><code>{escape(claim['field_path'])}</code></td><td>{claim_block(claim)}</td></tr>"
+                for claim in paper["uncontracted_claims"]
+            )
+            + "</tbody></table></details>"
+        )
+    coverage = "".join(
+        f"<code>{escape(item['source_name'])}</code>: {_cell(item.get('coverage_level'))} · "
+        f"{_cell(item.get('audit_state'))} · {_cell(item.get('claim_count'))} claims<br>"
+        for item in paper["coverage"]
+    ) or '<span class="muted">none</span>'
     audit = paper["scientific_audit_status"]
     linked = paper["linked_paper_record_id"]
     body = f"""<p><a href="/corpus">← Staging corpus</a></p>
@@ -196,6 +213,7 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
 <tr><th>Review stage</th><td class="status">{_cell(paper['review_stage'])}</td></tr>
 <tr><th>Extraction</th><td class="status">{_cell(paper['scientific_extraction_status'])} / {_cell(paper['detail_extraction_status'])}</td></tr>
 <tr><th>Audit status</th><td class="status">PAPER_INDEX {_cell(audit['paper_index'])} · PAPER_RECORDS {_cell(audit['paper_records'])}</td></tr>
+<tr><th>Supplement coverage</th><td class="status">{coverage}</td></tr>
 <tr><th>Experiments</th><td>{_cell(paper['experiments'])}</td></tr>
 <tr><th>Fields</th><td>{paper['populated_field_count']} with candidate claims · {paper['not_extracted_field_count']} NOT_EXTRACTED</td></tr>
 <tr><th>Canonical PaperRecord</th><td>{f'<a href="/papers/{escape(linked)}">{escape(linked)}</a>' if linked else '<span class="muted">none linked</span>'}</td></tr>

@@ -480,3 +480,145 @@ def test_the_existing_api_still_works_beside_the_corpus(client: TestClient) -> N
 def test_corpus_lookup_raises_for_unknown_paper(imported: CorpusRepository) -> None:
     with pytest.raises(CorpusNotFoundError):
         imported.get_paper("nope")
+
+
+# --- supplement workbook (EXPANDED_V2) --------------------------------------
+
+SUPPLEMENT_WORKBOOK = WORKBOOK.with_name("Ocean_Research_Intelligence_EXPANDED_V2.xlsx")
+
+
+@pytest.fixture(scope="module")
+def supplement() -> StagingWorkbook:
+    return read_workbook(SUPPLEMENT_WORKBOOK)
+
+
+@pytest.fixture()
+def enriched(imported: CorpusRepository, supplement: StagingWorkbook) -> CorpusRepository:
+    imported.import_workbook(supplement)
+    return imported
+
+
+def test_the_supplement_is_read_with_its_declared_counts(supplement: StagingWorkbook) -> None:
+    assert supplement.kind == "supplement"
+    assert (len(supplement.paper_index), len(supplement.claims), len(supplement.research_gaps)) == (115, 258, 8)
+    assert (len(supplement.coverage), len(supplement.new_detailed_papers)) == (115, 13)
+    assert supplement.paper_records == [] and supplement.field_contract == []
+
+
+def test_the_supplement_adds_only_new_claims(imported: CorpusRepository, supplement: StagingWorkbook) -> None:
+    counts = imported.import_workbook(supplement).counts()
+    assert counts["papers"] == {"created": 0, "updated": 0, "unchanged": 115, "skipped_protected": 0}
+    assert counts["claims"] == {"created": 114, "updated": 0, "unchanged": 144, "skipped_protected": 0}
+    assert counts["research_gaps"]["unchanged"] == 8
+    assert counts["aliases_created"] == 0 and counts["absent_from_source"] == {}
+    summary = imported.summary()
+    assert (summary["papers"], summary["claims"], summary["field_definitions"]) == (115, 258, 162)
+    assert summary["claim_statuses"] == {"NOT_VERIFIED": 258}
+    assert summary["claim_independent_audit"] == {"PENDING_INDEPENDENT_AUDIT": 144, "PENDING_PDF_AUDIT": 114}
+    with sqlite3.connect(imported.database_path) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*), COUNT(DISTINCT doi_key) FROM staging_corpus_papers WHERE doi_key IS NOT NULL"
+        ).fetchone() == (110, 110)
+
+
+def test_reimporting_the_supplement_is_a_no_op(enriched: CorpusRepository, supplement: StagingWorkbook) -> None:
+    counts = enriched.import_workbook(supplement).counts()
+    for entity, total in (("papers", 115), ("claims", 258), ("research_gaps", 8), ("coverage", 115), ("documents", 2)):
+        assert counts[entity] == {"created": 0, "updated": 0, "unchanged": total, "skipped_protected": 0}
+    assert enriched.summary()["claims"] == 258
+
+
+def test_supplement_claims_keep_their_evidence_and_invent_nothing(enriched: CorpusRepository) -> None:
+    claim = enriched.get_claim("WEB2-0001")
+    assert claim["scientific_status"] == "NOT_VERIFIED"
+    assert claim["independent_audit"] == "PENDING_PDF_AUDIT"
+    assert claim["claim_type"] == "AUTHOR_REPORTED_FACT"
+    assert claim["evidence"]["source_url"] == "https://arxiv.org/abs/2308.11814"
+    assert claim["evidence"]["section"] == "Abstract"
+    assert claim["evidence"]["pdf_page"] is None and claim["evidence"]["verbatim_evidence"] is None
+
+
+def test_supplement_claims_fill_fields_by_path_and_the_rest_stay_not_extracted(enriched: CorpusRepository) -> None:
+    paper = enriched.get_paper("OAI-0005")
+    task = next(item for item in paper["fields"] if item["field_path"] == "problem.task")
+    assert task["status"] == "NOT_VERIFIED" and "WEB2-0001" in task["claim_ids"]
+    assert paper["populated_field_count"] == 6
+    assert paper["not_extracted_field_count"] == 156
+    assert {field["status"] for field in paper["fields"] if not field["claims"]} == {"NOT_EXTRACTED"}
+    # The stored record is kept as the base package supplied it.
+    assert paper["detail_extraction_status"] == "NOT_EXTRACTED"
+    assert paper["coverage"][0]["coverage_level"] == "DETAILED"
+    assert paper["coverage"][0]["audit_state"] == "PDF_AUDIT_PENDING"
+
+
+def test_claims_outside_the_contract_are_kept_but_mapped_to_no_field(enriched: CorpusRepository) -> None:
+    paper = enriched.get_paper("OAI-0063")
+    assert {claim["field_path"] for claim in paper["uncontracted_claims"]} == {"rl.action", "rl.reward"}
+    assert not any("WEB2-0072" in field["claim_ids"] for field in paper["fields"])
+    assert "rl.action" not in {field["field_path"] for field in enriched.field_contract()}
+
+
+def test_a_pending_pdf_audit_claim_is_not_treated_as_attested(enriched: CorpusRepository, supplement: StagingWorkbook) -> None:
+    claims = copy.deepcopy(supplement.claims)
+    target = next(row for row in claims if row["claim_id"] == "WEB2-0001")
+    target["notes"] = "revised"
+    report = enriched.import_workbook(_mutated(supplement, claims=claims))
+    assert report.claims.updated == 1 and report.claims.skipped_protected == 0
+
+
+def test_the_supplement_never_overwrites_an_audited_claim(enriched: CorpusRepository, supplement: StagingWorkbook) -> None:
+    with sqlite3.connect(enriched.database_path) as connection:
+        connection.execute(
+            "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED', "
+            "independent_audit = 'AUDITED_BY_SCIENTIFIC_AUDITOR' WHERE claim_id = 'ORI-0001'"
+        )
+    claims = copy.deepcopy(supplement.claims)
+    next(row for row in claims if row["claim_id"] == "ORI-0001")["value"] = "rewritten"
+    report = enriched.import_workbook(_mutated(supplement, claims=claims))
+    assert report.claims.skipped_protected == 1
+    assert enriched.get_claim("ORI-0001")["scientific_status"] == "VERIFIED"
+    assert enriched.get_claim("ORI-0001")["value"] != "rewritten"
+
+
+def test_a_supplement_without_a_base_corpus_is_refused_and_writes_nothing(tmp_path: Path, supplement: StagingWorkbook) -> None:
+    repository = CorpusRepository(tmp_path / "hub.db")
+    with pytest.raises(WorkbookValidationError) as caught:
+        repository.import_workbook(supplement)
+    assert any("import the base workbook first" in error for error in caught.value.errors)
+    assert repository.summary()["claims"] == 0 and repository.import_runs() == []
+
+
+def test_a_supplement_cannot_introduce_a_paper(imported: CorpusRepository, supplement: StagingWorkbook) -> None:
+    index = copy.deepcopy(supplement.paper_index)
+    index[0].update(paper_id="OAI-9999", doi="10.9999/new", title="A paper the base never had")
+    claims_before = imported.summary()["claims"]
+    with pytest.raises(WorkbookValidationError) as caught:
+        imported.import_workbook(_mutated(supplement, paper_index=index))
+    assert any("OAI-9999" in error for error in caught.value.errors)
+    assert imported.summary()["claims"] == claims_before
+
+
+def test_a_supplement_whose_coverage_disagrees_with_its_claims_is_refused(tmp_path: Path) -> None:
+    workbook = load_workbook(SUPPLEMENT_WORKBOOK)
+    sheet = workbook["COVERAGE"]
+    sheet.cell(row=2, column=_column(sheet, "claim_count"), value=999)
+    target = tmp_path / "edited.xlsx"
+    workbook.save(target)
+    with pytest.raises(WorkbookValidationError) as caught:
+        read_workbook(target)
+    assert any("COVERAGE declares 999 claims" in error for error in caught.value.errors)
+
+
+def test_api_serves_the_enriched_corpus(tmp_path: Path, book: StagingWorkbook, supplement: StagingWorkbook) -> None:
+    database = tmp_path / "hub.db"
+    corpus = CorpusRepository(database)
+    corpus.import_workbook(book)
+    corpus.import_workbook(supplement)
+    app = create_app(repository=SqlitePaperRepository(database), corpus_repository=corpus)
+    with TestClient(app) as client:
+        summary = client.get("/api/corpus").json()
+        assert (summary["papers"], summary["claims"]) == (115, 258)
+        assert client.get("/api/corpus/claims", params={"limit": 1000}).json()["total"] == 258
+        assert client.get("/api/corpus/papers/OAI-0063").json()["uncontracted_claims"]
+        page = client.get("/corpus/papers/OAI-0063")
+        assert "Outside the field contract" in page.text and "rl.action" in page.text

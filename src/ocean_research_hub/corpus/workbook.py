@@ -30,6 +30,16 @@ REQUIRED_SHEETS: tuple[str, ...] = (
 )
 DOCUMENT_SHEETS: tuple[str, ...] = ("README", "AUDIT_PROTOCOL", "METHODS_GUIDE")
 
+# A supplement workbook (for example Ocean_Research_Intelligence_EXPANDED_V2)
+# adds candidate claims to a corpus that a base workbook already imported. It
+# carries no PAPER_RECORDS and no FIELD_CONTRACT, so it cannot introduce a
+# paper and is validated against the stored base corpus at import time.
+BASE = "base"
+SUPPLEMENT = "supplement"
+SUPPLEMENT_SHEETS: tuple[str, ...] = (
+    "START_HERE", "PAPER_INDEX", "SCIENTIFIC_CLAIMS", "RESEARCH_GAPS", "COVERAGE",
+)
+
 REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
     "PAPER_INDEX": (
         "paper_id", "title", "year", "doi", "domain", "source_url", "review_stage",
@@ -46,6 +56,8 @@ REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
     ),
     "PAPER_RECORDS": ("paper_id", "record_json"),
     "FIELD_CONTRACT": ("group", "field_name", "field_path"),
+    "COVERAGE": ("paper_id", "claim_count", "coverage_level", "audit_state"),
+    "NEW_DETAILED_PAPERS": ("paper_id", "claims_added"),
 }
 
 # A staging package may carry candidate states only. VERIFIED needs an
@@ -72,6 +84,12 @@ DECLARED_COUNTS = {
     "Scientific field definitions": "FIELD_CONTRACT",
     "Research-gap candidates": "RESEARCH_GAPS",
 }
+SUPPLEMENT_DECLARED_COUNTS = {
+    "Papers indexed": "PAPER_INDEX",
+    "Claims total": "SCIENTIFIC_CLAIMS",
+    "Detailed papers now": "DETAILED_PAPERS",
+    "New detailed papers": "NEW_DETAILED_PAPERS",
+}
 
 
 class WorkbookValidationError(ValueError):
@@ -95,6 +113,9 @@ class StagingWorkbook:
     field_contract: list[dict[str, Any]]
     documents: dict[str, str]
     warnings: list[str] = field(default_factory=list)
+    kind: str = BASE
+    coverage: list[dict[str, Any]] = field(default_factory=list)
+    new_detailed_papers: list[dict[str, Any]] = field(default_factory=list)
 
 
 def normalize_doi(doi: str | None) -> str | None:
@@ -156,6 +177,11 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
         errors: list[str] = [
             f"missing worksheet {name}" for name in REQUIRED_SHEETS if name not in sheet_names
         ]
+        kind = BASE
+        if errors and all(name in sheet_names for name in SUPPLEMENT_SHEETS) and not (
+            {"PAPER_RECORDS", "FIELD_CONTRACT"} & set(sheet_names)
+        ):
+            kind, errors = SUPPLEMENT, []
         if errors:
             raise WorkbookValidationError(errors)
 
@@ -188,13 +214,18 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
             name: "\n".join(
                 "" if len(row) < 2 or row[1] is None else str(row[1]) for row in rows(name)[1:]
             )
-            for name in DOCUMENT_SHEETS
+            for name in DOCUMENT_SHEETS if kind == BASE
         }
         paper_index = table("PAPER_INDEX")
         claims = table("SCIENTIFIC_CLAIMS")
         gaps = table("RESEARCH_GAPS")
-        record_rows = table("PAPER_RECORDS")
-        contract = table("FIELD_CONTRACT")
+        record_rows = table("PAPER_RECORDS") if kind == BASE else []
+        contract = table("FIELD_CONTRACT") if kind == BASE else []
+        coverage = table("COVERAGE") if kind == SUPPLEMENT else []
+        new_detailed = (
+            table("NEW_DETAILED_PAPERS")
+            if kind == SUPPLEMENT and "NEW_DETAILED_PAPERS" in sheet_names else []
+        )
     finally:
         workbook.close()
 
@@ -226,8 +257,14 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
         paper_records=records,
         field_contract=contract,
         documents=documents,
+        kind=kind,
+        coverage=coverage,
+        new_detailed_papers=new_detailed,
     )
-    errors.extend(_integrity_errors(staged))
+    if kind == SUPPLEMENT:
+        errors.extend(_supplement_errors(staged))
+    else:
+        errors.extend(_integrity_errors(staged))
     if errors:
         raise WorkbookValidationError(errors)
     staged.warnings.extend(_integrity_warnings(staged))
@@ -271,14 +308,11 @@ def _integrity_errors(book: StagingWorkbook) -> list[str]:
     contract = set(paths)
 
     # Papers: identity and cross-sheet agreement.
+    errors.extend(_paper_identity_errors(book))
     index_ids = [row.get("paper_id") for row in book.paper_index]
     record_ids = [record.get("paper_id") for record in book.paper_records]
-    for paper_id in _duplicates(index_ids):
-        errors.append(f"PAPER_INDEX lists paper_id {paper_id!r} more than once")
     for paper_id in _duplicates(record_ids):
         errors.append(f"PAPER_RECORDS lists paper_id {paper_id!r} more than once")
-    if any(not paper_id for paper_id in index_ids):
-        errors.append("PAPER_INDEX has a row without paper_id")
     if set(index_ids) != set(record_ids):
         errors.append(
             "PAPER_INDEX and PAPER_RECORDS disagree on the paper set: only in index "
@@ -300,17 +334,6 @@ def _integrity_errors(book: StagingWorkbook) -> list[str]:
                     f"{row.get('paper_id')}: PAPER_INDEX {column} {index_value!r} differs from "
                     f"PAPER_RECORDS {column} {record_value!r}"
                 )
-    doi_keys = [normalize_doi(row.get("doi")) for row in book.paper_index]
-    for doi in _duplicates([key for key in doi_keys if key]):
-        owners = [row.get("paper_id") for row in book.paper_index if normalize_doi(row.get("doi")) == doi]
-        errors.append(f"DOI {doi} is assigned to several paper_ids {owners}; deduplicate before import")
-    title_keys = [(normalize_title(row.get("title")), str(row.get("year"))) for row in book.paper_index]
-    for key in _duplicates([key for key in title_keys if key[0]]):
-        owners = [
-            row.get("paper_id") for row in book.paper_index
-            if (normalize_title(row.get("title")), str(row.get("year"))) == key
-        ]
-        errors.append(f"title/year {key} is assigned to several paper_ids {owners}; deduplicate before import")
 
     # Records must carry exactly the contract's fields.
     slot_of_claim: dict[str, tuple[str, str]] = {}
@@ -342,24 +365,14 @@ def _integrity_errors(book: StagingWorkbook) -> list[str]:
             )
 
     # Claims: referential integrity and status discipline.
+    errors.extend(_claim_row_errors(book))
     claim_ids = [row.get("claim_id") for row in book.claims]
-    for claim_id in _duplicates(claim_ids):
-        errors.append(f"SCIENTIFIC_CLAIMS lists claim_id {claim_id!r} more than once")
-    paper_set = set(index_ids)
     for row in book.claims:
         claim_id = row.get("claim_id")
         if not claim_id:
-            errors.append("SCIENTIFIC_CLAIMS has a row without claim_id")
             continue
-        if row.get("paper_id") not in paper_set:
-            errors.append(f"claim {claim_id} references unknown paper {row.get('paper_id')!r}")
         if row.get("field_path") not in contract:
             errors.append(f"claim {claim_id} uses field_path {row.get('field_path')!r} outside FIELD_CONTRACT")
-        status = row.get("scientific_status")
-        if status in REFUSED_CLAIM_STATUSES:
-            errors.append(f"claim {claim_id} is {status}: {REFUSED_CLAIM_STATUSES[status]}")
-        elif status not in ALLOWED_CLAIM_STATUSES:
-            errors.append(f"claim {claim_id} has unknown scientific_status {status!r}")
         slot = slot_of_claim.get(claim_id)
         if slot is None:
             errors.append(f"claim {claim_id} is not referenced by any PAPER_RECORDS field")
@@ -368,12 +381,107 @@ def _integrity_errors(book: StagingWorkbook) -> list[str]:
                 f"claim {claim_id} is filed under {slot} in PAPER_RECORDS but declares "
                 f"({row.get('paper_id')}, {row.get('field_path')})"
             )
-        if row.get("value") is None:
-            errors.append(f"claim {claim_id} has no value")
     for claim_id in sorted(set(slot_of_claim) - set(claim_ids)):
         errors.append(f"PAPER_RECORDS references claim {claim_id} which SCIENTIFIC_CLAIMS does not contain")
 
-    # Research-gap candidates.
+    errors.extend(_gap_errors(book))
+    return errors
+
+
+def _paper_identity_errors(book: StagingWorkbook) -> list[str]:
+    errors: list[str] = []
+    index_ids = [row.get("paper_id") for row in book.paper_index]
+    for paper_id in _duplicates(index_ids):
+        errors.append(f"PAPER_INDEX lists paper_id {paper_id!r} more than once")
+    if any(not paper_id for paper_id in index_ids):
+        errors.append("PAPER_INDEX has a row without paper_id")
+    doi_keys = [normalize_doi(row.get("doi")) for row in book.paper_index]
+    for doi in _duplicates([key for key in doi_keys if key]):
+        owners = [row.get("paper_id") for row in book.paper_index if normalize_doi(row.get("doi")) == doi]
+        errors.append(f"DOI {doi} is assigned to several paper_ids {owners}; deduplicate before import")
+    title_keys = [(normalize_title(row.get("title")), str(row.get("year"))) for row in book.paper_index]
+    for key in _duplicates([key for key in title_keys if key[0]]):
+        owners = [
+            row.get("paper_id") for row in book.paper_index
+            if (normalize_title(row.get("title")), str(row.get("year"))) == key
+        ]
+        errors.append(f"title/year {key} is assigned to several paper_ids {owners}; deduplicate before import")
+    return errors
+
+
+def _claim_row_errors(book: StagingWorkbook) -> list[str]:
+    """Checks every claim row must pass whatever the workbook layout."""
+    errors: list[str] = []
+    for claim_id in _duplicates([row.get("claim_id") for row in book.claims]):
+        errors.append(f"SCIENTIFIC_CLAIMS lists claim_id {claim_id!r} more than once")
+    paper_set = {row.get("paper_id") for row in book.paper_index}
+    for row in book.claims:
+        claim_id = row.get("claim_id")
+        if not claim_id:
+            errors.append("SCIENTIFIC_CLAIMS has a row without claim_id")
+            continue
+        if row.get("paper_id") not in paper_set:
+            errors.append(f"claim {claim_id} references unknown paper {row.get('paper_id')!r}")
+        if not row.get("field_path"):
+            errors.append(f"claim {claim_id} has no field_path")
+        status = row.get("scientific_status")
+        if status in REFUSED_CLAIM_STATUSES:
+            errors.append(f"claim {claim_id} is {status}: {REFUSED_CLAIM_STATUSES[status]}")
+        elif status not in ALLOWED_CLAIM_STATUSES:
+            errors.append(f"claim {claim_id} has unknown scientific_status {status!r}")
+        if row.get("value") is None:
+            errors.append(f"claim {claim_id} has no value")
+    return errors
+
+
+def _supplement_errors(book: StagingWorkbook) -> list[str]:
+    """Integrity of a supplement workbook on its own.
+
+    Checks that need the stored base corpus (every paper already known, field
+    paths inside the stored contract) run in ``CorpusRepository.import_workbook``.
+    """
+    errors = _paper_identity_errors(book) + _claim_row_errors(book) + _gap_errors(book)
+    per_paper: dict[Any, int] = {}
+    for row in book.claims:
+        per_paper[row.get("paper_id")] = per_paper.get(row.get("paper_id"), 0) + 1
+    counts = {
+        "PAPER_INDEX": len(book.paper_index), "SCIENTIFIC_CLAIMS": len(book.claims),
+        "DETAILED_PAPERS": len(per_paper), "NEW_DETAILED_PAPERS": len(book.new_detailed_papers),
+    }
+    for label, sheet in SUPPLEMENT_DECLARED_COUNTS.items():
+        declared = book.start_here.get(label)
+        if declared is not None and declared.strip().isdigit() and int(declared) != counts[sheet]:
+            errors.append(f"START_HERE declares {label} = {declared} but the workbook has {counts[sheet]}")
+    before, added, total = (book.start_here.get(label, "") for label in ("Claims before", "Claims added", "Claims total"))
+    if all(value.strip().isdigit() for value in (before, added, total)) and int(before) + int(added) != int(total):
+        errors.append(f"START_HERE declares Claims before {before} + Claims added {added} != Claims total {total}")
+
+    index_ids = {row.get("paper_id") for row in book.paper_index}
+    coverage_ids = [row.get("paper_id") for row in book.coverage]
+    for paper_id in _duplicates(coverage_ids):
+        errors.append(f"COVERAGE lists paper_id {paper_id!r} more than once")
+    if set(coverage_ids) != index_ids:
+        errors.append(
+            "COVERAGE and PAPER_INDEX disagree on the paper set: only in COVERAGE "
+            f"{sorted(map(str, set(coverage_ids) - index_ids))}, only in PAPER_INDEX "
+            f"{sorted(map(str, index_ids - set(coverage_ids)))}"
+        )
+    for row in book.coverage:
+        actual = per_paper.get(row.get("paper_id"), 0)
+        if str(row.get("claim_count")) != str(actual):
+            errors.append(
+                f"COVERAGE declares {row.get('claim_count')} claims for {row.get('paper_id')} "
+                f"but SCIENTIFIC_CLAIMS has {actual}"
+            )
+    for row in book.new_detailed_papers:
+        if row.get("paper_id") not in index_ids:
+            errors.append(f"NEW_DETAILED_PAPERS lists unknown paper {row.get('paper_id')!r}")
+    return errors
+
+
+def _gap_errors(book: StagingWorkbook) -> list[str]:
+    errors: list[str] = []
+    paper_set = {row.get("paper_id") for row in book.paper_index}
     for row in book.research_gaps:
         if not row.get("candidate_topic"):
             errors.append("RESEARCH_GAPS has a row without candidate_topic")
@@ -389,8 +497,16 @@ def _integrity_errors(book: StagingWorkbook) -> list[str]:
 def _integrity_warnings(book: StagingWorkbook) -> list[str]:
     warnings: list[str] = []
     records = {record["paper_id"]: record for record in book.paper_records}
+    if book.kind == SUPPLEMENT:
+        warnings.append(
+            "supplement workbook: no PAPER_RECORDS, so stored records are kept as supplied and "
+            "new claims are placed by field_path; COVERAGE coverage_level/audit_state are stored "
+            "beside the PAPER_INDEX and PAPER_RECORDS states, never in place of them"
+        )
     for row in book.paper_index:
-        record = records[row["paper_id"]]
+        record = records.get(row["paper_id"])
+        if record is None:
+            continue
         if row.get("scientific_audit_status") != record.get("scientific_audit_status"):
             warnings.append(
                 f"{row['paper_id']}: PAPER_INDEX scientific_audit_status "

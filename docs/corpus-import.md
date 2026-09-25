@@ -26,9 +26,50 @@ uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Hub_COMPLE
 Experiments are preserved as each claim's `experiment_id` and listed per paper
 (for example `OAI-0006:FNO3D` and `OAI-0006:RFNO2D`).
 
+## Supplement workbook: EXPANDED_V2
+
+`import_staging/Ocean_Research_Intelligence_EXPANDED_V2.xlsx` (SHA-256
+`7fa77bcda168007e99974d37fea32d5ffe7214e158ce1cc4f684facb0f4abb28`) enriches the
+same 115-paper corpus. It is imported **on top of** the base workbook:
+
+```bash
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_EXPANDED_V2.xlsx \
+  --database .data/ocean-research-hub.db --report-out .data/corpus-import-v2-report.json
+```
+
+Against V1, the PAPER_INDEX and RESEARCH_GAPS sheets are identical and the 144 V1
+claims are byte-identical. It adds 114 claims (`WEB2-0001`..`WEB2-0114`), which
+brings the corpus to 258 claims. Papers with at least one claim go from 7 to 20.
+The import result is `claims.created = 114`, `claims.unchanged = 144`,
+`papers.unchanged = 115`, and no aliases. A second import changes nothing.
+
+It has no `PAPER_RECORDS`, `FIELD_CONTRACT` or document sheets. It adds
+`COVERAGE` and `NEW_DETAILED_PAPERS`. A workbook with that layout is read as a
+**supplement**:
+- It is validated against the stored base corpus inside the import transaction.
+  If no base corpus is stored, or a paper is not already in the corpus, the whole
+  import is refused. A supplement carries no record, so it cannot introduce a paper.
+- START_HERE counts are checked (`Papers indexed`, `Claims total`,
+  `Detailed papers now`, `New detailed papers`, before + added = total). Each
+  COVERAGE `claim_count` must equal the paper's claim rows.
+- Stored records are kept as the base package supplied them. For example,
+  `detail_extraction_status` stays `NOT_EXTRACTED` for the 13 newly detailed papers.
+  COVERAGE `coverage_level` / `audit_state` rows are stored in
+  `staging_corpus_paper_coverage` and served as `coverage`, beside those values and
+  not in place of them.
+- A new claim is shown under the contract field named by its `field_path`. The
+  claims `WEB2-0072` (`rl.action`), `WEB2-0073` (`rl.reward`) and `WEB2-0114`
+  (`reproducibility.code`) use paths outside the 162-field contract. They are kept
+  verbatim, served as `uncontracted_claims`, reported in the import warnings, and
+  mapped to no field. Extending the contract is a #11 decision.
+- The new claims carry `independent_audit = PENDING_PDF_AUDIT`. That value is a
+  pending marker, not an attestation.
+- START_HERE and NEW_DETAILED_PAPERS are stored as documents keyed by workbook
+  name, so the base package's documents are not replaced.
+
 ## Scientific integrity rules the importer enforces
 
-- **Nothing is promoted.** All 144 claims arrive `NOT_VERIFIED` /
+- **Nothing is promoted.** All claims (144 base, 258 after V2) arrive `NOT_VERIFIED` /
   `PENDING_INDEPENDENT_AUDIT` and stay that way. A workbook row claiming
   `VERIFIED`, `PARTIALLY_VERIFIED` or `NOT_REPORTED` is **refused**: a staging
   package has neither an independent attestation nor a documented search scope.

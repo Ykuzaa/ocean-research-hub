@@ -29,7 +29,10 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from .workbook import StagingWorkbook, normalize_doi, normalize_title, parse_claim_value
+from .workbook import (
+    SUPPLEMENT, StagingWorkbook, WorkbookValidationError, normalize_doi, normalize_title,
+    parse_claim_value,
+)
 
 # States that mean an independent reviewer has attested the row. A row in one
 # of these states is never overwritten by an import. Staging workbooks cannot
@@ -38,7 +41,9 @@ from .workbook import StagingWorkbook, normalize_doi, normalize_title, parse_cla
 ATTESTED_STATES = frozenset({
     "VERIFIED", "PARTIALLY_VERIFIED", "AUDITED", "INDEPENDENTLY_AUDITED", "AUDIT_PASSED",
 })
-UNATTESTED_AUDIT_MARKERS = frozenset({None, "", "PENDING_INDEPENDENT_AUDIT", "NOT_AUDITED"})
+UNATTESTED_AUDIT_MARKERS = frozenset({
+    None, "", "PENDING_INDEPENDENT_AUDIT", "PENDING_PDF_AUDIT", "NOT_AUDITED",
+})
 
 NOT_EXTRACTED = "NOT_EXTRACTED"
 
@@ -103,6 +108,14 @@ CREATE TABLE IF NOT EXISTS staging_corpus_research_gaps (
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS staging_corpus_paper_coverage (
+    coverage_key TEXT PRIMARY KEY,
+    paper_id TEXT NOT NULL REFERENCES staging_corpus_papers(paper_id),
+    source_name TEXT NOT NULL,
+    row_json TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    import_run_id TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS staging_corpus_documents (
     name TEXT PRIMARY KEY,
     text TEXT NOT NULL,
@@ -152,6 +165,7 @@ class ImportReport:
     field_contract: EntityCounts = field(default_factory=EntityCounts)
     research_gaps: EntityCounts = field(default_factory=EntityCounts)
     documents: EntityCounts = field(default_factory=EntityCounts)
+    coverage: EntityCounts = field(default_factory=EntityCounts)
     aliases_created: list[dict[str, str]] = field(default_factory=list)
     linked_paper_records: int = 0
     absent_from_source: dict[str, list[str]] = field(default_factory=dict)
@@ -162,6 +176,7 @@ class ImportReport:
             "papers": self.papers.as_dict(), "claims": self.claims.as_dict(),
             "field_contract": self.field_contract.as_dict(),
             "research_gaps": self.research_gaps.as_dict(), "documents": self.documents.as_dict(),
+            "coverage": self.coverage.as_dict(),
             "aliases_created": len(self.aliases_created),
             "linked_paper_records": self.linked_paper_records,
             "absent_from_source": {key: len(value) for key, value in self.absent_from_source.items()},
@@ -210,11 +225,15 @@ class CorpusRepository:
         connection = self._ready()
         try:
             with connection:
-                self._import_contract(connection, book, report)
+                if book.kind == SUPPLEMENT:
+                    self._check_supplement(connection, book, report)
+                else:
+                    self._import_contract(connection, book, report)
                 paper_map = self._import_papers(connection, book, report, now)
                 self._import_claims(connection, book, report, paper_map, now)
                 self._import_gaps(connection, book, report, now)
                 self._import_documents(connection, book, report)
+                self._import_coverage(connection, book, report, paper_map)
                 connection.execute(
                     "INSERT INTO staging_corpus_import_runs VALUES (?, ?, ?, ?, ?, ?)",
                     (
@@ -277,6 +296,37 @@ class CorpusRepository:
                 report.field_contract,
             )
 
+    def _check_supplement(
+        self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport,
+    ) -> None:
+        """Validate a supplement against the stored base corpus before any write."""
+        contract = {
+            row["field_path"] for row in connection.execute("SELECT field_path FROM staging_corpus_field_contract")
+        }
+        errors: list[str] = []
+        if not contract:
+            errors.append("a supplement workbook needs a base corpus; import the base workbook first")
+        for row in book.paper_index:
+            canonical_id, _ = self._resolve_paper(
+                connection, row["paper_id"], normalize_doi(row.get("doi")), normalize_title(row.get("title")),
+                None if row.get("year") is None else str(row.get("year")),
+            )
+            if canonical_id is None:
+                errors.append(
+                    f"supplement paper {row['paper_id']} is not in the stored corpus; a supplement "
+                    f"carries no PAPER_RECORDS and cannot introduce a paper"
+                )
+        if errors:
+            raise WorkbookValidationError(errors)
+        outside = sorted(
+            f"{row['claim_id']} ({row['field_path']})" for row in book.claims if row["field_path"] not in contract
+        )
+        if outside:
+            report.warnings.append(
+                f"claim(s) whose field_path is outside the stored FIELD_CONTRACT are preserved verbatim, "
+                f"served as uncontracted_claims and mapped to no field: {outside}"
+            )
+
     def _resolve_paper(
         self, connection: sqlite3.Connection, paper_id: str, doi_key: str | None,
         title_key: str | None, year: str | None,
@@ -329,7 +379,6 @@ class CorpusRepository:
         paper_map: dict[str, str] = {}
         for index_row in book.paper_index:
             incoming_id = index_row["paper_id"]
-            record = records[incoming_id]
             doi_key = normalize_doi(index_row.get("doi"))
             title_key = normalize_title(index_row.get("title"))
             year = None if index_row.get("year") is None else str(index_row.get("year"))
@@ -351,6 +400,8 @@ class CorpusRepository:
                 "SELECT index_json, record_json FROM staging_corpus_papers WHERE paper_id = ?",
                 (target_id,),
             ).fetchone()
+            # A supplement has no record of its own: the stored one is kept as supplied.
+            record = json.loads(existing["record_json"]) if book.kind == SUPPLEMENT else records[incoming_id]
             protected = existing is not None and (
                 is_attested(json.loads(existing["index_json"]).get("scientific_audit_status"))
                 or is_attested(json.loads(existing["record_json"]).get("scientific_audit_status"))
@@ -418,11 +469,33 @@ class CorpusRepository:
 
     def _import_documents(self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport) -> None:
         documents = {**book.documents, "START_HERE": _canonical(book.start_here)}
+        if book.kind == SUPPLEMENT:
+            # Keyed by workbook so a supplement never replaces the base package's documents.
+            documents = {
+                f"{book.source_name}:START_HERE": _canonical(book.start_here),
+                f"{book.source_name}:NEW_DETAILED_PAPERS": _canonical(book.new_detailed_papers),
+            }
         for name, text in documents.items():
             self._upsert(
                 connection, "staging_corpus_documents", "name", name, _fingerprint(text),
                 {"text": text, "import_run_id": report.run_id},
                 report.documents,
+            )
+
+    def _import_coverage(
+        self, connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport,
+        paper_map: dict[str, str],
+    ) -> None:
+        for row in book.coverage:
+            paper_id = paper_map[row["paper_id"]]
+            self._upsert(
+                connection, "staging_corpus_paper_coverage", "coverage_key",
+                f"{book.source_name}:{paper_id}", _fingerprint(row),
+                {
+                    "paper_id": paper_id, "source_name": book.source_name,
+                    "row_json": _canonical(row), "import_run_id": report.run_id,
+                },
+                report.coverage,
             )
 
     # -- reads -------------------------------------------------------------
@@ -438,6 +511,12 @@ class CorpusRepository:
                     "SELECT scientific_status, COUNT(*) AS n FROM staging_corpus_claims GROUP BY 1"
                 )
             }
+            audits = {
+                row["independent_audit"]: row["n"]
+                for row in connection.execute(
+                    "SELECT independent_audit, COUNT(*) AS n FROM staging_corpus_claims GROUP BY 1"
+                )
+            }
             last = connection.execute(
                 "SELECT * FROM staging_corpus_import_runs ORDER BY imported_at DESC LIMIT 1"
             ).fetchone()
@@ -448,6 +527,7 @@ class CorpusRepository:
                 "research_gap_candidates": count("staging_corpus_research_gaps"),
                 "aliases": count("staging_corpus_paper_aliases"),
                 "claim_statuses": statuses,
+                "claim_independent_audit": audits,
                 "last_import": None if last is None else self._run(last),
             }
 
@@ -550,11 +630,29 @@ class CorpusRepository:
                     "SELECT * FROM staging_corpus_paper_aliases WHERE paper_id = ?", (row["paper_id"],)
                 )
             ]
+            coverage = [
+                {"source_name": item["source_name"], **json.loads(item["row_json"])}
+                for item in connection.execute(
+                    "SELECT * FROM staging_corpus_paper_coverage WHERE paper_id = ? ORDER BY source_name",
+                    (row["paper_id"],),
+                )
+            ]
         record = json.loads(row["record_json"])
         slots = record.get("field_claim_ids", {})
+        # Claims from a supplement workbook are not in the stored record's slots;
+        # they are placed by their declared field_path, never re-interpreted.
+        slotted = {claim_id for fields in slots.values() for ids in fields.values() for claim_id in ids}
+        by_path: dict[str, list[str]] = {}
+        for claim in claims.values():
+            if claim["claim_id"] not in slotted:
+                by_path.setdefault(claim["field_path"], []).append(claim["claim_id"])
+        contract_paths = {definition["field_path"] for definition in contract}
         fields: list[dict[str, Any]] = []
         for definition in contract:
-            claim_ids = slots.get(definition["field_group"], {}).get(definition["field_name"], [])
+            claim_ids = [
+                *slots.get(definition["field_group"], {}).get(definition["field_name"], []),
+                *by_path.get(definition["field_path"], []),
+            ]
             field_claims = [claims[claim_id] for claim_id in claim_ids if claim_id in claims]
             statuses = sorted({claim["scientific_status"] for claim in field_claims})
             fields.append({
@@ -575,6 +673,11 @@ class CorpusRepository:
             "aliases": aliases,
             "experiments": experiments,
             "fields": fields,
+            "uncontracted_claims": [
+                claims[claim_id] for path, ids in sorted(by_path.items())
+                if path not in contract_paths for claim_id in ids
+            ],
+            "coverage": coverage,
             "populated_field_count": sum(1 for item in fields if item["claims"]),
             "not_extracted_field_count": sum(1 for item in fields if not item["claims"]),
             "import_run_id": row["import_run_id"],

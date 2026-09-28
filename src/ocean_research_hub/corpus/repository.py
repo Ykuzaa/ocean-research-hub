@@ -1088,7 +1088,7 @@ class CorpusRepository:
         with closing(self._ready()) as connection:
             rows = connection.execute(
                 f"SELECT * FROM staging_corpus_audit_events {where} "
-                "ORDER BY audited_at, created_at, event_id",
+                "ORDER BY julianday(audited_at), created_at, event_id",
                 parameters,
             ).fetchall()
         return [self._audit_event(row) for row in rows]
@@ -1151,7 +1151,7 @@ class CorpusRepository:
             for row in connection.execute(f"SELECT {id_column}, fingerprint FROM {table}")
         }
         for row in connection.execute(
-            "SELECT * FROM staging_corpus_audit_events ORDER BY audited_at, created_at, event_id"
+            "SELECT * FROM staging_corpus_audit_events ORDER BY julianday(audited_at), created_at, event_id"
         ):
             event = CorpusRepository._audit_event(row)
             event["current"] = event["target_fingerprint"] == fingerprints.get((row["target_kind"], row["target_id"]))
@@ -1382,7 +1382,7 @@ class CorpusRepository:
             paper_audits = [
                 self._audit_event(item) for item in connection.execute(
                     "SELECT * FROM staging_corpus_audit_events WHERE target_kind = 'PAPER' AND target_id = ? "
-                    "ORDER BY audited_at, created_at, event_id",
+                    "ORDER BY julianday(audited_at), created_at, event_id",
                     (row["paper_id"],),
                 )
             ]
@@ -1554,7 +1554,7 @@ class CorpusRepository:
             ).fetchone()
             audits = connection.execute(
                 "SELECT * FROM staging_corpus_audit_events WHERE target_kind = 'CLAIM' AND target_id = ? "
-                "ORDER BY audited_at, created_at, event_id",
+                "ORDER BY julianday(audited_at), created_at, event_id",
                 (claim_id,),
             ).fetchall()
         if row is None:

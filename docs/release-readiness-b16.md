@@ -40,8 +40,10 @@ sufficient source review supports the negative finding.
 
 - **PR #35**, branch `claude/issue-13-import-b15`, now carries B16, the audit
   ledger and the Next.js corpus workspace. It is a **draft**, not merge-ready.
-  Local Python tests (266), frontend tests (8), typecheck and production build
-  pass. A Sourcery static-analysis check currently reports a dynamic-SQL warning
+  Local Python tests (267), frontend tests (8), typecheck and production build
+  pass. Independent QA found and reproduced a timezone-ordering defect in the
+  audit ledger; it is corrected with an absolute-time regression test, pending
+  QA rerun. A Sourcery static-analysis check currently reports a dynamic-SQL warning
   at claim filtering; that path builds column names from a fixed tuple and binds
   all user values as query parameters. It still needs review/closure in the PR.
 - **PR #36 (#11)**, branch `codex/issue-11-research-model`, preserves the

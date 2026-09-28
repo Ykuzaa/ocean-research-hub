@@ -1203,6 +1203,34 @@ def test_full_verification_requires_independent_paper_completeness_attestation(
     )["verification_state"] == "PARTIALLY_VERIFIED"
 
 
+def test_latest_audit_uses_absolute_time_across_timezone_offsets(
+    b16_repository: CorpusRepository,
+) -> None:
+    claim = b16_repository.get_claim("ORI-0001")
+    base = {
+        "target_kind": "CLAIM", "target_id": claim["claim_id"],
+        "justification": "Independent source review with a later conflicting passage.",
+        "auditor_id": "scientific-auditor:test", "provenance_type": "AUTHOR_REPORTED_FACT",
+        "source_kind": "PRIMARY_PAPER", "source_edition": "published PDF",
+        "page": 1, "section": "Methods", "locator": "paragraph", "evidence": "Source passage summary.",
+        "reviewed": {
+            "value": claim["value"], "unit": claim["unit"],
+            "experiment_id": claim["experiment_id"], "field_path": claim["field_path"],
+        },
+    }
+    b16_repository.record_audit({
+        **base, "decision": "VERIFIED", "audited_at": "2026-09-28T10:00:00+02:00",
+    })
+    b16_repository.record_audit({
+        **base, "decision": "CONFLICT", "audited_at": "2026-09-28T09:00:00+00:00",
+    })
+    updated = b16_repository.get_claim(claim["claim_id"])
+    assert [event["decision"] for event in updated["audits"]] == ["VERIFIED", "CONFLICT"]
+    assert updated["latest_audit"]["decision"] == "CONFLICT"
+    assert updated["verification_state"] == "CONFLICT"
+    assert b16_repository.get_paper(claim["paper_id"])["conflict_blocker_state"] == "CONFLICT"
+
+
 def test_audit_is_bound_to_the_reviewed_version_and_cannot_verify_a_review_label(
     b16_repository: CorpusRepository, b16_book: StagingWorkbook,
 ) -> None:

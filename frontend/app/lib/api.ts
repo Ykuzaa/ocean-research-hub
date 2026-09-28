@@ -241,3 +241,131 @@ export function getLandingDrilldown(path: string): Promise<LandingDrilldown> {
   }
   return request(path);
 }
+
+export type CorpusEvidence = {
+  source_url: string | null;
+  source_doi: string | null;
+  source_edition: string | null;
+  section: string | null;
+  locator: string | null;
+  verbatim_evidence: string | null;
+  pdf_page: number | null;
+  evidence_review: string | null;
+};
+
+export type CorpusAuditEvent = {
+  event_id: string;
+  target_kind: "CLAIM" | "MARKER" | "PAPER";
+  target_id: string;
+  decision: string;
+  justification: string;
+  auditor_id: string;
+  audited_at: string;
+  provenance_type: string;
+  source_kind: string;
+  source_edition: string;
+  page: number | null;
+  section: string | null;
+  locator: string | null;
+  evidence: string | null;
+  search_scope: string | null;
+  target_fingerprint: string;
+  current?: boolean;
+  reviewed: { value?: unknown; unit?: string | null; experiment_id?: string | null; field_path?: string };
+};
+
+export type CorpusClaim = {
+  claim_id: string;
+  paper_id: string;
+  experiment_id: string | null;
+  field_path: string;
+  value: unknown;
+  value_raw: unknown;
+  subject_scope: string | null;
+  claim_type: string | null;
+  unit: string | null;
+  scientific_status: string;
+  verification_state: string;
+  independent_audit: string | null;
+  evidence: CorpusEvidence;
+  notes: string | null;
+  latest_audit: CorpusAuditEvent | null;
+  audits?: CorpusAuditEvent[];
+};
+
+export type CorpusMarker = {
+  marker_id: string;
+  field_path: string;
+  extraction_status: string;
+  scientific_status: string;
+  verification_state: string;
+  section_or_scope: string | null;
+  source_edition: string | null;
+  source_url: string | null;
+  notes: string | null;
+};
+
+export type CorpusPaperSummary = {
+  paper_id: string;
+  title: string | null;
+  year: number | string | null;
+  doi: string | null;
+  domain: string | null;
+  source_url: string | null;
+  source_edition: string | null;
+  review_stage: string | null;
+  scientific_extraction_status: string | null;
+  claim_count: number;
+  extraction_completeness: {
+    state: string;
+    declared_coverage: string | null;
+    claim_count: number;
+    locatable_claim_count: number;
+    review_scope_documented: boolean;
+    primary_source_review: boolean;
+    follow_up: string | null;
+    completion_candidate: boolean;
+    completion_blocker: string | null;
+  };
+  verification_state: string;
+  conflict_blocker_state: string;
+  audit_candidate: boolean;
+  audit_counts: { claims: number; reviewed: number; verified: number; partially_verified: number; markers: number };
+};
+
+export type CorpusField = {
+  field_path: string;
+  group: string;
+  field_name: string;
+  status: string;
+  claims: CorpusClaim[];
+  markers: CorpusMarker[];
+};
+
+export type CorpusPaper = CorpusPaperSummary & {
+  experiments: string[];
+  fields: CorpusField[];
+  uncontracted_claims: CorpusClaim[];
+  uncontracted_markers: CorpusMarker[];
+  not_extracted_field_count: number;
+  paper_audits: CorpusAuditEvent[];
+};
+
+export async function listCorpusPapers(options: {
+  q?: string; domain?: string; extractionState?: string; auditState?: string; limit?: number;
+} = {}): Promise<{ papers: CorpusPaperSummary[]; total: number }> {
+  const query = new URLSearchParams({ limit: String(options.limit ?? 500) });
+  if (options.q) query.set("q", options.q);
+  if (options.domain) query.set("domain", options.domain);
+  if (options.extractionState) query.set("extraction_state", options.extractionState);
+  if (options.auditState) query.set("audit_state", options.auditState);
+  return request(`/api/corpus/papers?${query}`, { timeoutMs: 15_000 });
+}
+
+export function getCorpusPaper(id: string): Promise<CorpusPaper> {
+  return request(`/api/corpus/papers/${encodeURIComponent(id)}`, { timeoutMs: 15_000 });
+}
+
+export function getCorpusClaim(id: string): Promise<CorpusClaim> {
+  return request(`/api/corpus/claims/${encodeURIComponent(id)}`);
+}

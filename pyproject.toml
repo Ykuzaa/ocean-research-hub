@@ -29,3 +29,5 @@ packages = ["src/ocean_research_hub"]
 ocean-research-hub = "ocean_research_hub.__main__:main"
 ocean-research-hub-benchmark = "ocean_research_hub.evaluation.__main__:main"
 ocean-research-hub-import-corpus = "ocean_research_hub.corpus.cli:main"
+ocean-research-hub-audit-corpus = "ocean_research_hub.corpus.audit_cli:main"
+ocean-research-hub-audit-report = "ocean_research_hub.corpus.audit_report_cli:main"

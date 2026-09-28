@@ -429,7 +429,7 @@ def client(tmp_path: Path, book: StagingWorkbook):
 def test_api_summary_and_listing(client: TestClient) -> None:
     summary = client.get("/api/corpus").json()
     assert (summary["papers"], summary["claims"], summary["field_definitions"], summary["research_gap_candidates"]) == (115, 144, 162, 8)
-    assert "NOT independently verified" in summary["notice"]
+    assert "audit decisions are recorded per claim" in summary["notice"]
     listing = client.get("/api/corpus/papers", params={"limit": 500}).json()
     assert listing["total"] == 115 and len(listing["papers"]) == 115
     assert client.get("/api/corpus/papers", params={"q": "OceanNet"}).json()["total"] == 1
@@ -465,7 +465,7 @@ def test_api_unknown_ids_are_404(client: TestClient) -> None:
 def test_website_pages_render_with_the_staging_notice(client: TestClient) -> None:
     index = client.get("/corpus")
     assert index.status_code == 200
-    assert "NOT independently verified" in index.text
+    assert "audit decisions are recorded per claim" in index.text
     assert index.text.count('href="/corpus/papers/') == 115
     assert "Cross-regime robustness" in index.text
     detail = client.get("/corpus/papers/OAI-0001")
@@ -1019,7 +1019,26 @@ def test_a_count_matching_neither_definition_is_still_refused(b15_book: StagingW
     from ocean_research_hub.corpus import workbook as module
     start_here = {**b15_book.start_here, "Champs manquants hérités": "53"}
     errors = module._supplement_errors(_mutated(b15_book, start_here=start_here, warnings=[]))
-    assert "START_HERE declares Champs manquants hérités = 53 but the workbook has 69" in errors
+    assert "START_HERE declares Champs manquants hérités = 53 but its formula definition requires 52" in errors
+
+
+def test_b15_formula_counts_cannot_fall_back_to_the_legacy_marker_convention(
+    b15_book: StagingWorkbook,
+) -> None:
+    from ocean_research_hub.corpus import workbook as module
+
+    # These are internally consistent legacy counts (claims + all markers), but
+    # B15 explicitly declares formula-defined counts: all rows and B03 markers.
+    start_here = {
+        **b15_book.start_here,
+        "Lignes extraites / historiques": "1746",
+        "Champs manquants hérités": "69",
+    }
+    errors = module._supplement_errors(
+        _mutated(b15_book, start_here=start_here, warnings=[])
+    )
+    assert any("Lignes extraites / historiques" in error and "requires 1815" in error for error in errors)
+    assert any("Champs manquants hérités" in error and "requires 52" in error for error in errors)
 
 
 def test_a_marker_with_any_other_value_is_still_refused(b15_book: StagingWorkbook) -> None:
@@ -1054,3 +1073,173 @@ def test_a_doi_already_held_by_another_paper_is_refused(full: CorpusRepository, 
         full.import_workbook(_mutated(b15_book, paper_index=index))
     assert any("OAI-0071 the DOI" in error and "already held by OAI-0001" in error for error in caught.value.errors)
     assert full.summary() == before
+
+
+# --- supplement workbook (ENRICHED_B16) ------------------------------------
+
+B16_WORKBOOK = WORKBOOK.with_name("Ocean_Research_Intelligence_ENRICHED_B16.xlsx")
+
+
+@pytest.fixture(scope="module")
+def b16_book() -> StagingWorkbook:
+    return read_workbook(B16_WORKBOOK)
+
+
+@pytest.fixture()
+def b16_repository(full: CorpusRepository, b08_book: StagingWorkbook, b15_book: StagingWorkbook, b16_book: StagingWorkbook) -> CorpusRepository:
+    full.import_workbook(b08_book)
+    full.import_workbook(b15_book)
+    full.import_workbook(b16_book)
+    return full
+
+
+def test_b16_integrity_and_delta_are_explicit(b16_book: StagingWorkbook, b15_book: StagingWorkbook) -> None:
+    assert b16_book.sha256 == "084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f"
+    assert (len(b16_book.paper_index), len(b16_book.claims), len(b16_book.research_gaps)) == (115, 1936, 20)
+    old = {row["claim_id"]: row for row in b15_book.claims}
+    new = {row["claim_id"]: row for row in b16_book.claims}
+    assert len(new.keys() - old.keys()) == 121
+    assert all(new[key] == row for key, row in old.items())
+    assert {new[key]["batch_id"] for key in new.keys() - old.keys()} == {"B16"}
+    assert {new[key].get("extraction_status") for key in new.keys() - old.keys()} == {"EXTRACTED"}
+
+
+def test_b16_import_is_idempotent_and_preserves_pending_audits(
+    full: CorpusRepository, b08_book: StagingWorkbook, b15_book: StagingWorkbook, b16_book: StagingWorkbook,
+) -> None:
+    full.import_workbook(b08_book)
+    full.import_workbook(b15_book)
+    report = full.import_workbook(b16_book).counts()
+    assert report["papers"] == {"created": 0, "updated": 5, "unchanged": 110, "skipped_protected": 0}
+    assert report["claims"] == {"created": 121, "updated": 0, "unchanged": 1746, "skipped_protected": 0}
+    assert report["field_markers"]["unchanged"] == 69
+    assert full.summary()["claim_statuses"] == {"NOT_VERIFIED": 1867}
+    again = full.import_workbook(b16_book).counts()
+    assert again["claims"] == {"created": 0, "updated": 0, "unchanged": 1867, "skipped_protected": 0}
+    assert again["papers"] == {"created": 0, "updated": 0, "unchanged": 115, "skipped_protected": 0}
+
+
+def test_b16_mapping_is_complete_versioned_and_never_applied_while_pending(
+    b16_repository: CorpusRepository,
+) -> None:
+    mapping = b16_repository.field_mappings()
+    assert mapping["version"]["workbook_sha256"] == "084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f"
+    assert len(mapping["mappings"]) == 981
+    assert {row["review_status"] for row in mapping["mappings"]} == {"PENDING"}
+    assert not any(row["projection_applied"] for row in mapping["mappings"])
+    assert all(row["source_candidate"] is not None for row in mapping["mappings"])
+
+
+def test_audit_events_are_append_only_and_cannot_manufacture_verification(
+    b16_repository: CorpusRepository,
+) -> None:
+    imported = b16_repository.get_claim("ORI-0001")
+    base = {
+        "target_kind": "CLAIM", "target_id": "ORI-0001",
+        "decision": "VERIFIED", "justification": "Checked against the cited sentence.",
+        "auditor_id": "scientific-auditor:test", "audited_at": "2026-09-28T10:00:00+00:00",
+        "provenance_type": "AUTHOR_REPORTED_FACT", "source_kind": "PRIMARY_PAPER",
+        "source_edition": "published PDF", "page": 1, "section": "Methods",
+        "locator": "paragraph 2", "evidence": "Exact author sentence.",
+        "reviewed": {
+            "value": imported["value"], "unit": imported["unit"],
+            "experiment_id": imported["experiment_id"], "field_path": imported["field_path"],
+        },
+    }
+    with pytest.raises(ValueError, match="evidence and a page"):
+        b16_repository.record_audit({**base, "page": None, "section": None, "locator": None, "evidence": None})
+    with pytest.raises(ValueError, match="author-reported provenance"):
+        b16_repository.record_audit({**base, "provenance_type": "AI_INTERPRETATION"})
+    with pytest.raises(ValueError, match="field absence marker"):
+        b16_repository.record_audit({**base, "decision": "NOT_REPORTED", "evidence": None})
+    first = b16_repository.record_audit(base)
+    second = b16_repository.record_audit({
+        **base, "decision": "CONFLICT", "justification": "A second source passage disagrees.",
+        "audited_at": "2026-09-28T11:00:00+00:00", "event_id": None,
+    })
+    claim = b16_repository.get_claim("ORI-0001")
+    assert [event["event_id"] for event in claim["audits"]] == [first["event_id"], second["event_id"]]
+    assert claim["verification_state"] == "CONFLICT"
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        with pytest.raises(sqlite3.IntegrityError, match="append-only"):
+            connection.execute("UPDATE staging_corpus_audit_events SET decision='VERIFIED'")
+
+
+def test_operational_states_and_filters_do_not_treat_detailed_as_verified(
+    b16_repository: CorpusRepository,
+) -> None:
+    papers, total = b16_repository.list_papers(audit_state="NOT_VERIFIED", limit=500)
+    assert total == 115
+    detailed = next(paper for paper in papers if paper["paper_id"] == "OAI-0005")
+    assert detailed["extraction_completeness"]["declared_coverage"] == "DETAILED"
+    assert detailed["verification_state"] == "NOT_VERIFIED"
+    candidates, candidate_total = b16_repository.list_papers(extraction_state="READY_FOR_AUDIT", limit=500)
+    assert candidate_total > 0
+    assert all(paper["audit_candidate"] for paper in candidates)
+    assert all(not paper["extraction_completeness"]["completion_candidate"] for paper in candidates)
+    for paper_id in ("OAI-0013", "OAI-0077", "OAI-0089"):
+        assert b16_repository.get_paper(paper_id)["conflict_blocker_state"] == "CONFLICT"
+
+
+def test_full_verification_requires_independent_paper_completeness_attestation(
+    b16_repository: CorpusRepository,
+) -> None:
+    paper = b16_repository.get_paper("OAI-0002")
+    event = {
+        "target_kind": "PAPER", "target_id": paper["paper_id"], "decision": "VERIFIED",
+        "justification": "Checked every applicable field and source edition.",
+        "auditor_id": "scientific-auditor:test", "audited_at": "2026-09-28",
+        "provenance_type": "AUTHOR_REPORTED_FACT", "source_kind": "PRIMARY_PAPER",
+        "source_edition": "published PDF", "page": 1, "section": "Whole paper",
+        "locator": "all sections", "evidence": "Documented full-paper inspection.",
+        "reviewed": {"paper_id": paper["paper_id"]},
+    }
+    with pytest.raises(ValueError, match="field-by-field review scope"):
+        b16_repository.record_audit(event)
+    assert CorpusRepository._operational_states(
+        [{"claim_id": "test-claim", "scientific_status": "NOT_VERIFIED", "row_json": '{}'}],
+        [], {}, {("CLAIM", "test-claim"): {"decision": "VERIFIED", "current": True}},
+        "test-paper",
+    )["verification_state"] == "PARTIALLY_VERIFIED"
+
+
+def test_audit_is_bound_to_the_reviewed_version_and_cannot_verify_a_review_label(
+    b16_repository: CorpusRepository, b16_book: StagingWorkbook,
+) -> None:
+    claim = b16_repository.get_claim("ORI-0001")
+    event = {
+        "target_kind": "CLAIM", "target_id": "ORI-0001", "decision": "VERIFIED",
+        "justification": "The primary paper explicitly states the interpolation task.",
+        "auditor_id": "scientific-auditor:test", "audited_at": "2026-09-28",
+        "provenance_type": "AUTHOR_REPORTED_FACT", "source_kind": "PRIMARY_PAPER",
+        "source_edition": "GMD published PDF SHA-256 test", "page": 2119,
+        "section": "Abstract", "locator": "task sentence", "evidence": "Auditor evidence summary for the task sentence.",
+        "reviewed": {
+            "value": claim["value"], "unit": claim["unit"],
+            "experiment_id": claim["experiment_id"], "field_path": claim["field_path"],
+        },
+    }
+    with pytest.raises(ValueError, match="reviewed claim value"):
+        b16_repository.record_audit({**event, "reviewed": {**event["reviewed"], "unit": "m"}})
+    b16_repository.record_audit(event)
+    assert b16_repository.get_claim("ORI-0001")["verification_state"] == "VERIFIED"
+    review_claim = b16_repository.get_claim("B16-0001")
+    with pytest.raises(ValueError, match="not a scientific experiment"):
+        b16_repository.record_audit({
+            **event, "target_id": "B16-0001",
+            "reviewed": {
+                "value": review_claim["value"], "unit": review_claim["unit"],
+                "experiment_id": review_claim["experiment_id"], "field_path": review_claim["field_path"],
+            },
+        })
+    changed = copy.deepcopy(b16_book.claims)
+    next(row for row in changed if row["claim_id"] == "ORI-0001")["notes"] = "New source review pending."
+    report = b16_repository.import_workbook(_mutated(b16_book, claims=changed))
+    assert report.claims.updated == 1
+    current = b16_repository.get_claim("ORI-0001")
+    assert current["verification_state"] == "STALE_AUDIT"
+    assert current["latest_audit"]["current"] is False
+    assert len(current["audits"]) == 1
+    paper = b16_repository.get_paper("OAI-0001")
+    assert paper["verification_state"] != "FULLY_VERIFIED"
+    assert paper["audit_counts"]["stale"] == 1

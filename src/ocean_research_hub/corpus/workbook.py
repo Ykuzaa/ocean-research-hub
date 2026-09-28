@@ -132,6 +132,7 @@ SUPPLEMENT_DECLARED_COUNTS = {
     "New detailed papers": "NEW_DETAILED_PAPERS",
     # ENRICHED labels its counts in French.
     "Lignes SCIENTIFIC_CLAIMS": "SCIENTIFIC_CLAIMS",
+    "Lignes totales / historiques": "SCIENTIFIC_CLAIMS",
     "Lignes extraites / historiques": "EXTRACTED_ROWS",
     "Champs manquants hérités": "MARKERS",
     "Papiers avec extraction": "DETAILED_PAPERS",
@@ -634,7 +635,10 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
         )
     declared_extracted = declared_counts.get("Lignes extraites / historiques")
     declared_markers = declared_counts.get("Champs manquants hérités")
+    formula_count_contract = "Niveaux de couverture (formules)" in book.start_here
     marker_convention = (
+        not formula_count_contract
+        and
         declared_extracted is not None and declared_markers is not None
         and (declared_extracted, declared_markers) != (extracted, markers)
         and declared_extracted + declared_markers == len(book.claims) and declared_markers <= markers
@@ -657,7 +661,21 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
     }
     formula_matched: list[str] = []
     for label, sheet in SUPPLEMENT_DECLARED_COUNTS.items():
-        if label not in declared_counts or (marker_convention and sheet in {"EXTRACTED_ROWS", "MARKERS"}):
+        if label not in declared_counts:
+            continue
+        if formula_count_contract and sheet in formula_counts:
+            expected = formula_counts[sheet]
+            if declared_counts[label] != expected:
+                errors.append(
+                    f"START_HERE declares {label} = {declared_counts[label]} "
+                    f"but its formula definition requires {expected}"
+                )
+            elif declared_counts[label] != counts[sheet]:
+                formula_matched.append(
+                    f"{label} = {declared_counts[label]} (the workbook has {counts[sheet]})"
+                )
+            continue
+        if marker_convention and sheet in {"EXTRACTED_ROWS", "MARKERS"}:
             continue
         if declared_counts[label] == counts[sheet]:
             continue

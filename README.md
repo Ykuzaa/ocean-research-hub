@@ -7,6 +7,42 @@ status, provenance, and source evidence. Missing values remain `NOT_REPORTED`, d
 
 The scientific and multi-agent operating contract is in [`AGENTS.md`](AGENTS.md).
 
+## Current extracted-paper collection
+
+The staging collection is separate from the original canonical `PaperRecord`
+MVP below. The current B16 workbook contains 115 papers, 1,867 candidate claims
+and 69 absence markers (1,936 rows on `SCIENTIFIC_CLAIMS`). Import the cumulative
+editions in order into one SQLite database:
+
+```bash
+uv sync --all-extras --frozen
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Hub_COMPLET.xlsx --database .data/ocean-research-hub.db
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_EXPANDED_V2.xlsx --database .data/ocean-research-hub.db
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_ENRICHED.xlsx --database .data/ocean-research-hub.db
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_ENRICHED_B08.xlsx --database .data/ocean-research-hub.db
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_ENRICHED_B15.xlsx --database .data/ocean-research-hub.db
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_ENRICHED_B16.xlsx --database .data/ocean-research-hub.db
+```
+
+Launch the API in one terminal, then the Next.js workspace in another:
+
+```bash
+uv run uvicorn ocean_research_hub.api:app --host 127.0.0.1 --port 8001
+```
+
+```bash
+cd frontend
+npm ci
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8001 npm run dev -- --hostname 127.0.0.1 --port 3001
+```
+
+Open `http://127.0.0.1:3001/explore`. The separate ports avoid an existing
+service on the default 8000/3000 ports; use matching API URL and port if you
+change them. Imported claims start unverified. The two report files under
+`evaluation/reports/` can be replayed only with their hash-pinned primary PDFs;
+see [the import and audit procedure](docs/corpus-import.md). No paper is yet
+certified as fully extracted and verified.
+
 ## Prerequisites
 
 - Python 3.11 or newer
@@ -123,9 +159,11 @@ benchmark, provenance, and scientific-integrity regressions.
   multi-user collaboration yet.
 - DOI ingestion retrieves Crossref bibliographic metadata. The MVP does not download or parse PDFs;
   structured parsed records are supplied by the caller behind a replaceable parser interface.
-- Retrieval is by stable paper ID. There is no catalog, keyword search, or semantic/vector search.
-- The server-rendered detail and comparison pages are intentionally minimal; there is no Next.js
-  client yet.
+- The original canonical-record API retrieves by stable paper ID. The separate
+  staging collection now has a catalogue with title/DOI search and status filters;
+  semantic/vector search is not available.
+- The canonical-record HTML remains minimal. A Next.js staging workspace now
+  provides catalogue, paper, claim/evidence and comparison pages.
 - The three-paper golden dataset is a compact safety benchmark, not a comprehensive scientific
   corpus. Extraction outputs remain pre-audit until an independent Scientific Auditor verifies
   them against primary sources.

@@ -17,7 +17,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from .repository import CorpusNotFoundError, CorpusRepository
 
 STAGING_NOTICE = (
-    "Staging corpus - NOT independently verified. Candidate claims are NOT_VERIFIED; "
+    "Staging corpus - audit decisions are recorded per claim and never inferred from extraction. "
+    "Claims without a current independent audit remain NOT_VERIFIED; "
     "empty fields are NOT_EXTRACTED (nobody looked), never NOT_REPORTED; a field the package "
     "looked for and did not find is at most a NOT_REPORTED_CANDIDATE within its stated search scope. "
     "PDF page numbers, where present, are as supplied by the package and unchecked; no verbatim "
@@ -36,10 +37,13 @@ def register_corpus_routes(app: FastAPI, repository: CorpusRepository) -> None:
     @app.get("/api/corpus/papers")
     async def corpus_papers(
         q: str | None = None, domain: str | None = None, review_stage: str | None = None,
+        extraction_state: str | None = None, audit_state: str | None = None,
         limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0),
     ) -> dict[str, Any]:
         papers, total = repository.list_papers(
-            query=q, domain=domain, review_stage=review_stage, limit=limit, offset=offset,
+            query=q, domain=domain, review_stage=review_stage,
+            extraction_state=extraction_state, audit_state=audit_state,
+            limit=limit, offset=offset,
         )
         return {"notice": STAGING_NOTICE, "total": total, "limit": limit, "offset": offset, "papers": papers}
 
@@ -85,6 +89,17 @@ def register_corpus_routes(app: FastAPI, repository: CorpusRepository) -> None:
     @app.get("/api/corpus/import-runs")
     async def corpus_runs() -> dict[str, Any]:
         return {"import_runs": repository.import_runs()}
+
+    @app.get("/api/corpus/audits")
+    async def corpus_audits(
+        target_kind: str | None = None, target_id: str | None = None,
+    ) -> dict[str, Any]:
+        events = repository.list_audits(target_kind=target_kind, target_id=target_id)
+        return {"total": len(events), "audit_events": events}
+
+    @app.get("/api/corpus/field-mappings")
+    async def corpus_field_mappings(version_id: str | None = None) -> dict[str, Any]:
+        return repository.field_mappings(version_id)
 
     @app.get("/corpus", response_class=HTMLResponse)
     async def corpus_page(q: str | None = None, domain: str | None = None) -> HTMLResponse:

@@ -54,11 +54,16 @@ class SourceEvidence(BaseModel):
     locator: str | None = None
     evidence: str | None = None
     origin: SourceOrigin | None = None
+    # Optional exact binding to a registered source edition. When absent, the
+    # normalized projection binds evidence to its claim's source edition.
+    source_edition_key: str | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     # Required for each record that supports one side of a CONFLICT field.
     # JsonValue preserves a typed, serializable link to the asserted value.
     claimed_value: JsonValue | None = None
 
-    @field_validator("section", "locator", "evidence")
+    @field_validator("section", "locator", "evidence", "source_edition_key")
     @classmethod
     def blank_strings_are_none(cls, value: str | None) -> str | None:
         return value or None
@@ -395,6 +400,7 @@ class DataDescription(BaseModel):
 class Architecture(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    named_models: TextListField = Field(default_factory=TextListField)
     family: TextListField = Field(default_factory=TextListField)
     summary: TextField = Field(default_factory=TextField)
     encoder: TextField = Field(default_factory=TextField)

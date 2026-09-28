@@ -979,3 +979,64 @@ def test_an_aliased_base_row_keeps_the_canonical_id(imported: CorpusRepository, 
     imported.import_workbook(_mutated(book, paper_index=index, paper_records=records, claims=claims), allow_revert=True)
     stored = imported.get_paper("OAI-0002")["paper_index"]
     assert stored["paper_id"] == "OAI-0002" and stored["source_paper_id"] == "EXT-9002"
+
+
+# --- supplement workbook (ENRICHED_B15) --------------------------------------
+
+B15_WORKBOOK = WORKBOOK.with_name("Ocean_Research_Intelligence_ENRICHED_B15.xlsx")
+
+
+@pytest.fixture(scope="module")
+def b15_book() -> StagingWorkbook:
+    return read_workbook(B15_WORKBOOK)
+
+
+def test_b15_formula_counts_and_marker_reason_are_reported(b15_book: StagingWorkbook) -> None:
+    assert (len(b15_book.paper_index), len(b15_book.claims)) == (115, 1815)
+    marker = next(row for row in b15_book.claims if row["claim_id"] == "B14-0005")
+    assert marker["value"] == "NOT_EXTRACTED"
+    assert marker["value_as_supplied"].startswith("NOT_EXTRACTED: Supplementary Figures")
+    assert any("['B14-0005'] carried their reason" in warning for warning in b15_book.warnings)
+    assert any("B15 formula definitions" in warning and "Champs manquants hérités = 52" in warning for warning in b15_book.warnings)
+    assert set(b15_book.supplement_documents) >= {"FIELD_PATH_MAP", "RESUME_POINT", "BLOCKED_FULLTEXT"}
+
+
+def test_a_count_matching_neither_definition_is_still_refused(b15_book: StagingWorkbook) -> None:
+    from ocean_research_hub.corpus import workbook as module
+    start_here = {**b15_book.start_here, "Champs manquants hérités": "53"}
+    errors = module._supplement_errors(_mutated(b15_book, start_here=start_here, warnings=[]))
+    assert "START_HERE declares Champs manquants hérités = 53 but the workbook has 69" in errors
+
+
+def test_a_marker_with_any_other_value_is_still_refused(b15_book: StagingWorkbook) -> None:
+    from ocean_research_hub.corpus import workbook as module
+    claims = copy.deepcopy(b15_book.claims)
+    next(row for row in claims if row["claim_id"] == "B14-0005")["value"] = "Figures S1-S8"
+    assert any("B14-0005 is a NOT_EXTRACTED marker" in error for error in module._claim_row_errors(_mutated(b15_book, claims=claims)))
+
+
+def test_b15_fills_a_missing_doi_and_is_idempotent(full: CorpusRepository, b08_book: StagingWorkbook, b15_book: StagingWorkbook) -> None:
+    full.import_workbook(b08_book)
+    report = full.import_workbook(b15_book)
+    counts = report.counts()
+    assert counts["claims"] == {"created": 226, "updated": 0, "unchanged": 1520, "skipped_protected": 0}
+    assert counts["field_markers"] == {"created": 10, "updated": 3, "unchanged": 56, "skipped_protected": 0}
+    assert any("adds the missing DOI 10.1016/j.oceaneng.2024.117501 to OAI-0071" in warning for warning in report.warnings)
+    assert full.get_paper("OAI-0071")["paper_index"]["doi"] == "10.1016/j.oceaneng.2024.117501"
+    summary = full.summary()
+    assert (summary["papers"], summary["claims"]) == (115, 1746)
+    assert set(summary["claim_statuses"]) == {"NOT_VERIFIED"}
+    again = full.import_workbook(b15_book).counts()
+    assert again["claims"]["unchanged"] == 1746 and again["papers"]["unchanged"] == 115
+
+
+def test_a_doi_already_held_by_another_paper_is_refused(full: CorpusRepository, b08_book: StagingWorkbook, b15_book: StagingWorkbook) -> None:
+    full.import_workbook(b08_book)
+    index = copy.deepcopy(b15_book.paper_index)
+    taken = next(row["doi"] for row in index if row["paper_id"] == "OAI-0001")
+    next(row for row in index if row["paper_id"] == "OAI-0071")["doi"] = taken
+    before = full.summary()
+    with pytest.raises(WorkbookValidationError) as caught:
+        full.import_workbook(_mutated(b15_book, paper_index=index))
+    assert any("OAI-0071 the DOI" in error and "already held by OAI-0001" in error for error in caught.value.errors)
+    assert full.summary() == before

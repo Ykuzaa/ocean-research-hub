@@ -464,6 +464,24 @@ class CorpusRepository:
             }
             current = {"doi": stored["doi_key"], "title": stored["title_key"], "year": stored["year"]}
             changed = [column for column in incoming if incoming[column] != current[column]]
+            if changed == ["doi"] and current["doi"] is None and incoming["doi"]:
+                # Filling a missing DOI names the same work; it is refused only when
+                # another stored paper already holds that DOI.
+                holder = connection.execute(
+                    "SELECT paper_id FROM staging_corpus_papers WHERE doi_key = ? AND paper_id != ?",
+                    (incoming["doi"], stored["paper_id"]),
+                ).fetchone()
+                if holder is None:
+                    report.warnings.append(
+                        f"supplement adds the missing DOI {incoming['doi']} to {row['paper_id']} "
+                        f"(title and year unchanged)"
+                    )
+                    continue
+                errors.append(
+                    f"supplement gives {row['paper_id']} the DOI {incoming['doi']}, already held by "
+                    f"{holder['paper_id']}"
+                )
+                continue
             if changed:
                 errors.append(
                     f"supplement changes the identity of {row['paper_id']} ({', '.join(changed)}: stored "

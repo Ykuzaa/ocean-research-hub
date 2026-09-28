@@ -13,6 +13,7 @@ dependencies = [
     "pypdf>=5.0,<7",
     "pydantic>=2.7,<3",
     "uvicorn>=0.30,<1",
+    "openpyxl>=3.1,<4",
 ]
 
 [project.optional-dependencies]
@@ -27,3 +28,4 @@ packages = ["src/ocean_research_hub"]
 [project.scripts]
 ocean-research-hub = "ocean_research_hub.__main__:main"
 ocean-research-hub-benchmark = "ocean_research_hub.evaluation.__main__:main"
+ocean-research-hub-import-corpus = "ocean_research_hub.corpus.cli:main"

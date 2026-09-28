@@ -15,12 +15,14 @@ from ocean_research_hub.corpus.web import register_corpus_routes
 from ocean_research_hub.ingestion.errors import (
     IngestionConflictError,
     IngestionError,
+    InvalidArxivError,
     InvalidComparisonError,
     InvalidDoiError,
     MetadataProviderError,
     PaperNotFoundError,
     ParserError,
     PersistenceError,
+    ResearchEntityNotFoundError,
 )
 from ocean_research_hub.ingestion.models import (
     IngestPaperRequest,
@@ -47,6 +49,16 @@ from ocean_research_hub.landing import (
     landing_drilldown,
 )
 from ocean_research_hub.rendering import render_paper_comparison, render_paper_detail
+from ocean_research_hub.research.models import (
+    EntityDetail,
+    EntityListResponse,
+    EntityRelationship,
+    EntityRelationshipCreate,
+    EntityType,
+    ResearchPaper,
+    SourceEdition,
+    SourceEditionCreate,
+)
 
 
 def create_app(
@@ -90,6 +102,10 @@ def create_app(
     async def invalid_doi_handler(_: Request, error: InvalidDoiError) -> JSONResponse:
         return error_response(422, error)
 
+    @app.exception_handler(InvalidArxivError)
+    async def invalid_arxiv_handler(_: Request, error: InvalidArxivError) -> JSONResponse:
+        return error_response(422, error)
+
     @app.exception_handler(ParserError)
     async def parser_error_handler(_: Request, error: ParserError) -> JSONResponse:
         return error_response(422, error)
@@ -108,6 +124,12 @@ def create_app(
 
     @app.exception_handler(PaperNotFoundError)
     async def not_found_handler(_: Request, error: PaperNotFoundError) -> JSONResponse:
+        return error_response(404, error)
+
+    @app.exception_handler(ResearchEntityNotFoundError)
+    async def entity_not_found_handler(
+        _: Request, error: ResearchEntityNotFoundError
+    ) -> JSONResponse:
         return error_response(404, error)
 
     @app.exception_handler(InvalidComparisonError)
@@ -198,6 +220,72 @@ def create_app(
     @app.get("/api/papers/{paper_id}", response_model=StoredPaper)
     async def get_paper(paper_id: str) -> StoredPaper:
         return get_stored_paper(paper_id)
+
+    @app.get("/api/research/entities", response_model=EntityListResponse)
+    async def list_research_entities(
+        entity_type: EntityType | None = None,
+        q: str | None = Query(default=None, min_length=1, max_length=200),
+        limit: int = Query(default=50, ge=1, le=200),
+        offset: int = Query(default=0, ge=0),
+    ) -> EntityListResponse:
+        try:
+            return paper_repository.list_entities(
+                entity_type=entity_type, query=q, limit=limit, offset=offset
+            )  # type: ignore[attr-defined]
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("research entity query failed") from exc
+
+    @app.get("/api/research/entities/{entity_id}", response_model=EntityDetail)
+    async def get_research_entity(entity_id: str) -> EntityDetail:
+        try:
+            return paper_repository.get_entity(entity_id)  # type: ignore[attr-defined]
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("research entity read failed") from exc
+
+    @app.get("/api/research/papers/{paper_id}", response_model=ResearchPaper)
+    async def get_research_paper(paper_id: str) -> ResearchPaper:
+        try:
+            return paper_repository.get_research_paper(paper_id)  # type: ignore[attr-defined]
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("research paper read failed") from exc
+
+    @app.post(
+        "/api/research/papers/{paper_id}/source-editions",
+        response_model=SourceEdition,
+        status_code=201,
+    )
+    async def add_source_edition(
+        paper_id: str, edition: SourceEditionCreate
+    ) -> SourceEdition:
+        try:
+            return paper_repository.add_source_edition(paper_id, edition)  # type: ignore[attr-defined]
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("source edition write failed") from exc
+
+    @app.post(
+        "/api/research/papers/{paper_id}/relationships",
+        response_model=EntityRelationship,
+        status_code=201,
+    )
+    async def add_entity_relationship(
+        paper_id: str, relationship: EntityRelationshipCreate
+    ) -> EntityRelationship:
+        try:
+            return paper_repository.add_entity_relationship(  # type: ignore[attr-defined]
+                paper_id, relationship
+            )
+        except IngestionError:
+            raise
+        except Exception as exc:
+            raise PersistenceError("entity relationship write failed") from exc
 
     @app.get("/papers/compare", response_class=HTMLResponse)
     async def compare_papers_view(left_id: str, right_id: str) -> HTMLResponse:

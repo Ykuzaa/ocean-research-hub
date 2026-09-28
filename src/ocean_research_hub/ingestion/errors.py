@@ -9,6 +9,10 @@ class InvalidDoiError(IngestionError):
     code = "INVALID_DOI"
 
 
+class InvalidArxivError(IngestionError):
+    code = "INVALID_ARXIV"
+
+
 class MetadataProviderError(IngestionError):
     code = "METADATA_PROVIDER_ERROR"
 
@@ -23,6 +27,10 @@ class IngestionConflictError(IngestionError):
 
 class PaperNotFoundError(IngestionError):
     code = "PAPER_NOT_FOUND"
+
+
+class ResearchEntityNotFoundError(IngestionError):
+    code = "RESEARCH_ENTITY_NOT_FOUND"
 
 
 class InvalidComparisonError(IngestionError):

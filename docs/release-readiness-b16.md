@@ -44,13 +44,16 @@ sufficient source review supports the negative finding.
   pass. A Sourcery static-analysis check currently reports a dynamic-SQL warning
   at claim filtering; that path builds column names from a fixed tuple and binds
   all user values as query parameters. It still needs review/closure in the PR.
-- **#11/#29/#30**, worktree `/home/n7student/ocean-research-hub-issue11`, is
-  preserved with its staged and unstaged model/migration implementation; it is
-  six main commits behind. Its independent local suite has 183 pass, 2 fail:
-  provenance of missing primary-edition bibliography after metadata upgrade,
-  and rollback of a controlled paper upgrade when source-edition insertion
-  collides. These are data-integrity defects, so the worktree is not merged.
-  Field-path canonicalisation is still only a versioned *proposal*, not a
+- **PR #36 (#11)**, branch `codex/issue-11-research-model`, preserves the
+  existing worktree implementation and is now a separate draft PR based on
+  current main. Two data-integrity regressions were corrected: primary-edition
+  bibliography provenance and controlled-upgrade rollback on a source-edition
+  collision. Its own suite passes 272 tests after the main merge. A temporary
+  cross-branch merge with PR #35 passes 286 Python tests, 8 frontend tests,
+  typecheck and build. A full V1→B16 import and no-op B16 reimport also pass
+  in that combined tree; running its migration runner on the populated corpus
+  preserves all 115 staging papers. Independent QA and merge review are still
+  required. Field-path canonicalisation is only a versioned *proposal*, not a
   scientifically validated #29 projection. Numbered migration of the new
   staging tables (#30) is still outstanding.
 - **#19/#31**, branch `codex/issue-19-scientific-extraction-clean`, is preserved
@@ -67,9 +70,10 @@ sufficient source review supports the negative finding.
 
 ## Next work, in order
 
-1. Fix both #11 transactional/provenance regressions in its existing worktree;
-   rebase carefully and run independent QA before a dedicated PR. Port staging
-   DDL into its numbered migration runner without resetting the populated DB.
+1. Run independent adversarial QA on draft PR #36 and its combined head with
+   PR #35. Port staging DDL into the numbered migration runner without resetting
+   the populated DB; the temporary combined import check is not a migration
+   acceptance test for #30.
 2. Independently review the 981 B16 `FIELD_PATH_MAP` rows, version decisions,
    leave ambiguous ones pending, and only then apply validated canonical
    projections. Preserve each original source path and wording.

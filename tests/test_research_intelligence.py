@@ -89,7 +89,10 @@ def test_migrations_are_repeatable_and_recorded(tmp_path: Path) -> None:
             )
         }
 
-    assert versions == [("0001_paper_records",), ("0002_research_intelligence",)]
+    assert versions == [
+        ("0001_paper_records",), ("0002_research_intelligence",),
+        ("0003_staging_corpus",),
+    ]
     assert {
         "source_editions",
         "research_entities",
@@ -353,3 +356,26 @@ def test_cross_identifier_alias_prevents_doi_arxiv_duplicate(tmp_path: Path) -> 
     assert first.status_code == 201
     assert duplicate.status_code == 409
     assert repository.count() == 1
+
+
+def test_numbered_staging_migration_preserves_imported_corpus(tmp_path: Path) -> None:
+    from ocean_research_hub.corpus.repository import CorpusRepository
+    from ocean_research_hub.corpus.workbook import read_workbook
+
+    database = tmp_path / "research.db"
+    corpus = CorpusRepository(database)
+    workbook = Path(__file__).resolve().parents[1] / "import_staging" / "Ocean_Research_Hub_COMPLET.xlsx"
+    corpus.import_workbook(read_workbook(workbook))
+    assert corpus.summary()["papers"] == 115
+
+    canonical = SqlitePaperRepository(database)
+    canonical.initialize()
+    canonical.initialize()
+    with sqlite3.connect(database) as connection:
+        versions = {row[0] for row in connection.execute("SELECT version FROM schema_migrations")}
+        assert "0003_staging_corpus" in versions
+        assert connection.execute("SELECT COUNT(*) FROM staging_corpus_papers").fetchone()[0] == 115
+        assert connection.execute("SELECT COUNT(*) FROM staging_corpus_claims").fetchone()[0] == 144
+        assert connection.execute(
+            "SELECT name FROM sqlite_master WHERE name = 'staging_corpus_audit_events'"
+        ).fetchone() is not None

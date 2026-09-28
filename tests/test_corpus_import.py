@@ -623,7 +623,21 @@ def test_api_serves_the_enriched_corpus(tmp_path: Path, book: StagingWorkbook, s
         assert client.get("/api/corpus/claims", params={"limit": 1000}).json()["total"] == 258
         assert client.get("/api/corpus/papers/OAI-0063").json()["uncontracted_claims"]
         page = client.get("/corpus/papers/OAI-0063")
-        assert "Outside the field contract" in page.text and "rl.action" in page.text
+        assert "outside the 162-field contract" in page.text and "rl.action" in page.text
+
+
+def test_the_paper_page_leads_with_extracted_claims_and_folds_empty_fields(full: CorpusRepository, b08_book: StagingWorkbook, b15_book: StagingWorkbook) -> None:
+    from ocean_research_hub.corpus.web import render_corpus_paper
+    full.import_workbook(b08_book)
+    full.import_workbook(b15_book)
+    paper = full.get_paper("OAI-0005")
+    page = render_corpus_paper(paper)
+    empty = sum(1 for item in paper["fields"] if not item["claims"] and not item["markers"])
+    assert f"<summary><strong>{empty} contract fields not extracted</strong>" in page
+    assert page.index("<h2>Data") < page.index("<h2>Architecture") < page.index("<details><summary><strong>")
+    # Uncontracted claims sit in their theme under their own path and stay unmapped.
+    assert "<code>datasets.split</code><br><span class=\"muted\">outside the 162-field contract" in page
+    assert "B15-0003" in page and "NOT_VERIFIED" in page and "VERIFIED ·" not in page.replace("NOT_VERIFIED ·", "")
 
 
 # --- supplement workbook (ENRICHED: B03-B07, field-status markers) -----------

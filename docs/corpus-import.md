@@ -133,6 +133,97 @@ A declared count is accepted when marker rows alone explain the difference, and
 the import reports it. A difference that marker rows cannot explain is still
 refused.
 
+## Supplement workbook: ENRICHED_B16
+
+`import_staging/Ocean_Research_Intelligence_ENRICHED_B16.xlsx` (SHA-256
+`084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f`) is the
+current cumulative supplement. Import it after B15:
+
+```bash
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_ENRICHED_B16.xlsx \
+  --database .data/ocean-research-hub.db --report-out .data/corpus-import-b16.json
+uv run ocean-research-hub-import-corpus import_staging/Ocean_Research_Intelligence_ENRICHED_B16.xlsx \
+  --database .data/ocean-research-hub.db --dry-run
+```
+
+B16 has 1,936 `SCIENTIFIC_CLAIMS` rows: 1,867 value-bearing candidate claims
+and 69 absence markers. Relative to B15 it adds 121 claims, changes no existing
+claim or marker, and updates five paper/coverage rows (OAI-0001, OAI-0003,
+OAI-0045, OAI-0054 and OAI-0111). All claims remain `NOT_VERIFIED`. The
+workbook supplies 482 page locators and no verbatim evidence. A page number is
+an audit lead, not an attestation.
+
+`FIELD_PATH_MAP` contains 981 source paths. Import stores every row as a
+versioned `AI_INTERPRETATION` candidate. Exact contract-path matches may carry a
+proposed canonical path, but every rule starts `PENDING`; only `VALIDATED`
+rules are eligible for projection. The workbook never validates its own map.
+
+## Recording an independent audit
+
+Audits are append-only events bound to the exact imported row fingerprint and
+reviewed value, unit, experiment and original field path. Later imports cannot
+erase decisions; a changed row makes the earlier decision visibly stale. Prepare
+one JSON object and append it:
+
+```bash
+uv run ocean-research-hub-audit-corpus audit-event.json \
+  --database .data/ocean-research-hub.db
+```
+
+Every event identifies `target_kind` (`CLAIM`, `MARKER`, or `PAPER`),
+`target_id`, `decision`, `justification`, `auditor_id`, timezone-aware
+`audited_at`, provenance, source kind and exact source edition. `VERIFIED` and
+`PARTIALLY_VERIFIED` require author-reported provenance, primary-paper,
+supplement or author-code evidence, an evidence excerpt, and a page, section or
+locator. `NOT_REPORTED` requires a documented `search_scope`. Corrections are
+new events; SQL triggers reject update and delete.
+
+Paper state has three independent axes:
+
+- `extraction_completeness`: `NOT_EXTRACTED`, `PARTIAL`, or `READY_FOR_AUDIT`;
+- `verification_state`: `NOT_VERIFIED`, `PARTIALLY_VERIFIED`, or
+  `FULLY_VERIFIED`;
+- `conflict_blocker_state`: `CLEAR`, `CONFLICT`, or `BLOCKED`.
+
+`DETAILED` alone never makes a paper an audit candidate. The candidate rule
+requires actual claims, a documented review scope, a full-text/code evidence
+basis, and at least one locatable claim. No B16 paper has a documented
+field-by-field completeness review spanning the paper, supplements and relevant
+code, so `completion_candidate` is false for all 115 papers. `FULLY_VERIFIED`
+requires a current independent PAPER-level `VERIFIED` completeness attestation
+with documented scope, every claim to have a latest `VERIFIED` audit, and no
+markers, conflicts, or blockers. A partial field audit cannot satisfy this gate.
+
+The two independently authored reports currently available can be replayed
+after importing B16. The PDFs are not bundled with the repository. Download
+the exact editions from the report's `download_url` values and verify their
+hashes before replay:
+
+```bash
+mkdir -p .data/golden-pdfs
+curl -fL 'https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf' -o .data/golden-pdfs/4dvarnet-ssh-2023.pdf
+curl -fL 'https://arxiv.org/pdf/2310.00813v2' -o .data/golden-pdfs/oceannet-2023.pdf
+curl -fL 'https://media.springernature.com/original/springer-static/esm/art:10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf' -o .data/golden-pdfs/oceannet-2023-supplement.pdf
+sha256sum .data/golden-pdfs/4dvarnet-ssh-2023.pdf .data/golden-pdfs/oceannet-2023.pdf .data/golden-pdfs/oceannet-2023-supplement.pdf
+```
+
+The expected hashes, in that order, are
+`bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88`,
+`be82ff557769aff04b119490d6a2ebb718887a1e3962355ab10cc9a7291802e9`, and
+`c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf`.
+If any hash differs, stop; do not silently substitute a new edition. Then:
+
+```bash
+uv run ocean-research-hub-audit-report evaluation/reports/oai-0001-b16-scientific-audit.json --database .data/ocean-research-hub.db
+uv run ocean-research-hub-audit-report evaluation/reports/oai-0002-b16-scientific-audit.json --database .data/ocean-research-hub.db
+```
+
+Replaying an unchanged report is idempotent. A correction to edition, locator,
+evidence or justification appends a new versioned event while retaining the
+old one; thus audit-event history can exceed the number of distinct audited
+claims. The two reports audit 68 claims across two papers, not the entire
+115-paper collection. They do not establish extraction completeness.
+
 ## Scientific integrity rules the importer enforces
 
 - **Nothing is promoted.** All claims (144 base, 258 after V2, 1445 after ENRICHED) arrive `NOT_VERIFIED` /
@@ -160,10 +251,10 @@ refused.
   `PDF_AUDIT_PENDING`, in a claim's or marker's `independent_audit` and in a paper's
   `scientific_audit_status`. Anything else is refused. Otherwise the row would be
   locked against correction.
-- **Audited rows are never overwritten.** A staging paper or claim that received
-  an audit attestation after import (`VERIFIED`, `PARTIALLY_VERIFIED`, `AUDITED`,
-  `INDEPENDENTLY_AUDITED`, `AUDIT_PASSED`, or any non-pending `independent_audit`)
-  is skipped on re-import, and the skip is reported.
+- **Audits are not overwritten.** Independent decisions are separate append-only
+  rows. A changed imported row invalidates the currentness of its prior audit;
+  the UI exposes `STALE_AUDIT` and keeps the decision history. Workbook-provided
+  non-pending attestations remain refused.
 - **The canonical `papers` table (PaperRecord) is never written.** A staging
   paper whose DOI matches a canonical record is linked to it read-only
   (`linked_paper_record_id`).
@@ -237,16 +328,37 @@ Known limitations (confirmed by QA and deliberately not handled):
 | Route | Content |
 |---|---|
 | `GET /api/corpus` | counts, claim-status distribution, last import run, staging notice |
-| `GET /api/corpus/papers?q=&domain=&review_stage=&limit=&offset=` | paper listing |
+| `GET /api/corpus/papers?q=&domain=&review_stage=&extraction_state=&audit_state=&limit=&offset=` | paper listing and operational-state filters |
 | `GET /api/corpus/papers/{paper_id}` | full record: 162 fields with status, candidate claims with evidence, experiments, aliases, linked PaperRecord (alias IDs resolve) |
 | `GET /api/corpus/claims?paper_id=&field_path=&experiment_id=` | claims |
 | `GET /api/corpus/claims/{claim_id}` | one claim with source URL, DOI, edition, section, locator, page, quotation, notes |
 | `GET /api/corpus/fields` | the 162-field contract |
 | `GET /api/corpus/research-gaps` | the 17 research-gap candidates with their provenance |
 | `GET /api/corpus/import-runs` | import history |
-| `GET /corpus`, `GET /corpus/papers/{paper_id}` | server-rendered pages, each with the staging notice |
+| `GET /api/corpus/field-mappings` | versioned, pending source-to-canonical mapping proposals |
+| `GET /api/corpus/audits?target_kind=&target_id=` | immutable audit-event history |
+| `GET /explore`, `/papers/{paper_id}`, `/claims/{claim_id}`, `/compare?left_id=&right_id=` | Next.js catalogue, paper, claim proof and comparison |
 
-## Integration dependencies (not done here)
+## Adding or completing a paper without losing history
+
+1. Save the new source workbook as a new edition and record its SHA-256. Keep
+   stable paper, claim, marker and experiment IDs. Add new IDs for new claims;
+   do not recycle old IDs to mean something else.
+2. Import with `--dry-run` against the existing database; inspect created,
+   updated, unchanged, absent and conflicting rows. An older edition that would
+   revert a row is refused unless `--allow-revert` is deliberately used.
+3. Import the edition to the same database. Reimport it and confirm zero
+   created/updated rows. Earlier rows and audit events remain in place; changed
+   claims show stale audit decisions until independently rechecked.
+4. For missing fields use `NOT_EXTRACTED` until a documented review of the
+   relevant paper, supplement and code supports `NOT_REPORTED`. Record source
+   edition, location and evidence per claim. Keep ambiguous mappings pending.
+5. Ask an independent Scientific Auditor to inspect the primary sources and
+   append field-level decisions. Record a separate PAPER-level completeness
+   decision only after the field-by-field review is genuinely complete. Run QA
+   and the extraction benchmark after material extraction-logic changes.
+
+## Integration dependencies still open
 
 1. **#11 research-intelligence model (Codex, separate worktree, uncommitted).**
    #11 rewrites `api.py`, `ingestion/repository.py` and `schemas/paper_record.py`,
@@ -269,10 +381,9 @@ Known limitations (confirmed by QA and deliberately not handled):
    `data.input_variables`, ...) are not `PaperRecord` paths (`scientific_framing.task_type`,
    `data.inputs`, ...). The mapping is a scientific decision for #11; none is
    inferred here.
-4. **Frontend workspace (#12).** The Next.js app currently serves the public
-   landing only, and `/api/landing` aggregates canonical PaperRecords, so the
-   staging corpus does not appear there, deliberately. The research workspace can
-   consume `/api/corpus/*` directly.
+4. **Frontend workspace (#12).** The Next.js catalogue and detail pages now
+   consume `/api/corpus/*`. The public landing still aggregates canonical
+   PaperRecords and must not be used as a staging-corpus count.
 5. **DOI identity against the live corpus.** Linking uses lowercase DOI equality
    against `papers.doi`. Identity resolution beyond DOI, title and year (for
    example arXiv versus version of record) is part of #13's discovery pipeline

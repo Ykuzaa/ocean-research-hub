@@ -24,9 +24,10 @@ import json
 import sqlite3
 from contextlib import closing
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 from uuid import uuid4
 
 from .workbook import (
@@ -142,6 +143,66 @@ CREATE TABLE IF NOT EXISTS staging_corpus_documents (
     text TEXT NOT NULL,
     fingerprint TEXT NOT NULL,
     import_run_id TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS staging_corpus_audit_events (
+    event_id TEXT PRIMARY KEY,
+    target_kind TEXT NOT NULL CHECK (target_kind IN ('CLAIM', 'MARKER', 'PAPER')),
+    target_id TEXT NOT NULL,
+    decision TEXT NOT NULL CHECK (decision IN (
+        'VERIFIED', 'PARTIALLY_VERIFIED', 'NOT_VERIFIED', 'NOT_REPORTED',
+        'CONFLICT', 'EXTRACTION_ERROR', 'BLOCKED'
+    )),
+    justification TEXT NOT NULL,
+    auditor_id TEXT NOT NULL,
+    audited_at TEXT NOT NULL,
+    provenance_type TEXT NOT NULL CHECK (provenance_type IN (
+        'AUTHOR_REPORTED_FACT', 'AUTHOR_REPORTED_LIMITATION', 'AI_INTERPRETATION', 'TEAM_NOTE'
+    )),
+    source_kind TEXT NOT NULL CHECK (source_kind IN (
+        'PRIMARY_PAPER', 'SUPPLEMENTARY_MATERIAL', 'AUTHOR_CODE',
+        'PUBLISHER_METADATA', 'OTHER'
+    )),
+    source_edition TEXT NOT NULL,
+    page INTEGER CHECK (page IS NULL OR page >= 1),
+    section TEXT,
+    locator TEXT,
+    evidence TEXT,
+    search_scope TEXT,
+    target_fingerprint TEXT NOT NULL,
+    reviewed_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS staging_corpus_audit_target
+    ON staging_corpus_audit_events(target_kind, target_id, audited_at);
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audit_no_update
+BEFORE UPDATE ON staging_corpus_audit_events BEGIN
+    SELECT RAISE(ABORT, 'scientific audit events are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audit_no_delete
+BEFORE DELETE ON staging_corpus_audit_events BEGIN
+    SELECT RAISE(ABORT, 'scientific audit events are append-only');
+END;
+CREATE TABLE IF NOT EXISTS staging_corpus_mapping_versions (
+    version_id TEXT PRIMARY KEY,
+    source_name TEXT NOT NULL,
+    workbook_sha256 TEXT NOT NULL,
+    import_run_id TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS staging_corpus_field_mappings (
+    version_id TEXT NOT NULL REFERENCES staging_corpus_mapping_versions(version_id),
+    original_path TEXT NOT NULL,
+    canonical_path TEXT,
+    decision TEXT NOT NULL CHECK (decision IN ('MAPPED', 'UNMAPPED', 'AMBIGUOUS')),
+    basis TEXT NOT NULL,
+    provenance_type TEXT NOT NULL CHECK (provenance_type IN ('AI_INTERPRETATION', 'TEAM_NOTE')),
+    review_status TEXT NOT NULL CHECK (review_status IN ('PENDING', 'VALIDATED', 'REJECTED')),
+    auditor_id TEXT,
+    reviewed_at TEXT,
+    source_candidate TEXT,
+    PRIMARY KEY (version_id, original_path),
+    CHECK (review_status != 'VALIDATED' OR (auditor_id IS NOT NULL AND reviewed_at IS NOT NULL)),
+    CHECK (decision != 'MAPPED' OR canonical_path IS NOT NULL)
 );
 """
 
@@ -267,10 +328,28 @@ class CorpusRepository:
         connection.execute("PRAGMA foreign_keys = ON")
         return connection
 
-    def _ready(self) -> sqlite3.Connection:
-        if not self._initialized:
-            self.initialize()
-        return self._connect()
+    def _ready(self, *, write: bool = False) -> sqlite3.Connection:
+        if write:
+            if not self._initialized:
+                self.initialize()
+            return self._connect()
+        # Catalogue reads must never create or migrate a database. Before the
+        # first import, use an ephemeral empty schema solely to return truthful
+        # empty results from the same query paths.
+        if self.database_path.is_file():
+            uri = f"file:{quote(str(self.database_path.resolve()), safe='/')}?mode=ro"
+            connection = sqlite3.connect(uri, uri=True)
+            connection.row_factory = sqlite3.Row
+            present = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='staging_corpus_papers'"
+            ).fetchone()
+            if present:
+                return connection
+            connection.close()
+        connection = sqlite3.connect(":memory:")
+        connection.row_factory = sqlite3.Row
+        connection.executescript(SCHEMA)
+        return connection
 
     # -- import ------------------------------------------------------------
 
@@ -293,7 +372,7 @@ class CorpusRepository:
         report = ImportReport(str(uuid4()), book.source_name, book.sha256, allow_revert=allow_revert)
         report.warnings.extend(book.warnings)
         now = datetime.now(UTC).isoformat()
-        connection = self._ready()
+        connection = self._ready(write=True)
         try:
             with connection:
                 self._record_current_versions(connection)
@@ -306,6 +385,7 @@ class CorpusRepository:
                 self._import_gaps(connection, book, report, now)
                 self._import_documents(connection, book, report)
                 self._import_coverage(connection, book, report, paper_map)
+                self._import_field_path_mappings(connection, book, report, now)
                 if report.stale:
                     raise WorkbookValidationError([
                         f"{len(report.stale)} row(s) would be reverted to content an earlier import already "
@@ -342,7 +422,7 @@ class CorpusRepository:
         accepted, so a newer package can never be pre-emptively blocked.
         Returns the number of versions added.
         """
-        with closing(self._ready()) as connection:
+        with closing(self._ready(write=True)) as connection:
             known = connection.execute(
                 "SELECT 1 FROM staging_corpus_import_runs WHERE workbook_sha256 = ?", (book.sha256,)
             ).fetchone()
@@ -464,6 +544,24 @@ class CorpusRepository:
             }
             current = {"doi": stored["doi_key"], "title": stored["title_key"], "year": stored["year"]}
             changed = [column for column in incoming if incoming[column] != current[column]]
+            if changed == ["doi"] and current["doi"] is None and incoming["doi"]:
+                # Filling a missing DOI names the same work; it is refused only when
+                # another stored paper already holds that DOI.
+                holder = connection.execute(
+                    "SELECT paper_id FROM staging_corpus_papers WHERE doi_key = ? AND paper_id != ?",
+                    (incoming["doi"], stored["paper_id"]),
+                ).fetchone()
+                if holder is None:
+                    report.warnings.append(
+                        f"supplement adds the missing DOI {incoming['doi']} to {row['paper_id']} "
+                        f"(title and year unchanged)"
+                    )
+                    continue
+                errors.append(
+                    f"supplement gives {row['paper_id']} the DOI {incoming['doi']}, already held by "
+                    f"{holder['paper_id']}"
+                )
+                continue
             if changed:
                 errors.append(
                     f"supplement changes the identity of {row['paper_id']} ({', '.join(changed)}: stored "
@@ -752,6 +850,51 @@ class CorpusRepository:
                 report.coverage, report=report,
             )
 
+    @staticmethod
+    def _import_field_path_mappings(
+        connection: sqlite3.Connection, book: StagingWorkbook, report: ImportReport, now: str,
+    ) -> None:
+        """Store FIELD_PATH_MAP as a versioned proposal, never as validated truth."""
+        candidates = book.supplement_documents.get("FIELD_PATH_MAP", [])
+        if not candidates:
+            return
+        version_id = f"workbook:{book.sha256}"
+        connection.execute(
+            "INSERT OR IGNORE INTO staging_corpus_mapping_versions VALUES (?, ?, ?, ?, ?)",
+            (version_id, book.source_name, book.sha256, report.run_id, now),
+        )
+        contract = {
+            row["field_path"]
+            for row in connection.execute("SELECT field_path FROM staging_corpus_field_contract")
+        }
+        candidate_paths = {str(row.get("field_path") or "") for row in candidates}
+        supplied_paths = {str(row.get("field_path") or "") for row in book.claims}
+        missing = sorted(supplied_paths - candidate_paths)
+        if missing:
+            raise WorkbookValidationError([
+                f"FIELD_PATH_MAP omits {len(missing)} supplied field path(s): {missing[:20]}"
+            ])
+        for row in candidates:
+            original = str(row.get("field_path") or "").strip()
+            if not original:
+                continue
+            exact = original in contract
+            category = str(row.get("canonical_category") or "").strip()
+            decision = "MAPPED" if exact else ("AMBIGUOUS" if category else "UNMAPPED")
+            basis = (
+                "Exact path exists in the canonical field contract; validation still pending."
+                if exact else
+                f"Workbook source candidate category={category or 'none'}; no canonical field selected. "
+                f"Supplied basis: {row.get('mapping_basis') or 'none'}"
+            )
+            connection.execute(
+                """INSERT OR IGNORE INTO staging_corpus_field_mappings (
+                       version_id, original_path, canonical_path, decision, basis,
+                       provenance_type, review_status, auditor_id, reviewed_at, source_candidate
+                   ) VALUES (?, ?, ?, ?, ?, 'AI_INTERPRETATION', 'PENDING', NULL, NULL, ?)""",
+                (version_id, original, original if exact else None, decision, basis, _canonical(row)),
+            )
+
     # -- reads -------------------------------------------------------------
 
     def summary(self) -> dict[str, Any]:
@@ -811,6 +954,200 @@ class CorpusRepository:
                 )
             ]
 
+    def record_audit(self, event: dict[str, Any]) -> dict[str, Any]:
+        """Append one independently supplied audit decision after strict validation."""
+        required = {
+            "target_kind", "target_id", "decision", "justification", "auditor_id",
+            "audited_at", "provenance_type", "source_kind", "source_edition",
+        }
+        missing = sorted(key for key in required if not str(event.get(key) or "").strip())
+        if missing:
+            raise ValueError(f"audit event lacks required field(s): {missing}")
+        target_kind = str(event["target_kind"]).upper()
+        decision = str(event["decision"]).upper()
+        provenance = str(event["provenance_type"]).upper()
+        source_kind = str(event["source_kind"]).upper()
+        if target_kind not in {"CLAIM", "MARKER", "PAPER"}:
+            raise ValueError("target_kind must be CLAIM, MARKER, or PAPER")
+        if decision not in {
+            "VERIFIED", "PARTIALLY_VERIFIED", "NOT_VERIFIED", "NOT_REPORTED",
+            "CONFLICT", "EXTRACTION_ERROR", "BLOCKED",
+        }:
+            raise ValueError(f"unsupported audit decision {decision}")
+        if provenance not in {
+            "AUTHOR_REPORTED_FACT", "AUTHOR_REPORTED_LIMITATION", "AI_INTERPRETATION", "TEAM_NOTE",
+        }:
+            raise ValueError(f"unsupported provenance_type {provenance}")
+        if source_kind not in {
+            "PRIMARY_PAPER", "SUPPLEMENTARY_MATERIAL", "AUTHOR_CODE", "PUBLISHER_METADATA", "OTHER",
+        }:
+            raise ValueError(f"unsupported source_kind {source_kind}")
+        audited_at_raw = str(event["audited_at"])
+        try:
+            if len(audited_at_raw) == 10:
+                date.fromisoformat(audited_at_raw)
+            else:
+                audited_at = datetime.fromisoformat(audited_at_raw.replace("Z", "+00:00"))
+                if audited_at.tzinfo is None:
+                    raise ValueError("audited_at timestamp must include a timezone")
+        except ValueError as exc:
+            raise ValueError("audited_at must be an ISO-8601 date or timezone-aware timestamp") from exc
+        if decision in {"VERIFIED", "PARTIALLY_VERIFIED"}:
+            if provenance not in {"AUTHOR_REPORTED_FACT", "AUTHOR_REPORTED_LIMITATION"}:
+                raise ValueError("verified decisions require author-reported provenance")
+            if source_kind not in {"PRIMARY_PAPER", "SUPPLEMENTARY_MATERIAL", "AUTHOR_CODE"}:
+                raise ValueError("verified decisions require a primary-author source")
+            if not str(event.get("evidence") or "").strip() or not any(
+                event.get(key) not in (None, "") for key in ("page", "section", "locator")
+            ):
+                raise ValueError("verified decisions require evidence and a page, section, or locator")
+        if decision == "NOT_REPORTED":
+            if target_kind != "MARKER":
+                raise ValueError("NOT_REPORTED requires a field absence marker, not a populated claim or paper")
+            scope = str(event.get("search_scope") or "").strip()
+            if not scope or len(scope) < 30 or "keyword" in scope.casefold() or "mot-clé" in scope.casefold():
+                raise ValueError("NOT_REPORTED requires a documented search_scope beyond keyword search")
+        if target_kind == "PAPER" and decision == "VERIFIED":
+            scope = str(event.get("search_scope") or "").strip()
+            if len(scope) < 30:
+                raise ValueError("a fully verified paper requires documented field-by-field review scope")
+        if event.get("page") is not None and (not isinstance(event["page"], int) or event["page"] < 1):
+            raise ValueError("page must be a positive integer")
+
+        table, key = {
+            "CLAIM": ("staging_corpus_claims", "claim_id"),
+            "MARKER": ("staging_corpus_field_markers", "marker_id"),
+            "PAPER": ("staging_corpus_papers", "paper_id"),
+        }[target_kind]
+        normalized = {
+            **event,
+            "event_id": str(event.get("event_id") or uuid4()),
+            "target_kind": target_kind,
+            "decision": decision,
+            "provenance_type": provenance,
+            "source_kind": source_kind,
+        }
+        with closing(self._ready(write=True)) as connection, connection:
+            target = connection.execute(
+                f"SELECT * FROM {table} WHERE {key} = ?", (str(event["target_id"]),)
+            ).fetchone()
+            if target is None:
+                raise CorpusNotFoundError(f"{target_kind.lower()} {event['target_id']} was not found")
+            if target_kind == "CLAIM":
+                reviewed = event.get("reviewed")
+                if not isinstance(reviewed, dict) or not {"value", "unit", "experiment_id", "field_path"} <= reviewed.keys():
+                    raise ValueError("claim audit requires reviewed value, unit, experiment_id, and field_path")
+                source_row = json.loads(target["row_json"])
+                if decision in {"VERIFIED", "PARTIALLY_VERIFIED"}:
+                    if source_row.get("claim_type") != provenance:
+                        raise ValueError("verified audit provenance must match the imported claim")
+                    if "SOURCE_REVIEW" in str(target["experiment_id"] or ""):
+                        raise ValueError("an extraction review label is not a scientific experiment")
+                expected = {
+                    "value": parse_claim_value(source_row.get("value")),
+                    "unit": source_row.get("unit"),
+                    "experiment_id": target["experiment_id"],
+                    "field_path": target["field_path"],
+                }
+                if _canonical(reviewed) != _canonical(expected):
+                    raise ValueError("reviewed claim value, unit, experiment, or field differs from the stored row")
+            elif target_kind == "MARKER":
+                reviewed = event.get("reviewed")
+                expected = {
+                    "extraction_status": target["extraction_status"],
+                    "field_path": target["field_path"],
+                }
+                if reviewed != expected:
+                    raise ValueError("reviewed marker status or field differs from the stored row")
+                if decision == "NOT_REPORTED" and target["extraction_status"] != "NOT_REPORTED":
+                    raise ValueError("NOT_REPORTED audit requires a NOT_REPORTED candidate marker")
+            else:
+                reviewed = event.get("reviewed")
+                expected = {"paper_id": target["paper_id"]}
+                if reviewed != expected:
+                    raise ValueError("reviewed paper identity differs from the stored row")
+            normalized["target_fingerprint"] = target["fingerprint"]
+            normalized["reviewed"] = reviewed
+            connection.execute(
+                """INSERT INTO staging_corpus_audit_events (
+                       event_id, target_kind, target_id, decision, justification, auditor_id,
+                       audited_at, provenance_type, source_kind, source_edition, page, section,
+                       locator, evidence, search_scope, target_fingerprint, reviewed_json, created_at
+                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    normalized["event_id"], target_kind, str(event["target_id"]), decision,
+                    str(event["justification"]).strip(), str(event["auditor_id"]).strip(),
+                    audited_at_raw, provenance, source_kind,
+                    str(event["source_edition"]).strip(), event.get("page"),
+                    event.get("section"), event.get("locator"), event.get("evidence"),
+                    event.get("search_scope"), target["fingerprint"], _canonical(reviewed),
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+        return normalized
+
+    @staticmethod
+    def _audit_event(row: sqlite3.Row) -> dict[str, Any]:
+        event = {key: row[key] for key in row.keys() if key not in {"created_at", "reviewed_json"}}
+        event["reviewed"] = json.loads(row["reviewed_json"])
+        return event
+
+    def list_audits(
+        self, *, target_kind: str | None = None, target_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        clauses: list[str] = []
+        parameters: list[str] = []
+        if target_kind:
+            clauses.append("target_kind = ?")
+            parameters.append(target_kind.upper())
+        if target_id:
+            clauses.append("target_id = ?")
+            parameters.append(target_id)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with closing(self._ready()) as connection:
+            rows = connection.execute(
+                f"SELECT * FROM staging_corpus_audit_events {where} "
+                "ORDER BY julianday(audited_at), created_at, event_id",
+                parameters,
+            ).fetchall()
+        return [self._audit_event(row) for row in rows]
+
+    def field_mappings(self, version_id: str | None = None) -> dict[str, Any]:
+        with closing(self._ready()) as connection:
+            version = (
+                connection.execute(
+                    "SELECT * FROM staging_corpus_mapping_versions WHERE version_id = ?", (version_id,)
+                ).fetchone()
+                if version_id else connection.execute(
+                    "SELECT v.* FROM staging_corpus_mapping_versions v "
+                    "JOIN staging_corpus_import_runs r ON r.id = v.import_run_id "
+                    "ORDER BY r.imported_at DESC LIMIT 1"
+                ).fetchone()
+            )
+            if version is None:
+                return {"version": None, "mappings": []}
+            rows = connection.execute(
+                "SELECT * FROM staging_corpus_field_mappings WHERE version_id = ? ORDER BY original_path",
+                (version["version_id"],),
+            ).fetchall()
+        return {
+            "version": {
+                "version_id": version["version_id"], "source_name": version["source_name"],
+                "workbook_sha256": version["workbook_sha256"],
+            },
+            "mappings": [
+                {
+                    "original_path": row["original_path"], "canonical_path": row["canonical_path"],
+                    "decision": row["decision"], "basis": row["basis"],
+                    "provenance_type": row["provenance_type"], "review_status": row["review_status"],
+                    "auditor_id": row["auditor_id"], "reviewed_at": row["reviewed_at"],
+                    "source_candidate": json.loads(row["source_candidate"]) if row["source_candidate"] else None,
+                    "projection_applied": row["review_status"] == "VALIDATED" and row["decision"] == "MAPPED",
+                }
+                for row in rows
+            ],
+        }
+
     def field_contract(self) -> list[dict[str, Any]]:
         with closing(self._ready()) as connection:
             return [
@@ -820,9 +1157,107 @@ class CorpusRepository:
                 )
             ]
 
+    @staticmethod
+    def _latest_audits(connection: sqlite3.Connection) -> dict[tuple[str, str], dict[str, Any]]:
+        latest: dict[tuple[str, str], dict[str, Any]] = {}
+        fingerprints = {
+            (kind, row[id_column]): row["fingerprint"]
+            for kind, table, id_column in (
+                ("CLAIM", "staging_corpus_claims", "claim_id"),
+                ("MARKER", "staging_corpus_field_markers", "marker_id"),
+                ("PAPER", "staging_corpus_papers", "paper_id"),
+            )
+            for row in connection.execute(f"SELECT {id_column}, fingerprint FROM {table}")
+        }
+        for row in connection.execute(
+            "SELECT * FROM staging_corpus_audit_events ORDER BY julianday(audited_at), created_at, event_id"
+        ):
+            event = CorpusRepository._audit_event(row)
+            event["current"] = event["target_fingerprint"] == fingerprints.get((row["target_kind"], row["target_id"]))
+            latest[(row["target_kind"], row["target_id"])] = event
+        return latest
+
+    @staticmethod
+    def _operational_states(
+        claim_rows: list[sqlite3.Row], marker_rows: list[sqlite3.Row],
+        coverage: dict[str, Any] | None, latest_audits: dict[tuple[str, str], dict[str, Any]],
+        paper_id: str,
+    ) -> dict[str, Any]:
+        coverage = coverage or {}
+        claim_ids = [row["claim_id"] for row in claim_rows]
+        claim_audits = [latest_audits.get(("CLAIM", claim_id)) for claim_id in claim_ids]
+        decisions = [event["decision"] for event in claim_audits if event and event["current"]]
+        stale = sum(bool(event and not event["current"]) for event in claim_audits)
+        verified = sum(decision == "VERIFIED" for decision in decisions)
+        partial = sum(decision == "PARTIALLY_VERIFIED" for decision in decisions)
+        imported_conflict = any(
+            row["scientific_status"] == "CONFLICT"
+            or str(json.loads(row["row_json"]).get("evidence_review") or "").startswith("CONFLICT_REVIEW")
+            for row in claim_rows
+        )
+        has_conflict = imported_conflict or "CONFLICT" in decisions
+        has_blocker = stale > 0 or any(decision in {"BLOCKED", "EXTRACTION_ERROR"} for decision in decisions)
+        paper_audit = latest_audits.get(("PAPER", paper_id))
+        completion_attested = bool(
+            paper_audit and paper_audit["current"] and paper_audit["decision"] == "VERIFIED"
+            and len(str(paper_audit.get("search_scope") or "").strip()) >= 30
+        )
+        if claim_ids and verified == len(claim_ids) and not marker_rows and not has_conflict and not has_blocker and completion_attested:
+            verification_state = "FULLY_VERIFIED"
+        elif verified or partial:
+            verification_state = "PARTIALLY_VERIFIED"
+        else:
+            verification_state = "NOT_VERIFIED"
+        conflict_blocker_state = (
+            "CONFLICT" if has_conflict else "BLOCKED" if has_blocker else "CLEAR"
+        )
+        locatable = sum(
+            any(json.loads(row["row_json"]).get(key) not in (None, "") for key in (
+                "pdf_page", "source_section", "source_locator",
+            ))
+            for row in claim_rows
+        )
+        evidence_basis = str(coverage.get("evidence_basis") or "")
+        scope_documented = coverage.get("review_scope_documented") == "YES"
+        primary_source_review = "FULLTEXT" in evidence_basis or "CODE" in evidence_basis
+        audit_candidate = bool(claim_rows) and scope_documented and primary_source_review and locatable > 0
+        declared = str(coverage.get("coverage_level") or "")
+        follow_up = str(coverage.get("follow_up") or "").strip()
+        if not claim_rows:
+            extraction_state = "NOT_EXTRACTED"
+        elif audit_candidate:
+            extraction_state = "READY_FOR_AUDIT"
+        else:
+            extraction_state = "PARTIAL"
+        return {
+            "extraction_completeness": {
+                "state": extraction_state,
+                "declared_coverage": declared or None,
+                "claim_count": len(claim_rows),
+                "locatable_claim_count": locatable,
+                "review_scope_documented": scope_documented,
+                "primary_source_review": primary_source_review,
+                "follow_up": follow_up or None,
+                "completion_candidate": completion_attested,
+                "completion_blocker": None if completion_attested else (
+                    "No documented field-by-field completeness review of the full paper, "
+                    "supplements, and relevant code; the historical DETAILED label is insufficient."
+                ),
+            },
+            "verification_state": verification_state,
+            "conflict_blocker_state": conflict_blocker_state,
+            "audit_candidate": audit_candidate,
+            "audit_counts": {
+                "claims": len(claim_ids), "reviewed": len(decisions),
+                "verified": verified, "partially_verified": partial,
+                "markers": len(marker_rows), "stale": stale,
+            },
+        }
+
     def list_papers(
         self, *, query: str | None = None, domain: str | None = None,
-        review_stage: str | None = None, limit: int = 50, offset: int = 0,
+        review_stage: str | None = None, extraction_state: str | None = None,
+        audit_state: str | None = None, limit: int = 50, offset: int = 0,
     ) -> tuple[list[dict[str, Any]], int]:
         with closing(self._ready()) as connection:
             claim_counts = {
@@ -831,7 +1266,30 @@ class CorpusRepository:
                 )
             }
             rows = connection.execute("SELECT * FROM staging_corpus_papers ORDER BY paper_id").fetchall()
-        papers = [self._paper_summary(row, claim_counts.get(row["paper_id"], 0)) for row in rows]
+            latest_audits = self._latest_audits(connection)
+            states: dict[str, dict[str, Any]] = {}
+            for row in rows:
+                paper_id = row["paper_id"]
+                claim_rows = connection.execute(
+                    "SELECT * FROM staging_corpus_claims WHERE paper_id = ?", (paper_id,)
+                ).fetchall()
+                marker_rows = connection.execute(
+                    "SELECT * FROM staging_corpus_field_markers WHERE paper_id = ?", (paper_id,)
+                ).fetchall()
+                coverage_row = connection.execute(
+                    """SELECT c.row_json FROM staging_corpus_paper_coverage c
+                       JOIN staging_corpus_import_runs r ON r.id = c.import_run_id
+                       WHERE c.paper_id = ? ORDER BY r.imported_at DESC LIMIT 1""",
+                    (paper_id,),
+                ).fetchone()
+                coverage = json.loads(coverage_row["row_json"]) if coverage_row else None
+                states[paper_id] = self._operational_states(
+                    claim_rows, marker_rows, coverage, latest_audits, paper_id,
+                )
+        papers = [
+            {**self._paper_summary(row, claim_counts.get(row["paper_id"], 0)), **states[row["paper_id"]]}
+            for row in rows
+        ]
         if query:
             needle = query.casefold()
             papers = [
@@ -842,6 +1300,13 @@ class CorpusRepository:
             papers = [paper for paper in papers if paper["domain"] == domain]
         if review_stage:
             papers = [paper for paper in papers if paper["review_stage"] == review_stage]
+        if extraction_state:
+            papers = [
+                paper for paper in papers
+                if paper["extraction_completeness"]["state"] == extraction_state
+            ]
+        if audit_state:
+            papers = [paper for paper in papers if paper["verification_state"] == audit_state]
         return papers[offset: offset + limit], len(papers)
 
     @staticmethod
@@ -878,13 +1343,21 @@ class CorpusRepository:
                     ).fetchone()
             if row is None:
                 raise CorpusNotFoundError(f"staging paper {paper_id} was not found")
-            claims = {
-                claim["claim_id"]: self._claim(claim)
-                for claim in connection.execute(
+            raw_claim_rows = connection.execute(
                     "SELECT * FROM staging_corpus_claims WHERE paper_id = ? ORDER BY claim_id",
                     (row["paper_id"],),
+                ).fetchall()
+            latest_audits = self._latest_audits(connection)
+            claims = {}
+            for claim_row in raw_claim_rows:
+                claim = self._claim(claim_row)
+                audit = latest_audits.get(("CLAIM", claim_row["claim_id"]))
+                claim["latest_audit"] = audit
+                claim["verification_state"] = (
+                    audit["decision"] if audit and audit["current"] else
+                    "STALE_AUDIT" if audit else "NOT_VERIFIED"
                 )
-            }
+                claims[claim_row["claim_id"]] = claim
             contract = connection.execute(
                 "SELECT * FROM staging_corpus_field_contract ORDER BY position"
             ).fetchall()
@@ -895,14 +1368,40 @@ class CorpusRepository:
                 )
             ]
             markers: dict[str, list[dict[str, Any]]] = {}
-            for item in connection.execute(
+            raw_marker_rows = connection.execute(
                 "SELECT * FROM staging_corpus_field_markers WHERE paper_id = ? ORDER BY marker_id", (row["paper_id"],)
-            ):
-                markers.setdefault(item["field_path"], []).append(self._marker(item))
+            ).fetchall()
+            for item in raw_marker_rows:
+                marker = self._marker(item)
+                audit = latest_audits.get(("MARKER", item["marker_id"]))
+                marker["latest_audit"] = audit
+                marker["verification_state"] = (
+                    audit["decision"] if audit and audit["current"] else
+                    "STALE_AUDIT" if audit else "NOT_VERIFIED"
+                )
+                markers.setdefault(item["field_path"], []).append(marker)
             coverage = [
                 {"source_name": item["source_name"], **json.loads(item["row_json"])}
                 for item in connection.execute(
                     "SELECT * FROM staging_corpus_paper_coverage WHERE paper_id = ? ORDER BY source_name",
+                    (row["paper_id"],),
+                )
+            ]
+            latest_coverage_row = connection.execute(
+                """SELECT c.row_json FROM staging_corpus_paper_coverage c
+                   JOIN staging_corpus_import_runs r ON r.id = c.import_run_id
+                   WHERE c.paper_id = ? ORDER BY r.imported_at DESC LIMIT 1""",
+                (row["paper_id"],),
+            ).fetchone()
+            operational_states = self._operational_states(
+                raw_claim_rows, raw_marker_rows,
+                json.loads(latest_coverage_row["row_json"]) if latest_coverage_row else None,
+                latest_audits, row["paper_id"],
+            )
+            paper_audits = [
+                self._audit_event(item) for item in connection.execute(
+                    "SELECT * FROM staging_corpus_audit_events WHERE target_kind = 'PAPER' AND target_id = ? "
+                    "ORDER BY julianday(audited_at), created_at, event_id",
                     (row["paper_id"],),
                 )
             ]
@@ -933,6 +1432,8 @@ class CorpusRepository:
         experiments = sorted({claim["experiment_id"] for claim in claims.values() if claim["experiment_id"]})
         return {
             **self._paper_summary(row, len(claims)),
+            **operational_states,
+            "paper_audits": paper_audits,
             "tags": record.get("tags", []),
             "abstract_status": record.get("abstract_status"),
             "pdf_sha256": record.get("pdf_sha256"),
@@ -1052,16 +1553,44 @@ class CorpusRepository:
                 f"SELECT * FROM staging_corpus_claims {where} ORDER BY claim_id LIMIT ? OFFSET ?",
                 (*parameters, limit, offset),
             ).fetchall()
-        return [self._claim(row) for row in rows], total
+            latest = self._latest_audits(connection)
+        claims = []
+        for row in rows:
+            claim = self._claim(row)
+            audit = latest.get(("CLAIM", row["claim_id"]))
+            claim["latest_audit"] = audit
+            claim["verification_state"] = (
+                audit["decision"] if audit and audit["current"] else
+                "STALE_AUDIT" if audit else "NOT_VERIFIED"
+            )
+            claims.append(claim)
+        return claims, total
 
     def get_claim(self, claim_id: str) -> dict[str, Any]:
         with closing(self._ready()) as connection:
             row = connection.execute(
                 "SELECT * FROM staging_corpus_claims WHERE claim_id = ?", (claim_id,)
             ).fetchone()
+            audits = connection.execute(
+                "SELECT * FROM staging_corpus_audit_events WHERE target_kind = 'CLAIM' AND target_id = ? "
+                "ORDER BY julianday(audited_at), created_at, event_id",
+                (claim_id,),
+            ).fetchall()
         if row is None:
             raise CorpusNotFoundError(f"staging claim {claim_id} was not found")
-        return self._claim(row)
+        claim = self._claim(row)
+        claim["audits"] = [
+            {**self._audit_event(item), "current": item["target_fingerprint"] == row["fingerprint"]}
+            for item in audits
+        ]
+        claim["latest_audit"] = claim["audits"][-1] if claim["audits"] else None
+        if claim["latest_audit"]:
+            claim["latest_audit"]["current"] = claim["latest_audit"]["target_fingerprint"] == row["fingerprint"]
+        claim["verification_state"] = (
+            claim["latest_audit"]["decision"] if claim["latest_audit"] and claim["latest_audit"]["current"] else
+            "STALE_AUDIT" if claim["latest_audit"] else "NOT_VERIFIED"
+        )
+        return claim
 
     def research_gaps(self) -> list[dict[str, Any]]:
         with closing(self._ready()) as connection:

@@ -17,7 +17,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from .repository import CorpusNotFoundError, CorpusRepository
 
 STAGING_NOTICE = (
-    "Staging corpus - NOT independently verified. Candidate claims are NOT_VERIFIED; "
+    "Staging corpus - audit decisions are recorded per claim and never inferred from extraction. "
+    "Claims without a current independent audit remain NOT_VERIFIED; "
     "empty fields are NOT_EXTRACTED (nobody looked), never NOT_REPORTED; a field the package "
     "looked for and did not find is at most a NOT_REPORTED_CANDIDATE within its stated search scope. "
     "PDF page numbers, where present, are as supplied by the package and unchecked; no verbatim "
@@ -36,10 +37,13 @@ def register_corpus_routes(app: FastAPI, repository: CorpusRepository) -> None:
     @app.get("/api/corpus/papers")
     async def corpus_papers(
         q: str | None = None, domain: str | None = None, review_stage: str | None = None,
+        extraction_state: str | None = None, audit_state: str | None = None,
         limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0),
     ) -> dict[str, Any]:
         papers, total = repository.list_papers(
-            query=q, domain=domain, review_stage=review_stage, limit=limit, offset=offset,
+            query=q, domain=domain, review_stage=review_stage,
+            extraction_state=extraction_state, audit_state=audit_state,
+            limit=limit, offset=offset,
         )
         return {"notice": STAGING_NOTICE, "total": total, "limit": limit, "offset": offset, "papers": papers}
 
@@ -86,6 +90,17 @@ def register_corpus_routes(app: FastAPI, repository: CorpusRepository) -> None:
     async def corpus_runs() -> dict[str, Any]:
         return {"import_runs": repository.import_runs()}
 
+    @app.get("/api/corpus/audits")
+    async def corpus_audits(
+        target_kind: str | None = None, target_id: str | None = None,
+    ) -> dict[str, Any]:
+        events = repository.list_audits(target_kind=target_kind, target_id=target_id)
+        return {"total": len(events), "audit_events": events}
+
+    @app.get("/api/corpus/field-mappings")
+    async def corpus_field_mappings(version_id: str | None = None) -> dict[str, Any]:
+        return repository.field_mappings(version_id)
+
     @app.get("/corpus", response_class=HTMLResponse)
     async def corpus_page(q: str | None = None, domain: str | None = None) -> HTMLResponse:
         papers, total = repository.list_papers(query=q, domain=domain, limit=500)
@@ -111,6 +126,25 @@ table{{border-collapse:collapse;width:100%}}th,td{{border-bottom:1px solid #d9e1
 th{{background:#f3f6f9}}code{{font-size:12px}}.muted{{color:#5b6b79}}.status{{font-family:monospace;font-size:12px}}
 details summary{{cursor:pointer}}a{{color:#0b5c8a}}
 </style></head><body>{body}</body></html>"""
+
+
+DISPLAY_THEMES: tuple[tuple[str, frozenset[str]], ...] = (
+    ("Problem and scope", frozenset({"identity", "problem", "review", "methods", "research_gap", "research_gaps"})),
+    ("Data", frozenset({"data", "datasets", "inputs", "outputs", "preprocessing", "assimilation"})),
+    ("Architecture", frozenset({"architecture"})),
+    ("Training", frozenset({"training", "regularization", "inference"})),
+    ("Loss and physics", frozenset({"objective", "loss", "physics"})),
+    ("Evaluation and results", frozenset({"evaluation", "results", "metrics", "baselines", "ablations"})),
+    ("Limitations and future work", frozenset({"limitations", "future_work", "interpretation"})),
+    ("Reproducibility", frozenset({"reproducibility"})),
+    ("Reinforcement learning", frozenset({"rl"})),
+    ("Other", frozenset()),
+)
+
+
+def _display_theme(field_path: str) -> str:
+    prefix = field_path.split(".", 1)[0]
+    return next((theme for theme, prefixes in DISPLAY_THEMES if prefix in prefixes), "Other")
 
 
 def _href(url: Any) -> str:
@@ -189,40 +223,46 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
             + "</span></div>"
         )
 
-    groups: dict[str, list[dict[str, Any]]] = {}
+    # Display grouping only: a field path is shown verbatim under the theme of its
+    # first segment. It assigns no claim to a contract field.
+    entries: dict[str, dict[str, Any]] = {}
     for item in paper["fields"]:
-        groups.setdefault(item["group"], []).append(item)
+        if item["claims"] or item["markers"]:
+            entries[item["field_path"]] = {"claims": list(item["claims"]), "markers": list(item["markers"]), "contract": True}
+    for claim in paper["uncontracted_claims"]:
+        entries.setdefault(claim["field_path"], {"claims": [], "markers": [], "contract": False})["claims"].append(claim)
+    for marker in paper["uncontracted_markers"]:
+        entries.setdefault(marker["field_path"], {"claims": [], "markers": [], "contract": False})["markers"].append(marker)
+    themes: dict[str, list[tuple[str, dict[str, Any]]]] = {theme: [] for theme, _ in DISPLAY_THEMES}
+    for field_path, entry in sorted(entries.items()):
+        themes[_display_theme(field_path)].append((field_path, entry))
     sections = []
-    for group, items in groups.items():
-        populated = sum(1 for item in items if item["claims"])
+    for theme, items in themes.items():
+        if not items:
+            continue
         rows = "".join(
-            f"<tr><td><code>{escape(item['field_path'])}</code></td><td class=\"status\">{escape(item['status'])}</td>"
-            f"<td>{''.join(claim_block(claim) for claim in item['claims'])}"
-            f"{''.join(marker_block(marker) for marker in item['markers'])}"
-            f"{'' if item['claims'] or item['markers'] else '<span class=\"muted\">not extracted</span>'}</td></tr>"
-            for item in items
+            f"<tr><td><code>{escape(field_path)}</code>"
+            + ("" if entry["contract"] else '<br><span class="muted">outside the 162-field contract</span>')
+            + f"</td><td>{''.join(claim_block(claim) for claim in entry['claims'])}"
+            f"{''.join(marker_block(marker) for marker in entry['markers'])}</td></tr>"
+            for field_path, entry in items
         )
+        claim_total = sum(len(entry["claims"]) for _, entry in items)
         sections.append(
-            f"<details{' open' if populated else ''}><summary><strong>{escape(group)}</strong> — "
-            f"{populated} of {len(items)} fields with candidate claims</summary>"
-            f"<table><thead><tr><th>Field</th><th>Status</th><th>Candidate claims</th></tr></thead><tbody>{rows}</tbody></table></details>"
+            f"<h2>{escape(theme)} <span class=\"muted\">({claim_total} candidate claim{'s' if claim_total != 1 else ''})</span></h2>"
+            f"<table><thead><tr><th>Field (as supplied)</th><th>Candidate claims</th></tr></thead><tbody>{rows}</tbody></table>"
         )
-    if paper["uncontracted_claims"] or paper["uncontracted_markers"]:
+    if not sections:
+        sections.append('<p class="muted">No candidate claim has been extracted for this paper yet.</p>')
+    empty = [item["field_path"] for item in paper["fields"] if not item["claims"] and not item["markers"]]
+    if empty:
         sections.append(
-            "<details open><summary><strong>Outside the field contract</strong> — "
-            f"{len(paper['uncontracted_claims'])} candidate claim(s) whose field path is not one of the "
-            "contract's fields; kept verbatim, mapped to no field</summary><table><thead><tr><th>Field path</th>"
-            "<th>Candidate claim</th></tr></thead><tbody>"
-            + "".join(
-                f"<tr><td><code>{escape(claim['field_path'])}</code></td><td>{claim_block(claim)}</td></tr>"
-                for claim in paper["uncontracted_claims"]
-            )
-            + "".join(
-                f"<tr><td><code>{escape(marker['field_path'])}</code></td><td>{marker_block(marker)}</td></tr>"
-                for marker in paper["uncontracted_markers"]
-            )
-            + "</tbody></table></details>"
+            f"<details><summary><strong>{len(empty)} contract fields not extracted</strong> "
+            "<span class=\"muted\">(nobody looked; not the same as not reported)</span></summary><p>"
+            + ", ".join(f"<code>{escape(field_path)}</code>" for field_path in empty)
+            + "</p></details>"
         )
+    claim_count = sum(len(entry["claims"]) for entry in entries.values())
     coverage = "".join(
         f"<code>{escape(item['source_name'])}</code>: {_cell(item.get('coverage_level'))} · "
         f"{_cell(item.get('audit_state'))} · {_cell(item.get('claim_count'))} claims<br>"
@@ -243,7 +283,7 @@ def render_corpus_paper(paper: dict[str, Any]) -> str:
 <tr><th>Audit status</th><td class="status">PAPER_INDEX {_cell(audit['paper_index'])} · PAPER_RECORDS {_cell(audit['paper_records'])}</td></tr>
 <tr><th>Supplement coverage</th><td class="status">{coverage}</td></tr>
 <tr><th>Experiments</th><td>{_cell(paper['experiments'])}</td></tr>
-<tr><th>Fields</th><td>{paper['populated_field_count']} with candidate claims · {paper['not_extracted_field_count']} NOT_EXTRACTED</td></tr>
+<tr><th>Extracted</th><td>{claim_count} candidate claims across {len(entries)} fields · {len(empty)} contract fields not extracted</td></tr>
 <tr><th>Canonical PaperRecord</th><td>{f'<a href="/papers/{escape(linked)}">{escape(linked)}</a>' if linked else '<span class="muted">none linked</span>'}</td></tr>
 </table>
 {''.join(sections)}"""

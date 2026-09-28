@@ -42,6 +42,10 @@ SUPPLEMENT_SHEETS: tuple[str, ...] = (
 # Supplement sheets kept whole, as documents, when present.
 SUPPLEMENT_DOCUMENT_SHEETS: tuple[str, ...] = (
     "NEW_DETAILED_PAPERS", "SOURCE_ACCESS", "FIELD_COVERAGE", "CHANGE_LOG", "BATCH_LOG",
+    # Added by B15. FIELD_PATH_MAP is the package's own rule-based grouping of its
+    # field paths; it is stored as supplied and never applied as a field mapping.
+    "RESUME_POINT", "FIELD_PATH_MAP", "RL_APPLICABILITY", "FIELD_MATRIX_115",
+    "CHANGE_SUMMARY", "BLOCKED_FULLTEXT",
 )
 
 # A SCIENTIFIC_CLAIMS row whose extraction_status is one of these records that a
@@ -128,6 +132,7 @@ SUPPLEMENT_DECLARED_COUNTS = {
     "New detailed papers": "NEW_DETAILED_PAPERS",
     # ENRICHED labels its counts in French.
     "Lignes SCIENTIFIC_CLAIMS": "SCIENTIFIC_CLAIMS",
+    "Lignes totales / historiques": "SCIENTIFIC_CLAIMS",
     "Lignes extraites / historiques": "EXTRACTED_ROWS",
     "Champs manquants hérités": "MARKERS",
     "Papiers avec extraction": "DETAILED_PAPERS",
@@ -290,6 +295,7 @@ def read_workbook(path: str | Path) -> StagingWorkbook:
     warnings: list[str] = []
     if kind == SUPPLEMENT:
         gaps = _realign_gaps(gaps, warnings)
+        _split_marker_explanations(claims, warnings)
 
     records: list[dict[str, Any]] = []
     for position, row in enumerate(record_rows, start=2):
@@ -564,6 +570,31 @@ def _realign_gaps(gaps: list[dict[str, Any]], warnings: list[str]) -> list[dict[
     return fixed
 
 
+def _split_marker_explanations(claims: list[dict[str, Any]], warnings: list[str]) -> None:
+    """Separate a marker from the reason written into its value cell.
+
+    B15 row B14-0005 is a NOT_EXTRACTED marker whose value reads
+    ``NOT_EXTRACTED: <why>``. Its value becomes the status, the cell as supplied
+    is kept in ``value_as_supplied``, and the change is reported. A marker whose
+    value is anything else still fails validation.
+    """
+    split: list[str] = []
+    for row in claims:
+        status, value = row.get("extraction_status"), row.get("value")
+        if (
+            status in MARKER_EXTRACTION_STATUSES and isinstance(value, str)
+            and value.startswith(f"{status}:") and value[len(status) + 1:].strip()
+        ):
+            row["value_as_supplied"] = value
+            row["value"] = status
+            split.append(str(row.get("claim_id")))
+    if split:
+        warnings.append(
+            f"marker row(s) {split} carried their reason in the value cell; the value is stored as the "
+            f"marker status and the cell as supplied is kept in value_as_supplied"
+        )
+
+
 def _supplement_errors(book: StagingWorkbook) -> list[str]:
     """Integrity of a supplement workbook on its own.
 
@@ -604,7 +635,10 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
         )
     declared_extracted = declared_counts.get("Lignes extraites / historiques")
     declared_markers = declared_counts.get("Champs manquants hérités")
+    formula_count_contract = "Niveaux de couverture (formules)" in book.start_here
     marker_convention = (
+        not formula_count_contract
+        and
         declared_extracted is not None and declared_markers is not None
         and (declared_extracted, declared_markers) != (extracted, markers)
         and declared_extracted + declared_markers == len(book.claims) and declared_markers <= markers
@@ -615,11 +649,45 @@ def _supplement_errors(book: StagingWorkbook) -> list[str]:
             f"({declared_extracted} extracted + {declared_markers} inherited markers = {len(book.claims)} rows); "
             f"they are imported as markers ({extracted} claims + {markers} markers)"
         )
+    # B15 declares three counts as formulas with other definitions: every claim row
+    # (markers included), the inherited B03 markers only, and the DETAILED and
+    # DETAILED_PARTIAL papers of COVERAGE. A count matching its formula is reported.
+    formula_counts = {
+        "EXTRACTED_ROWS": len(book.claims),
+        "MARKERS": sum(1 for row in book.claims if is_marker(row) and row.get("batch_id") == "B03"),
+        "DETAILED_PAPERS": sum(
+            1 for row in book.coverage if row.get("coverage_level") in {"DETAILED", "DETAILED_PARTIAL"}
+        ),
+    }
+    formula_matched: list[str] = []
     for label, sheet in SUPPLEMENT_DECLARED_COUNTS.items():
-        if label not in declared_counts or (marker_convention and sheet in {"EXTRACTED_ROWS", "MARKERS"}):
+        if label not in declared_counts:
             continue
-        if declared_counts[label] != counts[sheet]:
-            errors.append(f"START_HERE declares {label} = {declared_counts[label]} but the workbook has {counts[sheet]}")
+        if formula_count_contract and sheet in formula_counts:
+            expected = formula_counts[sheet]
+            if declared_counts[label] != expected:
+                errors.append(
+                    f"START_HERE declares {label} = {declared_counts[label]} "
+                    f"but its formula definition requires {expected}"
+                )
+            elif declared_counts[label] != counts[sheet]:
+                formula_matched.append(
+                    f"{label} = {declared_counts[label]} (the workbook has {counts[sheet]})"
+                )
+            continue
+        if marker_convention and sheet in {"EXTRACTED_ROWS", "MARKERS"}:
+            continue
+        if declared_counts[label] == counts[sheet]:
+            continue
+        if declared_counts[label] == formula_counts.get(sheet):
+            formula_matched.append(f"{label} = {declared_counts[label]} (the workbook has {counts[sheet]})")
+            continue
+        errors.append(f"START_HERE declares {label} = {declared_counts[label]} but the workbook has {counts[sheet]}")
+    if formula_matched:
+        book.warnings.append(
+            "START_HERE counts follow the B15 formula definitions (all claim rows, B03 markers, "
+            "DETAILED + DETAILED_PARTIAL papers): " + "; ".join(formula_matched)
+        )
     before, added, total = (book.start_here.get(label, "") for label in ("Claims before", "Claims added", "Claims total"))
     if all(value.strip().isdigit() for value in (before, added, total)) and int(before) + int(added) != int(total):
         errors.append(f"START_HERE declares Claims before {before} + Claims added {added} != Claims total {total}")

@@ -70,14 +70,82 @@ sufficient source review supports the negative finding.
   missing final gates. Runtime effective model metadata was not exposed, so no
   claim about realized model or quota separation is made.
 
+## Update — 2026-09-28 afternoon (independent QA and #29 pre-review)
+
+### Combined PR #35 + PR #36: independent QA **PASS**
+
+A session that authored neither PR merged #36 (`1466667`) into #35 (`dd611bc`)
+in a separate worktree (local merge `a953938`, not pushed; no existing worktree
+or untracked file was touched). The merge is conflict-free. 290 Python tests,
+8 frontend tests, typecheck and build pass. The data checks
+(`evaluation/qa/combined_merge_check.py`, results in
+`evaluation/reports/pr35-pr36-combined-qa-2026-09-28.json`) pass 40 of 40 on a
+**copy** of the local B16 database; the original is unchanged
+(SHA-256 `e4f760d1…8f4cd9` before and after):
+
+- migration `0003_staging_corpus` on the populated B16 database is recorded,
+  leaves every `staging_corpus_*` table byte-identical, is a no-op when rerun,
+  and keeps the append-only audit triggers;
+- catalogue reads (7 API routes and `CorpusRepository`) on an absent database
+  return 200 and create neither the file nor its directory; reads on a
+  populated database leave it byte-identical;
+- B16 reimport: zero created/updated rows, 115 papers, 1,867 claims,
+  69 markers, no duplicate DOI; **all 94 audit events preserved**;
+- report replay with the three hash-pinned PDFs adds no event (still 94);
+  a PDF whose hash differs is refused;
+- a fresh V1→B16 build plus replay gives 68 events for 68 claims, and serves
+  the same B16 mapping version (981 rules, all `PENDING`); no paper is
+  `FULLY_VERIFIED` and no mapping rule is `VALIDATED`.
+
+Open finding before merge: the staging DDL exists twice (`SCHEMA` in
+`corpus/repository.py` and `migrations/0003_staging_corpus.sql`). They are
+identical today, but nothing prevents drift. After the merge, load one from the
+other or add an equality test.
+
+### #29 field-path mapping: pre-review done, human validation still required
+
+`evaluation/field_mapping/` holds a versioned `AI_INTERPRETATION` pre-review of
+all 981 B16 `FIELD_PATH_MAP` rules (`build.py` + `proposals.py` reproduce it
+from the database, read-only). Policy: map only synonyms or container fields
+whose original path stays the visible qualifier; leave component-, stage-,
+variant-, horizon- and max-vs-actual-qualified paths pending; never project
+AI interpretations, conflict notes, search-space or unlinked code config.
+
+An independent Scientific Auditor (Claude subagent, no PDF access; judgement on
+field semantics against stored claim text only) read every claim under every
+non-identity rule. It concurred with 356 of 378 and dissented on 22; all 22
+dissents were accepted and returned to pending.
+
+| Proposed decision | Rules | Claims |
+|---|---:|---:|
+| Identity (already a contract path) | 72 | – |
+| MAPPED, auditor concurred | 325 | 541 |
+| UNMAPPED, with reason | 17 | – |
+| Pending (incl. 14 guard blocks, 22 auditor dissents) | 567 | – |
+
+**No rule is `VALIDATED` and no projection is applied.** #29 requires a human
+to validate each rule (CSV has `human_decision` / `human_reviewer` /
+`reviewed_at` columns). The auditor also flagged claim-level items for the
+human reviewer (values taken from open-review author replies B05-0149/0150/0151,
+inferred row assignments B14-0012/B12-0003, B06-0137 possibly a sweep point)
+and guard gaps to close before any projection code is written (`CODE_REPOSITORY`
+scope into `data.*`, review scopes into non-results fields, conflict notes on
+single-value fields, stage qualifiers without experiment IDs).
+
+### #19/#31: not started, gates not met
+
+The #19 remediation (`8b015e5`, `6af7867`) has never been benchmarked: the
+required provider run is blocked by credit/quota, and the last independent
+scientific review failed. #31 depends on #19. Neither was touched.
+
 ## Next work, in order
 
-1. Run independent adversarial QA on updated draft PR #36 and its combined
-   head with PR #35. Verify numbered staging migration `0003` on a populated
-   database and that a catalogue read on an absent database writes nothing.
-2. Independently review the 981 B16 `FIELD_PATH_MAP` rows, version decisions,
-   leave ambiguous ones pending, and only then apply validated canonical
-   projections. Preserve each original source path and wording.
+1. ~~Independent QA of PR #36 and its combined head with PR #35~~ — done
+   2026-09-28 (PASS, above). Remaining: close the SCHEMA/0003 duplication, PR
+   review of both drafts, and the Sourcery dynamic-SQL note on #35.
+2. Human validation of the #29 pre-review (`evaluation/field_mapping/*.csv`),
+   starting with the 325 auditor-concurred rules; then implement projection with
+   the guard gaps above closed, keeping each original path and wording.
 3. Obtain and hash-pin primary PDFs, supplements and relevant code for the
    21 audit candidates. Check every populated claim and every required absence
    against its exact edition, page/section/locator, value, unit and experiment;

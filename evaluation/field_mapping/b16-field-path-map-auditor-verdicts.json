@@ -1,0 +1,3463 @@
+{
+ "auditor_role": "Scientific Auditor (independent AI, Claude subagent)",
+ "provenance_type": "AI_INTERPRETATION",
+ "review_status": "PENDING_HUMAN_VALIDATION",
+ "limitations": "No PDFs, supplements or code were consulted. Verdicts judge only whether each proposed canonical field is semantically correct for the stored claim text (value, unit, claim_type, subject_scope, source_section, notes), not whether the claims are true or correctly extracted. Nothing here is VALIDATED; this output is itself an AI_INTERPRETATION that awaits human validation. CONCUR on container targets (results.quantitative_results, encoder/decoder, lr_schedule, loss_weights) assumes the original path, unit and experiment_id stay visible alongside the canonical field as #29 specifies; if the UI shows only the canonical field, those concurrences do not hold.",
+ "verdicts": [
+  {
+   "rule_id": "ablations.components",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0117) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.design",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree, with a caution. B06-0049 describes the experiment matrix (forcings × operators × input combinations), which the source already labels an ablation. The container keeps the path."
+  },
+  {
+   "rule_id": "ablations.domain_size",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B11-0029) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.factors",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0115) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.inputs",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0272) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.mode_interactions",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0097) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.preprocessing",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0125) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.solver_iterations",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0008) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "ablations.strategies",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0140) describe ablation or sensitivity experiments and their outcomes. results.ablation is a container, and the specific factor stays in the path."
+  },
+  {
+   "rule_id": "applicability.rl",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B14-0014, B14-0015) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "architecture.afno_depth",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.num_layers",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B15-0006",
+    "B15-0020",
+    "B15-0031"
+   ],
+   "reason": "'AFNO depth' is the number of AFNO blocks in the processor, not the model's total layer count (patch embedding/decoder layers excluded). The proposer's own rule for architecture.hidden_layers (hidden-layer count != architecture.num_layers) applies equally; the contract has no block-count field."
+  },
+  {
+   "rule_id": "architecture.baseline_ann",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. B14-0007 describes Perezhogin et al. (2025)'s ANN (a prior or base model). It is unclear whether it is a baseline or the base of the studied eANN, and either way architecture.* would attribute it to the studied model."
+  },
+  {
+   "rule_id": "architecture.bias_initialization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.initialization",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0243"
+   ],
+   "reason": "Bare value '0' located under '§2.2, Gaussian activation'. The stored text does not establish whether this is a bias initialization of the network or a fixed parameter of the Gaussian activation. In training.initialization a bare '0' reads as the model's initialization scheme. Needs a check against the source."
+  },
+  {
+   "rule_id": "architecture.decoder_blocks",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B04-0226 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_layers",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B04-0175 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_output_length",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0101 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_parameters",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B04-0132 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_stages",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B16-0055 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_transpose",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0100 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_transpose_kernel",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B16-0062 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.decoder_transpose_stride",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.decoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.decoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B16-0063 describe the decoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_channels",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0093 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_conv_layers",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0092 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_convolutions",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B16-0056 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_count",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0091 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_kernel",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0094 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_layers",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B04-0174, B06-0174 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_parameters",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B04-0131 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_pooling",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B07-0095 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.encoder_stages",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.encoder",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. architecture.encoder is a description container. The sub-quantity (layers/blocks/kernel/stride/channels/parameters) stays in the source path and unit. B16-0054 describe the encoder of the studied network, and no bare value is presented as a model-level quantity."
+  },
+  {
+   "rule_id": "architecture.family",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.method_family",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 16 claims name the studied model's method family, including a GP, SOM, RF and YOLO detector. No baseline is included."
+  },
+  {
+   "rule_id": "architecture.feature_extractor",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.backbone",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The pre-trained InceptionV3 used as the feature extractor is the backbone of the clustering workflow."
+  },
+  {
+   "rule_id": "architecture.hidden_dimensions",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.hidden_width",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. 256 units (SeaCast) and per-layer widths 64/128/128/64 are hidden widths as labelled by the source. This is not an embedding-dimension inference."
+  },
+  {
+   "rule_id": "architecture.legacy_conflict",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B16-0034) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "architecture.model",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.method_family",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. KRR with RBF kernel and random forests are the studied method families."
+  },
+  {
+   "rule_id": "architecture.normalization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.normalization_layer",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 5 claims are normalization layers (group, batch or layer norm), not data normalization."
+  },
+  {
+   "rule_id": "architecture.parameters",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.parameter_count",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 3 values are total parameter counts of the studied models."
+  },
+  {
+   "rule_id": "architecture.policy",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "rl.policy_architecture",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. This is the RL policy network of MARINA's factor-discovery stage."
+  },
+  {
+   "rule_id": "architecture.sfno_block",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.block_type",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the internal structure of the SFNO block."
+  },
+  {
+   "rule_id": "architecture.type",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.method_family",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 12 claims describe the studied model's family or type, including B08-0073 (dynamical ESM, not ML) and B11-0017 (kNN analogs). That is still the correct method-family statement."
+  },
+  {
+   "rule_id": "baselines",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.baselines",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B11-0025"
+   ],
+   "reason": "B11-0025 includes the verifying analysis 'IMOS OceanCurrent 0.2°'. That is the verification reference (truth), not a baseline, and evaluation.baselines would list it as a competing model. The other 5 claims fit."
+  },
+  {
+   "rule_id": "baselines.list",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.baselines",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 8 claims are explicit comparison-baseline lists."
+  },
+  {
+   "rule_id": "baselines.pixel_model",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.baselines",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The source path already classifies LightGBM as a baseline, so mapping does not change meaning."
+  },
+  {
+   "rule_id": "boundary_conditions",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "physics.boundary_conditions",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It describes the land boundary treatment (zero Neumann/free-slip) of the studied scheme."
+  },
+  {
+   "rule_id": "claim_check",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B11-0015) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "data.caption_check",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B15-0035) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "data.conflict_review",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B10-0001, B10-0002, B10-0003, B11-0033, B12-0005, B13-0007, B14-0003) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "data.conflict_si_vs_text",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B12-0009) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "data.conflict_training_period",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B09-0022) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "data.conflict_trend_increase",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B09-0076) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "data.geographic_region",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.geography",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. An idealized basin and global coverage are the geographic domain. B03-0155 keeps experiment_id PRETRAIN."
+  },
+  {
+   "rule_id": "data.modalities",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.data_source",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B03-0124"
+   ],
+   "reason": "Scope REVIEW_SYNTHESIS (OAI-0009 is a review with 'no unified training experiment', per B03-0148). Data modalities surveyed across the reviewed literature would read in data.data_source as the paper's own data. The guard only checks review scopes for results/limitations targets."
+  },
+  {
+   "rule_id": "data.pressure_level_count",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.vertical_levels",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. 13 pressure levels (atmosphere experiment) is a vertical-level count."
+  },
+  {
+   "rule_id": "data.regridding",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.interpolation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. xESMF bilinear regridding is an interpolation method. The PRETRAIN experiment_id is kept."
+  },
+  {
+   "rule_id": "data.vertical_level_count",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.vertical_levels",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B03-0249"
+   ],
+   "reason": "The claim carries an unresolved CONFLICT_VLEVELS note (main text 8 vs Appendix A 6). Projecting '8' into the single-valued data.vertical_levels would surface one side of an open conflict as the field value. It must stay a visible CONFLICT."
+  },
+  {
+   "rule_id": "datasets.data_archive",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.data_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a Zenodo URL in the data-availability section."
+  },
+  {
+   "rule_id": "datasets.depth_levels",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.vertical_levels",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The 14 depth levels are listed explicitly."
+  },
+  {
+   "rule_id": "datasets.domain",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.geography",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the study domain."
+  },
+  {
+   "rule_id": "datasets.geography",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.geography",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 5 are study regions."
+  },
+  {
+   "rule_id": "datasets.labels",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.target_source",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. PET eddy detections and drifters are the label/target sources."
+  },
+  {
+   "rule_id": "datasets.name",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.dataset_name",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. OSTIA is a dataset name."
+  },
+  {
+   "rule_id": "datasets.period",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.study_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree, with a caution. These are the data periods used by the study. For OAI-0045, 1980–2022 is wider than the train/test span but matches the EOF analysis period, so it is still a study period."
+  },
+  {
+   "rule_id": "datasets.period_used",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.study_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. 1993–2021 equals the train+val+test span."
+  },
+  {
+   "rule_id": "datasets.region",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.geography",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B12-0029"
+   ],
+   "reason": "B12-0029 comes from a code-repository README (scope CODE_REPOSITORY; article body not accessed for OAI-0113). A README description is not the paper's reported configuration, and the primary source wins. The claim also mixes region with time period ('hourly data 2020'). The guard misses the CODE_REPOSITORY scope."
+  },
+  {
+   "rule_id": "datasets.reported_split",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.split_strategy",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0312"
+   ],
+   "reason": "OAI-0089 has an open in-source conflict: '60:20:20' is stated, but the counts 2667/667/660 give about 67:17:17 (B10-0001, B11-0033, B04-0321). Projecting '60:20:20' alone into data.split_strategy would hide the CONFLICT."
+  },
+  {
+   "rule_id": "datasets.resolution",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.spatial_resolution",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B12-0031"
+   ],
+   "reason": "B12-0031 comes from a code-repository README (scope CODE_REPOSITORY), not the paper. It must not be presented as the paper's data resolution. B05-0112 on its own would be fine."
+  },
+  {
+   "rule_id": "datasets.source",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.dataset_name",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 6 values are product or dataset names (data.data_source is the better fit only for modality/origin types)."
+  },
+  {
+   "rule_id": "datasets.sources",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.dataset_name",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 6 values are named data products or corpora. B05-0187 names the literature databases of a text-classification paper, which are its data."
+  },
+  {
+   "rule_id": "datasets.spatial_grids",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.spatial_resolution",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are the analysis grid resolutions used in the study."
+  },
+  {
+   "rule_id": "datasets.spatial_resolution",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.spatial_resolution",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 13 are dataset or model-grid resolutions with units retained."
+  },
+  {
+   "rule_id": "datasets.spatial_resolutions",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.spatial_resolution",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0160"
+   ],
+   "reason": "The value describes NeuralGCM model-variant grid resolutions (2.8°/1.4°/0.7° 'model variants'), not the resolution of a dataset. data.spatial_resolution would read these as input-data resolutions."
+  },
+  {
+   "rule_id": "datasets.split",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.split_strategy",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B12-0030"
+   ],
+   "reason": "B12-0030 (75%/25%) comes from a code-repository README (scope CODE_REPOSITORY), not the paper, and must not be presented as the paper's split. The other 17 claims fit data.split_strategy."
+  },
+  {
+   "rule_id": "datasets.temporal_resolution",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.temporal_resolution",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 8 are data temporal resolutions."
+  },
+  {
+   "rule_id": "datasets.temporal_resolutions",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.temporal_resolution",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "datasets.test_period",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.test_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 5 are explicit test periods. Caution: B05-0151 comes from an author reply in open discussion, not the paper itself, and that is a provenance issue separate from the mapping."
+  },
+  {
+   "rule_id": "datasets.test_years",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.test_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "datasets.train_period",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.train_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "datasets.training_period",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.train_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 5 are training periods. Caution: B05-0149 comes from an author reply in open discussion."
+  },
+  {
+   "rule_id": "datasets.training_validation_split",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.split_strategy",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. 80:20 train/validation is a split strategy."
+  },
+  {
+   "rule_id": "datasets.validation_period",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.validation_period",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0027"
+   ],
+   "reason": "B04-0027 (SeaCast, 'January–June 2024', §Ocean state) has no train/test context. In oceanography 'validation' often means evaluation against observations or forecasts, so it may be an evaluation/test period rather than an ML validation split. Needs a source check. B16-0046 and B05-0150 sit in explicit train/val/test triplets and fit. Note that B05-0150 comes from an author reply in open discussion, not the paper."
+  },
+  {
+   "rule_id": "datasets.validation_split",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.split_strategy",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It describes a validation split by realization."
+  },
+  {
+   "rule_id": "datasets.validation_year",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.validation_period",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree, with a caution. GLONET 2020 is labelled as the validation year. Confirm it is an ML validation split and not an evaluation year when the human reviews it."
+  },
+  {
+   "rule_id": "datasets.vertical_layers",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.vertical_levels",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. 30 terrain-following ROMS layers form the vertical grid of the data-generating model, and the unit is kept."
+  },
+  {
+   "rule_id": "datasets.vertical_levels",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.vertical_levels",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the 100-level vertical grid of the regional model."
+  },
+  {
+   "rule_id": "evaluation.ablations",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.ablation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are a loss ablation and a scaling study, with experiment_ids kept."
+  },
+  {
+   "rule_id": "evaluation.forecast_horizon",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.forecast_horizon",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B03-0258"
+   ],
+   "reason": "The source path is evaluation-scoped: '6 months' is the evaluated lead range, which may differ from the task's design horizon. The proposer kept outputs.lead_range AMBIGUOUS between problem.forecast_horizon and evaluation.forecast_lead for the same reason. This rule should be treated the same way."
+  },
+  {
+   "rule_id": "extraction.model_scope",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B03-0120, B03-0148) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "future_work",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B08-0043, B08-0070, B10-0009, B12-0023) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.angle_representation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0130) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.domain_adaptation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0034) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.explainability",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0036) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.global",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0020) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.hybrid_da",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0040"
+   ],
+   "reason": "'Hybrid DA–ML systems expected to dominate near-term applications' is a review-level prediction about the field, not a proposed piece of future work. limitations.future_work would misclassify it."
+  },
+  {
+   "rule_id": "future_work.multisensor",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0131) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.noisy_swot",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0019) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.observations",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0023) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.physics",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0035, B16-0088) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.predictors",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0173, B16-0117) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.probabilistic",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B07-0054) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.release",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0120) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.reproducibility",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0042) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.residuals",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B07-0111) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.robustness",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0285) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.satellite_data",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0186) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.ssh",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B07-0025) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "future_work.training_data",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.future_work",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0090) are forward-looking proposals by the paper's own authors (for reviews/editorials, the review authors' own proposed directions). The claim type is retained."
+  },
+  {
+   "rule_id": "gap.domain_shift",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "interpretation.candidate_research_gaps",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All claims (B04-0401) are AI_INTERPRETATION hypotheses or proposals, correctly kept in interpretation.*."
+  },
+  {
+   "rule_id": "gap.extremes",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "interpretation.candidate_research_gaps",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All claims (B04-0399) are AI_INTERPRETATION hypotheses or proposals, correctly kept in interpretation.*."
+  },
+  {
+   "rule_id": "gap.sparsity",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "interpretation.candidate_research_gaps",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All claims (B04-0400) are AI_INTERPRETATION hypotheses or proposals, correctly kept in interpretation.*."
+  },
+  {
+   "rule_id": "gap.stability",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "interpretation.candidate_research_gaps",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All claims (B04-0402) are AI_INTERPRETATION hypotheses or proposals, correctly kept in interpretation.*."
+  },
+  {
+   "rule_id": "inference.cost",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.runtime",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a runtime cost statement."
+  },
+  {
+   "rule_id": "inference.cpu_time",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.runtime",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is an inference runtime with the CPU in the unit."
+  },
+  {
+   "rule_id": "inference.time_2021",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.runtime",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is an inference runtime, and the '2021' qualifier stays in the path."
+  },
+  {
+   "rule_id": "inputs",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B12-0020"
+   ],
+   "reason": "B12-0020 (abstract) lists 'drifter data' as an input. For the same paper (OAI-0111), B16-0091 records 6-hourly surface drifters as the training labels (datasets.labels -> data.target_source). Projecting it into data.input_variables may conflate target and input, so the role must be resolved first."
+  },
+  {
+   "rule_id": "inputs.air_temperature",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are model input variables of the studied CNN."
+  },
+  {
+   "rule_id": "inputs.atmospheric_forcing",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are input-only forcing variables."
+  },
+  {
+   "rule_id": "inputs.cloud_cover",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "inputs.pressure",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "inputs.profiles",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are input features of the neural correction."
+  },
+  {
+   "rule_id": "inputs.scalars",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are input features."
+  },
+  {
+   "rule_id": "inputs.tensor_shape",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.input_shape",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is an input tensor shape."
+  },
+  {
+   "rule_id": "inputs.text_fields",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are the classifier's inputs (text fields)."
+  },
+  {
+   "rule_id": "inputs.variable",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the ANN input."
+  },
+  {
+   "rule_id": "inputs.variables",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 16 are explicit model input variables. None is an assimilated-observation set."
+  },
+  {
+   "rule_id": "inputs.wind",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.input_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "limitations.alkalinity_bias",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0174) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.angle_regression",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0129) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.apriori_training",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0355) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.architecture",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B11-0014) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.arctic",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B09-0079) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.baseline_instability",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0078"
+   ],
+   "reason": "The limitation belongs to the baseline ('Single-stage ConvLSTM accumulated recursive forecast errors'), not to the studied method. In limitations.author_reported it would read as a limitation of the paper's own model (baseline vs studied model)."
+  },
+  {
+   "rule_id": "limitations.biases",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B09-0043) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.class_imbalance",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0318) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.coarse_res",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B09-0042) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.comparison_scope",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. B06-0116 is an AUTHOR_REPORTED_FACT about comparison scope (physics-based models excluded). Recording it as an author-reported limitation would turn a fact into a limitation. It may fit evaluation.comparison_conditions after human review."
+  },
+  {
+   "rule_id": "limitations.compute",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0156) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.configuration",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0057) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.conservation",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B05-0220) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.constraint",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B09-0059) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.data",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B11-0013) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.data_availability",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0167) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.decoupling",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0098) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.deep_chlorophyll",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0255) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.dive145",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B08-0062) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.domain_shift",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0284) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.eddy_labels",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B05-0215) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.eddy_tracking",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B05-0216) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.effectiveness",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0195) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.ensemble_spread",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0096) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.enso",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B05-0217) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.error_covariance",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B05-0224) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.event_duration",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0162) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.extremes",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0206, B11-0027) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.grid",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B08-0042) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.image_licenses",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0301) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.initialization_shock",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B05-0222) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.inputs",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B15-0034) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.intensity",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B12-0026) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.ke_wbc",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0115) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.latency",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0022) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.lead_time",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B04-0032) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.longitude",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0116) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.memory",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0015) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.mesoscale",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B08-0041) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.misclassification",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B08-0061) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.missing_physics",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0087) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.model_error",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B04-0287, B05-0221) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.model_shock",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0042) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.nrt_data",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B09-0021) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.observation_error",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B04-0288) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.observations",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B04-0292, B05-0218) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.ohc_bias",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B08-0040) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.online_drift",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B07-0110) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.parameter_uncertainty",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B07-0053) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.peaks",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0021) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.raw_access",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0309) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.resolution",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B09-0078) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.scale",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B11-0028) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.seasonal_window",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0183) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.sparse_winter",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B04-0089) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.ssh_consistency",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B07-0024) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.swot_noise",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B16-0018) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.temperature_depth",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0069) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.transferability",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. The claim(s) (B04-0033) come from review papers and describe challenges of the field or the reviewed literature, not a limitation of the paper's own method."
+  },
+  {
+   "rule_id": "limitations.tuning",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0097) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.unconstrained_stability",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B06-0060) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "limitations.weddell_shelf",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "limitations.author_reported",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The claim(s) (B05-0182) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness."
+  },
+  {
+   "rule_id": "loss.component_fit",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.data_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are data-fit loss terms."
+  },
+  {
+   "rule_id": "loss.component_observation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.data_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the observation misfit term of a 4D-Var cost function, which is a data-fit term."
+  },
+  {
+   "rule_id": "loss.component_reconstruction",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.reconstruction_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "loss.component_regularization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.regularization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "loss.constraint_lambda",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree, with a caution. It is a weighting coefficient (lambda) and the path is kept. Its locator is Figure 4 (the ablation figure), so confirm it is the selected value and not one point of a sweep."
+  },
+  {
+   "rule_id": "loss.deterministic_spectral",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.spectral_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a spectral loss. The 'deterministic' variant qualifier stays in the path."
+  },
+  {
+   "rule_id": "loss.masking",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.masking_in_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "loss.observation_component",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.data_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a 4D-Var observation misfit, which is a data term."
+  },
+  {
+   "rule_id": "loss.physics1_weight",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a loss weight in Eq.10."
+  },
+  {
+   "rule_id": "loss.physics2_weight",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a loss weight in Eq.10."
+  },
+  {
+   "rule_id": "loss.regularization_component",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.regularization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "loss.regularization_weight",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a loss weight."
+  },
+  {
+   "rule_id": "loss.sensor_component",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.data_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the data (sensor) misfit term."
+  },
+  {
+   "rule_id": "loss.sensor_weight",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a loss weight."
+  },
+  {
+   "rule_id": "loss.specification_caveat",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B16-0030) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "loss.total",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.total_loss",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 29 are the total training or estimation objective of the studied method (the DA cost function for 4D-Var and the marginal likelihood for the GP). B04-0146 is Aurora's general objective."
+  },
+  {
+   "rule_id": "loss.weight_boundary",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "loss.weight_l2",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the L2 term weight in the loss (see B07-0064)."
+  },
+  {
+   "rule_id": "loss.weight_selection",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.loss_weights",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It describes how the loss weight was selected."
+  },
+  {
+   "rule_id": "methods.own_experiments",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B10-0010) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "metrics.bootstrap_interval",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.significance",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. Bootstrap confidence percentiles belong to the significance and uncertainty reporting method."
+  },
+  {
+   "rule_id": "metrics.detection",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "metrics.equation_check",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B16-0121) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "metrics.interannual_score",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "metrics.list",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 9 are metric lists."
+  },
+  {
+   "rule_id": "metrics.mae",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "metrics.names",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "metrics.pointwise",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "metrics.primary",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "metrics.sic_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a metric definition."
+  },
+  {
+   "rule_id": "metrics.similarity",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.metrics",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the analog similarity metric, a method-level metric."
+  },
+  {
+   "rule_id": "metrics.uncertainty",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.significance",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. Seeds, bootstrap and 95% intervals describe the significance and uncertainty procedure."
+  },
+  {
+   "rule_id": "objective.observation_loss",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.data_loss",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B03-0131"
+   ],
+   "reason": "OAI-0009 is a review (B03-0148: 'Review: no unified training experiment'). Scope REVIEWED_4DVARNET_FORMULATION describes a cited method's loss. The guard exempts 'reviewed_' scopes as 'a reviewed method, not a review paper', but here the paper is a review. In objective.data_loss it would read as the paper's own training objective."
+  },
+  {
+   "rule_id": "outputs",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.chlorophyll_units",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The value is the output variable, and the unit field holds the units."
+  },
+  {
+   "rule_id": "outputs.groups",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.horizon",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.forecast_horizon",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 6 are the model's output or forecast horizon (the design horizon)."
+  },
+  {
+   "rule_id": "outputs.prognostic_2d",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.prognostic_3d",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.residual",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The residual target is the output variable."
+  },
+  {
+   "rule_id": "outputs.rollout",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.autoregressive",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The value explicitly says 'Autoregressive'."
+  },
+  {
+   "rule_id": "outputs.sst",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.target",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.tendency_unit",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_units",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.tensor_shape",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.output_shape",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.variable",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "outputs.variables",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.output_variables",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "physics.boundary_atmosphere",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "physics.boundary_conditions",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the atmospheric surface forcing and boundary condition of the regional model."
+  },
+  {
+   "rule_id": "physics.boundary_data",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "physics.boundary_conditions",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "physics.boundary_ocean",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "physics.boundary_conditions",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. These are the open-boundary data."
+  },
+  {
+   "rule_id": "physics.derivatives",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "physics.numerical_discretization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. Fourier differentiation is a discretization of derivatives."
+  },
+  {
+   "rule_id": "preprocessing.flips",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.augmentation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.grid",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.interpolation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.interface_normalization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.normalization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. 'Interface' means ocean layer interfaces (physical data), so data.normalization is correct, not normalization_layer."
+  },
+  {
+   "rule_id": "preprocessing.interpolation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.interpolation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. B08-0014 keeps experiment_id PRETRAIN."
+  },
+  {
+   "rule_id": "preprocessing.land",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.masking",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.land_mask",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.masking",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.land_value",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.masking",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.masks",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.masking",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.missing_anomaly",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.missingness",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.missing_chlorophyll",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.missingness",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.missing_values",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.missingness",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.missingness",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.missingness",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It describes how observation presence is encoded."
+  },
+  {
+   "rule_id": "preprocessing.mosaic_probability",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.augmentation",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.normalization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.normalization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 8 are data scaling or standardization, not layers."
+  },
+  {
+   "rule_id": "preprocessing.output_standardization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.normalization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.pixel_scaling",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.normalization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "preprocessing.scaling_fit",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.data_leakage_controls",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. Fold-wise scaler fitting is a leakage control."
+  },
+  {
+   "rule_id": "preprocessing.time_window_conflict",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B16-0120) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "preprocessing.velocity_scaling",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.normalization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "problem.domain",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.primary_domain",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. For the review papers this is the review's own domain, which is correct."
+  },
+  {
+   "rule_id": "problem.formulation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "architecture.autoregressive",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. Both claims state autoregressive or non-autoregressive explicitly."
+  },
+  {
+   "rule_id": "problem.objective",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.research_question",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B05-0090",
+    "B07-0001",
+    "B07-0027",
+    "B07-0057",
+    "B07-0079",
+    "B07-0113",
+    "B08-0080",
+    "B12-0027"
+   ],
+   "reason": "An objective or aim is not a research question. Most values are task or topic labels ('California Current state estimation', 'Coupled-ocean bias correction', 'Stochastic subgrid momentum parameterization', 'Regional SLA analog forecasting…'), not questions the paper poses. Mapping them into problem.research_question converts an aim into a claimed research question. Several labels fit problem.task better, and no single target fits all 18 claims. B08-0080 is also a conference-abstract benchmark scope."
+  },
+  {
+   "rule_id": "problem.region",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "problem.geography",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. B09-0003 keeps its transfer experiment_id."
+  },
+  {
+   "rule_id": "regularization",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.weight_decay",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The single claim explicitly states 'no weight decay'."
+  },
+  {
+   "rule_id": "regularization.derivatives",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "objective.regularization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "regularization.early_stopping",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.early_stopping",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "regularization.gradient_clipping",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.gradient_clipping",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "reproducibility.capsule",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.code_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a Code Ocean capsule DOI."
+  },
+  {
+   "rule_id": "reproducibility.code_archive",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.code_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a URL."
+  },
+  {
+   "rule_id": "reproducibility.code_online",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.code_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a URL."
+  },
+  {
+   "rule_id": "reproducibility.code_training",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.code_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a URL."
+  },
+  {
+   "rule_id": "reproducibility.dynamical_core",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.code_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree, with a caution. It is a URL listed under the paper's Code availability for the model's own dycore (same group). If it is treated as a third-party dependency, reproducibility.dependencies would apply."
+  },
+  {
+   "rule_id": "reproducibility.figure_data",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.data_url",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a URL."
+  },
+  {
+   "rule_id": "reproducibility.framework",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.dependencies",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "reproducibility.inference_code",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.code_url",
+   "verdict": "DISSENT_OTHER_TARGET",
+   "alternative_target": "reproducibility.dependencies",
+   "offending_claim_ids": [
+    "B03-0270"
+   ],
+   "reason": "The scope is BASE_PACKAGE: earth2mip is a third-party base package used for inference, not the paper's own code release. In reproducibility.code_url it would read as the paper's code. reproducibility.dependencies is the correct field."
+  },
+  {
+   "rule_id": "reproducibility.metadata_license",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.license",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "reproducibility.software",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "reproducibility.dependencies",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "reproducibility.split_conflict",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B04-0321) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "reproducibility.supplement_search",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B16-0036) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "research_gap",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "interpretation.candidate_research_gaps",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 3 claims are AI_INTERPRETATION."
+  },
+  {
+   "rule_id": "research_gap.candidate",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "interpretation.candidate_research_gaps",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. All 5 claims are AI_INTERPRETATION."
+  },
+  {
+   "rule_id": "results.Z500.RMSE_72h",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0210, B03-0211, B03-0212, B03-0213) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.anosim",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B08-0059) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.argo_effect",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0075) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric. The 56% vs 57% conflict stays visible because both values (#argo_effect_p15/p18) are projected with their paths."
+  },
+  {
+   "rule_id": "results.argo_effect_p15",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0001) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.argo_effect_p18",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0002) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.baseline_map",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0271) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.confusion_matrix",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0019) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.correlation_ssh",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0188) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.currents",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B15-0052) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.daily_surface_correlation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B07-0112) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.detection_accuracy",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B08-0057) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.detections",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B08-0058) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.eof",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B11-0010) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.error",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B11-0009) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.error_reduction",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0021) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.example_niiee_model",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0134) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.example_niiee_persistence",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0135) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.free_antarctic_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B06-0041) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.free_arctic_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B06-0040) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.highlat_dnn_u_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B16-0113) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.highlat_swot_u_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B16-0114) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.improvement",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0058) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.inference_time",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.runtime",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "results.iod_spatial_correlation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B08-0039) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.lowlat_lgb_u_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B16-0111) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.lowlat_lgb_v_rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B16-0112) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.mae_day1",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0114) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.map",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0270) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.mean_test_ssp_case_a",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0398) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.meridional_velocity.log_1_minus_ACC",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0057, B03-0059) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.meridional_velocity.log_RSE",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0056, B03-0058) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.mhw_detection",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0018) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.ohc_correlation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B08-0038) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.percentage_conflict",
+   "proposed_decision": "UNMAPPED",
+   "proposed_canonical_path": null,
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree it should stay unmapped. The claim(s) (B16-0119) are an AI_INTERPRETATION/annotation, a conflict flag or an applicability finding, not a paper value."
+  },
+  {
+   "rule_id": "results.precision_oiednet",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B05-0126) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.r2_day10",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0116) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.recall_oiednet",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B05-0127) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.relative_cost",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.runtime",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a relative computational cost."
+  },
+  {
+   "rule_id": "results.rmse",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B15-0026, B15-0033) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_corrected_24h",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0237) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_corrected_72h",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0239) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_day10",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0115) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_hs",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0222) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_original_24h",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0236) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_original_72h",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0238) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_t60_fig2b",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B14-0012) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric. Claim-level caution: the Neptune-1 variant attribution is noted as assumed, not stated in the caption."
+  },
+  {
+   "rule_id": "results.rmse_tm",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0223) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_u",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0186) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_v",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0187) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.rmse_vs_climatology_fig2a",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.skill_vs_baseline",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a skill comparison against the climatology baseline."
+  },
+  {
+   "rule_id": "results.salinity.log_1_minus_ACC",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0049, B03-0051) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.salinity.log_RSE",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0048, B03-0050) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.significance",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "evaluation.significance",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a reported significance-tested outcome."
+  },
+  {
+   "rule_id": "results.skill",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0017, B12-0019) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.skill_horizon",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B08-0076) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.soda_correlation_no_transfer",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0205) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.soda_correlation_transfer",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0204) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.speed",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.runtime",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "results.steric_height",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0014) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.table1",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0017) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.table_s2_example",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0041) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.table_s5_global",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0003) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric. Claim-level caution: the row-label assignment is inferred."
+  },
+  {
+   "rule_id": "results.table_s5_regional",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0004) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.temperature.log_1_minus_ACC",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0053, B03-0055) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.temperature.log_RSE",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0052, B03-0054) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.test",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0073) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric. The open text-vs-SI conflict (B12-0009) stays visible because results.test_range_si is projected alongside."
+  },
+  {
+   "rule_id": "results.test_range_si",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B12-0008) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.transfer",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.generalization",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a transfer-region result under experiment_id NWA_TRANSFER."
+  },
+  {
+   "rule_id": "results.trend",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0074) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.uncertainty",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B09-0077) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.useful_forecast_lead",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0207) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.validation_mean_iou",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B04-0283) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.zonal_velocity.log_1_minus_ACC",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0061, B03-0063) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "results.zonal_velocity.log_RSE",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "results.quantitative_results",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. results.quantitative_results is a heterogeneous container. The claim(s) (B03-0060, B03-0062) are reported quantitative or qualitative outcomes, and the qualifiers (variable, horizon, region, table/figure, baseline/variant) stay in the original path and experiment_id. No value becomes an unqualified generic metric."
+  },
+  {
+   "rule_id": "rl.action",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "rl.action_space",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "rl.reward",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "rl.reward_formula",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "rl.reward_component_accuracy",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "rl.reward_components",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "rl.reward_component_diversity",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "rl.reward_components",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "rl.state",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "rl.state_space",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "training.adaboost_search",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.hyperparameter_search",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a search method, not a search-space value."
+  },
+  {
+   "rule_id": "training.adaptation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.fine_tuning",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "training.batch",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.batch_size",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It states full batch explicitly."
+  },
+  {
+   "rule_id": "training.cross_validation",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "data.split_strategy",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "training.early_stopping_patience",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.early_stopping",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "training.gpu_memory_reported",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.gpu_memory",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "training.hardware",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "training.training_hardware",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. B13-0006 is code-launcher config not linked to paper results. The path also needs a per-claim split: B04-0138 is pretraining-only hardware (Aurora), and B09-0072 describes HPO compute (5,400 trainings), not the selected model's training hardware."
+  },
+  {
+   "rule_id": "training.hardware_as_printed",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.training_hardware",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The verbatim designation and its unresolved status are kept."
+  },
+  {
+   "rule_id": "training.hardware_finetuning",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.training_hardware",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0023"
+   ],
+   "reason": "Stage-specific ('8 GPUs' for fine-tuning only). In training.training_hardware it would read as the training hardware in general, and SeaCast pretraining used 64 MI250x (B04-0020). The proposer keeps training.time_pretraining/finetuning pending for the same reason, so this is inconsistent. The value also gives a GPU count without a type."
+  },
+  {
+   "rule_id": "training.hardware_pretraining",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.training_hardware",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0020"
+   ],
+   "reason": "Stage-specific (pretraining only). In training.training_hardware it would read as the paper's training hardware, but fine-tuning used 8 GPUs (B04-0023). This is the same stage-qualifier loss the proposer rejected for training.time_pretraining."
+  },
+  {
+   "rule_id": "training.lstm_search",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.hyperparameter_search",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a search method."
+  },
+  {
+   "rule_id": "training.precision",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.precision_mode",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree, with a caution. B03-0195 (experiment_id PRETRAIN) and B04-0144 (§Pretraining methods) are pretraining-stage settings. Precision mode is a setting, not an aggregate, so this does not change meaning."
+  },
+  {
+   "rule_id": "training.scheduler",
+   "proposed_decision": "AMBIGUOUS",
+   "proposed_canonical_path": "training.lr_schedule",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "The block is justified. B13-0003 is a code default (MultiStepLR) that the paper does not state. The other claims would fit training.lr_schedule, so a per-claim split is needed. Note that B04-0142 is Aurora pretraining-specific."
+  },
+  {
+   "rule_id": "training.scheduler_factor",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.lr_schedule",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is a ReduceLROnPlateau factor, and the path is kept."
+  },
+  {
+   "rule_id": "training.scheduler_patience",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.lr_schedule",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. It is the ReduceLROnPlateau patience (not early stopping), and the path is kept."
+  },
+  {
+   "rule_id": "training.steps",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.iterations",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0137"
+   ],
+   "reason": "150000 steps are pretraining steps (§Pretraining methods, Aurora; experiment_id null, so the stage is visible only in the section). In training.iterations they read as the total training iterations. The wave fine-tuning stages are not included."
+  },
+  {
+   "rule_id": "training.time",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.training_time",
+   "verdict": "DISSENT_KEEP_PENDING",
+   "alternative_target": null,
+   "offending_claim_ids": [
+    "B04-0145"
+   ],
+   "reason": "B04-0145 ('2.5 weeks', §Pretraining, Aurora) is pretraining-only time with experiment_id null. In training.training_time it reads as total training time, which is exactly the hazard the proposer cited for training.time_pretraining. The other 6 claims fit."
+  },
+  {
+   "rule_id": "training.total_time",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.training_time",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree."
+  },
+  {
+   "rule_id": "training.warmup_epochs",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.lr_schedule",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. Both stages are kept as separate experiment_ids."
+  },
+  {
+   "rule_id": "training.warmup_steps",
+   "proposed_decision": "MAPPED",
+   "proposed_canonical_path": "training.lr_schedule",
+   "verdict": "CONCUR",
+   "alternative_target": null,
+   "offending_claim_ids": [],
+   "reason": "Agree. The PRETRAIN experiment_id is kept."
+  }
+ ]
+}

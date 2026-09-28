@@ -195,16 +195,34 @@ with documented scope, every claim to have a latest `VERIFIED` audit, and no
 markers, conflicts, or blockers. A partial field audit cannot satisfy this gate.
 
 The two independently authored reports currently available can be replayed
-after importing B16, provided the source PDFs at the recorded paths have the
-recorded SHA-256 hashes:
+after importing B16. The PDFs are not bundled with the repository. Download
+the exact editions from the report's `download_url` values and verify their
+hashes before replay:
+
+```bash
+mkdir -p .data/golden-pdfs
+curl -fL 'https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf' -o .data/golden-pdfs/4dvarnet-ssh-2023.pdf
+curl -fL 'https://arxiv.org/pdf/2310.00813v2' -o .data/golden-pdfs/oceannet-2023.pdf
+curl -fL 'https://media.springernature.com/original/springer-static/esm/art:10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf' -o .data/golden-pdfs/oceannet-2023-supplement.pdf
+sha256sum .data/golden-pdfs/4dvarnet-ssh-2023.pdf .data/golden-pdfs/oceannet-2023.pdf .data/golden-pdfs/oceannet-2023-supplement.pdf
+```
+
+The expected hashes, in that order, are
+`bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88`,
+`be82ff557769aff04b119490d6a2ebb718887a1e3962355ab10cc9a7291802e9`, and
+`c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf`.
+If any hash differs, stop; do not silently substitute a new edition. Then:
 
 ```bash
 uv run ocean-research-hub-audit-report evaluation/reports/oai-0001-b16-scientific-audit.json --database .data/ocean-research-hub.db
 uv run ocean-research-hub-audit-report evaluation/reports/oai-0002-b16-scientific-audit.json --database .data/ocean-research-hub.db
 ```
 
-Replaying them is idempotent. They audit 68 claims across two papers, not the
-entire 115-paper collection. They do not establish extraction completeness.
+Replaying an unchanged report is idempotent. A correction to edition, locator,
+evidence or justification appends a new versioned event while retaining the
+old one; thus audit-event history can exceed the number of distinct audited
+claims. The two reports audit 68 claims across two papers, not the entire
+115-paper collection. They do not establish extraction completeness.
 
 ## Scientific integrity rules the importer enforces
 

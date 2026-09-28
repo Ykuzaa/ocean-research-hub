@@ -22,6 +22,7 @@ from openpyxl import load_workbook
 
 from ocean_research_hub.api import create_app
 from ocean_research_hub.corpus.cli import main as cli_main
+from ocean_research_hub.corpus.audit_report_cli import _event as report_audit_event, _same_decision
 from ocean_research_hub.corpus.repository import CorpusNotFoundError, CorpusRepository
 from ocean_research_hub.corpus.workbook import (
     REQUIRED_SHEETS, StagingWorkbook, WorkbookValidationError, normalize_title, parse_claim_value,
@@ -588,6 +589,14 @@ def test_a_supplement_without_a_base_corpus_is_refused_and_writes_nothing(tmp_pa
         repository.import_workbook(supplement)
     assert any("import the base workbook first" in error for error in caught.value.errors)
     assert repository.summary()["claims"] == 0 and repository.import_runs() == []
+
+
+def test_catalogue_read_does_not_create_database(tmp_path: Path) -> None:
+    database = tmp_path / "missing.db"
+    repository = CorpusRepository(database)
+    assert repository.summary()["papers"] == 0
+    assert repository.list_papers()[1] == 0
+    assert not database.exists()
 
 
 def test_a_supplement_cannot_introduce_a_paper(imported: CorpusRepository, supplement: StagingWorkbook) -> None:
@@ -1229,6 +1238,29 @@ def test_latest_audit_uses_absolute_time_across_timezone_offsets(
     assert updated["latest_audit"]["decision"] == "CONFLICT"
     assert updated["verification_state"] == "CONFLICT"
     assert b16_repository.get_paper(claim["paper_id"])["conflict_blocker_state"] == "CONFLICT"
+
+
+def test_corrected_report_edition_and_supporting_source_get_new_audit_identity() -> None:
+    report = {"paper": {"paper_id": "OAI-0002"}, "auditor_id": "auditor:test", "audited_at": "2026-09-28"}
+    source = {"sha256": "a" * 64}
+    item = {
+        "claim_id": "ORI-0040", "field_path": "objective.loss_weights",
+        "extracted_value": "symbolic lambda", "unit": None,
+        "experiment_id": "OAI-0002:MAIN_EXPERIMENT",
+        "provenance_type": "AUTHOR_REPORTED_FACT", "final_status": "EXTRACTION_ERROR",
+        "audit_note": "Remove the extraction note.", "source_kind": "PRIMARY_PAPER",
+        "source_edition": "incorrect edition", "page": 14, "section": "Loss",
+        "locator": "Equation (6)", "evidence_summary": "Symbolic coefficient.",
+    }
+    old = report_audit_event(report, item, source)
+    corrected = report_audit_event(report, {
+        **item, "source_edition": "arXiv v2, 2024-09-04",
+        "corroborating_source_kind": "SUPPLEMENTARY_MATERIAL",
+        "corroborating_source_sha256": "b" * 64,
+    }, source)
+    assert old["event_id"] != corrected["event_id"]
+    assert not _same_decision(old, corrected)
+    assert "SUPPLEMENTARY_MATERIAL sha256:" in corrected["source_edition"]
 
 
 def test_audit_is_bound_to_the_reviewed_version_and_cannot_verify_a_review_label(

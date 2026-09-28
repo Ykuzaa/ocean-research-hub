@@ -13,7 +13,7 @@ The workbook is committed without alteration at
 | B16 `SCIENTIFIC_CLAIMS` worksheet rows | 1,936 |
 | Value-bearing candidate claims | 1,867 |
 | Absence markers, not claims | 69 (55 `NOT_EXTRACTED`, 14 `NOT_REPORTED` candidates) |
-| Field-level audit events | 68 |
+| Field-level audit events | 94 historical events for 68 distinct audited claims |
 | Audited claims `VERIFIED` / `PARTIALLY_VERIFIED` | 39 / 2 |
 | Audited claims `NOT_VERIFIED` / `EXTRACTION_ERROR` | 2 / 25 |
 | Entirely verified papers | 0 |
@@ -40,7 +40,7 @@ sufficient source review supports the negative finding.
 
 - **PR #35**, branch `claude/issue-13-import-b15`, now carries B16, the audit
   ledger and the Next.js corpus workspace. It is a **draft**, not merge-ready.
-  Local Python tests (267), frontend tests (8), typecheck and production build
+  Local Python tests (269), frontend tests (8), typecheck and production build
   pass. Independent QA found and reproduced a timezone-ordering defect in the
   audit ledger; it is corrected with an absolute-time regression test, pending
   QA rerun. A Sourcery static-analysis check currently reports a dynamic-SQL warning
@@ -56,8 +56,8 @@ sufficient source review supports the negative finding.
   in that combined tree; running its migration runner on the populated corpus
   preserves all 115 staging papers. Independent QA and merge review are still
   required. Field-path canonicalisation is only a versioned *proposal*, not a
-  scientifically validated #29 projection. Numbered migration of the new
-  staging tables (#30) is still outstanding.
+  scientifically validated #29 projection. PR #36 now includes numbered
+  migration `0003_staging_corpus` (#30); its combined-tree QA rerun is pending.
 - **#19/#31**, branch `codex/issue-19-scientific-extraction-clean`, is preserved
   with two local commits ahead of its remote. Its earlier independent scientific
   review failed (precision 29.17%, recall 15.91%, exact match 19.23%,
@@ -72,10 +72,9 @@ sufficient source review supports the negative finding.
 
 ## Next work, in order
 
-1. Run independent adversarial QA on draft PR #36 and its combined head with
-   PR #35. Port staging DDL into the numbered migration runner without resetting
-   the populated DB; the temporary combined import check is not a migration
-   acceptance test for #30.
+1. Run independent adversarial QA on updated draft PR #36 and its combined
+   head with PR #35. Verify numbered staging migration `0003` on a populated
+   database and that a catalogue read on an absent database writes nothing.
 2. Independently review the 981 B16 `FIELD_PATH_MAP` rows, version decisions,
    leave ambiguous ones pending, and only then apply validated canonical
    projections. Preserve each original source path and wording.

@@ -17,6 +17,7 @@
       "source_kind": "PRIMARY_PAPER",
       "edition": "PUBLISHED_VERSION_GMD_16_2119_2147_2023",
       "path": ".data/golden-pdfs/4dvarnet-ssh-2023.pdf",
+      "download_url": "https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf",
       "sha256": "bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88",
       "pages": 29,
       "doi": "10.5194/gmd-16-2119-2023"

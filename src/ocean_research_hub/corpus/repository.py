@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 from uuid import uuid4
 
 from .workbook import (
@@ -327,10 +328,28 @@ class CorpusRepository:
         connection.execute("PRAGMA foreign_keys = ON")
         return connection
 
-    def _ready(self) -> sqlite3.Connection:
-        if not self._initialized:
-            self.initialize()
-        return self._connect()
+    def _ready(self, *, write: bool = False) -> sqlite3.Connection:
+        if write:
+            if not self._initialized:
+                self.initialize()
+            return self._connect()
+        # Catalogue reads must never create or migrate a database. Before the
+        # first import, use an ephemeral empty schema solely to return truthful
+        # empty results from the same query paths.
+        if self.database_path.is_file():
+            uri = f"file:{quote(str(self.database_path.resolve()), safe='/')}?mode=ro"
+            connection = sqlite3.connect(uri, uri=True)
+            connection.row_factory = sqlite3.Row
+            present = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='staging_corpus_papers'"
+            ).fetchone()
+            if present:
+                return connection
+            connection.close()
+        connection = sqlite3.connect(":memory:")
+        connection.row_factory = sqlite3.Row
+        connection.executescript(SCHEMA)
+        return connection
 
     # -- import ------------------------------------------------------------
 
@@ -353,7 +372,7 @@ class CorpusRepository:
         report = ImportReport(str(uuid4()), book.source_name, book.sha256, allow_revert=allow_revert)
         report.warnings.extend(book.warnings)
         now = datetime.now(UTC).isoformat()
-        connection = self._ready()
+        connection = self._ready(write=True)
         try:
             with connection:
                 self._record_current_versions(connection)
@@ -403,7 +422,7 @@ class CorpusRepository:
         accepted, so a newer package can never be pre-emptively blocked.
         Returns the number of versions added.
         """
-        with closing(self._ready()) as connection:
+        with closing(self._ready(write=True)) as connection:
             known = connection.execute(
                 "SELECT 1 FROM staging_corpus_import_runs WHERE workbook_sha256 = ?", (book.sha256,)
             ).fetchone()
@@ -1008,7 +1027,7 @@ class CorpusRepository:
             "provenance_type": provenance,
             "source_kind": source_kind,
         }
-        with closing(self._ready()) as connection, connection:
+        with closing(self._ready(write=True)) as connection, connection:
             target = connection.execute(
                 f"SELECT * FROM {table} WHERE {key} = ?", (str(event["target_id"]),)
             ).fetchone()

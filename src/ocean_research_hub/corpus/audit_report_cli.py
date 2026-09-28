@@ -23,16 +23,19 @@ def _event(report: dict, item: dict, source: dict) -> dict:
     provenance = original_provenance if original_provenance in {
         "AUTHOR_REPORTED_FACT", "AUTHOR_REPORTED_LIMITATION", "AI_INTERPRETATION", "TEAM_NOTE"
     } else "TEAM_NOTE"
-    return {
-        "event_id": str(uuid5(NAMESPACE_URL, ":".join((
-            report["paper"]["paper_id"], item["claim_id"], item["final_status"],
-            report["auditor_id"], report["audited_at"], source["sha256"],
-        )))),
+    supporting = []
+    if item.get("corroborating_source_kind"):
+        supporting.append({
+            "source_kind": item["corroborating_source_kind"],
+            "sha256": item["corroborating_source_sha256"],
+        })
+    event = {
         "target_kind": "CLAIM", "target_id": item["claim_id"],
         "decision": item["final_status"], "justification": item["audit_note"],
         "auditor_id": report["auditor_id"], "audited_at": report["audited_at"],
         "provenance_type": provenance, "source_kind": item["source_kind"],
-        "source_edition": f"{item['source_edition']} sha256:{source['sha256']}",
+        "source_edition": f"{item['source_edition']} sha256:{source['sha256']}"
+        + (f"; corroborating {supporting[0]['source_kind']} sha256:{supporting[0]['sha256']}" if supporting else ""),
         "page": item.get("page"), "section": item.get("section"),
         "locator": item.get("locator"),
         "evidence": f"Auditor paraphrase: {item['evidence_summary']}",
@@ -41,6 +44,21 @@ def _event(report: dict, item: dict, source: dict) -> dict:
             "experiment_id": item.get("experiment_id"), "field_path": item["field_path"],
         },
     }
+    # Every evidentiary correction is a new event; an ID based only on claim,
+    # status and date would silently discard corrected editions or locators.
+    event["event_id"] = str(uuid5(NAMESPACE_URL, json.dumps(
+        event, sort_keys=True, ensure_ascii=False, separators=(",", ":"),
+    )))
+    return event
+
+
+def _same_decision(left: dict, right: dict) -> bool:
+    fields = (
+        "target_kind", "target_id", "decision", "justification", "auditor_id",
+        "audited_at", "provenance_type", "source_kind", "source_edition",
+        "page", "section", "locator", "evidence", "search_scope", "reviewed",
+    )
+    return all(left.get(field) == right.get(field) for field in fields)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -55,16 +73,29 @@ def main(argv: list[str] | None = None) -> int:
         report = json.loads(args.report.read_text(encoding="utf-8"))
         if report.get("report_kind") != "INDEPENDENT_SCIENTIFIC_AUDIT":
             raise ValueError("report is not an independent scientific audit")
-        source = report["sources"]["primary_paper"]
-        source_path = Path(source["path"])
-        if not source_path.is_file() or hashlib.sha256(source_path.read_bytes()).hexdigest() != source["sha256"]:
-            raise ValueError("primary source file is missing or its SHA-256 differs")
+        sources = report["sources"]
+        source = sources["primary_paper"]
+        for source_name, pinned in sources.items():
+            if not isinstance(pinned, dict) or "path" not in pinned:
+                continue
+            path = Path(pinned["path"])
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != pinned["sha256"]:
+                raise ValueError(f"{source_name} file is missing or its SHA-256 differs")
         repository = CorpusRepository(args.database)
         paper = repository.get_paper(report["paper"]["paper_id"])
         if paper["doi"].casefold() != report["paper"]["doi"].casefold():
             raise ValueError("report DOI differs from the imported paper")
         events = []
         for item in report["claims"]:
+            if item.get("corroborating_source_kind"):
+                if not any(
+                    isinstance(pinned, dict)
+                    and pinned.get("source_kind") == item["corroborating_source_kind"]
+                    and pinned.get("sha256") == item.get("corroborating_source_sha256")
+                    and "path" in pinned
+                    for pinned in sources.values()
+                ):
+                    raise ValueError(f"{item['claim_id']}: corroborating source is not hash-pinned")
             claim = repository.get_claim(item["claim_id"])
             if claim["paper_id"] != paper["paper_id"]:
                 raise ValueError(f"{item['claim_id']}: claim belongs to another paper")
@@ -83,15 +114,17 @@ def main(argv: list[str] | None = None) -> int:
             events.append(reviewed)
         if len({event["target_id"] for event in events}) != len(events):
             raise ValueError("report repeats a claim ID")
-        existing = {event["event_id"] for event in repository.list_audits()}
+        existing = repository.list_audits()
+        pending = [
+            event for event in events
+            if not any(_same_decision(event, earlier) for earlier in existing)
+        ]
         if args.dry_run:
             print(json.dumps({"status": "VALID_NOT_RECORDED", "events": len(events),
-                              "new_events": sum(event["event_id"] not in existing for event in events)}))
+                              "new_events": len(pending)}))
             return 0
         added = 0
-        for event in events:
-            if event["event_id"] in existing:
-                continue
+        for event in pending:
             repository.record_audit(event)
             added += 1
         print(json.dumps({"status": "RECORDED", "events": len(events), "added": added}))

@@ -13,14 +13,14 @@ The workbook is committed without alteration at
 | B16 `SCIENTIFIC_CLAIMS` worksheet rows | 1,936 |
 | Value-bearing candidate claims | 1,867 |
 | Absence markers, not claims | 69 (55 `NOT_EXTRACTED`, 14 `NOT_REPORTED` candidates) |
-| Field-level audit events | 94 historical events for 68 distinct audited claims |
+| Field-level audit events | 98 historical events for 72 distinct audited claims |
 | Audited claims `VERIFIED` / `PARTIALLY_VERIFIED` | 39 / 2 |
-| Audited claims `NOT_VERIFIED` / `EXTRACTION_ERROR` | 2 / 25 |
+| Audited claims `NOT_VERIFIED` / `EXTRACTION_ERROR` | 6 / 25 |
 | Entirely verified papers | 0 |
 | Partially verified papers | 2 (OAI-0001, OAI-0002) |
 | Papers blocked by audited extraction errors | 2 (OAI-0001, OAI-0002) |
 | Other papers with visible imported conflict reviews | 3 (OAI-0013, OAI-0077, OAI-0089) |
-| Papers not yet field-audited | 113 |
+| Papers not yet field-audited | 109 |
 
 Extraction is a separate axis: 9 `NOT_EXTRACTED`, 85 `PARTIAL`, 21
 `READY_FOR_AUDIT`. None has a documented full field-by-field completeness
@@ -35,6 +35,12 @@ and code inspection status. The decisions bind to the imported value, unit,
 experiment and path. They are partial audits, not PAPER-level completion
 attestations. `NOT_REPORTED` markers remain candidates until a documented,
 sufficient source review supports the negative finding.
+
+Four additional one-claim audits cover the B04-G01 through B04-G04 research-gap
+proposals for OAI-0031, OAI-0036, OAI-0091 and OAI-0101. The primary sources
+motivate the proposals, but every decision is `AI_INTERPRETATION` / `NOT_VERIFIED`;
+no proposal, mapping rule or paper was promoted. All 981 field mappings remain
+`PENDING`.
 
 ## Branch and gate status
 

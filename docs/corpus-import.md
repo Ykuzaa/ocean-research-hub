@@ -194,7 +194,7 @@ requires a current independent PAPER-level `VERIFIED` completeness attestation
 with documented scope, every claim to have a latest `VERIFIED` audit, and no
 markers, conflicts, or blockers. A partial field audit cannot satisfy this gate.
 
-The two independently authored reports currently available can be replayed
+The six independently authored reports currently available can be replayed
 after importing B16. The PDFs are not bundled with the repository. Download
 the exact editions from the report's `download_url` values and verify their
 hashes before replay:
@@ -204,25 +204,41 @@ mkdir -p .data/golden-pdfs
 curl -fL 'https://gmd.copernicus.org/articles/16/2119/2023/gmd-16-2119-2023.pdf' -o .data/golden-pdfs/4dvarnet-ssh-2023.pdf
 curl -fL 'https://arxiv.org/pdf/2310.00813v2' -o .data/golden-pdfs/oceannet-2023.pdf
 curl -fL 'https://media.springernature.com/original/springer-static/esm/art:10.1038%2Fs41598-024-72145-0/MediaObjects/41598_2024_72145_MOESM1_ESM.pdf' -o .data/golden-pdfs/oceannet-2023-supplement.pdf
-sha256sum .data/golden-pdfs/4dvarnet-ssh-2023.pdf .data/golden-pdfs/oceannet-2023.pdf .data/golden-pdfs/oceannet-2023-supplement.pdf
+curl -fL 'https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2023.1079286/pdf' -o .data/golden-pdfs/oai-0031-fmars-2023-1079286.pdf
+curl -fL 'https://www.nature.com/articles/s41598-025-23682-9.pdf' -o .data/golden-pdfs/oai-0036-s41598-025-23682-9.pdf
+curl -fL 'https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2025.1613061/pdf' -o .data/golden-pdfs/oai-0091-fmars-2025-1613061.pdf
+curl -fL 'https://arxiv.org/pdf/2512.04452v1' -o .data/golden-pdfs/oai-0101-arxiv-2512.04452v1.pdf
+sha256sum .data/golden-pdfs/4dvarnet-ssh-2023.pdf .data/golden-pdfs/oceannet-2023.pdf .data/golden-pdfs/oceannet-2023-supplement.pdf \
+  .data/golden-pdfs/oai-0031-fmars-2023-1079286.pdf .data/golden-pdfs/oai-0036-s41598-025-23682-9.pdf \
+  .data/golden-pdfs/oai-0091-fmars-2025-1613061.pdf .data/golden-pdfs/oai-0101-arxiv-2512.04452v1.pdf
 ```
 
 The expected hashes, in that order, are
 `bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88`,
 `be82ff557769aff04b119490d6a2ebb718887a1e3962355ab10cc9a7291802e9`, and
-`c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf`.
+`c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf`,
+`aecde959829c0e36bec232d4945c77e592f791e891d3879f5b5e36b3f6a7ed04`,
+`10f2e89adee7cf9aa1b1845e930a37741841a0cc8bb96f2c20ec0421fe5676b4`,
+`68b32d70ba677a595e5b87ba6a384c8b38e3680be7d0db598538148fb50b0df3`, and
+`cb4cd3dba2e4c903a9343ebad3ee077335c9f5227b9e846e71e03d27486edb85`.
 If any hash differs, stop; do not silently substitute a new edition. Then:
 
 ```bash
 uv run ocean-research-hub-audit-report evaluation/reports/oai-0001-b16-scientific-audit.json --database .data/ocean-research-hub.db
 uv run ocean-research-hub-audit-report evaluation/reports/oai-0002-b16-scientific-audit.json --database .data/ocean-research-hub.db
+uv run ocean-research-hub-audit-report evaluation/reports/oai-0031-b16-research-gap-audit.json --database .data/ocean-research-hub.db
+uv run ocean-research-hub-audit-report evaluation/reports/oai-0036-b16-research-gap-audit.json --database .data/ocean-research-hub.db
+uv run ocean-research-hub-audit-report evaluation/reports/oai-0091-b16-research-gap-audit.json --database .data/ocean-research-hub.db
+uv run ocean-research-hub-audit-report evaluation/reports/oai-0101-b16-research-gap-audit.json --database .data/ocean-research-hub.db
 ```
 
 Replaying an unchanged report is idempotent. A correction to edition, locator,
 evidence or justification appends a new versioned event while retaining the
 old one; thus audit-event history can exceed the number of distinct audited
-claims. The two reports audit 68 claims across two papers, not the entire
-115-paper collection. They do not establish extraction completeness.
+claims. The six reports audit 72 claims across six papers, not the entire
+115-paper collection. The four research-gap reports retain `AI_INTERPRETATION`
+and `NOT_VERIFIED`; none establishes proposal validity, novelty, mapping
+validation or extraction completeness.
 
 ## Scientific integrity rules the importer enforces
 

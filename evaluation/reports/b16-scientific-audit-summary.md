@@ -50,6 +50,29 @@ The first OAI-0002 replay stored the source-edition label `ARXIV_AUTHOR_MANUSCRI
 
 Multi-source checks such as `ORI-0040` retain the supplement hash and review scope in addition to the primary-paper edition. These source identities must remain separate in future replays; collapsing them to an undifferentiated primary source would lose provenance.
 
+## Research-gap proposal audit update — 2026-09-29
+
+An independent Scientific Auditor checked B04-G01 through B04-G04 against four
+hash-pinned primary PDFs. The four proposals reconcile exactly to claims
+`B04-0399` through `B04-0402` and papers OAI-0031, OAI-0036, OAI-0091 and
+OAI-0101. Each source motivates the proposed experiment, but the experiment,
+causal conclusion or literature-wide novelty is not an author-reported result.
+All four decisions are therefore `AI_INTERPRETATION` / `NOT_VERIFIED` with
+confidence 0.99. No field mapping was validated.
+
+The replayable reports are:
+
+- `evaluation/reports/oai-0031-b16-research-gap-audit.json`
+- `evaluation/reports/oai-0036-b16-research-gap-audit.json`
+- `evaluation/reports/oai-0091-b16-research-gap-audit.json`
+- `evaluation/reports/oai-0101-b16-research-gap-audit.json`
+
+Recording added four current events. The ledger now contains 98 historical
+events for 72 distinct claims; latest decisions are 39 `VERIFIED`, 2
+`PARTIALLY_VERIFIED`, 6 `NOT_VERIFIED` and 25 `EXTRACTION_ERROR`. Replaying the
+four reports adds zero events, and a B16 dry-run leaves all 115 papers, 1,867
+claims, 69 markers and 20 research-gap candidates unchanged.
+
 ## Additional-paper triage
 
 No additional paper can honestly be declared fully audited from the current assets and staging rows.

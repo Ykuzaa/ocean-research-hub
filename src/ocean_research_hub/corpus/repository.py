@@ -47,6 +47,7 @@ UNATTESTED_AUDIT_MARKERS = PENDING_AUDIT_MARKERS | {""}
 
 NOT_EXTRACTED = "NOT_EXTRACTED"
 NOT_REPORTED_CANDIDATE = "NOT_REPORTED_CANDIDATE"
+AUDIT_GUARD_MARKER = "-- AUDIT GUARDS REQUIRE CANONICAL CLAIM BINDINGS --"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS staging_corpus_import_runs (
@@ -204,6 +205,473 @@ CREATE TABLE IF NOT EXISTS staging_corpus_field_mappings (
     CHECK (review_status != 'VALIDATED' OR (auditor_id IS NOT NULL AND reviewed_at IS NOT NULL)),
     CHECK (decision != 'MAPPED' OR canonical_path IS NOT NULL)
 );
+-- Fail visibly rather than grandfathering invalid historical attestations.
+CREATE TABLE IF NOT EXISTS staging_corpus_claim_audit_bindings (
+    claim_id TEXT PRIMARY KEY REFERENCES staging_corpus_claims(claim_id),
+    target_fingerprint TEXT NOT NULL,
+    reviewed_json TEXT NOT NULL
+);
+-- Versioned bindings let a legitimate later workbook row acquire a new,
+-- immutable binding without rewriting the assertion attached to an older
+-- fingerprint.  The original table remains for compatibility with databases
+-- initialized by earlier revisions.
+CREATE TABLE IF NOT EXISTS staging_corpus_claim_audit_binding_versions (
+    claim_id TEXT NOT NULL REFERENCES staging_corpus_claims(claim_id),
+    target_fingerprint TEXT NOT NULL,
+    reviewed_json TEXT NOT NULL,
+    PRIMARY KEY (claim_id, target_fingerprint)
+);
+
+-- AUDIT GUARDS REQUIRE CANONICAL CLAIM BINDINGS --
+CREATE TEMP TABLE staging_corpus_preflight_verified_audits (
+    invalid INTEGER CONSTRAINT verified_audits_require_evidence CHECK (invalid = 0)
+);
+INSERT INTO staging_corpus_preflight_verified_audits
+SELECT 1
+FROM staging_corpus_audit_events
+WHERE decision IN ('VERIFIED', 'PARTIALLY_VERIFIED')
+  AND (
+      provenance_type NOT IN ('AUTHOR_REPORTED_FACT', 'AUTHOR_REPORTED_LIMITATION')
+      OR source_kind NOT IN ('PRIMARY_PAPER', 'SUPPLEMENTARY_MATERIAL', 'AUTHOR_CODE')
+      OR length(trim(source_edition)) = 0
+      OR length(trim(COALESCE(evidence, ''))) = 0
+      OR (
+          page IS NULL
+          AND length(trim(COALESCE(section, ''))) = 0
+          AND length(trim(COALESCE(locator, ''))) = 0
+      )
+  )
+LIMIT 1;
+DROP TABLE staging_corpus_preflight_verified_audits;
+
+CREATE TEMP TABLE staging_corpus_preflight_audit_scope (
+    invalid INTEGER CONSTRAINT audited_absence_and_papers_require_scope CHECK (invalid = 0)
+);
+INSERT INTO staging_corpus_preflight_audit_scope
+SELECT 1
+FROM staging_corpus_audit_events AS event
+WHERE (
+    event.decision = 'NOT_REPORTED'
+    AND (
+        event.target_kind != 'MARKER'
+        OR length(trim(COALESCE(event.search_scope, ''))) < 30
+        OR lower(event.search_scope) LIKE '%keyword%'
+        OR lower(event.search_scope) LIKE '%mot-cl%'
+        OR (
+            EXISTS (
+                SELECT 1
+                FROM staging_corpus_field_markers AS marker
+                WHERE marker.marker_id = event.target_id
+                  AND marker.fingerprint = event.target_fingerprint
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM staging_corpus_field_markers AS marker
+                WHERE marker.marker_id = event.target_id
+                  AND marker.fingerprint = event.target_fingerprint
+                  AND marker.extraction_status = 'NOT_REPORTED'
+            )
+        )
+    )
+) OR (
+    event.target_kind = 'PAPER'
+    AND event.decision = 'VERIFIED'
+    AND length(trim(COALESCE(event.search_scope, ''))) < 30
+)
+LIMIT 1;
+DROP TABLE staging_corpus_preflight_audit_scope;
+
+CREATE TEMP TABLE staging_corpus_preflight_reviewed_targets (
+    invalid INTEGER CONSTRAINT audit_review_must_match_current_target CHECK (invalid = 0)
+);
+INSERT INTO staging_corpus_preflight_reviewed_targets
+SELECT 1
+FROM staging_corpus_audit_events AS event
+WHERE json_valid(event.reviewed_json) = 0
+   OR (
+       event.target_kind = 'CLAIM'
+       AND EXISTS (
+           SELECT 1 FROM staging_corpus_claims
+           WHERE claim_id = event.target_id AND fingerprint = event.target_fingerprint
+       )
+       AND NOT EXISTS (
+           SELECT 1
+           FROM staging_corpus_claims AS claim
+           WHERE claim.claim_id = event.target_id
+             AND claim.fingerprint = event.target_fingerprint
+             AND json_type(event.reviewed_json, '$.field_path') IS NOT NULL
+             AND json_extract(event.reviewed_json, '$.field_path') = claim.field_path
+             AND json_type(event.reviewed_json, '$.experiment_id') IS NOT NULL
+             AND json_extract(event.reviewed_json, '$.experiment_id') IS claim.experiment_id
+       )
+   )
+   OR (
+       event.target_kind = 'MARKER'
+       AND EXISTS (
+           SELECT 1 FROM staging_corpus_field_markers
+           WHERE marker_id = event.target_id AND fingerprint = event.target_fingerprint
+       )
+       AND NOT EXISTS (
+           SELECT 1
+           FROM staging_corpus_field_markers AS marker
+           WHERE marker.marker_id = event.target_id
+             AND marker.fingerprint = event.target_fingerprint
+             AND json_extract(event.reviewed_json, '$.field_path') = marker.field_path
+             AND json_extract(event.reviewed_json, '$.extraction_status') = marker.extraction_status
+       )
+   )
+   OR (
+       event.target_kind = 'PAPER'
+       AND EXISTS (
+           SELECT 1 FROM staging_corpus_papers
+           WHERE paper_id = event.target_id AND fingerprint = event.target_fingerprint
+       )
+       AND NOT EXISTS (
+           SELECT 1
+           FROM staging_corpus_papers AS paper
+           WHERE paper.paper_id = event.target_id
+             AND paper.fingerprint = event.target_fingerprint
+             AND json_extract(event.reviewed_json, '$.paper_id') = paper.paper_id
+       )
+   )
+LIMIT 1;
+DROP TABLE staging_corpus_preflight_reviewed_targets;
+
+
+CREATE TEMP TABLE staging_corpus_preflight_claim_statuses (
+    invalid INTEGER CONSTRAINT claims_require_current_audit CHECK (invalid = 0)
+);
+INSERT INTO staging_corpus_preflight_claim_statuses
+SELECT 1
+FROM staging_corpus_claims AS claim
+WHERE claim.scientific_status NOT IN (
+        'NOT_VERIFIED', 'EXTRACTION_ERROR', 'CONFLICT', 'VERIFIED', 'PARTIALLY_VERIFIED'
+    )
+   OR (
+       claim.scientific_status IN ('VERIFIED', 'PARTIALLY_VERIFIED')
+       AND COALESCE((
+           SELECT event.decision
+           FROM staging_corpus_audit_events AS event
+           WHERE event.target_kind = 'CLAIM'
+             AND event.target_id = claim.claim_id
+             AND event.target_fingerprint = claim.fingerprint
+           ORDER BY julianday(event.audited_at) DESC, event.created_at DESC, event.event_id DESC
+           LIMIT 1
+       ), '') != claim.scientific_status
+   )
+   OR (
+       COALESCE(claim.independent_audit, '') NOT IN (
+           '', 'NOT_AUDITED', 'PENDING_INDEPENDENT_AUDIT', 'PENDING_PDF_AUDIT', 'PDF_AUDIT_PENDING'
+       )
+       AND NOT EXISTS (
+           SELECT 1
+           FROM staging_corpus_audit_events AS event
+           WHERE event.target_kind = 'CLAIM'
+             AND event.target_id = claim.claim_id
+             AND event.target_fingerprint = claim.fingerprint
+       )
+   )
+LIMIT 1;
+DROP TABLE staging_corpus_preflight_claim_statuses;
+
+CREATE TEMP TABLE staging_corpus_preflight_marker_statuses (
+    invalid INTEGER CONSTRAINT markers_require_current_audit CHECK (invalid = 0)
+);
+INSERT INTO staging_corpus_preflight_marker_statuses
+SELECT 1
+FROM staging_corpus_field_markers AS marker
+WHERE marker.scientific_status NOT IN (
+        'NOT_VERIFIED', 'EXTRACTION_ERROR', 'CONFLICT', 'NOT_REPORTED',
+        'VERIFIED', 'PARTIALLY_VERIFIED'
+    )
+   OR (
+       marker.scientific_status IN ('VERIFIED', 'PARTIALLY_VERIFIED', 'NOT_REPORTED')
+       AND COALESCE((
+           SELECT event.decision
+           FROM staging_corpus_audit_events AS event
+           WHERE event.target_kind = 'MARKER'
+             AND event.target_id = marker.marker_id
+             AND event.target_fingerprint = marker.fingerprint
+           ORDER BY julianday(event.audited_at) DESC, event.created_at DESC, event.event_id DESC
+           LIMIT 1
+       ), '') != marker.scientific_status
+   )
+   OR (
+       COALESCE(marker.independent_audit, '') NOT IN (
+           '', 'NOT_AUDITED', 'PENDING_INDEPENDENT_AUDIT', 'PENDING_PDF_AUDIT', 'PDF_AUDIT_PENDING'
+       )
+       AND NOT EXISTS (
+           SELECT 1
+           FROM staging_corpus_audit_events AS event
+           WHERE event.target_kind = 'MARKER'
+             AND event.target_id = marker.marker_id
+             AND event.target_fingerprint = marker.fingerprint
+       )
+   )
+LIMIT 1;
+DROP TABLE staging_corpus_preflight_marker_statuses;
+
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audit_verified_evidence
+BEFORE INSERT ON staging_corpus_audit_events
+WHEN NEW.decision IN ('VERIFIED', 'PARTIALLY_VERIFIED')
+ AND (
+    NEW.provenance_type NOT IN ('AUTHOR_REPORTED_FACT', 'AUTHOR_REPORTED_LIMITATION')
+    OR NEW.source_kind NOT IN ('PRIMARY_PAPER', 'SUPPLEMENTARY_MATERIAL', 'AUTHOR_CODE')
+    OR length(trim(NEW.source_edition)) = 0
+    OR length(trim(COALESCE(NEW.evidence, ''))) = 0
+    OR (
+        NEW.page IS NULL
+        AND length(trim(COALESCE(NEW.section, ''))) = 0
+        AND length(trim(COALESCE(NEW.locator, ''))) = 0
+    )
+ )
+BEGIN
+    SELECT RAISE(
+        ABORT,
+        'verified audit requires author provenance, primary source, source edition, evidence, and locator'
+    );
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audit_current_target
+BEFORE INSERT ON staging_corpus_audit_events
+WHEN (
+    NEW.target_kind = 'CLAIM'
+    AND NOT EXISTS (
+        SELECT 1 FROM staging_corpus_claims
+        WHERE claim_id = NEW.target_id AND fingerprint = NEW.target_fingerprint
+    )
+) OR (
+    NEW.target_kind = 'MARKER'
+    AND NOT EXISTS (
+        SELECT 1 FROM staging_corpus_field_markers
+        WHERE marker_id = NEW.target_id AND fingerprint = NEW.target_fingerprint
+    )
+) OR (
+    NEW.target_kind = 'PAPER'
+    AND NOT EXISTS (
+        SELECT 1 FROM staging_corpus_papers
+        WHERE paper_id = NEW.target_id AND fingerprint = NEW.target_fingerprint
+    )
+)
+BEGIN
+    SELECT RAISE(ABORT, 'audit event must target the current stored fingerprint');
+END;
+
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audit_scope
+BEFORE INSERT ON staging_corpus_audit_events
+WHEN (
+    NEW.decision = 'NOT_REPORTED'
+    AND (
+        NEW.target_kind != 'MARKER'
+        OR length(trim(COALESCE(NEW.search_scope, ''))) < 30
+        OR lower(NEW.search_scope) LIKE '%keyword%'
+        OR lower(NEW.search_scope) LIKE '%mot-cl%'
+        OR NOT EXISTS (
+            SELECT 1
+            FROM staging_corpus_field_markers AS marker
+            WHERE marker.marker_id = NEW.target_id
+              AND marker.fingerprint = NEW.target_fingerprint
+              AND marker.extraction_status = 'NOT_REPORTED'
+        )
+    )
+) OR (
+    NEW.target_kind = 'PAPER'
+    AND NEW.decision = 'VERIFIED'
+    AND length(trim(COALESCE(NEW.search_scope, ''))) < 30
+)
+BEGIN
+    SELECT RAISE(ABORT, 'NOT_REPORTED marker and VERIFIED paper audits require documented scope');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audit_reviewed_target
+BEFORE INSERT ON staging_corpus_audit_events
+WHEN json_valid(NEW.reviewed_json) = 0
+ OR (
+    NEW.target_kind = 'CLAIM'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM staging_corpus_claims AS claim
+           JOIN staging_corpus_claim_audit_binding_versions AS binding
+          ON binding.claim_id = claim.claim_id
+         AND binding.target_fingerprint = claim.fingerprint
+        WHERE claim.claim_id = NEW.target_id
+          AND claim.fingerprint = NEW.target_fingerprint
+          AND binding.reviewed_json = NEW.reviewed_json
+          AND json_type(NEW.reviewed_json, '$.field_path') IS NOT NULL
+          AND json_extract(NEW.reviewed_json, '$.field_path') = claim.field_path
+          AND json_type(NEW.reviewed_json, '$.experiment_id') IS NOT NULL
+          AND json_extract(NEW.reviewed_json, '$.experiment_id') IS claim.experiment_id
+    )
+ ) OR (
+    NEW.target_kind = 'MARKER'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM staging_corpus_field_markers AS marker
+        WHERE marker.marker_id = NEW.target_id
+          AND marker.fingerprint = NEW.target_fingerprint
+          AND json_extract(NEW.reviewed_json, '$.field_path') = marker.field_path
+          AND json_extract(NEW.reviewed_json, '$.extraction_status') = marker.extraction_status
+    )
+ ) OR (
+    NEW.target_kind = 'PAPER'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM staging_corpus_papers AS paper
+        WHERE paper.paper_id = NEW.target_id
+          AND paper.fingerprint = NEW.target_fingerprint
+          AND json_extract(NEW.reviewed_json, '$.paper_id') = paper.paper_id
+    )
+ )
+BEGIN
+    SELECT RAISE(ABORT, 'audit reviewed_json must match the current target');
+END;
+
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_audit_bindings_no_update
+BEFORE UPDATE ON staging_corpus_claim_audit_bindings
+BEGIN
+    SELECT RAISE(ABORT, 'claim audit bindings are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_audit_bindings_no_delete
+BEFORE DELETE ON staging_corpus_claim_audit_bindings
+BEGIN
+    SELECT RAISE(ABORT, 'claim audit bindings are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_audit_binding_versions_no_update
+BEFORE UPDATE ON staging_corpus_claim_audit_binding_versions
+BEGIN
+    SELECT RAISE(ABORT, 'claim audit bindings are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_audit_binding_versions_no_delete
+BEFORE DELETE ON staging_corpus_claim_audit_binding_versions
+BEGIN
+    SELECT RAISE(ABORT, 'claim audit bindings are append-only');
+END;
+
+-- A current audit is bound to all assertion-defining claim content.  Direct
+-- SQL must not preserve VERIFIED while replacing the value behind that audit.
+CREATE TRIGGER IF NOT EXISTS staging_corpus_audited_claim_content_no_update
+BEFORE UPDATE OF claim_id, fingerprint, row_json, field_path, experiment_id
+ON staging_corpus_claims
+WHEN NEW.fingerprint = OLD.fingerprint
+ AND EXISTS (
+    SELECT 1
+    FROM staging_corpus_audit_events AS event
+    WHERE event.target_kind = 'CLAIM'
+      AND event.target_id = OLD.claim_id
+      AND event.target_fingerprint = OLD.fingerprint
+)
+BEGIN
+    SELECT RAISE(ABORT, 'audited claim content is immutable');
+END;
+
+
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_status_insert
+BEFORE INSERT ON staging_corpus_claims
+WHEN NEW.scientific_status NOT IN (
+        'NOT_VERIFIED', 'EXTRACTION_ERROR', 'CONFLICT', 'VERIFIED', 'PARTIALLY_VERIFIED'
+    )
+BEGIN
+    SELECT RAISE(ABORT, 'invalid claim scientific_status');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_status_update
+BEFORE UPDATE OF scientific_status ON staging_corpus_claims
+WHEN NEW.scientific_status NOT IN (
+        'NOT_VERIFIED', 'EXTRACTION_ERROR', 'CONFLICT', 'VERIFIED', 'PARTIALLY_VERIFIED'
+    )
+BEGIN
+    SELECT RAISE(ABORT, 'invalid claim scientific_status');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_attestation_insert
+BEFORE INSERT ON staging_corpus_claims
+WHEN NEW.scientific_status IN ('VERIFIED', 'PARTIALLY_VERIFIED')
+ OR COALESCE(NEW.independent_audit, '') NOT IN (
+        '', 'NOT_AUDITED', 'PENDING_INDEPENDENT_AUDIT', 'PENDING_PDF_AUDIT', 'PDF_AUDIT_PENDING'
+    )
+BEGIN
+    SELECT RAISE(ABORT, 'claim attestation requires a current audit event');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_attestation_update
+BEFORE UPDATE OF scientific_status, independent_audit ON staging_corpus_claims
+WHEN (
+    NEW.scientific_status IN ('VERIFIED', 'PARTIALLY_VERIFIED')
+    AND COALESCE((
+        SELECT event.decision
+        FROM staging_corpus_audit_events AS event
+        WHERE event.target_kind = 'CLAIM'
+          AND event.target_id = NEW.claim_id
+          AND event.target_fingerprint = NEW.fingerprint
+        ORDER BY julianday(event.audited_at) DESC, event.created_at DESC, event.event_id DESC
+        LIMIT 1
+    ), '') != NEW.scientific_status
+) OR (
+    COALESCE(NEW.independent_audit, '') NOT IN (
+        '', 'NOT_AUDITED', 'PENDING_INDEPENDENT_AUDIT', 'PENDING_PDF_AUDIT', 'PDF_AUDIT_PENDING'
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM staging_corpus_audit_events AS event
+        WHERE event.target_kind = 'CLAIM'
+          AND event.target_id = NEW.claim_id
+          AND event.target_fingerprint = NEW.fingerprint
+    )
+)
+BEGIN
+    SELECT RAISE(ABORT, 'claim attestation requires the matching latest current audit decision');
+END;
+
+CREATE TRIGGER IF NOT EXISTS staging_corpus_marker_status_insert
+BEFORE INSERT ON staging_corpus_field_markers
+WHEN NEW.scientific_status NOT IN (
+        'NOT_VERIFIED', 'EXTRACTION_ERROR', 'CONFLICT', 'NOT_REPORTED',
+        'VERIFIED', 'PARTIALLY_VERIFIED'
+    )
+BEGIN
+    SELECT RAISE(ABORT, 'invalid marker scientific_status');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_marker_status_update
+BEFORE UPDATE OF scientific_status ON staging_corpus_field_markers
+WHEN NEW.scientific_status NOT IN (
+        'NOT_VERIFIED', 'EXTRACTION_ERROR', 'CONFLICT', 'NOT_REPORTED',
+        'VERIFIED', 'PARTIALLY_VERIFIED'
+    )
+BEGIN
+    SELECT RAISE(ABORT, 'invalid marker scientific_status');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_marker_attestation_insert
+BEFORE INSERT ON staging_corpus_field_markers
+WHEN NEW.scientific_status IN ('VERIFIED', 'PARTIALLY_VERIFIED', 'NOT_REPORTED')
+ OR COALESCE(NEW.independent_audit, '') NOT IN (
+        '', 'NOT_AUDITED', 'PENDING_INDEPENDENT_AUDIT', 'PENDING_PDF_AUDIT', 'PDF_AUDIT_PENDING'
+    )
+BEGIN
+    SELECT RAISE(ABORT, 'marker attestation requires a current audit event');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_marker_attestation_update
+BEFORE UPDATE OF scientific_status, independent_audit ON staging_corpus_field_markers
+WHEN (
+    NEW.scientific_status IN ('VERIFIED', 'PARTIALLY_VERIFIED', 'NOT_REPORTED')
+    AND COALESCE((
+        SELECT event.decision
+        FROM staging_corpus_audit_events AS event
+        WHERE event.target_kind = 'MARKER'
+          AND event.target_id = NEW.marker_id
+          AND event.target_fingerprint = NEW.fingerprint
+        ORDER BY julianday(event.audited_at) DESC, event.created_at DESC, event.event_id DESC
+        LIMIT 1
+    ), '') != NEW.scientific_status
+) OR (
+    COALESCE(NEW.independent_audit, '') NOT IN (
+        '', 'NOT_AUDITED', 'PENDING_INDEPENDENT_AUDIT', 'PENDING_PDF_AUDIT', 'PDF_AUDIT_PENDING'
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM staging_corpus_audit_events AS event
+        WHERE event.target_kind = 'MARKER'
+          AND event.target_id = NEW.marker_id
+          AND event.target_fingerprint = NEW.fingerprint
+    )
+)
+BEGIN
+    SELECT RAISE(ABORT, 'marker attestation requires the matching latest current audit decision');
+END;
 """
 
 
@@ -302,8 +770,71 @@ class CorpusRepository:
     def initialize(self) -> None:
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         with closing(self._connect()) as connection:
-            connection.executescript(SCHEMA)
+            self._initialize_schema(connection)
         self._initialized = True
+
+    @classmethod
+    def _initialize_schema(cls, connection: sqlite3.Connection) -> None:
+        schema, guards = SCHEMA.split(AUDIT_GUARD_MARKER, 1)
+        connection.executescript(schema)
+        with connection:
+            cls._sync_claim_audit_bindings(connection)
+        connection.executescript(guards)
+
+    @staticmethod
+    def _sync_claim_audit_bindings(connection: sqlite3.Connection) -> None:
+        """Bind audits to the exact parsed claim value, unit, experiment and path."""
+        for row in connection.execute(
+            "SELECT claim_id, fingerprint, experiment_id, field_path, row_json "
+            "FROM staging_corpus_claims"
+        ):
+            source = json.loads(row["row_json"])
+            reviewed = _canonical({
+                "value": parse_claim_value(source.get("value")),
+                "unit": source.get("unit"),
+                "experiment_id": row["experiment_id"],
+                "field_path": row["field_path"],
+            })
+            connection.execute(
+                """INSERT OR IGNORE INTO staging_corpus_claim_audit_bindings (
+                       claim_id, target_fingerprint, reviewed_json
+                   ) VALUES (?, ?, ?)""",
+                (row["claim_id"], row["fingerprint"], reviewed),
+            )
+            connection.execute(
+                """INSERT OR IGNORE INTO staging_corpus_claim_audit_binding_versions (
+                       claim_id, target_fingerprint, reviewed_json
+                   ) VALUES (?, ?, ?)""",
+                (row["claim_id"], row["fingerprint"], reviewed),
+            )
+            stored = connection.execute(
+                """SELECT reviewed_json
+                   FROM staging_corpus_claim_audit_binding_versions
+                   WHERE claim_id = ? AND target_fingerprint = ?""",
+                (row["claim_id"], row["fingerprint"]),
+            ).fetchone()
+            if stored is None or stored["reviewed_json"] != reviewed:
+                raise sqlite3.IntegrityError(
+                    f"claim {row['claim_id']} binding differs for the stored fingerprint"
+                )
+        invalid = connection.execute(
+            """SELECT event.event_id
+               FROM staging_corpus_audit_events AS event
+               JOIN staging_corpus_claims AS claim
+                 ON event.target_kind = 'CLAIM'
+                AND claim.claim_id = event.target_id
+                AND claim.fingerprint = event.target_fingerprint
+               JOIN staging_corpus_claim_audit_binding_versions AS binding
+                 ON binding.claim_id = claim.claim_id
+                AND binding.target_fingerprint = claim.fingerprint
+               WHERE event.reviewed_json != binding.reviewed_json
+               LIMIT 1"""
+        ).fetchone()
+        if invalid is not None:
+            raise sqlite3.IntegrityError(
+                f"audit {invalid['event_id']} reviewed value/unit does not match the current claim"
+            )
+
 
     @staticmethod
     def _record_current_versions(connection: sqlite3.Connection) -> None:
@@ -348,7 +879,7 @@ class CorpusRepository:
             connection.close()
         connection = sqlite3.connect(":memory:")
         connection.row_factory = sqlite3.Row
-        connection.executescript(SCHEMA)
+        self._initialize_schema(connection)
         return connection
 
     # -- import ------------------------------------------------------------
@@ -386,6 +917,7 @@ class CorpusRepository:
                 self._import_documents(connection, book, report)
                 self._import_coverage(connection, book, report, paper_map)
                 self._import_field_path_mappings(connection, book, report, now)
+                self._sync_claim_audit_bindings(connection)
                 if report.stale:
                     raise WorkbookValidationError([
                         f"{len(report.stale)} row(s) would be reverted to content an earlier import already "
@@ -1539,18 +2071,28 @@ class CorpusRepository:
                 ).fetchone()
             if alias is not None:
                 paper_id = alias["paper_id"]
-        clauses, parameters = [], []
-        for column, value in (("paper_id", paper_id), ("field_path", field_path), ("experiment_id", experiment_id)):
-            if value is not None:
-                clauses.append(f"{column} = ?")
-                parameters.append(value)
-        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        # Keep both the query structure and the filter columns static. Values
+        # remain bound parameters, and adding a filter requires an explicit
+        # clause here rather than interpolating a column name into SQL.
+        parameters = (
+            paper_id, paper_id,
+            field_path, field_path,
+            experiment_id, experiment_id,
+        )
         with closing(self._ready()) as connection:
             total = int(connection.execute(
-                f"SELECT COUNT(*) AS n FROM staging_corpus_claims {where}", parameters
+                """SELECT COUNT(*) AS n FROM staging_corpus_claims
+                   WHERE (? IS NULL OR paper_id = ?)
+                     AND (? IS NULL OR field_path = ?)
+                     AND (? IS NULL OR experiment_id = ?)""",
+                parameters,
             ).fetchone()["n"])
             rows = connection.execute(
-                f"SELECT * FROM staging_corpus_claims {where} ORDER BY claim_id LIMIT ? OFFSET ?",
+                """SELECT * FROM staging_corpus_claims
+                   WHERE (? IS NULL OR paper_id = ?)
+                     AND (? IS NULL OR field_path = ?)
+                     AND (? IS NULL OR experiment_id = ?)
+                   ORDER BY claim_id LIMIT ? OFFSET ?""",
                 (*parameters, limit, offset),
             ).fetchall()
             latest = self._latest_audits(connection)

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "report_kind": "INDEPENDENT_SCIENTIFIC_AUDIT",
+  "persistence_status": "RECORDED",
+  "auditor_id": "scientific-auditor:/root/scientific_audit_proposals",
+  "audited_at": "2026-09-29",
+  "paper": {
+    "paper_id": "OAI-0036",
+    "title": "Multiscale neural assimilation scheme for high-resolution sea surface temperature reconstruction from satellite observations",
+    "doi": "10.1038/s41598-025-23682-9",
+    "conclusion": "NOT_VERIFIED",
+    "conclusion_note": "The source motivates the proposed study, but the proposal is an AI interpretation rather than an author-reported result or established research gap.",
+    "status_counts": {"VERIFIED": 0, "PARTIALLY_VERIFIED": 0, "NOT_VERIFIED": 1, "NOT_REPORTED": 0, "CONFLICT": 0, "EXTRACTION_ERROR": 0}
+  },
+  "sources": {
+    "primary_paper": {
+      "source_kind": "PRIMARY_PAPER",
+      "edition": "PUBLISHED_PDF_SCIENTIFIC_REPORTS_2025",
+      "path": ".data/golden-pdfs/oai-0036-s41598-025-23682-9.pdf",
+      "download_url": "https://www.nature.com/articles/s41598-025-23682-9.pdf",
+      "sha256": "10f2e89adee7cf9aa1b1845e930a37741841a0cc8bb96f2c20ec0421fe5676b4",
+      "pages": 17,
+      "doi": "10.1038/s41598-025-23682-9"
+    }
+  },
+  "claims": [
+    {
+      "claim_id": "B04-0400",
+      "field_path": "gap.sparsity",
+      "extracted_value": "Compare observation-density-aware training across winters and ocean basins.",
+      "experiment_id": null,
+      "provenance_type": "AI_INTERPRETATION",
+      "final_status": "NOT_VERIFIED",
+      "confidence": 0.99,
+      "value_support": "SOURCE_GROUNDED_INTERPRETATION",
+      "source_kind": "PRIMARY_PAPER",
+      "source_edition": "PUBLISHED_PDF_SCIENTIFIC_REPORTS_2025",
+      "section": "Generalization and seasonal variation; Discussion",
+      "page": 9,
+      "locator": "PDF pp. 9-10 and 14: winter/coverage analysis around Figure 9; longer seasonal-training paragraph; discussion limitation and domain-adaptation directions",
+      "evidence_summary": "Low winter observation coverage degrades performance; the authors ask whether longer, potentially sparser training data could help, state that generalization depends on training-data quality and density, and propose domain adaptation across ocean regions.",
+      "audit_note": "The comparative study phrasing is a faithful AI proposal, not an author-reported result or established novelty. Retain AI_INTERPRETATION and NOT_VERIFIED."
+    }
+  ],
+  "unresolved": [
+    "The proposal's comparative value and novelty require a broader literature review; this claim audit does not establish them."
+  ]
+}

@@ -65,6 +65,31 @@ def _mutated(book: StagingWorkbook, **changes) -> StagingWorkbook:
     return replace(copy.deepcopy(book), **changes)
 
 
+def _record_verified_claim(repository: CorpusRepository, claim_id: str) -> None:
+    claim = repository.get_claim(claim_id)
+    repository.record_audit({
+        "target_kind": "CLAIM",
+        "target_id": claim_id,
+        "decision": "VERIFIED",
+        "justification": "Test fixture: checked against the cited source passage.",
+        "auditor_id": "scientific-auditor:test",
+        "audited_at": "2026-09-28T10:00:00+00:00",
+        "provenance_type": claim["claim_type"],
+        "source_kind": "PRIMARY_PAPER",
+        "source_edition": "test source edition",
+        "page": 1,
+        "section": "Methods",
+        "locator": "paragraph 1",
+        "evidence": "Test evidence summary tied to the imported value.",
+        "reviewed": {
+            "value": claim["value"],
+            "unit": claim["unit"],
+            "experiment_id": claim["experiment_id"],
+            "field_path": claim["field_path"],
+        },
+    })
+
+
 # --- the complete corpus is imported ---------------------------------------
 
 def test_the_workbook_has_all_nine_sheets_and_the_declared_counts(book: StagingWorkbook) -> None:
@@ -112,6 +137,25 @@ def test_claim_source_columns_are_preserved_exactly(imported: CorpusRepository, 
             assert stored[key] == row[column], (row["claim_id"], column)
         for column, (group, key) in mapping.items():
             assert stored[group][key] == row[column], (row["claim_id"], column)
+
+
+def test_claim_filters_are_explicit_bound_parameters(imported: CorpusRepository) -> None:
+    paper_claims, paper_total = imported.list_claims(paper_id="OAI-0006", limit=1000)
+    target = next(claim for claim in paper_claims if claim["experiment_id"] is not None)
+
+    filtered, total = imported.list_claims(
+        paper_id=target["paper_id"],
+        field_path=target["field_path"],
+        experiment_id=target["experiment_id"],
+        limit=1000,
+    )
+
+    assert paper_total > 0
+    assert total == len(filtered) > 0
+    assert all(claim["paper_id"] == target["paper_id"] for claim in filtered)
+    assert all(claim["field_path"] == target["field_path"] for claim in filtered)
+    assert all(claim["experiment_id"] == target["experiment_id"] for claim in filtered)
+    assert imported.list_claims(field_path="' OR 1 = 1 --")[1] == 0
 
 
 def test_no_page_number_or_quotation_is_invented(imported: CorpusRepository) -> None:
@@ -195,7 +239,13 @@ def test_a_changed_unaudited_claim_is_updated(imported: CorpusRepository, book: 
 
 def test_an_audited_claim_is_never_overwritten(imported: CorpusRepository, book: StagingWorkbook) -> None:
     claim_id = book.claims[0]["claim_id"]
-    # Simulate an independent audit recorded after import.
+    with sqlite3.connect(imported.database_path) as connection:
+        with pytest.raises(sqlite3.IntegrityError, match="latest current audit decision"):
+            connection.execute(
+                "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED', "
+                "independent_audit = 'ATTESTED_BY_AUDITOR' WHERE claim_id = ?", (claim_id,),
+            )
+    _record_verified_claim(imported, claim_id)
     with sqlite3.connect(imported.database_path) as connection:
         connection.execute(
             "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED', "
@@ -570,6 +620,7 @@ def test_a_pending_pdf_audit_claim_is_not_treated_as_attested(enriched: CorpusRe
 
 
 def test_the_supplement_never_overwrites_an_audited_claim(enriched: CorpusRepository, supplement: StagingWorkbook) -> None:
+    _record_verified_claim(enriched, "ORI-0001")
     with sqlite3.connect(enriched.database_path) as connection:
         connection.execute(
             "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED', "
@@ -1137,6 +1188,259 @@ def test_b16_mapping_is_complete_versioned_and_never_applied_while_pending(
     assert {row["review_status"] for row in mapping["mappings"]} == {"PENDING"}
     assert not any(row["projection_applied"] for row in mapping["mappings"])
     assert all(row["source_candidate"] is not None for row in mapping["mappings"])
+
+
+@pytest.mark.parametrize(("source_edition", "evidence"), [
+    ("published PDF", None),
+    ("   ", "Exact author sentence."),
+])
+def test_database_rejects_malformed_verified_audits_inserted_directly(
+    b16_repository: CorpusRepository, source_edition: str, evidence: str | None,
+) -> None:
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        fingerprint, field_path, experiment_id, row_json = connection.execute(
+            """SELECT fingerprint, field_path, experiment_id, row_json
+               FROM staging_corpus_claims WHERE claim_id = 'ORI-0001'"""
+        ).fetchone()
+        source = json.loads(row_json)
+        with pytest.raises(sqlite3.IntegrityError, match="verified audit requires"):
+            connection.execute(
+                """INSERT INTO staging_corpus_audit_events (
+                       event_id, target_kind, target_id, decision, justification, auditor_id,
+                       audited_at, provenance_type, source_kind, source_edition, page, section,
+                       locator, evidence, search_scope, target_fingerprint, reviewed_json, created_at
+                   ) VALUES (?, 'CLAIM', 'ORI-0001', 'VERIFIED', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    f"direct-invalid-{source_edition!r}-{evidence!r}", "Direct SQL test.",
+                    "scientific-auditor:test", "2026-09-28T10:00:00+00:00",
+                    "AUTHOR_REPORTED_FACT", "PRIMARY_PAPER", source_edition,
+                    1, "Methods", "paragraph 1", evidence, None, fingerprint,
+                json.dumps({
+                    "value": source["value"],
+                    "unit": source.get("unit"),
+                    "field_path": field_path,
+                    "experiment_id": experiment_id,
+                }, sort_keys=True, separators=(",", ":")),
+                    "2026-09-28T10:00:00+00:00",
+                ),
+            )
+
+
+def test_database_enforces_scope_and_review_binding_for_direct_audit_inserts(
+    b16_repository: CorpusRepository,
+) -> None:
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        connection.row_factory = sqlite3.Row
+        claim = connection.execute(
+            "SELECT * FROM staging_corpus_claims WHERE claim_id = 'ORI-0001'"
+        ).fetchone()
+        marker = connection.execute(
+            """SELECT * FROM staging_corpus_field_markers
+               WHERE extraction_status = 'NOT_REPORTED' ORDER BY marker_id LIMIT 1"""
+        ).fetchone()
+        paper = connection.execute(
+            "SELECT * FROM staging_corpus_papers WHERE paper_id = 'OAI-0001'"
+        ).fetchone()
+
+        def insert_event(
+            event_id: str, target_kind: str, target_id: str, decision: str,
+            fingerprint: str, reviewed: dict[str, object], *, search_scope: str | None = None,
+        ) -> None:
+            connection.execute(
+                """INSERT INTO staging_corpus_audit_events (
+                       event_id, target_kind, target_id, decision, justification, auditor_id,
+                       audited_at, provenance_type, source_kind, source_edition, page, section,
+                       locator, evidence, search_scope, target_fingerprint, reviewed_json, created_at
+                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    event_id, target_kind, target_id, decision, "Direct SQL test.",
+                    "scientific-auditor:test", "2026-09-28T10:00:00+00:00",
+                    "AUTHOR_REPORTED_FACT", "PRIMARY_PAPER", "published PDF", 1,
+                    "Methods", "paragraph 1", "Exact source passage.", search_scope,
+                    fingerprint, json.dumps(reviewed), "2026-09-28T10:00:00+00:00",
+                ),
+            )
+
+        with pytest.raises(sqlite3.IntegrityError, match="require documented scope"):
+            insert_event(
+                "direct-marker-no-scope", "MARKER", marker["marker_id"], "NOT_REPORTED",
+                marker["fingerprint"],
+                {"field_path": marker["field_path"], "extraction_status": marker["extraction_status"]},
+            )
+        with pytest.raises(sqlite3.IntegrityError, match="require documented scope"):
+            insert_event(
+                "direct-paper-short-scope", "PAPER", paper["paper_id"], "VERIFIED",
+                paper["fingerprint"], {"paper_id": paper["paper_id"]}, search_scope="Too short",
+            )
+        with pytest.raises(sqlite3.IntegrityError, match="reviewed_json must match"):
+            insert_event(
+                "direct-claim-wrong-review", "CLAIM", claim["claim_id"], "NOT_VERIFIED",
+                claim["fingerprint"],
+                {"field_path": "wrong.path", "experiment_id": claim["experiment_id"]},
+            )
+
+
+def test_database_binds_direct_audits_to_exact_scalar_and_parsed_list_values(
+    b16_repository: CorpusRepository,
+) -> None:
+    claims, _ = b16_repository.list_claims(limit=2000)
+    scalar = next(
+        claim for claim in claims
+        if claim["claim_type"] == "AUTHOR_REPORTED_FACT" and not isinstance(claim["value"], list)
+    )
+    listed = next(
+        claim for claim in claims
+        if claim["claim_type"] == "AUTHOR_REPORTED_FACT" and isinstance(claim["value"], list)
+    )
+
+    def reviewed(claim: dict[str, object], value: object, unit: object) -> str:
+        return json.dumps({
+            "value": value,
+            "unit": unit,
+            "experiment_id": claim["experiment_id"],
+            "field_path": claim["field_path"],
+        }, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        fingerprints = {
+            row[0]: row[1]
+            for row in connection.execute(
+                "SELECT claim_id, fingerprint FROM staging_corpus_claims WHERE claim_id IN (?, ?)",
+                (scalar["claim_id"], listed["claim_id"]),
+            )
+        }
+
+        def insert_verified(event_id: str, claim: dict[str, object], payload: str) -> None:
+            connection.execute(
+                """INSERT INTO staging_corpus_audit_events (
+                       event_id, target_kind, target_id, decision, justification, auditor_id,
+                       audited_at, provenance_type, source_kind, source_edition, page, section,
+                       locator, evidence, search_scope, target_fingerprint, reviewed_json, created_at
+                   ) VALUES (?, 'CLAIM', ?, 'VERIFIED', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    event_id, claim["claim_id"], "Direct SQL binding test.",
+                    "scientific-auditor:test", "2026-09-28T10:00:00+00:00",
+                    "AUTHOR_REPORTED_FACT", "PRIMARY_PAPER", "published PDF", 1,
+                    "Methods", "paragraph 1", "Exact author passage.", None,
+                    fingerprints[claim["claim_id"]], payload, "2026-09-28T10:00:00+00:00",
+                ),
+            )
+
+        with pytest.raises(sqlite3.IntegrityError, match="reviewed_json must match"):
+            insert_verified(
+                "forged-scalar", scalar,
+                reviewed(scalar, "forged value", "forged unit"),
+            )
+        insert_verified(
+            "valid-parsed-list", listed,
+            reviewed(listed, listed["value"], listed["unit"]),
+        )
+        with pytest.raises(sqlite3.IntegrityError, match="reviewed_json must match"):
+            insert_verified(
+                "forged-parsed-list", listed,
+                reviewed(listed, [*listed["value"], "forged item"], listed["unit"]),
+            )
+
+
+def test_database_rejects_forging_a_claim_audit_binding(
+    b16_repository: CorpusRepository,
+) -> None:
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        original = connection.execute(
+            """SELECT reviewed_json
+               FROM staging_corpus_claim_audit_bindings
+               WHERE claim_id = 'ORI-0001'"""
+        ).fetchone()[0]
+        forged = json.dumps({
+            "value": "FORGED",
+            "unit": None,
+            "experiment_id": None,
+            "field_path": "problem.task",
+        }, sort_keys=True, separators=(",", ":"))
+
+        with pytest.raises(sqlite3.IntegrityError, match="bindings are append-only"):
+            connection.execute(
+                """UPDATE staging_corpus_claim_audit_bindings
+                   SET reviewed_json = ? WHERE claim_id = 'ORI-0001'""",
+                (forged,),
+            )
+
+        assert connection.execute(
+            """SELECT reviewed_json
+               FROM staging_corpus_claim_audit_bindings
+               WHERE claim_id = 'ORI-0001'"""
+        ).fetchone()[0] == original
+
+
+def test_database_rejects_mutating_claim_content_after_a_valid_audit(
+    b16_repository: CorpusRepository,
+) -> None:
+    original = b16_repository.get_claim("ORI-0001")
+    _record_verified_claim(b16_repository, "ORI-0001")
+
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        with pytest.raises(sqlite3.IntegrityError, match="audited claim content is immutable"):
+            connection.execute(
+                """UPDATE staging_corpus_claims
+                   SET row_json = json_set(row_json, '$.value', 'FORGED')
+                   WHERE claim_id = 'ORI-0001'"""
+            )
+
+    stored = b16_repository.get_claim("ORI-0001")
+    assert stored["value"] == original["value"]
+    assert stored["verification_state"] == "VERIFIED"
+
+
+def test_database_requires_the_matching_latest_current_audit_for_promotions(
+    b16_repository: CorpusRepository,
+) -> None:
+    claim = b16_repository.get_claim("ORI-0001")
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        marker_id = connection.execute(
+            "SELECT marker_id FROM staging_corpus_field_markers ORDER BY marker_id LIMIT 1"
+        ).fetchone()[0]
+        with pytest.raises(sqlite3.IntegrityError, match="latest current audit decision"):
+            connection.execute(
+                "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED' WHERE claim_id = 'ORI-0001'"
+            )
+        with pytest.raises(sqlite3.IntegrityError, match="latest current audit decision"):
+            connection.execute(
+                "UPDATE staging_corpus_field_markers SET scientific_status = 'NOT_REPORTED' WHERE marker_id = ?",
+                (marker_id,),
+            )
+        with pytest.raises(sqlite3.IntegrityError, match="invalid claim scientific_status"):
+            connection.execute(
+                "UPDATE staging_corpus_claims SET scientific_status = 'AUDITED' WHERE claim_id = 'ORI-0001'"
+            )
+
+    base = {
+        "target_kind": "CLAIM", "target_id": "ORI-0001",
+        "justification": "Independent review of the exact stored value.",
+        "auditor_id": "scientific-auditor:test", "provenance_type": claim["claim_type"],
+        "source_kind": "PRIMARY_PAPER", "source_edition": "published PDF",
+        "page": 1, "section": "Methods", "locator": "paragraph 1",
+        "evidence": "Exact source passage supporting the stored value.",
+        "reviewed": {
+            "value": claim["value"], "unit": claim["unit"],
+            "experiment_id": claim["experiment_id"], "field_path": claim["field_path"],
+        },
+    }
+    b16_repository.record_audit({
+        **base, "decision": "VERIFIED", "audited_at": "2026-09-28T10:00:00+00:00",
+    })
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        connection.execute(
+            "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED' WHERE claim_id = 'ORI-0001'"
+        )
+    b16_repository.record_audit({
+        **base, "decision": "CONFLICT", "justification": "A later passage conflicts.",
+        "audited_at": "2026-09-28T11:00:00+00:00",
+    })
+    with sqlite3.connect(b16_repository.database_path) as connection:
+        with pytest.raises(sqlite3.IntegrityError, match="latest current audit decision"):
+            connection.execute(
+                "UPDATE staging_corpus_claims SET scientific_status = 'VERIFIED' WHERE claim_id = 'ORI-0001'"
+            )
 
 
 def test_audit_events_are_append_only_and_cannot_manufacture_verification(

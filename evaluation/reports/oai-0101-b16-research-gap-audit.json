@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "report_kind": "INDEPENDENT_SCIENTIFIC_AUDIT",
+  "persistence_status": "RECORDED",
+  "auditor_id": "scientific-auditor:/root/scientific_audit_proposals",
+  "audited_at": "2026-09-29",
+  "paper": {
+    "paper_id": "OAI-0101",
+    "title": "NORi: An ML-Augmented Ocean Boundary Layer Parameterization",
+    "doi": "10.1029/2025MS005667",
+    "conclusion": "NOT_VERIFIED",
+    "conclusion_note": "The exact B16 arXiv v1 evidence motivates the proposed study, but the proposal is an AI interpretation rather than an author-reported ablation or established causal result.",
+    "status_counts": {"VERIFIED": 0, "PARTIALLY_VERIFIED": 0, "NOT_VERIFIED": 1, "NOT_REPORTED": 0, "CONFLICT": 0, "EXTRACTION_ERROR": 0}
+  },
+  "sources": {
+    "primary_paper": {
+      "source_kind": "PRIMARY_PAPER",
+      "edition": "ARXIV_V1_PDF",
+      "path": ".data/golden-pdfs/oai-0101-arxiv-2512.04452v1.pdf",
+      "download_url": "https://arxiv.org/pdf/2512.04452v1",
+      "sha256": "cb4cd3dba2e4c903a9343ebad3ee077335c9f5227b9e846e71e03d27486edb85",
+      "pages": 48,
+      "doi": "10.48550/arXiv.2512.04452"
+    }
+  },
+  "claims": [
+    {
+      "claim_id": "B04-0402",
+      "field_path": "gap.stability",
+      "extracted_value": "Compare derivative regularization and long-rollout stability under unseen forcing.",
+      "experiment_id": null,
+      "provenance_type": "AI_INTERPRETATION",
+      "final_status": "NOT_VERIFIED",
+      "confidence": 0.99,
+      "value_support": "SOURCE_GROUNDED_INTERPRETATION",
+      "source_kind": "PRIMARY_PAPER",
+      "source_edition": "ARXIV_V1_PDF",
+      "section": "5.2 Neural ODEs; 6.3 Numerical stability; 7 Global ocean simulation; 8 Conclusion",
+      "page": 15,
+      "locator": "PDF pp. 15, 21, 25-27: vertical-derivative regularization paragraph; 60-day time-dependent-forcing test; 100-year stability result and conclusion",
+      "evidence_summary": "Vertical derivatives of tracers are included as a smoothing regularizer; NORi is then tested for 60 days under time-dependent fluxes although training used constant fluxes, and remains stable in a separate 100-year run.",
+      "audit_note": "Comparing the regularizer with rollout stability is a source-grounded AI proposal, not an author-reported ablation or established causal result. Retain AI_INTERPRETATION and NOT_VERIFIED."
+    }
+  ],
+  "unresolved": [
+    "The publisher PDF returned HTTP 403 and was not substituted for the exact arXiv v1 edition cited by B16.",
+    "The proposal's causal value and novelty require a dedicated ablation and broader literature review; this claim audit does not establish them."
+  ]
+}

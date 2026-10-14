@@ -1,0 +1,530 @@
+{
+ "source": {
+  "source_id": "oai-0031-fmars-2023-1079286",
+  "file": ".data/golden-pdfs/oai-0031-fmars-2023-1079286.pdf",
+  "sha256_prefix": "aecde959829c0e36bec232d4",
+  "pdf_pages": 10,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-XIN2023-ITF-CNN",
+  "doi": "10.3389/fmars.2023.1079286",
+  "title": "Using a deep-learning approach to infer and forecast the Indonesian Throughflow transport from sea surface height",
+  "year": 2023,
+  "venue": "Frontiers in Marine Science",
+  "ocean_domains": [
+   "ocean circulation",
+   "Indonesian Throughflow",
+   "sea surface height"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-CNN-ITF",
+   "canonical_name": "CNN (4 conv + 4 pooling layers, 2 FC layers)",
+   "family": "CNN_AUTOENCODER",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "which consists\nof four convolutional layers and four pooling layers."
+    }
+   ]
+  },
+  {
+   "method_id": "M-DNN",
+   "canonical_name": "Deep fully connected neural network",
+   "family": "OTHER",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "deep fully connected neural networks (DNN)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-RF",
+   "canonical_name": "Random forest",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "random forest, in which we implemented a random forest with 1,000 tree estimators"
+    }
+   ]
+  },
+  {
+   "method_id": "M-SVM",
+   "canonical_name": "Support vector machine",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "vector machines\n(R2 =0.22)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-LOGREG",
+   "canonical_name": "Logistic regression",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "regression with the penalty"
+    }
+   ]
+  },
+  {
+   "method_id": "M-RESNET",
+   "canonical_name": "ResNet",
+   "family": "CNN_UNET",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "a residual network (ResNet) with over 17 million parameters"
+    }
+   ]
+  },
+  {
+   "method_id": "M-CONVLSTM",
+   "canonical_name": "Convolutional LSTM network",
+   "family": "RNN_LSTM_GRU",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "convolutional LSTM network with two convolutional LSTM layers"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-CMIP6",
+   "canonical_name": "CMIP6 historical simulations (36 models)",
+   "variables": [
+    "SSH",
+    "U",
+    "V"
+   ],
+   "spatial_resolution": "1°×1° and 0.25°×0.25°",
+   "temporal_resolution": "monthly",
+   "region": "30°E – 286°E and 44°S – 44°N",
+   "period_start": "1850",
+   "period_end": "2014",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "The data we used for training came from 36 climate models that"
+    },
+    {
+     "field": "period",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "1°×1° Jan. 1850 – Dec. 2014"
+    },
+    {
+     "field": "region",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "30°E – 286°E and 44°S – 44°N"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-SODA",
+   "canonical_name": "SODA 2.2.4 reanalysis",
+   "variables": [
+    "SSH",
+    "U",
+    "V"
+   ],
+   "spatial_resolution": "0.5°×0.5°×40",
+   "temporal_resolution": "monthly",
+   "region": "30°E – 286°E and 44°S – 44°N",
+   "period_start": "1871",
+   "period_end": "2010",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "(SODA 2.2.4; details in Table 1)"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "mapped to a uniform 0.5°×0.5°×40 grid in the form of a monthly average."
+    },
+    {
+     "field": "period",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "SODA data from 1871 to 1974 was used for transfer learning"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-AVISO",
+   "canonical_name": "AVISO altimeter SSH",
+   "variables": [
+    "SSH"
+   ],
+   "spatial_resolution": "0.25°×0.25°",
+   "temporal_resolution": "1 month",
+   "region": null,
+   "period_start": "1993",
+   "period_end": "2021",
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "AVISO, with a spatial resolution of 0.25°×0.25° and a temporal"
+    },
+    {
+     "field": "period",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "1993 to 2021"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "task": "OTHER",
+   "method_id": "M-CNN-ITF",
+   "dataset_ids": [
+    "D-CMIP6"
+   ],
+   "target_variable": "ITF transport",
+   "training": {
+    "loss": {
+     "value": "mean square error",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "The neural network loss function is deﬁned as the mean square error between"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "Adam Optimiser algorithm (Kingma and"
+    },
+    "learning_rate": {
+     "value": 0.001,
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "the default learning rate is\nset to 0.001."
+    },
+    "epochs": {
+     "value": 100,
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "CNN’s epoch was set to 100."
+    }
+   }
+  },
+  {
+   "experiment_id": "X-ITF-SODA-TRANSFER",
+   "task": "OTHER",
+   "method_id": "M-CNN-ITF",
+   "dataset_ids": [
+    "D-CMIP6",
+    "D-SODA"
+   ],
+   "target_variable": "ITF transport",
+   "training": {
+    "loss": {
+     "value": "mean square error",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "The neural network loss function is deﬁned as the mean square error between"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "Adam Optimiser algorithm (Kingma and"
+    },
+    "learning_rate": {
+     "value": 0.001,
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "the default learning rate is\nset to 0.001."
+    },
+    "epochs": {
+     "value": 100,
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "CNN’s epoch was set to 100."
+    }
+   }
+  },
+  {
+   "experiment_id": "X-ITF-FORECAST",
+   "task": "FORECASTING",
+   "method_id": "M-CNN-ITF",
+   "dataset_ids": [
+    "D-SODA"
+   ],
+   "target_variable": "ITF transport",
+   "training": {
+    "loss": {
+     "value": "mean square error",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "The neural network loss function is deﬁned as the mean square error between"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "Adam Optimiser algorithm (Kingma and"
+    },
+    "learning_rate": {
+     "value": 0.001,
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "the default learning rate is\nset to 0.001."
+    },
+    "epochs": {
+     "value": 100,
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "CNN’s epoch was set to 100."
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "dataset_id": "D-CMIP6",
+   "metric": "SKILL_SCORE",
+   "value": 0.69,
+   "unit": "",
+   "split": "VALIDATION",
+   "config": "peak average skill S",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "The averageS showed a peak of 0.69 (Figure 4)"
+  },
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "dataset_id": "D-CMIP6",
+   "metric": "R2",
+   "value": 0.9,
+   "unit": "",
+   "split": "TEST",
+   "config": "max R2 CNN vs actual CMIP6 ITF",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "(max achieves R 2 = 0.90)"
+  },
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "dataset_id": "D-CMIP6",
+   "metric": "R2",
+   "value": 0.84,
+   "unit": "",
+   "split": "UNSPECIFIED",
+   "config": "DNN baseline vs CNN",
+   "baseline_name": "M-DNN",
+   "baseline_value": 0.84,
+   "source_table": "Figure 7",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "primary fully connected neural networks ( R2 =0.84)"
+  },
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "dataset_id": "D-CMIP6",
+   "metric": "R2",
+   "value": 0.74,
+   "unit": "",
+   "split": "UNSPECIFIED",
+   "config": "random forest baseline",
+   "baseline_name": "M-RF",
+   "baseline_value": 0.74,
+   "source_table": "Figure 7",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "random forest ( R2 =0.74)"
+  },
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "dataset_id": "D-CMIP6",
+   "metric": "R2",
+   "value": 0.56,
+   "unit": "",
+   "split": "UNSPECIFIED",
+   "config": "logistic regression baseline",
+   "baseline_name": "M-LOGREG",
+   "baseline_value": 0.56,
+   "source_table": "Figure 7",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "logistic regression\n(R2 =0.56)"
+  },
+  {
+   "experiment_id": "X-ITF-CMIP6",
+   "dataset_id": "D-CMIP6",
+   "metric": "R2",
+   "value": 0.22,
+   "unit": "",
+   "split": "UNSPECIFIED",
+   "config": "SVM baseline",
+   "baseline_name": "M-SVM",
+   "baseline_value": 0.22,
+   "source_table": "Figure 7",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "statistical vector machines\n(R2 =0.22)"
+  },
+  {
+   "experiment_id": "X-ITF-SODA-TRANSFER",
+   "dataset_id": "D-SODA",
+   "metric": "CORRELATION",
+   "value": 0.91,
+   "unit": "",
+   "split": "TEST",
+   "config": "with transfer learning",
+   "baseline_name": "CNN without transfer",
+   "baseline_value": 0.86,
+   "source_table": null,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "with transfer learning\nwas 0.91"
+  },
+  {
+   "experiment_id": "X-ITF-SODA-TRANSFER",
+   "dataset_id": "D-SODA",
+   "metric": "CORRELATION",
+   "value": 0.86,
+   "unit": "",
+   "split": "TEST",
+   "config": "without transfer learning",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "without transfer\nlearning was 0.86"
+  },
+  {
+   "experiment_id": "X-ITF-SODA-TRANSFER",
+   "dataset_id": "D-SODA",
+   "metric": "SKILL_SCORE",
+   "value": 0.54,
+   "unit": "",
+   "split": "TEST",
+   "config": "CMIP6-trained CNN applied directly to SODA, peak average test skill",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "The average\ntest skill of SODA data acquired by the CNN peaked at 0.54"
+  },
+  {
+   "experiment_id": "X-ITF-FORECAST",
+   "dataset_id": "D-SODA",
+   "metric": "STABILITY_HORIZON",
+   "value": 7,
+   "unit": "months",
+   "split": "TEST",
+   "config": "valid prediction defined as R > 0.5; after transfer learning on SODA; 12-month moving average",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "with a lead time of\nup to approximately 7 months",
+   "metric_raw": "valid prediction lead time",
+   "metric_kind": "STABILITY",
+   "higher_is_better": true
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "DATA",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "the amount of training data\nrequired for the CNN supervised learning is quite large"
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "the skill limitations are due to the\ninherent incompleteness of the information in SSH"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "these various statistical methodscontain very different parameters that\nmay potentially inﬂuence the comparison."
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[*].training.batch_size",
+   "searched": [
+    "section 2.2",
+    "section 3",
+    "section 4"
+   ]
+  },
+  {
+   "field": "experiments[*].training.hardware",
+   "searched": [
+    "section 2.2",
+    "section 3",
+    "full text"
+   ]
+  }
+ ]
+}

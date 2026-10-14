@@ -1,0 +1,372 @@
+{
+ "source": {
+  "source_id": "4dvarnet-ssh-2023",
+  "file": ".data/golden-pdfs/4dvarnet-ssh-2023.pdf",
+  "sha256_prefix": "bfad134ecdf1a4786ee4fdad",
+  "pdf_pages": 29,
+  "printed_page_offset": 2118,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-4DVARNET-SSH-2023",
+  "doi": "10.5194/gmd-16-2119-2023",
+  "title": "4DVarNet-SSH: end-to-end learning of variational interpolation schemes for nadir and wide-swath satellite altimetry",
+  "year": 2023,
+  "venue": "Geoscientific Model Development",
+  "ocean_domains": [
+   "satellite altimetry",
+   "sea surface height",
+   "data assimilation"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-4DVARNET-SSH",
+   "canonical_name": "4DVarNet-SSH",
+   "family": "VARIATIONAL_ANALYSIS",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 2119,
+     "quote": "an end-to-end neu-\nral scheme backed on a variational data assimilation for-\nmulation"
+    }
+   ]
+  },
+  {
+   "method_id": "M-DUACS-OI",
+   "canonical_name": "DUACS OI",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 8,
+     "page_printed": 2126,
+     "quote": "DUACS (four nadirs) OI 0.92 0.01 1.42 12.0"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-NATL60",
+   "canonical_name": "NATL60 OSSE",
+   "variables": [
+    "SSH"
+   ],
+   "spatial_resolution": "1/20 degree (downgraded from 1/60)",
+   "temporal_resolution": "daily",
+   "region": "North Atlantic subdomains (GULFSTREAM, OSMOSIS, cNATL)",
+   "period_start": "2012-10-01",
+   "period_end": "2013-09-29",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "the nature run (NR) corresponds to the NATL60\nconﬁguration"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 2125,
+     "quote": "the SSH resolution of the nature run\nis downgraded to 1 /20"
+    },
+    {
+     "field": "period",
+     "page_pdf": 8,
+     "page_printed": 2126,
+     "quote": "from 1 October 2012 to 29 September 2013"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-4DVARNET-GULFSTREAM",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "method_id": "M-4DVARNET-SSH",
+   "dataset_ids": [
+    "D-NATL60"
+   ],
+   "target_variable": "sea surface height (SSH) GULFSTREAM domain",
+   "training": {
+    "loss": {
+     "value": "weighted reconstruction losses plus gradient and prior-regularization terms",
+     "page_pdf": 5,
+     "page_printed": 2123,
+     "quote": "combines reconstruction losses and additional regularization terms as follows"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "we use a single GPU and Adam optimizer"
+    },
+    "batch_size": {
+     "value": 2,
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "with a batch size of 2 over 200 epochs"
+    },
+    "epochs": {
+     "value": 200,
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "with a batch size of 2 over 200 epochs"
+    },
+    "hardware": {
+     "value": "single GPU",
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "we use a single GPU and Adam optimizer"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-4DVARNET-OSMOSIS",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "method_id": "M-4DVARNET-SSH",
+   "dataset_ids": [
+    "D-NATL60"
+   ],
+   "target_variable": "sea surface height (SSH) OSMOSIS domain",
+   "training": {
+    "loss": {
+     "value": "weighted reconstruction losses plus gradient and prior-regularization terms",
+     "page_pdf": 5,
+     "page_printed": 2123,
+     "quote": "combines reconstruction losses and additional regularization terms as follows"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "we use a single GPU and Adam optimizer"
+    },
+    "batch_size": {
+     "value": 2,
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "with a batch size of 2 over 200 epochs"
+    },
+    "epochs": {
+     "value": 200,
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "with a batch size of 2 over 200 epochs"
+    },
+    "hardware": {
+     "value": "single GPU",
+     "page_pdf": 6,
+     "page_printed": 2124,
+     "quote": "we use a single GPU and Adam optimizer"
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-4DVARNET-GULFSTREAM",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.92,
+   "unit": "normalized RMSE score",
+   "split": "TEST",
+   "config": "DUACS OI, four nadirs, mu(RMSE)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "page_pdf": 8,
+   "page_printed": 2126,
+   "quote": "DUACS (four nadirs) OI 0.92 0.01 1.42 12.0"
+  },
+  {
+   "experiment_id": "X-4DVARNET-GULFSTREAM",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.94,
+   "unit": "normalized RMSE score",
+   "split": "TEST",
+   "config": "4DVarNet, four nadirs, mu(RMSE)",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 0.92,
+   "source_table": "Table 2",
+   "page_pdf": 8,
+   "page_printed": 2126,
+   "quote": "4DVarNet (four nadirs) NN-based 4D-Var (ours) 0.94 0.01 0.83 8.01"
+  },
+  {
+   "experiment_id": "X-4DVARNET-GULFSTREAM",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.95,
+   "unit": "normalized RMSE score",
+   "split": "TEST",
+   "config": "4DVarNet, one SWOT plus four nadirs, mu(RMSE)",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 0.92,
+   "source_table": "Table 2",
+   "page_pdf": 8,
+   "page_printed": 2126,
+   "quote": "4DVarNet (one SWOT plus four nadirs) NN-based 4D-Var (ours) 0.95 0.01 0.62 5.29",
+   "is_best_in_table": true
+  },
+  {
+   "experiment_id": "X-4DVARNET-GULFSTREAM",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.62,
+   "unit": "degrees",
+   "split": "TEST",
+   "config": "4DVarNet, one SWOT plus four nadirs, lambda_x",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 1.22,
+   "source_table": "Table 2",
+   "page_pdf": 8,
+   "page_printed": 2126,
+   "quote": "4DVarNet (one SWOT plus four nadirs) NN-based 4D-Var (ours) 0.95 0.01 0.62 5.29",
+   "is_best_in_table": true
+  },
+  {
+   "experiment_id": "X-4DVARNET-GULFSTREAM",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 5.29,
+   "unit": "days",
+   "split": "TEST",
+   "config": "4DVarNet, one SWOT plus four nadirs, lambda_t",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 11.15,
+   "source_table": "Table 2",
+   "page_pdf": 8,
+   "page_printed": 2126,
+   "quote": "4DVarNet (one SWOT plus four nadirs) NN-based 4D-Var (ours) 0.95 0.01 0.62 5.29",
+   "is_best_in_table": true
+  },
+  {
+   "experiment_id": "X-4DVARNET-OSMOSIS",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.78,
+   "unit": "normalized RMSE score",
+   "split": "TEST",
+   "config": "DUACS OI, four nadirs, mu(RMSE)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 3",
+   "page_pdf": 9,
+   "page_printed": 2127,
+   "quote": "DUACS (four nadirs) 0.78 0.02 1.10 18.80"
+  },
+  {
+   "experiment_id": "X-4DVARNET-OSMOSIS",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.8,
+   "unit": "normalized RMSE score",
+   "split": "TEST",
+   "config": "4DVarNet, four nadirs, mu(RMSE)",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 0.78,
+   "source_table": "Table 3",
+   "page_pdf": 9,
+   "page_printed": 2127,
+   "quote": "4DVarNet (four nadirs; ours) 0.80 0.01 1.18 14.51"
+  },
+  {
+   "experiment_id": "X-4DVARNET-OSMOSIS",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.87,
+   "unit": "normalized RMSE score",
+   "split": "TEST",
+   "config": "4DVarNet, one SWOT plus four nadirs, mu(RMSE)",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 0.81,
+   "source_table": "Table 3",
+   "page_pdf": 9,
+   "page_printed": 2127,
+   "quote": "4DVarNet (one SWOT plus four nadirs; ours) 0.87 0.02 0.35 6.84",
+   "is_best_in_table": true
+  },
+  {
+   "experiment_id": "X-4DVARNET-OSMOSIS",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 0.35,
+   "unit": "degrees",
+   "split": "TEST",
+   "config": "4DVarNet, one SWOT plus four nadirs, lambda_x",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 1.03,
+   "source_table": "Table 3",
+   "page_pdf": 9,
+   "page_printed": 2127,
+   "quote": "4DVarNet (one SWOT plus four nadirs; ours) 0.87 0.02 0.35 6.84",
+   "is_best_in_table": true
+  },
+  {
+   "experiment_id": "X-4DVARNET-OSMOSIS",
+   "dataset_id": "D-NATL60",
+   "metric": "OTHER",
+   "value": 6.84,
+   "unit": "days",
+   "split": "TEST",
+   "config": "4DVarNet, one SWOT plus four nadirs, lambda_t",
+   "baseline_name": "DUACS OI",
+   "baseline_value": 17.5,
+   "source_table": "Table 3",
+   "page_pdf": 9,
+   "page_printed": 2127,
+   "quote": "4DVarNet (one SWOT plus four nadirs; ours) 0.87 0.02 0.35 6.84",
+   "is_best_in_table": true
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 16,
+   "page_printed": 2134,
+   "quote": "These results assume an error-\nfree SWOT product."
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 16,
+   "page_printed": 2134,
+   "quote": "Our numerical experiments focused mainly on\na regional scale"
+  },
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 6,
+   "page_printed": 2124,
+   "quote": "The direct training 4DVarNet models over larger spa-\ntial domains is, however, limited by the GPU memory."
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-4DVARNET-GULFSTREAM].training.learning_rate",
+   "searched": [
+    "section 3.3",
+    "section 3.4",
+    "section 4",
+    "section 5.4"
+   ]
+  },
+  {
+   "field": "experiments[X-4DVARNET-OSMOSIS].training.learning_rate",
+   "searched": [
+    "section 3.3",
+    "section 3.4",
+    "section 4",
+    "section 5.4"
+   ]
+  }
+ ]
+}

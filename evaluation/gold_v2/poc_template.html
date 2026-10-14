@@ -1,0 +1,304 @@
+<title>Bilan reproductibilité ML-océan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Rapport technique en une colonne: constat d'abord, enregistrements ensuite. */
+  :root {
+    --paper: #f5f6f7;
+    --card: #ffffff;
+    --ink: #11191f;
+    --ink-soft: #46555f;
+    --ink-faint: #6d7c86;
+    --rule: #d8dee2;
+    --tide: #0d5567;
+    --tide-soft: #cfe0e4;
+    --absent: #9a5b14;
+    --absent-soft: #f0dfc6;
+    --font-display: "Newsreader", Georgia, serif;
+    --font-body: "Public Sans", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0e1418; --card: #151d22; --ink: #e8edef; --ink-soft: #a8b7bf;
+      --ink-faint: #7d8d96; --rule: #27333a; --tide: #6fc2d6; --tide-soft: #1b3740;
+      --absent: #e0a662; --absent-soft: #3a2c16; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0e1418; --card: #151d22; --ink: #e8edef; --ink-soft: #a8b7bf;
+    --ink-faint: #7d8d96; --rule: #27333a; --tide: #6fc2d6; --tide-soft: #1b3740;
+    --absent: #e0a662; --absent-soft: #3a2c16; color-scheme: dark;
+  }
+
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 62rem; margin: 0 auto; padding-block: 2.5rem 4rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 500; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; }
+  h2 { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; letter-spacing: -0.015em; }
+  h3 { font-size: 1.125rem; }
+  p { margin: 0; max-width: 68ch; }
+  .lede { font-size: 1.0625rem; color: var(--ink-soft); }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 0.8125rem; color: var(--tide);
+    letter-spacing: 0.04em; margin: 0;
+  }
+  .stack { display: flex; flex-direction: column; gap: 1rem; }
+  section { margin-top: 3.5rem; }
+  .rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+
+  /* Compteurs d'en-tête */
+  .counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 1.5rem 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+  .counters div { min-width: 0; }
+  .counters b { display: block; font-family: var(--font-display); font-size: 2.25rem; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
+  .counters span { display: block; margin-top: 0.4rem; font-size: 0.875rem; color: var(--ink-faint); line-height: 1.35; }
+
+  /* Barres de reporting */
+  .bars { display: flex; flex-direction: column; gap: 0.1rem; margin-top: 1.75rem; }
+  .bar { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr) 4.5rem; gap: 0.85rem; align-items: center; padding-block: 0.55rem; border-bottom: 1px solid var(--rule); }
+  .bar:last-child { border-bottom: 0; }
+  .bar > span:first-child { font-family: var(--font-mono); font-size: 0.875rem; color: var(--ink-soft); }
+  .track { position: relative; height: 1.15rem; background: var(--absent-soft); min-width: 0; }
+  .track i { position: absolute; inset: 0 auto 0 0; background: var(--tide); display: block; }
+  .bar > span:last-child { font-family: var(--font-mono); font-size: 0.875rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 1rem; font-size: 0.875rem; color: var(--ink-soft); }
+  .legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .swatch { width: 0.75rem; height: 0.75rem; display: inline-block; }
+
+  /* Encadré de constat */
+  .finding { background: var(--card); border: 1px solid var(--rule); border-left: 3px solid var(--tide); padding: 1.25rem 1.5rem; margin-top: 1.75rem; }
+  .finding p + p { margin-top: 0.75rem; }
+
+  /* Listes de distribution */
+  .dist { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem; margin-top: 1.75rem; }
+  .dist ul { list-style: none; margin: 0.75rem 0 0; padding: 0; }
+  .dist li { display: flex; justify-content: space-between; gap: 1rem; padding-block: 0.4rem; border-bottom: 1px solid var(--rule); font-size: 0.9375rem; }
+  .dist li span:last-child { font-family: var(--font-mono); color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+  /* Enregistrements */
+  details.record { background: var(--card); border: 1px solid var(--rule); margin-top: 0.75rem; }
+  details.record > summary { cursor: pointer; list-style: none; padding: 1rem 1.25rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem 1rem; align-items: start; }
+  details.record > summary::-webkit-details-marker { display: none; }
+  details.record > summary:focus-visible { outline: 2px solid var(--tide); outline-offset: -2px; }
+  .rtitle { font-family: var(--font-display); font-size: 1.0625rem; line-height: 1.3; min-width: 0; }
+  .rmeta { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-faint); white-space: nowrap; }
+  .rbody { padding: 0 1.25rem 1.5rem; border-top: 1px solid var(--rule); }
+  .rbody h4 { font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; letter-spacing: 0.02em; color: var(--ink-faint); margin: 1.5rem 0 0.6rem; }
+  .exp { border-left: 2px solid var(--tide-soft); padding-left: 1rem; margin-top: 1rem; }
+  .exp-head { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-soft); }
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.5rem 1.25rem; margin-top: 0.6rem; }
+  .kv > div { min-width: 0; }
+  .k { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--ink-faint); }
+  .v { font-family: var(--font-mono); font-size: 0.9375rem; overflow-wrap: break-word; }
+  .v button { all: unset; cursor: pointer; border-bottom: 1px dotted var(--tide); }
+  .v button:focus-visible { outline: 2px solid var(--tide); outline-offset: 2px; }
+  .miss { color: var(--absent); font-family: var(--font-mono); font-size: 0.875rem; }
+  blockquote { margin: 0.5rem 0 0; padding: 0.65rem 0.9rem; background: var(--tide-soft); border: 0; font-family: var(--font-mono); font-size: 0.875rem; line-height: 1.5; overflow-wrap: break-word; }
+  blockquote cite { display: block; margin-top: 0.4rem; font-style: normal; color: var(--ink-soft); font-size: 0.8125rem; }
+  .tablewrap { overflow-x: auto; margin-top: 0.6rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.875rem; }
+  th, td { text-align: left; padding: 0.5rem 0.75rem 0.5rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--font-body); font-weight: 600; color: var(--ink-faint); font-size: 0.8125rem; white-space: nowrap; }
+  td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lim { margin-top: 0.75rem; }
+  .theme { font-family: var(--font-mono); font-size: 0.75rem; color: var(--absent); }
+  footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: 0.875rem; color: var(--ink-faint); }
+  footer p { max-width: 72ch; }
+  @media (max-width: 30rem) {
+    .bar { grid-template-columns: 7rem minmax(0, 1fr) 3.5rem; gap: 0.5rem; }
+    details.record > summary { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<div class="wrap">
+  <header class="stack">
+    <p class="eyebrow">Ocean Research Hub · corpus v2 · 14 octobre 2026</p>
+    <h1>Ce que la littérature ML-océan rapporte, et ce qu'elle tait</h1>
+    <p class="lede" id="lede"></p>
+    <div class="counters" id="counters"></div>
+  </header>
+
+  <section>
+    <h2 id="gap-title"></h2>
+    <p class="lede" style="margin-top:.75rem" id="gap-lede"></p>
+    <div class="bars" id="bars"></div>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--tide)"></i>rapporté dans le papier</span>
+      <span><i class="swatch" style="background:var(--absent-soft);border:1px solid var(--absent)"></i>absent, périmètre de recherche consigné</span>
+    </div>
+    <div class="finding">
+      <p id="gap-note"></p>
+      <p>Ces absences ne sont pas des échecs d'extraction : chaque champ manquant est enregistré avec les sections effectivement consultées. C'est une mesure du domaine, pas de l'outil.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 id="cmp-title"></h2>
+    <p class="lede" style="margin-top:.75rem" id="cmp-lede"></p>
+    <div class="finding">
+      <p>Chaque équipe évalue sur son propre jeu, avec sa propre métrique. Un classement « quelle architecture est la meilleure » n'est donc pas calculable à partir de ces publications, et aucun chiffre de cette page ne doit être lu comme tel.</p>
+      <p id="cmp-note"></p>
+    </div>
+    <div class="dist" id="dist"></div>
+  </section>
+
+  <section>
+    <h2 id="rec-title"></h2>
+    <p class="lede" style="margin-top:.75rem">Ouvrez un papier pour voir ses expériences, ses réglages, ses résultats et ses limites. Les valeurs soulignées en pointillés affichent la phrase source et sa page.</p>
+    <div id="records"></div>
+  </section>
+
+  <footer>
+    <p>Corpus v2 du dépôt Ocean Research Hub. Les citations sont stockées telles qu'extraites du PDF, césures comprises. Un contrôle vérifie que la citation existe à la page citée et qu'elle porte bien la valeur stockée ; il ne remplace pas l'audit scientifique, qui reste à faire. Aucun champ n'est marqué vérifié.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+  const DATA = JSON.parse(document.getElementById("data").textContent);
+  const { agg, papers } = DATA;
+  const TRAIN = ["loss", "optimizer", "learning_rate", "batch_size", "epochs", "hardware"];
+  const LABEL = { loss: "loss", optimizer: "optimizer", learning_rate: "learning rate", batch_size: "batch size", epochs: "epochs", hardware: "hardware" };
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
+  const text = (id, value) => { document.getElementById(id).textContent = value; };
+  const worst = Object.entries(agg.reporting).sort((a, b) => a[1] - b[1])[0];
+  const lrPct = Math.round((agg.reporting.learning_rate / agg.experiments) * 100);
+
+  text("lede", `${plural(agg.papers, "papier")} lus intégralement, ${agg.experiments} expériences et `
+    + `${agg.results} résultats extraits. Chaque valeur porte la phrase du papier dont elle est tirée et sa page ; `
+    + `un contrôle déterministe a relocalisé les ${agg.quotes} citations sur la page citée avant publication`
+    + (agg.excluded ? `. ${plural(agg.excluded, "papier")} supplémentaire s'est révélé être une revue sans modèle entraîné : il est enregistré comme exclu plutôt qu'extrait de force.` : "."));
+
+  text("gap-title", `Seules ${lrPct} % des expériences donnent leur learning rate`);
+  text("gap-lede", `Part des ${agg.experiments} expériences qui rapportent chaque réglage d'entraînement. `
+    + `L'orange est ce qui manque — vérifié section par section, pas simplement absent de notre lecture.`);
+  text("gap-note", `Le réglage le moins souvent rapporté est ${LABEL[worst[0]] || worst[0]} : ${worst[1]} expériences sur ${agg.experiments}. `
+    + `Sans ces valeurs, ni le coût ni la reproductibilité d'un résultat ne sont évaluables.`);
+
+  text("cmp-title", agg.shared_cells === 0
+    ? "Aucun de ces papiers n'est comparable à un autre"
+    : `${plural(agg.shared_cells, "cellule")} de comparaison seulement`);
+  text("cmp-lede", `Sur les ${agg.cells} combinaisons (jeu de données, métrique, unité) présentes dans le corpus, `
+    + (agg.shared_cells === 0 ? "aucune n'est partagée par deux papiers." : `${agg.shared_cells} sont partagées par au moins deux papiers.`));
+  text("cmp-note", `Ce que les papiers permettent en revanche : comparer chaque méthode à la baseline que ses propres `
+    + `auteurs ont retenue. Les ${agg.results} résultats ci-dessous conservent cette paire.`);
+
+  text("rec-title", `Les ${agg.papers} enregistrements`);
+
+  document.getElementById("counters").innerHTML = [
+    [agg.papers, "papiers lus intégralement"],
+    [agg.experiments, "expériences"],
+    [agg.results, "résultats mesurés"],
+    [agg.quotes, "citations relocalisées"],
+    [0, "champs marqués vérifiés"],
+  ].map(([n, label]) => `<div><b>${n}</b><span>${label}</span></div>`).join("");
+
+  document.getElementById("bars").innerHTML = TRAIN.map((key) => {
+    const n = agg.reporting[key] || 0;
+    const pct = Math.round((n / agg.experiments) * 100);
+    return `<div class="bar">
+      <span>${LABEL[key]}</span>
+      <span class="track" role="img" aria-label="${n} expériences sur ${agg.experiments}"><i style="width:${pct}%"></i></span>
+      <span>${n}/${agg.experiments}</span>
+    </div>`;
+  }).join("");
+
+  const distBlock = (title, obj, note) => {
+    const rows = Object.entries(obj).sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `<li><span>${esc(k.toLowerCase().replace(/_/g, " "))}</span><span>${v}</span></li>`).join("");
+    return `<div><h3>${title}</h3>${note ? `<p style="font-size:.875rem;color:var(--ink-faint);margin-top:.4rem">${note}</p>` : ""}<ul>${rows}</ul></div>`;
+  };
+  document.getElementById("dist").innerHTML =
+    distBlock("Tâches traitées", agg.tasks, "par expérience") +
+    distBlock("Familles d'architecture", agg.families, "par expérience") +
+    distBlock("Métriques rapportées", agg.metrics, "« other » = métrique hors vocabulaire contrôlé");
+
+  const quote = (q, page) => q ? `<blockquote>« ${esc(q)} »<cite>page ${esc(page)}</cite></blockquote>` : "";
+
+  const value = (key, f, id) => {
+    const inner = `${esc(f.value)}`;
+    if (!f.quote) return `<div><div class="k">${LABEL[key]}</div><div class="v">${inner}</div></div>`;
+    return `<div><div class="k">${LABEL[key]}</div><div class="v"><button type="button" aria-expanded="false" data-target="${id}">${inner}</button></div><div id="${id}" hidden>${quote(f.quote, f.page)}</div></div>`;
+  };
+
+  document.getElementById("records").innerHTML = papers.map((p, pi) => {
+    if (p.excluded) {
+      return `<details class="record">
+        <summary>
+          <span class="rtitle">${esc(p.title)}</span>
+          <span class="rmeta">${esc(p.year || "")} · exclu du corpus</span>
+        </summary>
+        <div class="rbody">
+          <h4>Motif d'exclusion</h4>
+          <p style="margin-top:.4rem">${esc(p.excluded.reason)}</p>
+          ${quote(p.excluded.quote, p.excluded.page_pdf)}
+        </div>
+      </details>`;
+    }
+    const exps = p.experiments.map((e, ei) => `
+      <div class="exp">
+        <div class="exp-head">${esc(e.id)} · ${esc(e.task.toLowerCase().replace(/_/g, " "))} · ${esc(e.family.toLowerCase().replace(/_/g, " "))}</div>
+        ${e.target ? `<p style="font-size:.9375rem;color:var(--ink-soft);margin-top:.3rem">cible : ${esc(e.target)}${e.datasets.filter(Boolean).length ? " — " + esc(e.datasets.filter(Boolean).join(", ")) : ""}</p>` : ""}
+        <div class="kv">${TRAIN.filter((k) => e.found[k]).map((k) => value(k, e.found[k], `q${pi}-${ei}-${k}`)).join("")}</div>
+        ${e.missing.length ? `<p class="miss">non rapporté : ${e.missing.map((k) => LABEL[k]).join(" · ")}</p>` : ""}
+      </div>`).join("");
+
+    const results = p.results.length ? `
+      <h4>Résultats mesurés</h4>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Métrique</th><th>Valeur</th><th>Baseline des auteurs</th><th>Configuration</th><th>Source</th></tr></thead>
+        <tbody>${p.results.map((r, ri) => `
+          <tr>
+            <td class="num">${esc(r.metric === "OTHER" && r.raw ? r.raw : r.metric)}</td>
+            <td class="num">${esc(r.value)} ${esc(r.unit || "")}${r.best ? " ★" : ""}</td>
+            <td class="num">${r.baseline ? `${esc(r.baseline)}${r.baseline_value !== null && r.baseline_value !== undefined ? " : " + esc(r.baseline_value) : ""}` : "—"}</td>
+            <td>${esc(r.config || "—")}</td>
+            <td><button type="button" class="qbtn" aria-expanded="false" data-target="r${pi}-${ri}">p.${esc(r.page)}</button><div id="r${pi}-${ri}" hidden>${quote(r.quote, r.page)}</div></td>
+          </tr>`).join("")}</tbody>
+      </table></div>` : `<h4>Résultats mesurés</h4><p class="miss">aucune valeur numérique : les résultats de ce papier ne figurent que dans des figures.</p>`;
+
+    const lims = p.limitations.length ? `<h4>Limites énoncées par les auteurs</h4>${p.limitations.map((l) => `
+      <div class="lim"><div class="theme">${esc(l.theme.toLowerCase())}</div>${quote(l.quote, l.page)}</div>`).join("")}` : "";
+
+    return `<details class="record">
+      <summary>
+        <span class="rtitle">${esc(p.title)}</span>
+        <span class="rmeta">${esc(p.year || "")} · ${p.pdf_pages} p. · ${p.quotes} citations</span>
+      </summary>
+      <div class="rbody">
+        <h4>Identité</h4>
+        <div class="kv">
+          <div><div class="k">venue</div><div class="v" style="font-family:var(--font-body)">${esc(p.venue || "—")}</div></div>
+          <div><div class="k">doi</div><div class="v">${esc(p.doi || "—")}</div></div>
+          <div><div class="k">pdf sha256</div><div class="v">${esc(p.sha || "—")}</div></div>
+          <div><div class="k">méthode proposée</div><div class="v">${esc(p.proposed.join(", ") || "—")}</div></div>
+          <div><div class="k">baselines comparées</div><div class="v">${esc(p.baselines.join(", ") || "—")}</div></div>
+        </div>
+        <h4>Expériences (${p.experiments.length})</h4>
+        ${exps}
+        ${results}
+        ${lims}
+      </div>
+    </details>`;
+  }).join("");
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-target]");
+    if (!button) return;
+    const panel = document.getElementById(button.dataset.target);
+    if (!panel) return;
+    panel.hidden = !panel.hidden;
+    button.setAttribute("aria-expanded", String(!panel.hidden));
+  });
+</script>

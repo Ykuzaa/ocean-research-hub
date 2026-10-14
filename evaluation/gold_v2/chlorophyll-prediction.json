@@ -1,0 +1,782 @@
+{
+  "source": {
+    "source_id": "chlorophyll-prediction",
+    "file": ".data/golden-pdfs/spatiotemporal-prediction-of-chlorophyll-a-in-semi-enclosed.pdf",
+    "sha256_prefix": "b8709561b0f4b98a95385f2f",
+    "pdf_pages": 59,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-CHLOROPHYLL-PREDICTION",
+    "doi": "10.1038/s41598-026-42388-0",
+    "title": "Spatiotemporal prediction of chlorophyll-a in semi-enclosed gulfs using a hybrid graph neural network-transformer framework with satellite data and causal analysis",
+    "year": 2026,
+    "venue": "Scientific Reports",
+    "ocean_domains": [
+      "ocean color",
+      "chlorophyll-a",
+      "harmful algal blooms",
+      "Persian Gulf",
+      "ocean biogeochemistry"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-GNNT",
+      "canonical_name": "GNN-T (graph attention network + Transformer encoder)",
+      "family": "GNN",
+      "family_raw": "hybrid Graph Neural Network-Transformer",
+      "architecture_note": "Two backbones: GAT spatial message passing on a KNN graph followed by a Transformer encoder for temporal attention. Classified GNN as the spatial stage is described first; TRANSFORMER is the alternative. Authors state it is adapted from existing GNN-Transformer models, not a new paradigm.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 16,
+          "page_printed": 16,
+          "quote": "by feeding GNN-embedded spatial features into Transformer layers"
+        },
+        {
+          "field": "role",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "This study proposes an adapted hybrid GNN-T model"
+        },
+        {
+          "field": "is_novel_in_paper",
+          "page_pdf": 16,
+          "page_printed": 16,
+          "quote": "architecture adapted from existing GNN–Transformer models"
+        }
+      ]
+    },
+    {
+      "method_id": "M-CNNLSTM",
+      "canonical_name": "CNN-LSTM",
+      "family": "RNN_LSTM_GRU",
+      "family_raw": "Convolutional Neural Network Long Short-Term Memory",
+      "architecture_note": "CNN feature extractor followed by an LSTM and a fully connected layer; classified on the forecasting stage (LSTM). CNN_GENERIC is the alternative.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 17,
+          "page_printed": 17,
+          "quote": "The CNN-LSTM architecture consists of two main components: the first"
+        },
+        {
+          "field": "role",
+          "page_pdf": 10,
+          "page_printed": 10,
+          "quote": "performance metrics are computed and compared with baselines such as"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-MODIS-AQUA",
+      "canonical_name": "MODIS/Aqua ocean colour (NASA)",
+      "variables": [
+        "Chl-a",
+        "SSS",
+        "NFLH",
+        "RRS_443",
+        "RRS_488",
+        "POC"
+      ],
+      "spatial_resolution": "4 km",
+      "temporal_resolution": "monthly",
+      "region": "Persian Gulf",
+      "period_start": "2002",
+      "period_end": "2022",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 11,
+          "page_printed": 11,
+          "quote": "MODIS/Aqua provides"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 11,
+          "page_printed": 11,
+          "quote": "ocean color data at 4 km resolution"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 12,
+          "page_printed": 12,
+          "quote": "concentration (HChl-a) mg/m³ Monthly MODIS/Aqua",
+          "note": "Row label 'Historical chlorophyll-a' is on the previous line."
+        },
+        {
+          "field": "region",
+          "page_pdf": 10,
+          "page_printed": 10,
+          "quote": "The Persian Gulf (approximately 24°N to 30°N"
+        },
+        {
+          "field": "period",
+          "page_pdf": 24,
+          "page_printed": 24,
+          "quote": "spanning 2002–2022"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-ERA5",
+      "canonical_name": "ERA5 reanalysis (ECMWF)",
+      "variables": [
+        "SST",
+        "TP",
+        "CBH",
+        "LCC",
+        "TCC",
+        "E",
+        "TCRW",
+        "LSP",
+        "CP",
+        "U10",
+        "V10",
+        "T2M",
+        "MSL",
+        "MWD",
+        "MWP",
+        "SWH",
+        "SP"
+      ],
+      "spatial_resolution": "0.25-0.5 deg",
+      "temporal_resolution": "monthly",
+      "region": "Persian Gulf",
+      "period_start": "2002",
+      "period_end": "2022",
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 11,
+          "page_printed": 11,
+          "quote": "ECMWF’s ERA5 datasets"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 11,
+          "page_printed": 11,
+          "quote": "ERA5 contributes atmospheric and climatic variables at 0.25–0.5° resolution"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 12,
+          "page_printed": 12,
+          "quote": "Sea surface temperature (SST) K Monthly ERA5 (ECMWF)"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-HYCOM",
+      "canonical_name": "HYCOM ocean currents",
+      "variables": [
+        "VU",
+        "VV"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": "monthly",
+      "region": "Persian Gulf",
+      "period_start": "2002",
+      "period_end": "2022",
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 12,
+          "page_printed": 12,
+          "quote": "Eastward sea water velocity (VU) m/s Monthly HYCOM"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 12,
+          "page_printed": 12,
+          "quote": "Northward sea water velocity (VV) m/s Monthly HYCOM"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-GNNT-PG",
+      "task": "FORECASTING",
+      "task_raw": "one-step-ahead monthly spatiotemporal Chl-a forecasting",
+      "method_id": "M-GNNT",
+      "dataset_ids": [
+        "D-MODIS-AQUA",
+        "D-ERA5",
+        "D-HYCOM"
+      ],
+      "target_variable": "Chl-a",
+      "note": "Persian Gulf, 24 input variables, 60/20/20 temporal split (2002-2014 / 2015-2018 / 2019-2022)",
+      "training": {
+        "optimizer": {
+          "value": "AdamW",
+          "page_pdf": 23,
+          "page_printed": 23,
+          "quote": "optimizer [Adam, AdamW] AdamW",
+          "note": "Table 2 row, GNN-T block (the model label sits at the end of the block in the extracted text). Section 2.7.3 (p25) says Adam: see conflicts."
+        },
+        "learning_rate": {
+          "value": 0.001,
+          "page_pdf": 23,
+          "page_printed": 23,
+          "quote": "learning_rate [1e-4, 1e-3, 1e-2] 1.00E-03",
+          "note": "Table 2 row, GNN-T block (the model label sits at the end of the block in the extracted text)."
+        },
+        "batch_size": {
+          "value": 16,
+          "page_pdf": 23,
+          "page_printed": 23,
+          "quote": "batch_size [8, 16, 32] 16",
+          "note": "Table 2 row, GNN-T block (the model label sits at the end of the block in the extracted text)."
+        },
+        "epochs": {
+          "value": 200,
+          "page_pdf": 23,
+          "page_printed": 23,
+          "quote": "num_epochs [100, 200, 300] 200",
+          "note": "Table 2 row, GNN-T block (the model label sits at the end of the block in the extracted text). Maximum epochs from grid search; early stopping at epoch 68 is reported on p33."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-CNNLSTM-PG",
+      "task": "FORECASTING",
+      "task_raw": "one-step-ahead monthly spatiotemporal Chl-a forecasting",
+      "method_id": "M-CNNLSTM",
+      "dataset_ids": [
+        "D-MODIS-AQUA",
+        "D-ERA5",
+        "D-HYCOM"
+      ],
+      "target_variable": "Chl-a",
+      "note": "Baseline on the same Persian Gulf split; batch size and epochs not given for CNN-LSTM in Table 2",
+      "training": {
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 23,
+          "page_printed": 23,
+          "quote": "optimizer [Adam, AdamW] Adam",
+          "note": "Table 2 CNN-LSTM block (label at the end of the block); string also matches the start of the GNN-T row, disambiguated by position in the table."
+        },
+        "learning_rate": {
+          "value": 0.001,
+          "page_pdf": 23,
+          "page_printed": 23,
+          "quote": "learning_rate [1e-4, 1e-3, 1e-2] 1.00E-03",
+          "note": "Table 2 CNN-LSTM block; identical string to the GNN-T row, taken from the second occurrence."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-GNNT-13VAR-PG",
+      "task": "FORECASTING",
+      "task_raw": "one-step-ahead monthly spatiotemporal Chl-a forecasting",
+      "method_id": "M-GNNT",
+      "dataset_ids": [
+        "D-MODIS-AQUA",
+        "D-ERA5",
+        "D-HYCOM"
+      ],
+      "target_variable": "Chl-a",
+      "note": "Causality-driven ablation: GNN-T retrained on the top 13 variables (CCM and Sobol), same splits. Hyperparameters of the retraining not restated.",
+      "training": {}
+    },
+    {
+      "experiment_id": "X-GNNT-GOM",
+      "task": "FORECASTING",
+      "task_raw": "one-step-ahead monthly spatiotemporal Chl-a forecasting",
+      "method_id": "M-GNNT",
+      "dataset_ids": [
+        "D-MODIS-AQUA",
+        "D-ERA5",
+        "D-HYCOM"
+      ],
+      "target_variable": "Chl-a",
+      "note": "Transfer test in the Gulf of Mexico. Whether the model was retrained is not stated unambiguously (introduction claims no region-specific retraining).",
+      "training": {}
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-GNNT-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "R2",
+      "metric_raw": "R²",
+      "metric_kind": "ERROR",
+      "value": 0.903,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Persian Gulf, test 2019-2022, one-step-ahead monthly; also in Table 3. Units not stated (inputs min-max or standard scaled).",
+      "baseline_name": "CNN-LSTM",
+      "baseline_value": 0.755,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 30,
+      "page_printed": 30,
+      "quote": "higher coefficient of determination (R² = 0.903 vs. 0.755), lower mean"
+    },
+    {
+      "experiment_id": "X-GNNT-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.097,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Persian Gulf, test 2019-2022, one-step-ahead monthly; also in Table 3. Units not stated (inputs min-max or standard scaled).",
+      "baseline_name": "CNN-LSTM",
+      "baseline_value": 0.116,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 30,
+      "page_printed": 30,
+      "quote": "lower mean absolute error (MAE = 0.097 vs. 0.116)"
+    },
+    {
+      "experiment_id": "X-GNNT-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.128,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Persian Gulf, test 2019-2022, one-step-ahead monthly; also in Table 3. Units not stated (inputs min-max or standard scaled).",
+      "baseline_name": "CNN-LSTM",
+      "baseline_value": 0.162,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 30,
+      "page_printed": 30,
+      "quote": "lower root mean square error (RMSE = 0.128 vs. 0.162)"
+    },
+    {
+      "experiment_id": "X-CNNLSTM-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "R2",
+      "metric_raw": "R²",
+      "metric_kind": "ERROR",
+      "value": 0.755,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Persian Gulf, test 2019-2022, one-step-ahead monthly; also in Table 3. Units not stated (inputs min-max or standard scaled).",
+      "baseline_name": "GNN-T",
+      "baseline_value": 0.903,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 30,
+      "page_printed": 30,
+      "quote": "higher coefficient of determination (R² = 0.903 vs. 0.755), lower mean"
+    },
+    {
+      "experiment_id": "X-CNNLSTM-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.116,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Persian Gulf, test 2019-2022, one-step-ahead monthly; also in Table 3. Units not stated (inputs min-max or standard scaled).",
+      "baseline_name": "GNN-T",
+      "baseline_value": 0.097,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 30,
+      "page_printed": 30,
+      "quote": "lower mean absolute error (MAE = 0.097 vs. 0.116)"
+    },
+    {
+      "experiment_id": "X-CNNLSTM-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.162,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Persian Gulf, test 2019-2022, one-step-ahead monthly; also in Table 3. Units not stated (inputs min-max or standard scaled).",
+      "baseline_name": "GNN-T",
+      "baseline_value": 0.128,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 30,
+      "page_printed": 30,
+      "quote": "lower root mean square error (RMSE = 0.128 vs. 0.162)"
+    },
+    {
+      "experiment_id": "X-GNNT-13VAR-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "R2",
+      "metric_raw": "R²",
+      "metric_kind": "ERROR",
+      "value": 0.882,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Persian Gulf, 13 selected variables, test split",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 45,
+      "page_printed": 45,
+      "quote": "achieved a test R² of 0.882"
+    },
+    {
+      "experiment_id": "X-GNNT-13VAR-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.102,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Persian Gulf, 13 selected variables, test split",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 45,
+      "page_printed": 45,
+      "quote": "MAE of 0.102"
+    },
+    {
+      "experiment_id": "X-GNNT-13VAR-PG",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.135,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Persian Gulf, 13 selected variables, test split",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 45,
+      "page_printed": 45,
+      "quote": "RMSE of 0.135"
+    },
+    {
+      "experiment_id": "X-GNNT-GOM",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "R2",
+      "metric_raw": "R²",
+      "metric_kind": "ERROR",
+      "value": 0.906,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Gulf of Mexico, April 2020 maps; test metrics",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 43,
+      "page_printed": 43,
+      "quote": "(R² = 0.906"
+    },
+    {
+      "experiment_id": "X-GNNT-GOM",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.095,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Gulf of Mexico, April 2020 maps; test metrics",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 43,
+      "page_printed": 43,
+      "quote": "MAE = 0.095"
+    },
+    {
+      "experiment_id": "X-GNNT-GOM",
+      "dataset_id": "D-MODIS-AQUA",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.121,
+      "unit": "",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Gulf of Mexico, April 2020 maps; test metrics",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 43,
+      "page_printed": 43,
+      "quote": "RMSE = 0.121"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "page_pdf": 51,
+      "page_printed": 51,
+      "quote": "satellite-derived data (e.g., MODIS/Aqua Chl-a products) as ground truth"
+    },
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 51,
+      "page_printed": 51,
+      "quote": "The absence of in-situ calibration data exacerbates these issues"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 51,
+      "page_printed": 51,
+      "quote": "the resolution mismatch between datasets can lead to excessive smoothing of"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 51,
+      "page_printed": 51,
+      "quote": "Future research should integrate field"
+    },
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 52,
+      "page_printed": 52,
+      "quote": "explore physics-constrained hybrids to enhance mechanistic interpretability,"
+    },
+    {
+      "theme": "COMPUTE",
+      "page_pdf": 48,
+      "page_printed": 48,
+      "quote": "Limitations include higher computational demands and reliance on data"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 48,
+      "page_printed": 48,
+      "quote": "potentially underperforming in sparsely observed regions"
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "experiments[X-GNNT-PG].training.optimizer",
+      "values": [
+        "AdamW",
+        "Adam"
+      ],
+      "sources": [
+        {
+          "page_pdf": 23,
+          "quote": "optimizer [Adam, AdamW] AdamW"
+        },
+        {
+          "page_pdf": 25,
+          "quote": "Training was optimized using the Adam algorithm with"
+        }
+      ],
+      "chosen": "AdamW",
+      "reason": "Table 2 lists the final tuned configuration per model; the text on p25 names Adam without the variant."
+    },
+    {
+      "field": "experiments[X-GNNT-PG].training.epochs",
+      "values": [
+        200,
+        68
+      ],
+      "sources": [
+        {
+          "page_pdf": 23,
+          "quote": "num_epochs [100, 200, 300] 200"
+        },
+        {
+          "page_pdf": 33,
+          "quote": "The early stopping method for GNN-T is stopped at 68, and CNN-"
+        }
+      ],
+      "chosen": 200,
+      "reason": "200 is the configured maximum from grid search; 68 is where early stopping triggered (also p33 says GNN-T converges in 15 epochs)."
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "experiments[X-GNNT-PG].training.loss",
+      "searched": [
+        "2.2",
+        "2.3",
+        "2.4",
+        "2.7",
+        "3.1-3.2 (training/validation loss curves only in Fig. 7; composite F is an evaluation objective)"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-PG].training.hardware",
+      "searched": [
+        "2.7",
+        "3",
+        "4",
+        "full text for GPU/CPU/NVIDIA"
+      ]
+    },
+    {
+      "field": "experiments[X-CNNLSTM-PG].training.loss",
+      "searched": [
+        "Table 2",
+        "2.3.2",
+        "2.7.2",
+        "2.7.3",
+        "3.1"
+      ]
+    },
+    {
+      "field": "experiments[X-CNNLSTM-PG].training.batch_size",
+      "searched": [
+        "Table 2",
+        "2.3.2",
+        "2.7.2",
+        "2.7.3",
+        "3.1"
+      ]
+    },
+    {
+      "field": "experiments[X-CNNLSTM-PG].training.epochs",
+      "searched": [
+        "Table 2",
+        "2.3.2",
+        "2.7.2",
+        "2.7.3",
+        "3.1"
+      ]
+    },
+    {
+      "field": "experiments[X-CNNLSTM-PG].training.hardware",
+      "searched": [
+        "Table 2",
+        "2.3.2",
+        "2.7.2",
+        "2.7.3",
+        "3.1"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-13VAR-PG].training.loss",
+      "searched": [
+        "3.5",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-13VAR-PG].training.optimizer",
+      "searched": [
+        "3.5",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-13VAR-PG].training.learning_rate",
+      "searched": [
+        "3.5",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-13VAR-PG].training.batch_size",
+      "searched": [
+        "3.5",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-13VAR-PG].training.epochs",
+      "searched": [
+        "3.5",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-13VAR-PG].training.hardware",
+      "searched": [
+        "3.5",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-GOM].training.loss",
+      "searched": [
+        "3.4",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-GOM].training.optimizer",
+      "searched": [
+        "3.4",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-GOM].training.learning_rate",
+      "searched": [
+        "3.4",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-GOM].training.batch_size",
+      "searched": [
+        "3.4",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-GOM].training.epochs",
+      "searched": [
+        "3.4",
+        "Table 2",
+        "2.7"
+      ]
+    },
+    {
+      "field": "experiments[X-GNNT-GOM].training.hardware",
+      "searched": [
+        "3.4",
+        "Table 2",
+        "2.7"
+      ]
+    }
+  ]
+}

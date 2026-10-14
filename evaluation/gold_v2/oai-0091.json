@@ -1,0 +1,355 @@
+{
+ "source": {
+  "source_id": "oai-0091-fmars-2025-1613061",
+  "file": ".data/golden-pdfs/oai-0091-fmars-2025-1613061.pdf",
+  "sha256_prefix": "68b32d70ba677a595e5b87ba",
+  "pdf_pages": 18,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5 subagent",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-ZIOLKOWSKI2025-SEAMOUNT-UNET",
+  "doi": "10.3389/fmars.2025.1613061",
+  "title": "Detecting small seamounts in multibeam data using convolutional neural networks",
+  "year": 2025,
+  "venue": "Frontiers in Marine Science",
+  "ocean_domains": [
+   "seafloor bathymetry",
+   "marine geology"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-UNET",
+   "canonical_name": "U-Net",
+   "family": "CNN_UNET",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "This study introduces a deep-learning-based"
+    },
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "The UNet architecture is trained using the input"
+    }
+   ]
+  },
+  {
+   "method_id": "M-VGG16",
+   "canonical_name": "VGG16 feature extraction + clustering",
+   "family": "OTHER",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "The analysis highlights VGG16 as the optimal model for"
+    }
+   ]
+  },
+  {
+   "method_id": "M-RESNET50",
+   "canonical_name": "ResNet50 feature extraction + clustering",
+   "family": "OTHER",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "ResNet50: ResNet50 performed well in scenarios requiring"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-MSM75",
+   "canonical_name": "MSM75 multibeam bathymetry (Reykjanes Ridge)",
+   "variables": [
+    "bathymetry"
+   ],
+   "spatial_resolution": "15 m",
+   "temporal_resolution": null,
+   "region": "Reykjanes Ridge",
+   "period_start": "2018",
+   "period_end": "2018",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "The MSM75 cruise, conducted in 2018,"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "MSM75 MSM75 ∼10,000 15 m 102 –2,044"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-MSM88",
+   "canonical_name": "MSM88 multibeam bathymetry (Atlantic)",
+   "variables": [
+    "bathymetry"
+   ],
+   "spatial_resolution": "100 m",
+   "temporal_resolution": null,
+   "region": "Atlantic, Cabo Verde EEZ to Guadeloupe, Dominica, Martinique EEZs",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "Complementing this, the MSM88 cruise dataset, collected using"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "MSM88 MSM88 ∼153,000 100 m 1,500 –6,000"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-SO305",
+   "canonical_name": "SO305/2 multibeam bathymetry (Indian Ocean)",
+   "variables": [
+    "bathymetry"
+   ],
+   "spatial_resolution": "100 m",
+   "temporal_resolution": null,
+   "region": "Indian Ocean, Central Indian Ridge",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "The data shown in Figure 3 were acquired during SO305-2, a"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "SO305/2 SO305/2 ∼12,000 100 m 492 –5,664"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-UNET-SEG",
+   "task": "CLASSIFICATION_SEGMENTATION",
+   "method_id": "M-UNET",
+   "dataset_ids": [
+    "D-MSM75",
+    "D-MSM88"
+   ],
+   "target_variable": "seamount binary mask",
+   "training": {
+    "loss": {
+     "value": "Dice loss",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "To optimize model training, the Dice loss function is employed,"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 8,
+     "page_printed": 8,
+     "quote": "We use the Adam optimizer (with the learning rate"
+    },
+    "learning_rate": {
+     "value": 0.0001,
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "dropout rate 0.1, learning rate 0.0001,"
+    },
+    "batch_size": {
+     "value": 64,
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "batch size 64."
+    }
+   }
+  },
+  {
+   "experiment_id": "X-FILTER-CLUSTER",
+   "task": "OTHER",
+   "method_id": "M-VGG16",
+   "dataset_ids": [
+    "D-SO305"
+   ],
+   "target_variable": "seamount candidate image clusters",
+   "training": {}
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-UNET-SEG",
+   "dataset_id": "D-MSM75",
+   "metric": "IOU",
+   "value": 0.7514,
+   "unit": "",
+   "split": "UNSPECIFIED",
+   "config": "final model, best epoch 37 (trained on pooled MSM75+MSM88)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "attained a Dice Coef ﬁcient of 0.8274 and a Mean IoU of 0.7514"
+  },
+  {
+   "experiment_id": "X-UNET-SEG",
+   "dataset_id": "D-MSM75",
+   "metric": "OTHER",
+   "value": 0.8274,
+   "unit": "",
+   "split": "UNSPECIFIED",
+   "config": "Dice coefficient, final model, best epoch 37 (pooled MSM75+MSM88)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "attained a Dice Coef ﬁcient of 0.8274 and a Mean IoU of 0.7514"
+  },
+  {
+   "experiment_id": "X-UNET-SEG",
+   "dataset_id": "D-MSM75",
+   "metric": "IOU",
+   "value": 0.722,
+   "unit": "",
+   "split": "VALIDATION",
+   "config": "grid search best: 32 filters, kernel 5, dropout 0.1, lr 0.0001, batch 64 (val mean IoU)",
+   "baseline_name": "32 filters, kernel 3, dropout 0.5, lr 0.0001, batch 64",
+   "baseline_value": 0.584,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "32 5 0.1 0.0001 64 0.225 0.721 0.722"
+  },
+  {
+   "experiment_id": "X-UNET-SEG",
+   "dataset_id": "D-MSM75",
+   "metric": "IOU",
+   "value": 0.584,
+   "unit": "",
+   "split": "VALIDATION",
+   "config": "grid search row: 32 filters, kernel 3, dropout 0.5, lr 0.0001, batch 64 (val mean IoU)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "32 3 0.5 0.0001 64 0.403 0.584 0.584"
+  },
+  {
+   "experiment_id": "X-FILTER-CLUSTER",
+   "dataset_id": "D-SO305",
+   "metric": "OTHER",
+   "value": 100.0,
+   "unit": "%",
+   "split": "UNSPECIFIED",
+   "config": "VGG16, 10 clusters, % match with manual labels",
+   "baseline_name": "ResNet50 (10 clusters)",
+   "baseline_value": 67.72,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "VGG16 16816 5834 34.69 Uniformly distributed 127 127 100.00 10"
+  },
+  {
+   "experiment_id": "X-FILTER-CLUSTER",
+   "dataset_id": "D-SO305",
+   "metric": "OTHER",
+   "value": 67.72,
+   "unit": "%",
+   "split": "UNSPECIFIED",
+   "config": "ResNet50, 10 clusters, % match with manual labels",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "ResNet50 16816 8151 48.47 Uniformly distributed 86 127 67.72 10"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "a limitation remains its sensitivity to out-of-domain (OOD) data"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "subjectivity and bias into the ground truth masks."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "limitation of the U-Net model is its occasional inability to"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "should therefore explore strategies such as domain adaptation,"
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-UNET-SEG].training.epochs",
+   "searched": [
+    "section 4.3",
+    "section 4.4",
+    "Table 3"
+   ]
+  },
+  {
+   "field": "experiments[X-UNET-SEG].training.hardware",
+   "searched": [
+    "section 4.3",
+    "section 4.4"
+   ]
+  },
+  {
+   "field": "experiments[X-FILTER-CLUSTER].training",
+   "searched": [
+    "section 3.1",
+    "section 4.1",
+    "Table 1"
+   ]
+  }
+ ]
+}

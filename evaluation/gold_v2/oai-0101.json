@@ -1,0 +1,312 @@
+{
+ "source": {
+  "source_id": "oai-0101-arxiv-2512.04452v1",
+  "file": ".data/golden-pdfs/oai-0101-arxiv-2512.04452v1.pdf",
+  "sha256_prefix": "cb4cd3dba2e4c903a9343eba",
+  "pdf_pages": 48,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5 subagent",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-NORI",
+  "doi": "",
+  "title": "NORi: An ML-Augmented Ocean Boundary Layer Parameterization",
+  "year": 2025,
+  "venue": "manuscript submitted to Journal of Advances in Modeling Earth Systems (JAMES); arXiv:2512.04452v1",
+  "ocean_domains": [
+   "ocean boundary layer turbulence",
+   "mixed layer"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-NORI",
+   "canonical_name": "NORi (neural ODE Richardson number closure)",
+   "family": "HYBRID_PHYSICS_ML",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "then augment it with a neural network to address its limitations"
+    }
+   ]
+  },
+  {
+   "method_id": "M-BASE-CLOSURE",
+   "canonical_name": "Ri-based eddy-diffusivity base closure",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": true,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "the base closure represents all subgrid-scale fluxes as down-gradient fluxes"
+    }
+   ]
+  },
+  {
+   "method_id": "M-KEPS",
+   "canonical_name": "k-epsilon closure",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 20,
+     "page_printed": 20,
+     "quote": "is a second-order turbulence model that solves two additional"
+    }
+   ]
+  },
+  {
+   "method_id": "M-CATKE",
+   "canonical_name": "CATKE",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 21,
+     "page_printed": 21,
+     "quote": "a recently-developed 1.5-order closure that estimates turbulent fluxes"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-LES",
+   "canonical_name": "Large-eddy simulation suite (area-averaged profiles)",
+   "variables": [
+    "u",
+    "v",
+    "T",
+    "S"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": null,
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "predicts the evolution of the LES area-averaged profiles of velocity"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-DOUBLEGYRE",
+   "canonical_name": "Idealized double-gyre ocean simulation (Oceananigans.jl)",
+   "variables": [
+    "temperature",
+    "salinity",
+    "buoyancy",
+    "barotropic streamfunction"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "idealized double gyre domain",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "The double-gyre has dimensions of"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-NORI-COLUMN",
+   "task": "PARAMETERIZATION",
+   "method_id": "M-NORI",
+   "dataset_ids": [
+    "D-LES"
+   ],
+   "target_variable": "temperature and salinity profiles (boundary layer entrainment)",
+   "training": {
+    "loss": {
+     "value": "same form as the loss used to train the base closure",
+     "page_pdf": 15,
+     "page_printed": 15,
+     "quote": "has the same form as the one used to train the base closure",
+     "extra_evidence": [
+      {
+       "claim": "vertical derivatives of tracers included in the loss",
+       "page_pdf": 15,
+       "page_printed": 15,
+       "quote": "including vertical derivatives of tracers during optimization promotes smooth"
+      },
+      {
+       "claim": "momentum terms excluded from the loss",
+       "page_pdf": 15,
+       "page_printed": 15,
+       "quote": "Including the momentum terms in the loss function"
+      }
+     ]
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 16,
+     "page_printed": 16,
+     "quote": "are updated using the Adam optimizer"
+    },
+    "batch_size": {
+     "value": "full-batch (all 62 training simulations per step)",
+     "page_pdf": 16,
+     "page_printed": 16,
+     "quote": "where the loss is computed across all training simulations for each gradient descent step"
+    },
+    "epochs": {
+     "value": 2000,
+     "page_pdf": 16,
+     "page_printed": 16,
+     "quote": "In each stage, the NODEs are trained for 2000 epochs"
+    },
+    "hardware": {
+     "value": "single CPU, about 90 hours wall time",
+     "page_pdf": 16,
+     "page_printed": 16,
+     "quote": "General training takes approximately 90 hours wall time on a single CPU"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-NORI-DOUBLEGYRE",
+   "task": "PARAMETERIZATION",
+   "method_id": "M-NORI",
+   "dataset_ids": [
+    "D-DOUBLEGYRE"
+   ],
+   "target_variable": "zonally-averaged temperature, mixed layer depth",
+   "training": {}
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-NORI-COLUMN",
+   "dataset_id": "D-LES",
+   "metric": "OTHER",
+   "value": 1,
+   "unit": "hour",
+   "split": "UNSPECIFIED",
+   "config": "Maximum time step with accurate T and S (time step dependence test)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 22,
+   "page_printed": 22,
+   "quote": "NORi can be used with time steps up to 1 hour without loss of accuracy"
+  },
+  {
+   "experiment_id": "X-NORI-COLUMN",
+   "dataset_id": "D-LES",
+   "metric": "OTHER",
+   "value": 25,
+   "unit": "m",
+   "split": "UNSPECIFIED",
+   "config": "Mixed layer depth bias vs LES after 60 days, single column",
+   "baseline_name": "k-epsilon",
+   "baseline_value": 25,
+   "source_table": null,
+   "page_pdf": 21,
+   "page_printed": 21,
+   "quote": "where the biases are around 25 m in each direction"
+  },
+  {
+   "experiment_id": "X-NORI-DOUBLEGYRE",
+   "dataset_id": "D-DOUBLEGYRE",
+   "metric": "OTHER",
+   "value": 15,
+   "unit": "%",
+   "split": "UNSPECIFIED",
+   "config": "Per-time-step cost relative to k-epsilon (NORi slower), naive Oceananigans.jl implementation",
+   "baseline_name": "k-epsilon",
+   "baseline_value": 0,
+   "source_table": null,
+   "page_pdf": 24,
+   "page_printed": 24,
+   "quote": "is around 15% slower than"
+  },
+  {
+   "experiment_id": "X-NORI-DOUBLEGYRE",
+   "dataset_id": "D-DOUBLEGYRE",
+   "metric": "OTHER",
+   "value": 100,
+   "unit": "years",
+   "split": "UNSPECIFIED",
+   "config": "Stable integration length without crash",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "NORi is stable for the full 100 years of simulation"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 27,
+   "page_printed": 27,
+   "quote": "this also means that NORi cannot capture deep convection dynamics"
+  },
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 27,
+   "page_printed": 27,
+   "quote": "we have made sacrifices in the scalability of the calibration process because of the serial-in-time nature of neural ODEs"
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 28,
+   "page_printed": 28,
+   "quote": "we have only focused on the deepening phases of the mixed layer"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 28,
+   "page_printed": 28,
+   "quote": "In the future, we aim to extend NORi to include restratification processes"
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-NORI-COLUMN].training.learning_rate",
+   "searched": [
+    "section 5.3 training (p16)",
+    "section 6.1",
+    "Figure 4 caption"
+   ]
+  },
+  {
+   "field": "datasets[D-LES].spatial_resolution",
+   "searched": [
+    "sections 3, 4, 6 (main body)"
+   ]
+  },
+  {
+   "field": "experiments[X-NORI-DOUBLEGYRE].training",
+   "searched": [
+    "section 7",
+    "section 8"
+   ]
+  }
+ ]
+}

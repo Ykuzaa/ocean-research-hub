@@ -1,0 +1,573 @@
+{
+ "source": {
+  "source_id": "xihe-2024",
+  "file": ".data/golden-pdfs/xihe-2024.pdf",
+  "sha256_prefix": "a7d1c25ed007983fb496ab17",
+  "pdf_pages": 18,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-XIHE",
+  "doi": "",
+  "title": "XiHe: A Data-Driven Model for Global Ocean Eddy-Resolving Forecasting",
+  "year": 2024,
+  "venue": "",
+  "ocean_domains": [
+   "ocean circulation",
+   "mesoscale eddies",
+   "temperature and salinity"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-XIHE",
+   "canonical_name": "XiHe",
+   "family": "TRANSFORMER",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "which adopts a hierarchical trans-"
+    }
+   ]
+  },
+  {
+   "method_id": "M-PSY4",
+   "canonical_name": "PSY4 (Mercator numerical GOFS)",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "We compare XiHe with the four state-of-the-art global"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-GLORYS12",
+   "canonical_name": "GLORYS12 reanalysis",
+   "variables": [
+    "temperature",
+    "salinity",
+    "zonal current",
+    "meridional current",
+    "SSH"
+   ],
+   "spatial_resolution": "1/12 deg",
+   "temporal_resolution": "1 day",
+   "region": "global",
+   "period_start": "1993-01",
+   "period_end": "2020-12",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "The GLORYS12 dataset we utilized spans from Jan."
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-ERA5",
+   "canonical_name": "ERA5 10m wind",
+   "variables": [
+    "U10",
+    "V10"
+   ],
+   "spatial_resolution": "0.25 deg (interpolated to 1/12 deg)",
+   "temporal_resolution": null,
+   "region": "global",
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "we incorporate the 10m u-component of wind"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-OSTIA",
+   "canonical_name": "OSTIA satellite SST",
+   "variables": [
+    "SST"
+   ],
+   "spatial_resolution": "1/20 deg (interpolated to 1/12 deg)",
+   "temporal_resolution": null,
+   "region": "global",
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "we introduce the satellite SST data from the Operational Sea Surface"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-IVTT4",
+   "canonical_name": "GODAE OceanView IV-TT Class 4 observations (Argo, drifting buoys, altimeters)",
+   "variables": [
+    "temperature",
+    "salinity",
+    "currents",
+    "SLA"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "global",
+   "period_start": "2019-01",
+   "period_end": "2020-12",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "XiHe is primarily evaluated based on the GODAE Ocean-"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-MOORED",
+   "canonical_name": "Global Tropical Moored Buoy Array (TAO, RAMA, PIRATA)",
+   "variables": [
+    "temperature",
+    "salinity"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "tropical Pacific, Indian, Atlantic",
+   "period_start": "2019-01",
+   "period_end": "2020-12",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 8,
+     "page_printed": 8,
+     "quote": "which contains the TAO, RAMA, and PIRATA projects."
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-CMEMS-L4",
+   "canonical_name": "CMEMS L4 sea level altimetry (SLA, geostrophic currents)",
+   "variables": [
+    "SLA",
+    "geostrophic currents"
+   ],
+   "spatial_resolution": "1/4 deg",
+   "temporal_resolution": "daily",
+   "region": "global",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "The CMEMS provides global ocean gridded"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-XIHE-IVTT",
+   "task": "FORECASTING",
+   "method_id": "M-XIHE",
+   "dataset_ids": [
+    "D-GLORYS12",
+    "D-ERA5",
+    "D-OSTIA",
+    "D-IVTT4"
+   ],
+   "target_variable": "temperature, salinity, 15m currents, SLA",
+   "training": {
+    "loss": {
+     "value": "MSE",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "The loss function used is the Mean Square Error (MSE) loss."
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "We use the AdamW [42], [43] optimizer with"
+    },
+    "learning_rate": {
+     "value": 5e-05,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "and a learning rate 5e−5."
+    },
+    "batch_size": {
+     "value": 1,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "using the batch size of 1"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Each model is trained for 50 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-XIHE-LONGLEAD",
+   "task": "FORECASTING",
+   "method_id": "M-XIHE",
+   "dataset_ids": [
+    "D-GLORYS12",
+    "D-ERA5",
+    "D-OSTIA",
+    "D-IVTT4"
+   ],
+   "target_variable": "15m-depth zonal and meridional currents (uo, vo), 20/30/60-day lead",
+   "training": {
+    "loss": {
+     "value": "MSE",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "The loss function used is the Mean Square Error (MSE) loss."
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "We use the AdamW [42], [43] optimizer with"
+    },
+    "learning_rate": {
+     "value": 5e-05,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "and a learning rate 5e−5."
+    },
+    "batch_size": {
+     "value": 1,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "using the batch size of 1"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Each model is trained for 50 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-XIHE-MOORED",
+   "task": "FORECASTING",
+   "method_id": "M-XIHE",
+   "dataset_ids": [
+    "D-GLORYS12",
+    "D-ERA5",
+    "D-OSTIA",
+    "D-MOORED"
+   ],
+   "target_variable": "temperature and salinity vs moored buoys",
+   "training": {
+    "loss": {
+     "value": "MSE",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "The loss function used is the Mean Square Error (MSE) loss."
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "We use the AdamW [42], [43] optimizer with"
+    },
+    "learning_rate": {
+     "value": 5e-05,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "and a learning rate 5e−5."
+    },
+    "batch_size": {
+     "value": 1,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "using the batch size of 1"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Each model is trained for 50 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-XIHE-GEOSTROPHIC",
+   "task": "FORECASTING",
+   "method_id": "M-XIHE",
+   "dataset_ids": [
+    "D-GLORYS12",
+    "D-ERA5",
+    "D-OSTIA",
+    "D-CMEMS-L4"
+   ],
+   "target_variable": "surface currents vs geostrophic currents",
+   "training": {
+    "loss": {
+     "value": "MSE",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "The loss function used is the Mean Square Error (MSE) loss."
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "We use the AdamW [42], [43] optimizer with"
+    },
+    "learning_rate": {
+     "value": 5e-05,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "and a learning rate 5e−5."
+    },
+    "batch_size": {
+     "value": 1,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "using the batch size of 1"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Each model is trained for 50 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-XIHE-EDDY",
+   "task": "DETECTION",
+   "method_id": "M-XIHE",
+   "dataset_ids": [
+    "D-GLORYS12",
+    "D-ERA5",
+    "D-OSTIA",
+    "D-CMEMS-L4"
+   ],
+   "target_variable": "mesoscale eddies detected from forecast SLA",
+   "training": {
+    "loss": {
+     "value": "MSE",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "The loss function used is the Mean Square Error (MSE) loss."
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "We use the AdamW [42], [43] optimizer with"
+    },
+    "learning_rate": {
+     "value": 5e-05,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "and a learning rate 5e−5."
+    },
+    "batch_size": {
+     "value": 1,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "using the batch size of 1"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Each model is trained for 50 epochs"
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-XIHE-LONGLEAD",
+   "dataset_id": "D-IVTT4",
+   "metric": "RMSE",
+   "value": 0.2165,
+   "unit": "m/s",
+   "split": "TEST",
+   "config": "uo 15m, 60-day lead; baseline PSY4 10-day",
+   "baseline_name": "PSY4 (10-day)",
+   "baseline_value": 0.2214,
+   "source_table": null,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "0.2038, 0.2093, and 0.2165 respectively, which is even smaller than the PSY4’s 10-day RMSE of 0.2214."
+  },
+  {
+   "experiment_id": "X-XIHE-LONGLEAD",
+   "dataset_id": "D-IVTT4",
+   "metric": "RMSE",
+   "value": 0.2062,
+   "unit": "m/s",
+   "split": "TEST",
+   "config": "vo 15m, 60-day lead; baseline PSY4 10-day",
+   "baseline_name": "PSY4 (10-day)",
+   "baseline_value": 0.2149,
+   "source_table": null,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "0.1955, 0.2008, and 0.2062 respectively, which is smaller than the 10-day RMSE of 0.2149 for PSY4."
+  },
+  {
+   "experiment_id": "X-XIHE-IVTT",
+   "dataset_id": "D-IVTT4",
+   "metric": "ANOMALY_CORRELATION",
+   "value": 0.8743,
+   "unit": "",
+   "split": "TEST",
+   "config": "temperature profile ACC, 20-day lead",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "are 0.8743 and 0.6420"
+  },
+  {
+   "experiment_id": "X-XIHE-IVTT",
+   "dataset_id": "D-IVTT4",
+   "metric": "ANOMALY_CORRELATION",
+   "value": 0.642,
+   "unit": "",
+   "split": "TEST",
+   "config": "salinity profile ACC, 20-day lead",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "are 0.8743 and 0.6420"
+  },
+  {
+   "experiment_id": "X-XIHE-MOORED",
+   "dataset_id": "D-MOORED",
+   "metric": "RMSE",
+   "value": 1.094,
+   "unit": "degC",
+   "split": "TEST",
+   "config": "temperature, Atlantic, 1-day lead",
+   "baseline_name": "GLORYS12 reanalysis",
+   "baseline_value": 0.81,
+   "source_table": null,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "average RMSE values of XiHe with a lead time of 1 day are 1.094 oC, 0.889 oC,"
+  },
+  {
+   "experiment_id": "X-XIHE-GEOSTROPHIC",
+   "dataset_id": "D-CMEMS-L4",
+   "metric": "RMSE",
+   "value": 0.1,
+   "unit": "m/s",
+   "split": "TEST",
+   "config": "global mean zonal geostrophic current RMSE, 5-day lead",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "(from Jan. 2019 to Dec. 2020) are 0.10 m/s and 0.11 m/s, respectively."
+  },
+  {
+   "experiment_id": "X-XIHE-GEOSTROPHIC",
+   "dataset_id": "D-CMEMS-L4",
+   "metric": "RMSE",
+   "value": 0.09,
+   "unit": "m/s",
+   "split": "TEST",
+   "config": "ug Pacific mean RMSE, 5-day lead",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "Mean RMSE 0.10 0.09 0.09"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "DATA",
+   "page_pdf": 14,
+   "page_printed": 14,
+   "quote": "quality improvement of the reanalysis data in the future."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 17,
+   "page_printed": 17,
+   "quote": "the initial fields of the data-driven models still mainly come from the"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 17,
+   "page_printed": 17,
+   "quote": "is a worthwhile endeavour."
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "At the same time, there are some regions where the RMSEs for"
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[*].training.hardware",
+   "searched": [
+    "section 4.6",
+    "section 5",
+    "abstract",
+    "whole text (GPU type/count for training not given)"
+   ]
+  },
+  {
+   "field": "paper.doi",
+   "searched": [
+    "page 1",
+    "whole text"
+   ]
+  },
+  {
+   "field": "paper.venue",
+   "searched": [
+    "page 1",
+    "whole text"
+   ]
+  }
+ ]
+}

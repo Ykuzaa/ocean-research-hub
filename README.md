@@ -7,6 +7,18 @@ status, provenance, and source evidence. Missing values remain `NOT_REPORTED`, d
 
 The scientific and multi-agent operating contract is in [`AGENTS.md`](AGENTS.md).
 
+## Corpus v2: every value with the sentence it was read from
+
+The evidence-gated corpus lives in `evaluation/gold_v2/` — 43 records, 137 experiments,
+434 measured results, 1,450 claims, each carrying a verbatim quote and its PDF page, all
+re-located on every commit by `corpus_v2.gate`. Browse it at `/corpus`, audit it at
+`/revue`. The pipeline, the API, the states and the measured ceilings are in
+[`docs/corpus-v2.md`](docs/corpus-v2.md); the extraction contract is in
+[`evaluation/gold_v2/SCHEMA.md`](evaluation/gold_v2/SCHEMA.md).
+
+Sourced is not audited: the gate proves the sentence exists, a person decides whether the
+reading is right.
+
 ## Current extracted-paper collection
 
 The staging collection is separate from the original canonical `PaperRecord`

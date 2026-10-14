@@ -1,0 +1,1360 @@
+{
+ "source": {
+  "source_id": "S-OCEANGYM",
+  "file": ".data/golden-pdfs/oceangym-a-benchmark-environment-for-underwater-embodied-age.pdf",
+  "sha256_prefix": "74228e97c9cfdcf08dfa7d27",
+  "pdf_pages": 22,
+  "printed_page_offset": 0,
+  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-OCEANGYM",
+  "doi": null,
+  "title": "OceanGym: Evaluating Language-Grounded Embodied Agents in Underwater Environments",
+  "year": 2026,
+  "venue": "arXiv:2509.26536v3 [cs.CL]",
+  "ocean_domains": [
+   "llm-agents",
+   "benchmarks"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-GLM-4-5V",
+   "canonical_name": "GLM-4.5V",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-GPT-4O-MINI",
+   "canonical_name": "GPT-4o-mini",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-GEMINI-2-5-FLASH",
+   "canonical_name": "Gemini-2.5-Flash",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-QWEN2-5-VL-7B",
+   "canonical_name": "Qwen2.5-VL-7B",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-MINICPM-V-4-5",
+   "canonical_name": "MiniCPM-V-4.5",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-GPT-5-2",
+   "canonical_name": "GPT-5.2",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  },
+  {
+   "method_id": "M-GEMINI-3-PRO",
+   "canonical_name": "Gemini-3-Pro",
+   "family": "TRANSFORMER",
+   "family_raw": "multimodal large language model (MLLM)",
+   "architecture_note": "Architecture not described in the paper; classed TRANSFORMER as an evaluated LLM per task instructions. Used as a frozen agent backbone, not trained.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "Multimodal Large Language Models (MLLMs)"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "canonical_name": "OceanGym perception tasks",
+   "variables": [
+    "RGB images",
+    "sonar images"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": null,
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "There are a total of 85 scenes"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "canonical_name": "OceanGym decision tasks",
+   "variables": [
+    "optical images",
+    "sonar images"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": null,
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "we design eight representative task scenar-"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-PERC-GLM-4-5V",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-GLM-4-5V",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-PERC-GPT-4O-MINI",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-GPT-4O-MINI",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-PERC-GEMINI-2-5-FLASH",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-GEMINI-2-5-FLASH",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-PERC-QWEN2-5-VL-7B",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-QWEN2-5-VL-7B",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-PERC-MINICPM-V-4-5",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-MINICPM-V-4-5",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-PERC-GPT-5-2",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-GPT-5-2",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-PERC-GEMINI-3-PRO",
+   "task": "OTHER",
+   "task_raw": "underwater embodied perception: multi-view and context-based object identification from RGB and sonar images",
+   "method_id": "M-GEMINI-3-PRO",
+   "dataset_ids": [
+    "D-OCEANGYM-PERCEPTION"
+   ],
+   "target_variable": "object identification (exact-match answer)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-DEC-GLM-4-5V",
+   "task": "OTHER",
+   "task_raw": "underwater embodied decision-making: autonomous navigation/search/inspection/docking in continuous 3D with AUV",
+   "method_id": "M-GLM-4-5V",
+   "dataset_ids": [
+    "D-OCEANGYM-DECISION"
+   ],
+   "target_variable": "distance-based task score (0-100)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-DEC-GPT-4O-MINI",
+   "task": "OTHER",
+   "task_raw": "underwater embodied decision-making: autonomous navigation/search/inspection/docking in continuous 3D with AUV",
+   "method_id": "M-GPT-4O-MINI",
+   "dataset_ids": [
+    "D-OCEANGYM-DECISION"
+   ],
+   "target_variable": "distance-based task score (0-100)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-DEC-GEMINI-2-5-FLASH",
+   "task": "OTHER",
+   "task_raw": "underwater embodied decision-making: autonomous navigation/search/inspection/docking in continuous 3D with AUV",
+   "method_id": "M-GEMINI-2-5-FLASH",
+   "dataset_ids": [
+    "D-OCEANGYM-DECISION"
+   ],
+   "target_variable": "distance-based task score (0-100)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  },
+  {
+   "experiment_id": "X-DEC-QWEN2-5-VL-7B",
+   "task": "OTHER",
+   "task_raw": "underwater embodied decision-making: autonomous navigation/search/inspection/docking in continuous 3D with AUV",
+   "method_id": "M-QWEN2-5-VL-7B",
+   "dataset_ids": [
+    "D-OCEANGYM-DECISION"
+   ],
+   "target_variable": "distance-based task score (0-100)",
+   "training": {},
+   "note": "Frozen MLLM evaluated as agent backbone; no training reported."
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-PERC-GLM-4-5V",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 54.77,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "GLM-4.5V 52.7356.3646.67 63.33 54.77 36.36 30.91 20.00 33.33 30.15"
+  },
+  {
+   "experiment_id": "X-PERC-GLM-4-5V",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 30.15,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "GLM-4.5V 52.7356.3646.67 63.33 54.77 36.36 30.91 20.00 33.33 30.15"
+  },
+  {
+   "experiment_id": "X-PERC-GPT-4O-MINI",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 30.61,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "GPT-4o-mini 34.55 34.55 20.00 33.33 30.61 14.55 20.00 3.33 6.67 11.14"
+  },
+  {
+   "experiment_id": "X-PERC-GPT-4O-MINI",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 11.14,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "GPT-4o-mini 34.55 34.55 20.00 33.33 30.61 14.55 20.00 3.33 6.67 11.14"
+  },
+  {
+   "experiment_id": "X-PERC-GEMINI-2-5-FLASH",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 35.83,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Gemini-2.5-Flash 29.09 30.91 50.00 33.33 35.83 9.09 5.45 20.00 30.00 16.14"
+  },
+  {
+   "experiment_id": "X-PERC-GEMINI-2-5-FLASH",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 16.14,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Gemini-2.5-Flash 29.09 30.91 50.00 33.33 35.83 9.09 5.45 20.00 30.00 16.14"
+  },
+  {
+   "experiment_id": "X-PERC-QWEN2-5-VL-7B",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 57.12,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Qwen2.5-VL-7B58.1843.64 56.67 70.00 57.12 27.27 20.00 33.33 33.33 28.48"
+  },
+  {
+   "experiment_id": "X-PERC-QWEN2-5-VL-7B",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 28.48,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Qwen2.5-VL-7B58.1843.64 56.67 70.00 57.12 27.27 20.00 33.33 33.33 28.48"
+  },
+  {
+   "experiment_id": "X-PERC-MINICPM-V-4-5",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 39.09,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Minicpm-4.5 52.73 43.64 36.67 23.33 39.09 29.09 23.6443.3313.33 27.35"
+  },
+  {
+   "experiment_id": "X-PERC-MINICPM-V-4-5",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 27.35,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Minicpm-4.5 52.73 43.64 36.67 23.33 39.09 29.09 23.6443.3313.33 27.35"
+  },
+  {
+   "experiment_id": "X-PERC-GPT-5-2",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 55.68,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "GPT-5.2 56.36 56.3636.6773.33 55.68 36.36 36.36 13.33 33.33 21.60"
+  },
+  {
+   "experiment_id": "X-PERC-GPT-5-2",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 21.6,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "GPT-5.2 56.36 56.3636.6773.33 55.68 36.36 36.36 13.33 33.33 21.60"
+  },
+  {
+   "experiment_id": "X-PERC-GEMINI-3-PRO",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 59.17,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water (high illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Gemini-3-Pro 45.45 54.55 66.6770.00 59.17 40.00 38.1836.67 36.67 37.88"
+  },
+  {
+   "experiment_id": "X-PERC-GEMINI-3-PRO",
+   "dataset_id": "D-OCEANGYM-PERCEPTION",
+   "metric": "ACCURACY",
+   "metric_raw": "accuracy (%), exact match",
+   "metric_kind": "SKILL",
+   "value": 37.88,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water (low illumination), average column; row quote lists vision/sonar columns then Avg for shallow then deep",
+   "baseline_name": "Human",
+   "baseline_value": 92.35,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "Gemini-3-Pro 45.45 54.55 66.6770.00 59.17 40.00 38.1836.67 36.67 37.88"
+  },
+  {
+   "experiment_id": "X-DEC-GLM-4-5V",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 16.1,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water, average over 8 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 16.1±15.6 18.4±19.9 14.4±16.1 11.8±13.7 100"
+  },
+  {
+   "experiment_id": "X-DEC-GLM-4-5V",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 11.5,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water, average over 4 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 69.6,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 11.5±7.3 14.8±13.9 6.4±8.8 6.4±8.4 69.6"
+  },
+  {
+   "experiment_id": "X-DEC-GPT-4O-MINI",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 18.4,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water, average over 8 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 16.1±15.6 18.4±19.9 14.4±16.1 11.8±13.7 100"
+  },
+  {
+   "experiment_id": "X-DEC-GPT-4O-MINI",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 14.8,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water, average over 4 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 69.6,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 11.5±7.3 14.8±13.9 6.4±8.8 6.4±8.4 69.6"
+  },
+  {
+   "experiment_id": "X-DEC-GEMINI-2-5-FLASH",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 14.4,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water, average over 8 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 16.1±15.6 18.4±19.9 14.4±16.1 11.8±13.7 100"
+  },
+  {
+   "experiment_id": "X-DEC-GEMINI-2-5-FLASH",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 6.4,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water, average over 4 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 69.6,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 11.5±7.3 14.8±13.9 6.4±8.8 6.4±8.4 69.6"
+  },
+  {
+   "experiment_id": "X-DEC-QWEN2-5-VL-7B",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 11.8,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "shallow water, average over 8 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 100.0,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 16.1±15.6 18.4±19.9 14.4±16.1 11.8±13.7 100"
+  },
+  {
+   "experiment_id": "X-DEC-QWEN2-5-VL-7B",
+   "dataset_id": "D-OCEANGYM-DECISION",
+   "metric": "OTHER",
+   "metric_raw": "distance-based score S_total (0-100), mean over runs",
+   "metric_kind": "SKILL",
+   "value": 6.4,
+   "unit": "score",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "deep water, average over 4 tasks; columns of the quoted row: GLM-4.5V, GPT-4o-mini, Gemini-2.5, Qwen2.5-VL-7B, Human",
+   "baseline_name": "Human",
+   "baseline_value": 69.6,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Average 11.5±7.3 14.8±13.9 6.4±8.8 6.4±8.4 69.6"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "The optical and sonar images still differ from those in the"
+  },
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "the environment is large"
+  },
+  {
+   "theme": "OTHER",
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "the memory methods employed in our"
+  }
+ ],
+ "conflicts": [],
+ "not_reported": [
+  {
+   "field": "experiments[X-PERC-GLM-4-5V].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GLM-4-5V].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GLM-4-5V].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GLM-4-5V].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GLM-4-5V].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GLM-4-5V].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-4O-MINI].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-4O-MINI].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-4O-MINI].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-4O-MINI].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-4O-MINI].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-4O-MINI].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-2-5-FLASH].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-2-5-FLASH].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-2-5-FLASH].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-2-5-FLASH].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-2-5-FLASH].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-2-5-FLASH].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-QWEN2-5-VL-7B].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-QWEN2-5-VL-7B].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-QWEN2-5-VL-7B].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-QWEN2-5-VL-7B].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-QWEN2-5-VL-7B].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-QWEN2-5-VL-7B].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-MINICPM-V-4-5].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-MINICPM-V-4-5].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-MINICPM-V-4-5].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-MINICPM-V-4-5].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-MINICPM-V-4-5].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-MINICPM-V-4-5].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-5-2].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-5-2].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-5-2].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-5-2].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-5-2].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GPT-5-2].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-3-PRO].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-3-PRO].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-3-PRO].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-3-PRO].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-3-PRO].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-PERC-GEMINI-3-PRO].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GLM-4-5V].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GLM-4-5V].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GLM-4-5V].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GLM-4-5V].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GLM-4-5V].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GLM-4-5V].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GPT-4O-MINI].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GPT-4O-MINI].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GPT-4O-MINI].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GPT-4O-MINI].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GPT-4O-MINI].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GPT-4O-MINI].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GEMINI-2-5-FLASH].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GEMINI-2-5-FLASH].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GEMINI-2-5-FLASH].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GEMINI-2-5-FLASH].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GEMINI-2-5-FLASH].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-GEMINI-2-5-FLASH].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-QWEN2-5-VL-7B].training.loss",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-QWEN2-5-VL-7B].training.optimizer",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-QWEN2-5-VL-7B].training.learning_rate",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-QWEN2-5-VL-7B].training.batch_size",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-QWEN2-5-VL-7B].training.epochs",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  },
+  {
+   "field": "experiments[X-DEC-QWEN2-5-VL-7B].training.hardware",
+   "searched": [
+    "Abstract",
+    "Section 2 (OceanGym)",
+    "Section 3 (Experiments)",
+    "Appendix (keyword search for GPU, NVIDIA, batch size, learning rate, epoch)"
+   ]
+  }
+ ]
+}

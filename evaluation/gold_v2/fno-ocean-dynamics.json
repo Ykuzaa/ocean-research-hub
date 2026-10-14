@@ -1,0 +1,619 @@
+{
+ "source": {
+  "source_id": "fno-ocean-dynamics",
+  "file": ".data/golden-pdfs/streamlining-ocean-dynamics-modeling-with-fourier-neural-ope.pdf",
+  "sha256_prefix": "558a62fa9b4aa9a769e5d9f3",
+  "pdf_pages": 15,
+  "printed_page_offset": 0,
+  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-FNO-OCEAN-DYNAMICS",
+  "doi": null,
+  "title": "Streamlining Ocean Dynamics Modeling with Fourier Neural Operators: A Multiobjective Hyperparameter and Architecture Optimization Approach",
+  "year": 2024,
+  "venue": "arXiv preprint 2404.05768 (cs.LG)",
+  "ocean_domains": [
+   "forecasting",
+   "neural-operators"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-FNO-OPT",
+   "canonical_name": "Fourier Neural Operator with DeepHyper-optimized hyperparameters",
+   "family": "FNO_NEURAL_OPERATOR",
+   "family_raw": "Fourier neural operators (FNOs)",
+   "architecture_note": "FNO built with the Nvidia Modulus package; hyperparameters and architecture chosen by multiobjective Bayesian optimization (DeepHyper).",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 1,
+     "quote": "The focus is on optimizing Fourier neural operators"
+    },
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "We construct the model with Fourier neural operators"
+    },
+    {
+     "field": "is_novel_in_paper",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "We use a FNO,Nθ, parameterized by learnable weights and biases"
+    }
+   ]
+  },
+  {
+   "method_id": "M-FNO-DEFAULT",
+   "canonical_name": "Fourier Neural Operator, Modulus default configuration",
+   "family": "FNO_NEURAL_OPERATOR",
+   "family_raw": "FNO with default hyperparameters preset in Modulus",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "We used the default hyperparameter configuration preset in Modulus as a baseline"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-SOMA-FNO",
+   "canonical_name": "SOMA idealized baroclinic wind-driven ocean simulations (100 runs, varying bolus diffusivity)",
+   "variables": [
+    "salinity",
+    "temperature",
+    "zonal velocity",
+    "meridional velocity"
+   ],
+   "spatial_resolution": "100 x 100 grid points",
+   "temporal_resolution": "daily, 30 time steps per simulation",
+   "region": "idealized circular basin (SOMA test case)",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "Simulating Ocean Mesoscale Activity (SOMA) test"
+    },
+    {
+     "field": "temporal_resolution",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "where 30 indicates 30 time steps (days)"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "spanning 100 grid points per direction"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "task": "FORECASTING",
+   "task_raw": "single time-step prediction of four prognostic variables (surrogate of idealized ocean model)",
+   "method_id": "M-FNO-DEFAULT",
+   "dataset_ids": [
+    "D-SOMA-FNO"
+   ],
+   "target_variable": "salinity, temperature, zonal and meridional velocity",
+   "training": {
+    "loss": {
+     "value": "MSE and negative ACC",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "The loss function contains two terms: the standard MSE loss and the negative ACC.",
+     "note": "This experiment compares pure MSE loss against MSE plus negative ACC; the latter is stored. Weighting factor alpha is a hyperparameter (Section 3.1)."
+    },
+    "epochs": {
+     "value": 100,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "we trained models using the default hyperparameters provided by Modulus for 100 epochs"
+    },
+    "hardware": {
+     "value": "Nvidia A100 GPUs, 20 nodes x 4 GPUs (Polaris, ALCF), stated for the hyperparameter searches",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "The searches used 20 computing nodes, with four Nvidia A100 GPUS per node, on Polaris cluster at the Argonne Leadership Computing Facility.",
+     "note": "Hardware stated for the searches; hardware of the 100-epoch final trainings not stated separately."
+    }
+   }
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "task": "FORECASTING",
+   "task_raw": "single time-step prediction and autoregressive rollout up to 30 days",
+   "method_id": "M-FNO-OPT",
+   "dataset_ids": [
+    "D-SOMA-FNO"
+   ],
+   "target_variable": "salinity, temperature, zonal and meridional velocity",
+   "training": {
+    "loss": {
+     "value": "MSE and negative ACC",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "The loss function contains two terms: the standard MSE loss and the negative ACC."
+    },
+    "epochs": {
+     "value": 100,
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "we conducted a full training (100 epochs) using the set of hyperparameters that resulted in the best objectives"
+    },
+    "hardware": {
+     "value": "Nvidia A100 GPUs, 20 nodes x 4 GPUs (Polaris, ALCF), stated for the hyperparameter searches",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "The searches used 20 computing nodes, with four Nvidia A100 GPUS per node, on Polaris cluster at the Argonne Leadership Computing Facility.",
+     "note": "Hardware stated for the searches; hardware of the 100-epoch final trainings not stated separately."
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (salinity)",
+   "metric_kind": "ERROR",
+   "value": -2.498,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -2.202,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Salinity −2.202 −2.498 −2.503 −2.800",
+   "note": "Row quoted as extracted; columns: log(RSE) MSE loss, log(RSE) MSE+NegACC loss, log(1-ACC) MSE loss, log(1-ACC) MSE+NegACC loss"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (salinity)",
+   "metric_kind": "SKILL",
+   "value": -2.8,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -2.503,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Salinity −2.202 −2.498 −2.503 −2.800",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (temperature)",
+   "metric_kind": "ERROR",
+   "value": -3.061,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -3.696,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Temperature −3.696 −3.061 −4.015 −3.363",
+   "note": "Row quoted as extracted; columns: log(RSE) MSE loss, log(RSE) MSE+NegACC loss, log(1-ACC) MSE loss, log(1-ACC) MSE+NegACC loss"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (temperature)",
+   "metric_kind": "SKILL",
+   "value": -3.363,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -4.015,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Temperature −3.696 −3.061 −4.015 −3.363",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (meridional velocity)",
+   "metric_kind": "ERROR",
+   "value": -2.067,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -1.958,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Meridional V . −1.958 −2.067 −2.258 −2.842",
+   "note": "Row quoted as extracted; columns: log(RSE) MSE loss, log(RSE) MSE+NegACC loss, log(1-ACC) MSE loss, log(1-ACC) MSE+NegACC loss"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (meridional velocity)",
+   "metric_kind": "SKILL",
+   "value": -2.842,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -2.258,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Meridional V . −1.958 −2.067 −2.258 −2.842",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (zonal velocity)",
+   "metric_kind": "ERROR",
+   "value": -2.303,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -2.248,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Zonal V . −2.248 −2.303 −2.549 −2.808",
+   "note": "Row quoted as extracted; columns: log(RSE) MSE loss, log(RSE) MSE+NegACC loss, log(1-ACC) MSE loss, log(1-ACC) MSE+NegACC loss"
+  },
+  {
+   "experiment_id": "X-LOSS-ABLATION",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (zonal velocity)",
+   "metric_kind": "SKILL",
+   "value": -2.808,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Modulus default hyperparameters, MSE+NegACC loss, 100 epochs",
+   "baseline_name": "Same config, pure MSE loss",
+   "baseline_value": -2.549,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Zonal V . −2.248 −2.303 −2.549 −2.808",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (salinity)",
+   "metric_kind": "ERROR",
+   "value": -3.143,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -2.498,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Salinity −2.498 −2.800 −3.143 −3.552",
+   "note": "Row quoted as extracted; columns: log(RSE) baseline, log(1-ACC) baseline, log(RSE) optimal, log(1-ACC) optimal"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (salinity)",
+   "metric_kind": "SKILL",
+   "value": -3.552,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -2.8,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Salinity −2.498 −2.800 −3.143 −3.552",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (temperature)",
+   "metric_kind": "ERROR",
+   "value": -3.984,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -3.061,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Temperature −3.061 −3.362 −3.984 −4.286",
+   "note": "Row quoted as extracted; columns: log(RSE) baseline, log(1-ACC) baseline, log(RSE) optimal, log(1-ACC) optimal"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (temperature)",
+   "metric_kind": "SKILL",
+   "value": -4.286,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -3.362,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Temperature −3.061 −3.362 −3.984 −4.286",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (meridional velocity)",
+   "metric_kind": "ERROR",
+   "value": -2.921,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -2.067,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Meridional V . −2.067 −2.842 −2.921 −3.254",
+   "note": "Row quoted as extracted; columns: log(RSE) baseline, log(1-ACC) baseline, log(RSE) optimal, log(1-ACC) optimal"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (meridional velocity)",
+   "metric_kind": "SKILL",
+   "value": -3.254,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -2.842,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Meridional V . −2.067 −2.842 −2.921 −3.254",
+   "note": "Row quoted as extracted; columns: as above"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(RSE) (zonal velocity)",
+   "metric_kind": "ERROR",
+   "value": -3.013,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -2.303,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Zonal V . −2.303 −2.808 −3.013 −3.349",
+   "note": "Row quoted as extracted; columns: log(RSE) baseline, log(1-ACC) baseline, log(RSE) optimal, log(1-ACC) optimal"
+  },
+  {
+   "experiment_id": "X-HPO-OPTIMAL",
+   "dataset_id": "D-SOMA-FNO",
+   "metric": "OTHER",
+   "metric_raw": "log(1-ACC) (zonal velocity)",
+   "metric_kind": "SKILL",
+   "value": -3.349,
+   "unit": "log",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Optimal configuration from DeepHyper search, 100 epochs, composite loss",
+   "baseline_name": "Modulus default configuration",
+   "baseline_value": -2.808,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "Zonal V . −2.303 −2.808 −3.013 −3.349",
+   "note": "Row quoted as extracted; columns: as above"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 13,
+   "page_printed": 13,
+   "quote": "Future work includes exploring more efficient function evaluation strategies during the search"
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "We plan to investigate the phenomenon and test this hypothesis in future work."
+  },
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "We suspect this was due to the limited number of epochs in the search"
+  }
+ ],
+ "conflicts": [
+  {
+   "field": "results[11].baseline_value",
+   "values": [
+    -3.362,
+    -3.363
+   ],
+   "sources": [
+    {
+     "page_pdf": 11,
+     "quote": "Temperature −3.061 −3.362 −3.984 −4.286"
+    },
+    {
+     "page_pdf": 7,
+     "quote": "Temperature −3.696 −3.061 −4.015 −3.363"
+    }
+   ],
+   "chosen": -3.362,
+   "reason": "Same model (default config, composite loss, 100 epochs) reported as log(1-ACC) -3.363 in Table 2 and -3.362 in Table 3; each table row kept in its own result row."
+  },
+  {
+   "field": "results[12].value",
+   "values": [
+    -2.921
+   ],
+   "sources": [
+    {
+     "page_pdf": 11,
+     "quote": "Meridional V . −2.067 −2.842 −2.921 −3.254"
+    },
+    {
+     "page_pdf": 10,
+     "quote": "while the baseline has a slight advantage in terms of the MSE for meridional"
+    }
+   ],
+   "chosen": -2.921,
+   "reason": "Text of Section 5.4 says the baseline is slightly better in MSE for meridional velocity, but Table 3 log(RSE) is lower for the optimal configuration (-2.921 vs -2.067); the table value is kept."
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-LOSS-ABLATION].training.optimizer",
+   "searched": [
+    "Section 3 Method",
+    "Section 4.2 and Table 1 (ranges only)",
+    "Section 4.4 Implementation",
+    "Section 5 Results"
+   ],
+   "note": "Only search ranges (Table 1) or 'Modulus default' are given; the values of the baseline and of the selected optimal configuration are not stated."
+  },
+  {
+   "field": "experiments[X-LOSS-ABLATION].training.learning_rate",
+   "searched": [
+    "Section 3 Method",
+    "Section 4.2 and Table 1 (ranges only)",
+    "Section 4.4 Implementation",
+    "Section 5 Results"
+   ],
+   "note": "Only search ranges (Table 1) or 'Modulus default' are given; the values of the baseline and of the selected optimal configuration are not stated."
+  },
+  {
+   "field": "experiments[X-LOSS-ABLATION].training.batch_size",
+   "searched": [
+    "Section 3 Method",
+    "Section 4.2 and Table 1 (ranges only)",
+    "Section 4.4 Implementation",
+    "Section 5 Results"
+   ],
+   "note": "Only search ranges (Table 1) or 'Modulus default' are given; the values of the baseline and of the selected optimal configuration are not stated."
+  },
+  {
+   "field": "experiments[X-HPO-OPTIMAL].training.optimizer",
+   "searched": [
+    "Section 3 Method",
+    "Section 4.2 and Table 1 (ranges only)",
+    "Section 4.4 Implementation",
+    "Section 5 Results",
+    "Section 6"
+   ],
+   "note": "Only search ranges (Table 1) or 'Modulus default' are given; the values of the baseline and of the selected optimal configuration are not stated."
+  },
+  {
+   "field": "experiments[X-HPO-OPTIMAL].training.learning_rate",
+   "searched": [
+    "Section 3 Method",
+    "Section 4.2 and Table 1 (ranges only)",
+    "Section 4.4 Implementation",
+    "Section 5 Results",
+    "Section 6"
+   ],
+   "note": "Only search ranges (Table 1) or 'Modulus default' are given; the values of the baseline and of the selected optimal configuration are not stated."
+  },
+  {
+   "field": "experiments[X-HPO-OPTIMAL].training.batch_size",
+   "searched": [
+    "Section 3 Method",
+    "Section 4.2 and Table 1 (ranges only)",
+    "Section 4.4 Implementation",
+    "Section 5 Results",
+    "Section 6"
+   ],
+   "note": "Only search ranges (Table 1) or 'Modulus default' are given; the values of the baseline and of the selected optimal configuration are not stated."
+  }
+ ]
+}

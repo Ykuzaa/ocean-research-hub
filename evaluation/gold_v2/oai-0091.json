@@ -15,6 +15,9 @@
   "year": 2025,
   "venue": "Frontiers in Marine Science",
   "ocean_domains": [
+   "bathymetry"
+  ],
+  "ocean_domains_raw": [
    "seafloor bathymetry",
    "marine geology"
   ]

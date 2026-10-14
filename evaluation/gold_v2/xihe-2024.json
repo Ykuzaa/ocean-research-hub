@@ -15,6 +15,11 @@
   "year": 2024,
   "venue": "",
   "ocean_domains": [
+   "currents",
+   "eddies-fronts",
+   "subsurface"
+  ],
+  "ocean_domains_raw": [
    "ocean circulation",
    "mesoscale eddies",
    "temperature and salinity"

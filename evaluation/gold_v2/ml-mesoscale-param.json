@@ -15,6 +15,11 @@
   "year": 2023,
   "venue": "Journal of Advances in Modeling Earth Systems (submitted; arXiv:2303.00962v1)",
   "ocean_domains": [
+   "eddies-fronts",
+   "parameterization",
+   "currents"
+  ],
+  "ocean_domains_raw": [
    "mesoscale eddies",
    "subgrid parameterization",
    "ocean circulation modelling"

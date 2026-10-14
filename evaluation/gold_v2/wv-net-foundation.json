@@ -1,0 +1,765 @@
+{
+ "source": {
+  "source_id": "wv-net-foundation",
+  "file": ".data/golden-pdfs/wv-net-a-foundation-model-for-sar-wv-mode-satellite-imagery.pdf",
+  "sha256_prefix": "d63743aefb4ed75e56169e51",
+  "pdf_pages": 20,
+  "printed_page_offset": 0,
+  "extracted_by": "paper-extractor",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-WVNET",
+  "doi": null,
+  "title": "WV-Net: A foundation model for SAR WV-mode satellite imagery trained using contrastive self-supervised learning on 10 million images",
+  "year": 2024,
+  "venue": "arXiv:2406.18765 (preprint, under review)",
+  "ocean_domains": [
+   "foundation-models",
+   "waves"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-WVNET",
+   "canonical_name": "WV-Net (SimCLR, ResNet50)",
+   "family": "CNN_GENERIC",
+   "family_raw": "contrastive self-supervised learning with ResNet50 backend",
+   "architecture_note": "SimCLR contrastive framework with ResNet50 backbone and projector head; only the backbone is used for transfer",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "WV-Net is trained using the SimCLR contrastive SSL framework"
+    },
+    {
+     "field": "architecture_note",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "with a ResNet50 backend"
+    }
+   ]
+  },
+  {
+   "method_id": "M-SIMCLR-BASE",
+   "canonical_name": "Baseline SimCLR on WV images",
+   "family": "CNN_GENERIC",
+   "family_raw": "SimCLR ResNet50 default augmentations",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "baseline SimCLR model trained on WV images"
+    }
+   ]
+  },
+  {
+   "method_id": "M-IMAGENET-R50",
+   "canonical_name": "ImageNet supervised ResNet50",
+   "family": "CNN_GENERIC",
+   "family_raw": "supervised ImageNet pretrained model",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "the ImageNet model trained using supervised learning"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-WV-UNLABELED",
+   "canonical_name": "Sentinel-1 WV-mode image archive",
+   "variables": [
+    "SAR backscatter imagery"
+   ],
+   "spatial_resolution": "5 m",
+   "temporal_resolution": null,
+   "region": "Open ocean, global",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "approximately 165 months and 9.9M images"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "Images are stored as PNG files with 20x20 km footprints and 5 m resolution."
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-GOALI",
+   "canonical_name": "GOALI classification dataset (plus Wang et al. images)",
+   "variables": [
+    "multilabel geophysical phenomena"
+   ],
+   "spatial_resolution": "5 m",
+   "temporal_resolution": null,
+   "region": "Open ocean, global",
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "for a total of annotated 16,400 images"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-HS",
+   "canonical_name": "Wave height regression dataset (Quach et al.)",
+   "variables": [
+    "significant wave height"
+   ],
+   "spatial_resolution": "5 m",
+   "temporal_resolution": null,
+   "region": "Open ocean, global",
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "Here we use a subset of 200,000 images"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-AIRTEMP",
+   "canonical_name": "Air temperature regression dataset (ERA5 labels)",
+   "variables": [
+    "air-sea temperature difference"
+   ],
+   "spatial_resolution": "5 m",
+   "temporal_resolution": null,
+   "region": "Open ocean, global",
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "The annotated dataset consists of 76,000 images"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "task": "CLASSIFICATION_SEGMENTATION",
+   "task_raw": "multilabel classification of geophysical phenomena",
+   "method_id": "M-WVNET",
+   "dataset_ids": [
+    "D-GOALI"
+   ],
+   "target_variable": "geophysical phenomena labels",
+   "training": {
+    "loss": {
+     "value": "sum of binary cross-entropy losses over classes (finetuning)",
+     "page_pdf": 18,
+     "page_printed": 18,
+     "quote": "trained to minimize the sum of binary cross-entropy losses"
+    },
+    "optimizer": {
+     "value": "Adam (MLP probing)",
+     "page_pdf": 18,
+     "page_printed": 18,
+     "quote": "using the Adam optimizer"
+    },
+    "learning_rate": {
+     "value": 0.05,
+     "page_pdf": 18,
+     "page_printed": 18,
+     "quote": "rate scaled to 0.05 accordingly",
+     "note": "Finetuning value; MLP probe lr 0.001 on same page"
+    },
+    "batch_size": {
+     "value": 256,
+     "page_pdf": 18,
+     "page_printed": 18,
+     "quote": "batch size reduced to 256",
+     "note": "End-to-end finetuning"
+    },
+    "epochs": {
+     "value": 200,
+     "page_pdf": 18,
+     "page_printed": 18,
+     "quote": "is trained for 200 epochs",
+     "note": "MLP probing protocol"
+    },
+    "hardware": {
+     "value": "8 x V100-32GB GPUs",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "on 8 V100-32GB GPUs, using 400GB of RAM and 36 CPU cores",
+     "note": "Pretraining hardware of WV-Net, shared by all downstream experiments"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "task": "INVERSE_INFERENCE",
+   "task_raw": "significant wave height regression from SAR images",
+   "method_id": "M-WVNET",
+   "dataset_ids": [
+    "D-HS"
+   ],
+   "target_variable": "significant wave height",
+   "training": {
+    "loss": {
+     "value": "weighted MAE + MSE, weighted in favor of MSE (finetuning)",
+     "page_pdf": 19,
+     "page_printed": 19,
+     "quote": "trained using a weighted combination of the mean absolute (or L1) error (MAE) and the mean squared error (MSE) weighted in favor of the MSE"
+    },
+    "learning_rate": {
+     "value": "0.007 backbone (finetuning)",
+     "page_pdf": 19,
+     "page_printed": 19,
+     "quote": "a backbone learning rate of 0.007",
+     "note": "Output layer lr 0.025 also given"
+    },
+    "hardware": {
+     "value": "8 x V100-32GB GPUs",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "on 8 V100-32GB GPUs, using 400GB of RAM and 36 CPU cores",
+     "note": "Pretraining hardware of WV-Net, shared by all downstream experiments"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-WV-AIRTEMP",
+   "task": "INVERSE_INFERENCE",
+   "task_raw": "air-sea temperature difference regression from SAR images",
+   "method_id": "M-WVNET",
+   "dataset_ids": [
+    "D-AIRTEMP"
+   ],
+   "target_variable": "air-sea temperature difference",
+   "training": {
+    "loss": {
+     "value": "weighted MAE + MSE, weighted in favor of MSE (finetuning)",
+     "page_pdf": 19,
+     "page_printed": 19,
+     "quote": "trained using a weighted combination of the mean absolute (or L1) error (MAE) and the mean squared error (MSE) weighted in favor of the MSE",
+     "note": "Same regression protocol as wave height"
+    },
+    "learning_rate": {
+     "value": "0.007 backbone (finetuning)",
+     "page_pdf": 19,
+     "page_printed": 19,
+     "quote": "a backbone learning rate of 0.007",
+     "note": "Same regression protocol as wave height"
+    },
+    "hardware": {
+     "value": "8 x V100-32GB GPUs",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "on 8 V100-32GB GPUs, using 400GB of RAM and 36 CPU cores",
+     "note": "Pretraining hardware of WV-Net, shared by all downstream experiments"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-WV-RETRIEVAL",
+   "task": "OTHER",
+   "task_raw": "one-shot unsupervised image retrieval (kNN) on rare classes",
+   "method_id": "M-WVNET",
+   "dataset_ids": [
+    "D-GOALI"
+   ],
+   "target_variable": "class overlap of retrieved images",
+   "training": {
+    "hardware": {
+     "value": "8 x V100-32GB GPUs",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "on 8 V100-32GB GPUs, using 400GB of RAM and 36 CPU cores",
+     "note": "Pretraining hardware of WV-Net, shared by all downstream experiments"
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "micro-averaged AUROC",
+   "metric_kind": "SKILL",
+   "value": 0.936,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "kNN protocol, micro-AUROC",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.925,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.936 0.697 - - - -"
+  },
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "micro-averaged AUROC",
+   "metric_kind": "SKILL",
+   "value": 0.958,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "Linear protocol, micro-AUROC",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.952,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.958 0.754 0.370 0.500 0.637 0.902"
+  },
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "micro-averaged AUROC",
+   "metric_kind": "SKILL",
+   "value": 0.948,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "MLP protocol, micro-AUROC",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.931,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.948 0.744 0.335 0.459 0.763 1.01"
+  },
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "micro-averaged AUROC",
+   "metric_kind": "SKILL",
+   "value": 0.939,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "FT protocol, micro-AUROC",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.931,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.939 0.777 0.377 0.530 0.635 0.923"
+  },
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "dataset_id": "D-GOALI",
+   "metric": "F1",
+   "metric_raw": "F1-score",
+   "metric_kind": "AGREEMENT",
+   "value": 0.777,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "Finetuned, F1-score",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.759,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.939 0.777 0.377 0.530 0.635 0.923"
+  },
+  {
+   "experiment_id": "X-WV-CLASSIFICATION",
+   "dataset_id": "D-GOALI",
+   "metric": "F1",
+   "metric_raw": "F1-score",
+   "metric_kind": "AGREEMENT",
+   "value": 0.754,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "Linear probing, F1-score",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.73,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.958 0.754 0.370 0.500 0.637 0.902"
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "dataset_id": "D-HS",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.5,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Linear protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.601,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.958 0.754 0.370 0.500 0.637 0.902"
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "dataset_id": "D-HS",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 0.37,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Linear protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.447,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.958 0.754 0.370 0.500 0.637 0.902"
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "dataset_id": "D-HS",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.459,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLP protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.656,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.948 0.744 0.335 0.459 0.763 1.01"
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "dataset_id": "D-HS",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 0.335,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLP protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.479,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.948 0.744 0.335 0.459 0.763 1.01"
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "dataset_id": "D-HS",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.53,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "FT protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 3.001,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.939 0.777 0.377 0.530 0.635 0.923"
+  },
+  {
+   "experiment_id": "X-WV-WAVEHEIGHT",
+   "dataset_id": "D-HS",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 0.377,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "FT protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 2.696,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.939 0.777 0.377 0.530 0.635 0.923"
+  },
+  {
+   "experiment_id": "X-WV-AIRTEMP",
+   "dataset_id": "D-AIRTEMP",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.902,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Linear protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.974,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.958 0.754 0.370 0.500 0.637 0.902"
+  },
+  {
+   "experiment_id": "X-WV-AIRTEMP",
+   "dataset_id": "D-AIRTEMP",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.01,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLP protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.996,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.948 0.744 0.335 0.459 0.763 1.01"
+  },
+  {
+   "experiment_id": "X-WV-AIRTEMP",
+   "dataset_id": "D-AIRTEMP",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.923,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "FT protocol",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.964,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "WV-Net (ours) 0.939 0.777 0.377 0.530 0.635 0.923"
+  },
+  {
+   "experiment_id": "X-WV-RETRIEVAL",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "mAP",
+   "metric_kind": "SKILL",
+   "value": 0.127,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "one-shot kNN retrieval, class AW",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.013,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "WV-Net (Ours) 0.127 0.297 0.119 0.901 0.398 0.021 0.020"
+  },
+  {
+   "experiment_id": "X-WV-RETRIEVAL",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "mAP",
+   "metric_kind": "SKILL",
+   "value": 0.297,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "one-shot kNN retrieval, class IW",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.184,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "WV-Net (Ours) 0.127 0.297 0.119 0.901 0.398 0.021 0.020"
+  },
+  {
+   "experiment_id": "X-WV-RETRIEVAL",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "mAP",
+   "metric_kind": "SKILL",
+   "value": 0.901,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "one-shot kNN retrieval, class SI",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.845,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "WV-Net (Ours) 0.127 0.297 0.119 0.901 0.398 0.021 0.020"
+  },
+  {
+   "experiment_id": "X-WV-RETRIEVAL",
+   "dataset_id": "D-GOALI",
+   "metric": "OTHER",
+   "metric_raw": "mAP",
+   "metric_kind": "SKILL",
+   "value": 0.119,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "one-shot kNN retrieval, class OE",
+   "baseline_name": "ImageNet",
+   "baseline_value": 0.13,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "WV-Net (Ours) 0.127 0.297 0.119 0.901 0.398 0.021 0.020"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "One major limitation of this work is computational constraints."
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "The downstream tasks presented are only a small subset of potential applications."
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "It is possible that given a larger ViT model and enough training time this could be a competitive"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Notably, that is after limited hyperparameter tuning to have the majority of models fit the regression problems."
+  },
+  {
+   "theme": "REPRODUCIBILITY",
+   "page_pdf": 3,
+   "page_printed": 3,
+   "quote": "This dataset is currently unpublished work but will be made publicly available in the future."
+  }
+ ],
+ "conflicts": [],
+ "not_reported": [
+  {
+   "field": "experiments[X-WV-CLASSIFICATION].training.pretraining_optimizer",
+   "searched": [
+    "Methods 2.2",
+    "Results 3.1-3.2",
+    "Appendix A-E"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-WAVEHEIGHT].training.optimizer",
+   "searched": [
+    "Section 2.4",
+    "Appendix E.3"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-WAVEHEIGHT].training.batch_size",
+   "searched": [
+    "Section 2.4",
+    "Appendix E.3 (only says other hyperparameters unchanged)"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-WAVEHEIGHT].training.epochs",
+   "searched": [
+    "Section 2.4",
+    "Appendix E.3"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-AIRTEMP].training.optimizer",
+   "searched": [
+    "Section 2.4",
+    "Appendix E.3"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-AIRTEMP].training.batch_size",
+   "searched": [
+    "Section 2.4",
+    "Appendix E.3"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-AIRTEMP].training.epochs",
+   "searched": [
+    "Section 2.4",
+    "Appendix E.3"
+   ]
+  },
+  {
+   "field": "experiments[X-WV-RETRIEVAL].training",
+   "searched": [
+    "Appendix E.2: no supervised training, embeddings used directly"
+   ]
+  }
+ ]
+}

@@ -15,6 +15,10 @@
   "year": 2023,
   "venue": "Frontiers in Marine Science",
   "ocean_domains": [
+   "currents",
+   "ssh-altimetry"
+  ],
+  "ocean_domains_raw": [
    "ocean circulation",
    "Indonesian Throughflow",
    "sea surface height"

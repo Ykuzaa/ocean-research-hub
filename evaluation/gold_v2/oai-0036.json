@@ -15,6 +15,10 @@
   "year": 2025,
   "venue": "Scientific Reports",
   "ocean_domains": [
+   "sst",
+   "data-assimilation"
+  ],
+  "ocean_domains_raw": [
    "sea surface temperature",
    "data assimilation",
    "North and Baltic Seas"

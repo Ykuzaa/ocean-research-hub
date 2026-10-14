@@ -1,0 +1,1822 @@
+{
+ "source": {
+  "source_id": "local-to-largescale-mapping",
+  "file": ".data/golden-pdfs/from-local-training-to-large-scale-mapping-a-comparative-ass.pdf",
+  "sha256_prefix": "ecf661ce2555020beefa0300",
+  "pdf_pages": 42,
+  "printed_page_offset": 0,
+  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-LOCAL-TO-LARGESCALE-MAPPING",
+  "doi": null,
+  "title": "From Local Training to Large-Scale Mapping: A Comparative Assessment of Machine Learning and Deep Learning for Transferable Satellite-Derived Bathymetry",
+  "year": 2026,
+  "venue": "arXiv:2606.02764 [cs.CV]",
+  "ocean_domains": [
+   "bathymetry"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-RF",
+   "canonical_name": "Random Forest",
+   "family": "CLASSICAL_ML",
+   "family_raw": "Random Forest (ensemble of decision trees)",
+   "architecture_note": "100 trees; pixel-wise, no spatial context",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "Random Forest (RF) is an ensemble learning method that combines multiple decision trees"
+    }
+   ]
+  },
+  {
+   "method_id": "M-RESNET50",
+   "canonical_name": "DeepLabV3+ ResNet50",
+   "family": "CNN_GENERIC",
+   "family_raw": "ResNet50 encoder in DeepLabV3+",
+   "architecture_note": "DeepLabV3+ decoder with this encoder backbone, ImageNet-1k pretrained, fine-tuned",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "ResNet50 and ResNet101 are deep convolutional neural networks based on residual learning"
+    },
+    {
+     "field": "architecture_note",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "implemented within a unified DeepLabV3+ framework"
+    }
+   ]
+  },
+  {
+   "method_id": "M-RESNET101",
+   "canonical_name": "DeepLabV3+ ResNet101",
+   "family": "CNN_GENERIC",
+   "family_raw": "ResNet101 encoder in DeepLabV3+",
+   "architecture_note": "DeepLabV3+ decoder with this encoder backbone, ImageNet-1k pretrained, fine-tuned",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "ResNet50 and ResNet101 are deep convolutional neural networks based on residual learning"
+    }
+   ]
+  },
+  {
+   "method_id": "M-EFFNETB4",
+   "canonical_name": "DeepLabV3+ EfficientNet-B4",
+   "family": "CNN_GENERIC",
+   "family_raw": "EfficientNet-B4 encoder in DeepLabV3+",
+   "architecture_note": "DeepLabV3+ decoder with this encoder backbone, ImageNet-1k pretrained, fine-tuned",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "EfficientNet-B4 [39] employs compound scaling of network depth, width, and input resolution"
+    }
+   ]
+  },
+  {
+   "method_id": "M-CONVNEXTL",
+   "canonical_name": "DeepLabV3+ ConvNeXt-Large",
+   "family": "CNN_GENERIC",
+   "family_raw": "ConvNeXt-Large encoder in DeepLabV3+ (modern CNN inspired by Vision Transformers)",
+   "architecture_note": "DeepLabV3+ decoder with this encoder backbone, ImageNet-1k pretrained, fine-tuned",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "ConvNeXt-Large [40] is a modern convolutional architecture inspired by Vision Transformers"
+    }
+   ]
+  },
+  {
+   "method_id": "M-SWINBATHYUNET",
+   "canonical_name": "Swin-BathyUNet",
+   "family": "TRANSFORMER",
+   "family_raw": "transformer-based bathymetry architecture",
+   "architecture_note": "Results taken from the MagicBathyNet publication [44], not re-trained",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 33,
+     "page_printed": 33,
+     "quote": "the transformer-based Swin-BathyUNet"
+    }
+   ]
+  },
+  {
+   "method_id": "M-UNET",
+   "canonical_name": "Baseline U-Net",
+   "family": "CNN_UNET",
+   "family_raw": "baseline U-Net",
+   "architecture_note": "Results taken from the MagicBathyNet publication [44], not re-trained",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "Swin-BathyUNet and a baseline U-Net"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-PRATAS-GBR",
+   "canonical_name": "Pratas Island LiDAR and GBR AusBathyTopo reference bathymetry (training, validation, intra-regional test)",
+   "variables": [
+    "bathymetric depth"
+   ],
+   "spatial_resolution": "10 m (resampled)",
+   "temporal_resolution": null,
+   "region": "Pratas Island (South China Sea); Great Barrier Reef (Jewell, Parke, Waining, Hilder; test Hicks, Day, Carter)",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "High-resolution airborne topo-bathymetric LiDAR data were acquired over Pratas Island in September 2010 by the Ministry of the Interior, Taiwan"
+    },
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Reference bathymetry for the GBR is obtained from the AusBathyTopo regional-scale depth model"
+    },
+    {
+     "field": "split",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "bathymetry-relevant regions are spatially partitioned into 60% training, 20% validation, and 20% intra-regional test subsets"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "resampled to a consistent 10 m spatial resolution aligned with Sentinel-2 imagery"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-ASHMORE",
+   "canonical_name": "Ashmore Reef reference bathymetry (Geoscience Australia)",
+   "variables": [
+    "bathymetric depth"
+   ],
+   "spatial_resolution": "10 m (resampled; native approx. 2 m)",
+   "temporal_resolution": null,
+   "region": "Ashmore Reef, Timor Sea",
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "region",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Ashmore Reef is located in the Timor Sea"
+    },
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "Bathymetry data for Ashmore and Cartier reefs were also obtained from the Geoscience Australia"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "have a native spatial resolution of approximately 2 m"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-CARTIER",
+   "canonical_name": "Cartier Reef reference bathymetry (Geoscience Australia)",
+   "variables": [
+    "bathymetric depth"
+   ],
+   "spatial_resolution": "10 m (resampled; native approx. 2 m)",
+   "temporal_resolution": null,
+   "region": "Cartier Reef, northwestern Australia",
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "region",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Cartier Reef lies approximately 70 km east of Ashmore"
+    },
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "Bathymetry data for Ashmore and Cartier reefs were also obtained from the Geoscience Australia"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-SENTINEL2",
+   "canonical_name": "Sentinel-2 Level-2A surface reflectance (via Google Earth Engine)",
+   "variables": [
+    "12 spectral bands of BOA reflectance"
+   ],
+   "spatial_resolution": "10 m (all bands resampled)",
+   "temporal_resolution": "revisit approx. 3-5 days; 4-10 repeat images per site",
+   "region": null,
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "Sentinel-2 Level-2A (L2A) products providing bottom-of-atmosphere (BOA) surface reflectance were accessed via Google Earth Engine"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "All spectral bands were resampled to a uniform spatial resolution of 10 m via bilinear interpolation"
+    },
+    {
+     "field": "temporal_resolution",
+     "page_pdf": 8,
+     "page_printed": 8,
+     "quote": "6 repeat images were used for Pratas Island"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-MAGICBATHYNET",
+   "canonical_name": "MagicBathyNet (Agia Napa and Puck Lagoon, aerial RGB)",
+   "variables": [
+    "bathymetric depth",
+    "RGB aerial imagery"
+   ],
+   "spatial_resolution": "25 cm",
+   "temporal_resolution": null,
+   "region": "Agia Napa; Puck Lagoon",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "using the public MagicBathyNet dataset"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "patches at 25 cm resolution"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-RF-S2",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite-derived bathymetry (SDB), 0-20 m",
+   "method_id": "M-RF",
+   "dataset_ids": [
+    "D-PRATAS-GBR",
+    "D-ASHMORE",
+    "D-CARTIER",
+    "D-SENTINEL2"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {}
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite-derived bathymetry (SDB), 0-20 m",
+   "method_id": "M-RESNET50",
+   "dataset_ids": [
+    "D-PRATAS-GBR",
+    "D-ASHMORE",
+    "D-CARTIER",
+    "D-SENTINEL2"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "SWF-weighted RMSE",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "All deep learning models were trained using the proposed SWF-weighted RMSE loss"
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "batch size of 16 and the AdamW optimizer"
+    },
+    "learning_rate": {
+     "value": "1e-4 (initial)",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'initial learning rate of 10-4' (exponent symbol); value read from page 10, reduced after five plateau epochs."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Training employed a batch size of 16"
+    },
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Models were trained for up to 100 epochs",
+     "extra_evidence": [
+      {
+       "claim": "early stopping on validation loss, patience 10 epochs",
+       "page_pdf": 10,
+       "page_printed": 10,
+       "quote": "Early stopping was applied based on validation loss"
+      }
+     ]
+    },
+    "hardware": {
+     "value": "48 GB NVIDIA A40/L40/L40S GPUs",
+     "page_pdf": 11,
+     "page_printed": 11,
+     "quote": "the 48 GB NVIDIA A40/L40/L40S GPUs used for training the high-capacity architectures"
+    }
+   },
+   "note": "One training setup given for all deep learning models; copied (Section 3.2.5)."
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite-derived bathymetry (SDB), 0-20 m",
+   "method_id": "M-RESNET101",
+   "dataset_ids": [
+    "D-PRATAS-GBR",
+    "D-ASHMORE",
+    "D-CARTIER",
+    "D-SENTINEL2"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "SWF-weighted RMSE",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "All deep learning models were trained using the proposed SWF-weighted RMSE loss"
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "batch size of 16 and the AdamW optimizer"
+    },
+    "learning_rate": {
+     "value": "1e-4 (initial)",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'initial learning rate of 10-4' (exponent symbol); value read from page 10, reduced after five plateau epochs."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Training employed a batch size of 16"
+    },
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Models were trained for up to 100 epochs",
+     "extra_evidence": [
+      {
+       "claim": "early stopping on validation loss, patience 10 epochs",
+       "page_pdf": 10,
+       "page_printed": 10,
+       "quote": "Early stopping was applied based on validation loss"
+      }
+     ]
+    },
+    "hardware": {
+     "value": "48 GB NVIDIA A40/L40/L40S GPUs",
+     "page_pdf": 11,
+     "page_printed": 11,
+     "quote": "the 48 GB NVIDIA A40/L40/L40S GPUs used for training the high-capacity architectures"
+    }
+   },
+   "note": "One training setup given for all deep learning models; copied (Section 3.2.5)."
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite-derived bathymetry (SDB), 0-20 m",
+   "method_id": "M-EFFNETB4",
+   "dataset_ids": [
+    "D-PRATAS-GBR",
+    "D-ASHMORE",
+    "D-CARTIER",
+    "D-SENTINEL2"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "SWF-weighted RMSE",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "All deep learning models were trained using the proposed SWF-weighted RMSE loss"
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "batch size of 16 and the AdamW optimizer"
+    },
+    "learning_rate": {
+     "value": "1e-4 (initial)",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'initial learning rate of 10-4' (exponent symbol); value read from page 10, reduced after five plateau epochs."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Training employed a batch size of 16"
+    },
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Models were trained for up to 100 epochs",
+     "extra_evidence": [
+      {
+       "claim": "early stopping on validation loss, patience 10 epochs",
+       "page_pdf": 10,
+       "page_printed": 10,
+       "quote": "Early stopping was applied based on validation loss"
+      }
+     ]
+    },
+    "hardware": {
+     "value": "48 GB NVIDIA A40/L40/L40S GPUs",
+     "page_pdf": 11,
+     "page_printed": 11,
+     "quote": "the 48 GB NVIDIA A40/L40/L40S GPUs used for training the high-capacity architectures"
+    }
+   },
+   "note": "One training setup given for all deep learning models; copied (Section 3.2.5)."
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite-derived bathymetry (SDB), 0-20 m",
+   "method_id": "M-CONVNEXTL",
+   "dataset_ids": [
+    "D-PRATAS-GBR",
+    "D-ASHMORE",
+    "D-CARTIER",
+    "D-SENTINEL2"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "SWF-weighted RMSE",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "All deep learning models were trained using the proposed SWF-weighted RMSE loss"
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "batch size of 16 and the AdamW optimizer"
+    },
+    "learning_rate": {
+     "value": "1e-4 (initial)",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'initial learning rate of 10-4' (exponent symbol); value read from page 10, reduced after five plateau epochs."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Training employed a batch size of 16"
+    },
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 10,
+     "page_printed": 10,
+     "quote": "Models were trained for up to 100 epochs",
+     "extra_evidence": [
+      {
+       "claim": "early stopping on validation loss, patience 10 epochs",
+       "page_pdf": 10,
+       "page_printed": 10,
+       "quote": "Early stopping was applied based on validation loss"
+      }
+     ]
+    },
+    "hardware": {
+     "value": "48 GB NVIDIA A40/L40/L40S GPUs",
+     "page_pdf": 11,
+     "page_printed": 11,
+     "quote": "the 48 GB NVIDIA A40/L40/L40S GPUs used for training the high-capacity architectures"
+    }
+   },
+   "note": "One training setup given for all deep learning models; copied (Section 3.2.5)."
+  },
+  {
+   "experiment_id": "X-RESNET50-MBN",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "shallow-water bathymetry, aerial RGB, 0-16 m",
+   "method_id": "M-RESNET50",
+   "dataset_ids": [
+    "D-MAGICBATHYNET"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "RMSE",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "RMSE loss was adopted to align with"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "Adam optimizer, learning rate of"
+    },
+    "learning_rate": {
+     "value": "1e-4 (ReduceLROnPlateau factor 0.5, patience 5)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'learning rate of 1x10-4' (symbols); page 24."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "batch size of 16, and a maximum of 100 epochs"
+    },
+    "epochs": {
+     "value": "up to 100 (early stopping, patience 10)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "a maximum of 100 epochs with early stopping"
+    }
+   },
+   "note": "Benchmark setup copied across the four backbones (Section 5.2.3); hardware not stated for this benchmark."
+  },
+  {
+   "experiment_id": "X-RESNET101-MBN",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "shallow-water bathymetry, aerial RGB, 0-16 m",
+   "method_id": "M-RESNET101",
+   "dataset_ids": [
+    "D-MAGICBATHYNET"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "RMSE",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "RMSE loss was adopted to align with"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "Adam optimizer, learning rate of"
+    },
+    "learning_rate": {
+     "value": "1e-4 (ReduceLROnPlateau factor 0.5, patience 5)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'learning rate of 1x10-4' (symbols); page 24."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "batch size of 16, and a maximum of 100 epochs"
+    },
+    "epochs": {
+     "value": "up to 100 (early stopping, patience 10)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "a maximum of 100 epochs with early stopping"
+    }
+   },
+   "note": "Benchmark setup copied across the four backbones (Section 5.2.3); hardware not stated for this benchmark."
+  },
+  {
+   "experiment_id": "X-EFFNETB4-MBN",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "shallow-water bathymetry, aerial RGB, 0-16 m",
+   "method_id": "M-EFFNETB4",
+   "dataset_ids": [
+    "D-MAGICBATHYNET"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "RMSE",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "RMSE loss was adopted to align with"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "Adam optimizer, learning rate of"
+    },
+    "learning_rate": {
+     "value": "1e-4 (ReduceLROnPlateau factor 0.5, patience 5)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'learning rate of 1x10-4' (symbols); page 24."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "batch size of 16, and a maximum of 100 epochs"
+    },
+    "epochs": {
+     "value": "up to 100 (early stopping, patience 10)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "a maximum of 100 epochs with early stopping"
+    }
+   },
+   "note": "Benchmark setup copied across the four backbones (Section 5.2.3); hardware not stated for this benchmark."
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-MBN",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "shallow-water bathymetry, aerial RGB, 0-16 m",
+   "method_id": "M-CONVNEXTL",
+   "dataset_ids": [
+    "D-MAGICBATHYNET"
+   ],
+   "target_variable": "water depth (m)",
+   "training": {
+    "loss": {
+     "value": "RMSE",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "RMSE loss was adopted to align with"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "Adam optimizer, learning rate of"
+    },
+    "learning_rate": {
+     "value": "1e-4 (ReduceLROnPlateau factor 0.5, patience 5)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "",
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Text reads 'learning rate of 1x10-4' (symbols); page 24."
+    },
+    "batch_size": {
+     "value": 16,
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "batch size of 16, and a maximum of 100 epochs"
+    },
+    "epochs": {
+     "value": "up to 100 (early stopping, patience 10)",
+     "page_pdf": 24,
+     "page_printed": 24,
+     "quote": "a maximum of 100 epochs with early stopping"
+    }
+   },
+   "note": "Benchmark setup copied across the four backbones (Section 5.2.3); hardware not stated for this benchmark."
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.15,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m, 512x512 patches, SWF loss, Strategy 2 (Full)",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ResNet50 1.02 0.70 13.82 1.32 0.82 23.85 1.15 0.80 11.28 0.91 0.28 40"
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "SKILL",
+   "value": 0.91,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ResNet50 1.02 0.70 13.82 1.32 0.82 23.85 1.15 0.80 11.28 0.91 0.28 40"
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "<=3 m RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.28,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, depths <=3 m",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ResNet50 1.02 0.70 13.82 1.32 0.82 23.85 1.15 0.80 11.28 0.91 0.28 40"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.26,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m, 512x512 patches, SWF loss, Strategy 2 (Full)",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ResNet101 0.95 0.63 10.69 1.29 0.77 18.64 1.26 0.90 12.17 0.89 0.26 33"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "SKILL",
+   "value": 0.89,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ResNet101 0.95 0.63 10.69 1.29 0.77 18.64 1.26 0.90 12.17 0.89 0.26 33"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "<=3 m RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.26,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, depths <=3 m",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ResNet101 0.95 0.63 10.69 1.29 0.77 18.64 1.26 0.90 12.17 0.89 0.26 33"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.79,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m, 512x512 patches, SWF loss, Strategy 2 (Full)",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "EfficientNet-B4 1.50 1.04 15.86 1.72 1.14 28.74 1.79 1.29 16.43 0.78 0.37 23"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "SKILL",
+   "value": 0.78,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "EfficientNet-B4 1.50 1.04 15.86 1.72 1.14 28.74 1.79 1.29 16.43 0.78 0.37 23"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "<=3 m RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.37,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, depths <=3 m",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "EfficientNet-B4 1.50 1.04 15.86 1.72 1.14 28.74 1.79 1.29 16.43 0.78 0.37 23"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.92,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m, 512x512 patches, SWF loss, Strategy 2 (Full)",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ConvNeXt-Large 1.42 1.08 23.05 1.52 1.04 33.09 1.92 1.52 22.57 0.74 0.63 23"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "SKILL",
+   "value": 0.74,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ConvNeXt-Large 1.42 1.08 23.05 1.52 1.04 33.09 1.92 1.52 22.57 0.74 0.63 23"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "<=3 m RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.63,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, depths <=3 m",
+   "baseline_name": "Random Forest",
+   "baseline_value": 1.53,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "ConvNeXt-Large 1.42 1.08 23.05 1.52 1.04 33.09 1.92 1.52 22.57 0.74 0.63 23"
+  },
+  {
+   "experiment_id": "X-RF-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.53,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m, 512x512 patches, SWF loss, Strategy 2 (Full)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "Random Forest 0.96 0.60 N/A 1.18 0.73 N/A 1.53 1.02 13.63 0.87 0.89 N/A"
+  },
+  {
+   "experiment_id": "X-RF-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "SKILL",
+   "value": 0.87,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "intra-regional test, 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "Random Forest 0.96 0.60 N/A 1.18 0.73 N/A 1.53 1.02 13.63 0.87 0.89 N/A"
+  },
+  {
+   "experiment_id": "X-RF-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "<=3 m RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.89,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "intra-regional test, depths <=3 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 16,
+   "page_printed": 16,
+   "quote": "Random Forest 0.96 0.60 N/A 1.18 0.73 N/A 1.53 1.02 13.63 0.87 0.89 N/A"
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.88,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 2.99,
+   "source_table": "Table 4 (a)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "ResNet50 3.16 2.59 0.64 2.88 2.36 0.71"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.56,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 2.99,
+   "source_table": "Table 4 (a)",
+   "is_best_in_table": true,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "ResNet101 2.86 2.06 0.71 2.56 1.85 0.77"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 4.49,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 2.99,
+   "source_table": "Table 4 (a)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "EfficientNet-B4 4.79 3.31 0.18 4.49 3.02 0.30"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.98,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 2.99,
+   "source_table": "Table 4 (a)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "ConvNeXt-Large 3.22 1.87 0.63 2.98 1.56 0.69"
+  },
+  {
+   "experiment_id": "X-RF-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.99,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 4 (a)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "Random Forest 2.93 2.67 0.70 2.99 2.77 0.69"
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.59,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 3.78,
+   "source_table": "Table 4 (b)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "ResNet50 3.01 2.39 0.77 2.59 2.13 0.83"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.85,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 3.78,
+   "source_table": "Table 4 (b)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "ResNet101 3.00 2.36 0.77 2.85 2.29 0.79"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 3.78,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 3.78,
+   "source_table": "Table 4 (b)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "EfficientNet-B4 4.53 3.34 0.47 3.78 2.81 0.64"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.46,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": "Random Forest",
+   "baseline_value": 3.78,
+   "source_table": "Table 4 (b)",
+   "is_best_in_table": true,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "ConvNeXt-Large 2.87 2.17 0.79 2.46 1.87 0.85"
+  },
+  {
+   "experiment_id": "X-RF-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 3.78,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "cross-regional, 0-20 m, median aggregation over 10 Sentinel-2 acquisitions",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 4 (b)",
+   "is_best_in_table": false,
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "Random Forest 3.60 3.47 0.68 3.78 3.44 0.65"
+  },
+  {
+   "experiment_id": "X-RESNET50-MBN",
+   "dataset_id": "D-MAGICBATHYNET",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.21,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "unified Puck Lagoon + Agia Napa training, 0-16 m, aerial RGB",
+   "baseline_name": "Swin-BathyUNet (Agia Napa, 0-16 m)",
+   "baseline_value": 0.53,
+   "source_table": "Table 5",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 24,
+   "quote": "ResNet-50 Unified (0–16 m) 0.21 0.12 39.7"
+  },
+  {
+   "experiment_id": "X-RESNET101-MBN",
+   "dataset_id": "D-MAGICBATHYNET",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.19,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "unified Puck Lagoon + Agia Napa training, 0-16 m, aerial RGB",
+   "baseline_name": "Swin-BathyUNet (Agia Napa, 0-16 m)",
+   "baseline_value": 0.53,
+   "source_table": "Table 5",
+   "is_best_in_table": true,
+   "page_pdf": 24,
+   "page_printed": 24,
+   "quote": "ResNet-101 Unified (0–16 m)0.19 0.1258.7"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-MBN",
+   "dataset_id": "D-MAGICBATHYNET",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.22,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "unified Puck Lagoon + Agia Napa training, 0-16 m, aerial RGB",
+   "baseline_name": "Swin-BathyUNet (Agia Napa, 0-16 m)",
+   "baseline_value": 0.53,
+   "source_table": "Table 5",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 24,
+   "quote": "EfficientNet-B4 Unified (0–16 m) 0.22 0.13 18.6"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-MBN",
+   "dataset_id": "D-MAGICBATHYNET",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.21,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "unified Puck Lagoon + Agia Napa training, 0-16 m, aerial RGB",
+   "baseline_name": "Swin-BathyUNet (Agia Napa, 0-16 m)",
+   "baseline_value": 0.53,
+   "source_table": "Table 5",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 24,
+   "quote": "ConvNeXt-Large Unified (0–16 m) 0.21 0.13 198.8"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.56,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: SWF; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ResNet101 SWF 2.56 1.35 2.85 1.88"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.85,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: SWF; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ResNet101 SWF 2.56 1.35 2.85 1.88"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.71,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RMSE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ResNet101 RMSE 2.71 1.53 2.51 1.92"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.51,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RMSE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ResNet101 RMSE 2.71 1.53 2.51 1.92"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.27,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RPE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ResNet101 RPE (Z>0.01m) 2.27 1.54 2.53 1.73"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.53,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RPE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ResNet101 RPE (Z>0.01m) 2.27 1.54 2.53 1.73"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.98,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: SWF; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ConvNeXt-L SWF 2.98 0.90 2.46 1.46"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.46,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: SWF; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ConvNeXt-L SWF 2.98 0.90 2.46 1.46"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 3.5,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RMSE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ConvNeXt-L RMSE 3.50 1.27 2.42 1.88"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.42,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RMSE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": false,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ConvNeXt-L RMSE 3.50 1.27 2.42 1.88"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-ASHMORE",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.0,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RPE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": true,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ConvNeXt-L RPE (Z>0.01m) 2.00 0.96 2.35 1.92"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-CARTIER",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.35,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "loss comparison: RPE; cross-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 6",
+   "is_best_in_table": true,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "ConvNeXt-L RPE (Z>0.01m) 2.00 0.96 2.35 1.92"
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 3.1,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 1 (random patch split), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "ResNet50 3.10 0.95 2.13 0.56 1.15 0.28"
+  },
+  {
+   "experiment_id": "X-RESNET50-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.13,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 2 (spatially continuous, no augmentation), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "ResNet50 3.10 0.95 2.13 0.56 1.15 0.28"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.17,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 1 (random patch split), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "ResNet101 2.17 1.11 1.52 0.60 1.26 0.26"
+  },
+  {
+   "experiment_id": "X-RESNET101-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.52,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 2 (spatially continuous, no augmentation), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "ResNet101 2.17 1.11 1.52 0.60 1.26 0.26"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 3.22,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 1 (random patch split), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "EfficientNet-B4 3.22 0.76 2.99 0.92 1.79 0.37"
+  },
+  {
+   "experiment_id": "X-EFFNETB4-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.99,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 2 (spatially continuous, no augmentation), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "EfficientNet-B4 3.22 0.76 2.99 0.92 1.79 0.37"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.78,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 1 (random patch split), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "ConvNeXt-Large 1.78 0.64 2.01 0.54 1.92 0.63"
+  },
+  {
+   "experiment_id": "X-CONVNEXTL-S2",
+   "dataset_id": "D-PRATAS-GBR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 2.01,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "Strategy 2 (spatially continuous, no augmentation), intra-regional 0-20 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 7",
+   "is_best_in_table": false,
+   "page_pdf": 29,
+   "page_printed": 29,
+   "quote": "ConvNeXt-Large 1.78 0.64 2.01 0.54 1.92 0.63"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 33,
+   "page_printed": 33,
+   "quote": "geographic transfer still incurs a substantial accuracy penalty relative to intra-regional performance"
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 33,
+   "page_printed": 33,
+   "quote": "All study sites are outer-shelf or oceanic reefs with clear-water conditions; therefore, performance may differ in inshore or turbid environments."
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 35,
+   "page_printed": 35,
+   "quote": "The present study therefore does not quantitatively isolate the individual contributions of these factors to the observed cross-regional accuracy degradation."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 18,
+   "page_printed": 18,
+   "quote": "The limitation observed here is instead specific to purely data-driven regression in this depth regime"
+  },
+  {
+   "theme": "DATA",
+   "page_pdf": 36,
+   "page_printed": 36,
+   "quote": "residual tidal errors near coastlines may propagate into both training labels and model predictions"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 24,
+   "page_printed": 24,
+   "quote": "should not be interpreted as representing operational Sentinel-2 SDB performance"
+  },
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 11,
+   "page_printed": 11,
+   "quote": "consistently caused out-of-memory failures on the 48 GB NVIDIA A40/L40/L40S GPUs used for training the high-capacity architectures"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 34,
+   "page_printed": 34,
+   "quote": "is a hypothesis supported by quantitative and qualitative evidence, rather than a directly verified mechanism"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 37,
+   "page_printed": 37,
+   "quote": "depth-stratified sampling strategies represent a promising direction to address depth-distribution imbalance"
+  }
+ ],
+ "conflicts": [],
+ "not_reported": [
+  {
+   "field": "experiments[X-RF-S2].training.loss",
+   "searched": [
+    "3.2.1 Random Forest",
+    "3.2.5 Training Configuration",
+    "5.1 Random Forest Model Performance"
+   ]
+  },
+  {
+   "field": "experiments[X-RF-S2].training.optimizer",
+   "searched": [
+    "3.2.1 Random Forest",
+    "3.2.5 Training Configuration",
+    "5.1 Random Forest Model Performance"
+   ]
+  },
+  {
+   "field": "experiments[X-RF-S2].training.learning_rate",
+   "searched": [
+    "3.2.1 Random Forest",
+    "3.2.5 Training Configuration",
+    "5.1 Random Forest Model Performance"
+   ]
+  },
+  {
+   "field": "experiments[X-RF-S2].training.batch_size",
+   "searched": [
+    "3.2.1 Random Forest",
+    "3.2.5 Training Configuration",
+    "5.1 Random Forest Model Performance"
+   ]
+  },
+  {
+   "field": "experiments[X-RF-S2].training.epochs",
+   "searched": [
+    "3.2.1 Random Forest",
+    "3.2.5 Training Configuration",
+    "5.1 Random Forest Model Performance"
+   ]
+  },
+  {
+   "field": "experiments[X-RF-S2].training.hardware",
+   "searched": [
+    "3.2.1 Random Forest",
+    "3.2.5 Training Configuration",
+    "5.1 Random Forest Model Performance"
+   ]
+  },
+  {
+   "field": "experiments[X-RESNET50-MBN].training.hardware",
+   "searched": [
+    "5.2.3 Comparison with Reference Architectures",
+    "3.2.6"
+   ]
+  },
+  {
+   "field": "experiments[X-RESNET101-MBN].training.hardware",
+   "searched": [
+    "5.2.3 Comparison with Reference Architectures",
+    "3.2.6"
+   ]
+  },
+  {
+   "field": "experiments[X-EFFNETB4-MBN].training.hardware",
+   "searched": [
+    "5.2.3 Comparison with Reference Architectures",
+    "3.2.6"
+   ]
+  },
+  {
+   "field": "experiments[X-CONVNEXTL-MBN].training.hardware",
+   "searched": [
+    "5.2.3 Comparison with Reference Architectures",
+    "3.2.6"
+   ]
+  }
+ ]
+}

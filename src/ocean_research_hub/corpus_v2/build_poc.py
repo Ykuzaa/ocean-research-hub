@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import datetime
 import json
 import pathlib
 import sys
@@ -79,11 +80,32 @@ def _paper_view(path: pathlib.Path) -> dict:
         "limitations": [{"theme": l["theme"], "quote": l["quote"],
                          "page": l.get("page_printed") or l.get("page_pdf")}
                         for l in record.get("limitations", [])],
+        "conflicts": [{"field": c.get("field"), "values": c.get("values", []),
+                       "chosen": c.get("chosen"), "reason": c.get("reason")}
+                      for c in record.get("conflicts", [])],
         "quotes": json.dumps(record).count('"quote"'),
     }
 
 
-def build(gold_dir: pathlib.Path) -> dict:
+def access_report(manifest_path: pathlib.Path) -> dict | None:
+    """Combien de papiers indexés sont seulement atteignables, avant toute extraction."""
+    if not manifest_path.exists():
+        return None
+    entries = json.loads(manifest_path.read_text())
+    counts = collections.Counter(entry["status"] for entry in entries)
+    reachable = counts["DOWNLOADED"] + counts["ALREADY_PRESENT"] + counts["DUPLICATE"]
+    unreachable = counts["BLOCKED"] + counts["NO_OA_PDF"] + counts["UNRESOLVED"]
+    return {
+        "indexed": len(entries),
+        "reachable": reachable,
+        "blocked": counts["BLOCKED"],
+        "no_oa": counts["NO_OA_PDF"],
+        "unresolved": counts["UNRESOLVED"],
+        "unreachable": unreachable,
+    }
+
+
+def build(gold_dir: pathlib.Path, manifest: pathlib.Path | None = None) -> dict:
     views = [_paper_view(path) for path in sorted(gold_dir.glob("*.json"))]
     usable = [paper for paper in views if not paper["excluded"]]
     experiments = [e for paper in usable for e in paper["experiments"]]
@@ -96,6 +118,8 @@ def build(gold_dir: pathlib.Path) -> dict:
     shared = [cell for cell, papers in cells.items() if len(papers) > 1]
 
     aggregate = {
+        "built_on": datetime.date.today().isoformat(),
+        "conflicts": sum(len(paper["conflicts"]) for paper in usable),
         "papers": len(usable),
         "excluded": len(views) - len(usable),
         "experiments": len(experiments),
@@ -108,6 +132,7 @@ def build(gold_dir: pathlib.Path) -> dict:
         "cells": len(cells),
         "shared_cells": len(shared),
         "figures_only": [paper["slug"] for paper in usable if not paper["results"]],
+        "access": access_report(manifest) if manifest else None,
     }
     return {"agg": aggregate, "papers": views}
 
@@ -117,9 +142,10 @@ def main() -> int:
     parser.add_argument("--gold", default="evaluation/gold_v2")
     parser.add_argument("--template", default="evaluation/gold_v2/poc_template.html")
     parser.add_argument("--out", default=".data/poc.html")
+    parser.add_argument("--manifest", default=".data/oa-manifest-full.json")
     args = parser.parse_args()
 
-    payload = build(pathlib.Path(args.gold))
+    payload = build(pathlib.Path(args.gold), pathlib.Path(args.manifest))
     data = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     template = pathlib.Path(args.template).read_text()
     if "__DATA__" not in template:
@@ -132,6 +158,10 @@ def main() -> int:
     print(f"{agg['experiments']} expériences, {agg['results']} résultats, {agg['quotes']} citations")
     print(f"comparabilité: {agg['shared_cells']} cellule(s) partagée(s) sur {agg['cells']}")
     print(f"résultats uniquement en figures: {len(agg['figures_only'])} papier(s)")
+    if agg.get("access"):
+        a = agg["access"]
+        print(f"accès: {a['reachable']}/{a['indexed']} papiers atteignables "
+              f"({a['blocked']} bloqués, {a['no_oa']} sans version ouverte)")
     print(f"page: {args.out}")
     return 0
 

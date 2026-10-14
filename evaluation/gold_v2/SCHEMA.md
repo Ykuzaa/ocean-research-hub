@@ -45,7 +45,11 @@ neighbouring `*_raw` field. Never invent a vocabulary entry.
   identifiers, not free text): `forecasting`, `data-assimilation`, `subsurface`, `sst`,
   `ssh-altimetry`, `currents`, `eddies-fronts`, `marine-heatwaves`, `sea-ice`, `waves`,
   `biogeochemistry`, `bathymetry`, `parameterization`, `neural-operators`,
-  `foundation-models`, `llm-agents`, `marine-ecology`, `benchmarks`, `reviews`
+  `foundation-models`, `llm-agents`, `marine-ecology`, `benchmarks`, `reviews`.
+  A **region is not a domain**: "Mediterranean Sea" or "Persian Gulf" belongs in
+  `dataset.region`, never in this list. `corpus_v2.normalize` maps the wording that was
+  actually read into these identifiers and keeps the original in `ocean_domains_raw`,
+  so a mapping mistake is fixed without re-reading the PDF.
 - `evidence_status`: `QUOTED` (default, omit), `VALUE_READ_NO_SAFE_QUOTE`
 
 ### Family classification: arbitration rules

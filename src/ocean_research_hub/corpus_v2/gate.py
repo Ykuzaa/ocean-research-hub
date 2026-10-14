@@ -53,7 +53,10 @@ def _numbers(text: str) -> set[str]:
     for bad, good in DASHES.items():
         text = text.replace(bad, good)
     found = set()
-    for raw in re.findall(r"\d+(?:\.\d+)?(?:[eE][+-]?\d+)?", text.replace(",", "")):
+    # The leading minus counts as a sign unless a digit precedes it, so "log(-2.498)"
+    # yields -2.498 while a hyphenated "10-5" still yields 10 and 5. The lookbehind must
+    # not exclude letters: PDF extraction glues numbers to words ("MLDRMSE3.83").
+    for raw in re.findall(r"(?<![\d.])-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?", text.replace(",", "")):
         try:
             value = float(raw)
         except ValueError:

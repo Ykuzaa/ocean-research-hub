@@ -15,6 +15,10 @@
   "year": 2023,
   "venue": "Geoscientific Model Development",
   "ocean_domains": [
+   "ssh-altimetry",
+   "data-assimilation"
+  ],
+  "ocean_domains_raw": [
    "satellite altimetry",
    "sea surface height",
    "data assimilation"

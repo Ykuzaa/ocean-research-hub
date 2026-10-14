@@ -16,6 +16,9 @@
   "year_note": "Not printed in the PDF text; inferred from the most recent references (2025). Treat as unverified.",
   "venue": null,
   "ocean_domains": [
+   "bathymetry"
+  ],
+  "ocean_domains_raw": [
    "shallow-water bathymetry",
    "seabed habitat classification",
    "coastal remote sensing"

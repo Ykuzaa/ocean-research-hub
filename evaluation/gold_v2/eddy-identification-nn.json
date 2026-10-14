@@ -1,0 +1,364 @@
+{
+  "source": {
+    "source_id": "eddy-identification-nn",
+    "file": ".data/golden-pdfs/ocean-eddy-identification-and-tracking-using-neural-networks.pdf",
+    "sha256_prefix": "2182da2fc53b4b8df03cad9c",
+    "pdf_pages": 4,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-EDDY-ID-NN",
+    "doi": null,
+    "title": "Ocean Eddy Identification and Tracking Using Neural Networks",
+    "year": 2018,
+    "venue": "arXiv:1803.07436v2 [cs.CV]",
+    "ocean_domains": [
+      "eddies-fronts",
+      "ssh-altimetry"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-CNN-ENCDEC",
+      "canonical_name": "Encoder-decoder CNN eddy detector",
+      "family": "CNN_AUTOENCODER",
+      "family_raw": "encoder-decoder CNN",
+      "architecture_note": "Five conv/batch-norm/activation/pooling blocks in encoder, mirrored decoder with upsampling, softmax output (eddy / non-eddy); no skip connections stated. Detections are tracked downstream with a KLT optical-flow tracker.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "due to the chosen encoder-decoder architecture"
+        }
+      ]
+    },
+    {
+      "method_id": "M-CONVLSTM",
+      "canonical_name": "Convolutional LSTM eddy tracker",
+      "family": "RNN_LSTM_GRU",
+      "family_raw": "convolutional LSTM (RNN)",
+      "architecture_note": "Convolutional LSTM units process SLA image sequences directly; architecture details not given.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we apply convolutional LSTMs"
+        }
+      ]
+    },
+    {
+      "method_id": "M-OKUBO-WEISS",
+      "canonical_name": "Okubo-Weiss method",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "Okubo-Weiss parameter thresholding",
+      "architecture_note": "Used to generate pseudo-reference labels for training, not compared quantitatively.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "The Okubo-Weiss method is an established algorithm for"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-ESACCI-SLA",
+      "canonical_name": "ESA CCI gridded sea level anomaly maps",
+      "variables": [
+        "sea level anomaly"
+      ],
+      "spatial_resolution": "0.25 deg",
+      "temporal_resolution": "daily",
+      "region": "Seas around Australia and South Equatorial / East Australian currents",
+      "period_start": "1993-01",
+      "period_end": "2014-12",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 1,
+          "page_printed": 1,
+          "quote": "ESA Climate Change Initiative"
+        },
+        {
+          "field": "period",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "set covers daily data from January 1993 until December 2014"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-CNN-DETECT",
+      "task": "DETECTION",
+      "task_raw": "eddy core detection (two-class pixel-wise segmentation)",
+      "method_id": "M-CNN-ENCDEC",
+      "dataset_ids": [
+        "D-ESACCI-SLA"
+      ],
+      "target_variable": "eddy / non-eddy class per grid cell",
+      "training": {
+        "epochs": {
+          "value": 100,
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we have trained the CNN on 100"
+        },
+        "batch_size": {
+          "value": "18 grid cells",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "used a batch size of 18 grid cells"
+        },
+        "hardware": {
+          "value": "GPU",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we take advantage of a GPU"
+        }
+      }
+    },
+    {
+      "experiment_id": "X-CNN-KLT-TRACK",
+      "task": "OTHER",
+      "task_raw": "eddy tracking with KLT optical flow on CNN detections",
+      "method_id": "M-CNN-ENCDEC",
+      "dataset_ids": [
+        "D-ESACCI-SLA"
+      ],
+      "target_variable": "eddy core positions over 5 days",
+      "training": {
+        "epochs": {
+          "value": 100,
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we have trained the CNN on 100"
+        },
+        "batch_size": {
+          "value": "18 grid cells",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "used a batch size of 18 grid cells"
+        },
+        "hardware": {
+          "value": "GPU",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we take advantage of a GPU"
+        }
+      },
+      "note": "KLT tracker has no trained parameters; training setup is the CNN detector's."
+    },
+    {
+      "experiment_id": "X-CONVLSTM-TRACK",
+      "task": "OTHER",
+      "task_raw": "eddy detection and tracking from image sequences",
+      "method_id": "M-CONVLSTM",
+      "dataset_ids": [
+        "D-ESACCI-SLA"
+      ],
+      "target_variable": "eddy probability maps over time",
+      "training": {
+        "epochs": {
+          "value": 300,
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "convolutional LSTM is trained on 300 epochs"
+        },
+        "hardware": {
+          "value": "GPU",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we take advantage of a GPU"
+        }
+      }
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-CNN-KLT-TRACK",
+      "dataset_id": "D-ESACCI-SLA",
+      "metric": "OTHER",
+      "metric_raw": "number of detected/tracked eddy cores",
+      "metric_kind": "OTHER",
+      "value": 100,
+      "unit": "count",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Day 1 (detection, 1 March 1993)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "# Eddies 100 87 71 64 62"
+    },
+    {
+      "experiment_id": "X-CNN-KLT-TRACK",
+      "dataset_id": "D-ESACCI-SLA",
+      "metric": "OTHER",
+      "metric_raw": "number of detected/tracked eddy cores",
+      "metric_kind": "OTHER",
+      "value": 62,
+      "unit": "count",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Day 5 (still tracked)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "# Eddies 100 87 71 64 62"
+    },
+    {
+      "experiment_id": "X-CNN-KLT-TRACK",
+      "dataset_id": "D-ESACCI-SLA",
+      "metric": "OTHER",
+      "metric_raw": "averaged distance of eddy movement",
+      "metric_kind": "OTHER",
+      "value": 23,
+      "unit": "km",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Day 2",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "Av. distance - 23km 20km 24km 25km"
+    },
+    {
+      "experiment_id": "X-CNN-KLT-TRACK",
+      "dataset_id": "D-ESACCI-SLA",
+      "metric": "OTHER",
+      "metric_raw": "averaged distance of eddy movement",
+      "metric_kind": "OTHER",
+      "value": 25,
+      "unit": "km",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Day 5",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "Av. distance - 23km 20km 24km 25km"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 2,
+      "page_printed": 2,
+      "quote": "Since no reference data is given"
+    },
+    {
+      "theme": "UNCERTAINTY",
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "due to the noisy pseudo-reference data"
+    },
+    {
+      "theme": "COMPUTE",
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "Due to memory and capacity restrictions of our used GPU"
+    },
+    {
+      "theme": "OTHER",
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "A drawback of the KLT-tracker is a potential mismatch of tracked eddies"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 4,
+      "page_printed": 4,
+      "quote": "the spatial resolution is not adequate"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-CNN-DETECT].training.loss",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CNN-DETECT].training.optimizer",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CNN-DETECT].training.learning_rate",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CNN-KLT-TRACK].training.loss",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CNN-KLT-TRACK].training.optimizer",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CNN-KLT-TRACK].training.learning_rate",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CONVLSTM-TRACK].training.loss",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CONVLSTM-TRACK].training.optimizer",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CONVLSTM-TRACK].training.learning_rate",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-CONVLSTM-TRACK].training.batch_size",
+      "searched": [
+        "Sections 3 Method, 4.1 Experimental Setup, 4.2-4.4, 5 Conclusions"
+      ]
+    }
+  ]
+}

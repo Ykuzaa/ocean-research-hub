@@ -1,0 +1,527 @@
+{
+ "source": {
+  "source_id": "multispectral-sdb",
+  "file": ".data/golden-pdfs/a-machine-learning-approach-to-multispectral-satellite-deriv.pdf",
+  "sha256_prefix": "1a8c354207ff79706ad7f791",
+  "pdf_pages": 6,
+  "printed_page_offset": 564,
+  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-MULTISPECTRAL-SDB",
+  "doi": "10.5194/isprs-annals-V-3-2020-565-2020",
+  "title": "A Machine Learning Approach to Multispectral Satellite Derived Bathymetry",
+  "year": 2020,
+  "venue": "ISPRS Annals of the Photogrammetry, Remote Sensing and Spatial Information Sciences, Volume V-3-2020",
+  "ocean_domains": [
+   "bathymetry"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-RF",
+   "canonical_name": "Random Forest",
+   "family": "CLASSICAL_ML",
+   "family_raw": "Random Forest (RF)",
+   "architecture_note": "ntree=600, mtry=10 selected by iterative tuning (ntree range 100-2000, mtry range 2-30)",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "this model is based on an ensemble of decision trees (forest)"
+    },
+    {
+     "field": "architecture_note",
+     "page_pdf": 3,
+     "page_printed": 567,
+     "quote": "was set equal to 600 and"
+    }
+   ]
+  },
+  {
+   "method_id": "M-SVM",
+   "canonical_name": "Support Vector Machine",
+   "family": "CLASSICAL_ML",
+   "family_raw": "Support Vector Machine (SVM)",
+   "architecture_note": "linear kernel, scale factor kept at default 1",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 1,
+     "page_printed": 565,
+     "quote": "SVM is a supervised non -parametric statistical learning"
+    },
+    {
+     "field": "architecture_note",
+     "page_pdf": 3,
+     "page_printed": 567,
+     "quote": "use linear kernel function"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-SURVEY",
+   "canonical_name": "Single-beam echo sounder bathymetric survey, Cesenatico",
+   "variables": [
+    "water depth"
+   ],
+   "spatial_resolution": "approximately 1 m between points along transects",
+   "temporal_resolution": null,
+   "region": "Cesenatico, Adriatic coast, Italy",
+   "period_start": "2018-04-26",
+   "period_end": "2018-04-26",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "Water depth data were collected on 26 April 2018 with a"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "~1m distant from other measures"
+    },
+    {
+     "field": "region",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "The study area is situated in Cesenatico (FC) in Italy."
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-LANDSAT8",
+   "canonical_name": "Landsat 8",
+   "variables": [
+    "reflectance bands 2-11"
+   ],
+   "spatial_resolution": "15 m to 100 m",
+   "temporal_resolution": null,
+   "region": "Cesenatico, Adriatic coast, Italy",
+   "period_start": "2018-04-26",
+   "period_end": "2018-04-26",
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "Landsat 8. Bands 2, 3, 4, 5, 6, 7, 8, 9, 10 and 11"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "The spatial resolution of Landsat 8 bands vary from 15m to 100m"
+    },
+    {
+     "field": "period_start",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "acquired on the 26th of April 2018"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-SENTINEL2",
+   "canonical_name": "Sentinel 2",
+   "variables": [
+    "reflectance bands 2-12"
+   ],
+   "spatial_resolution": "10 m to 60 m",
+   "temporal_resolution": null,
+   "region": "Cesenatico, Adriatic coast, Italy",
+   "period_start": "2018-04-26",
+   "period_end": "2018-04-26",
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "Sentinel 2. Bands 2, 3, 4, 5, 6, 7, 8, 9, 10, 11and 12"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "Sentinel 2 data spatial resolution vary from 10m to 60 m"
+    },
+    {
+     "field": "period_start",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "acquired on the 26th of April 2018"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-PLANETSCOPE",
+   "canonical_name": "Planetscope",
+   "variables": [
+    "reflectance bands 1-4"
+   ],
+   "spatial_resolution": "3 m",
+   "temporal_resolution": null,
+   "region": "Cesenatico, Adriatic coast, Italy",
+   "period_start": "2018-04-26",
+   "period_end": "2018-04-26",
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "Planetscope. Bands 1, 2, 3 and 4."
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "Planetscope data have a spatial resolution of 3m"
+    },
+    {
+     "field": "period_start",
+     "page_pdf": 2,
+     "page_printed": 566,
+     "quote": "acquired on the 26th of April 2018"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-RF",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite derived bathymetry (water depth estimation)",
+   "method_id": "M-RF",
+   "dataset_ids": [
+    "D-SURVEY",
+    "D-LANDSAT8",
+    "D-SENTINEL2",
+    "D-PLANETSCOPE"
+   ],
+   "target_variable": "water depth",
+   "training": {},
+   "note": "Training: 6727 records on alternate transects; validation: 6585 records on the other transects. 53 predictor variables."
+  },
+  {
+   "experiment_id": "X-SVM",
+   "task": "BATHYMETRY_ESTIMATION",
+   "task_raw": "satellite derived bathymetry (water depth estimation)",
+   "method_id": "M-SVM",
+   "dataset_ids": [
+    "D-SURVEY",
+    "D-LANDSAT8",
+    "D-SENTINEL2",
+    "D-PLANETSCOPE"
+   ],
+   "target_variable": "water depth",
+   "training": {},
+   "note": "Same data split and predictors as X-RF."
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-RF",
+   "dataset_id": "D-SURVEY",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (m)",
+   "metric_kind": "ERROR",
+   "value": 0.228,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "VALIDATION",
+   "config": "ntree=600, mtry=10, data fusion of Landsat 8, Sentinel 2 and Planetscope",
+   "baseline_name": "SVM",
+   "baseline_value": 0.409,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 4,
+   "page_printed": 568,
+   "quote": "RF 0.228 0.158"
+  },
+  {
+   "experiment_id": "X-RF",
+   "dataset_id": "D-SURVEY",
+   "metric": "MAE",
+   "metric_raw": "MAE (m)",
+   "metric_kind": "ERROR",
+   "value": 0.158,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "VALIDATION",
+   "config": "ntree=600, mtry=10, data fusion of Landsat 8, Sentinel 2 and Planetscope",
+   "baseline_name": "SVM",
+   "baseline_value": 0.226,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 4,
+   "page_printed": 568,
+   "quote": "RF 0.228 0.158"
+  },
+  {
+   "experiment_id": "X-RF",
+   "dataset_id": "D-SURVEY",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "AGREEMENT",
+   "value": 0.97,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "VALIDATION",
+   "config": "ntree=600, mtry=10, data fusion of Landsat 8, Sentinel 2 and Planetscope",
+   "baseline_name": "SVM",
+   "baseline_value": 0.89,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 4,
+   "page_printed": 568,
+   "quote": "RF 0.97"
+  },
+  {
+   "experiment_id": "X-SVM",
+   "dataset_id": "D-SURVEY",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (m)",
+   "metric_kind": "ERROR",
+   "value": 0.409,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "VALIDATION",
+   "config": "linear kernel, scale factor default 1, data fusion of Landsat 8, Sentinel 2 and Planetscope",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 4,
+   "page_printed": 568,
+   "quote": "SVM 0.409 0.226"
+  },
+  {
+   "experiment_id": "X-SVM",
+   "dataset_id": "D-SURVEY",
+   "metric": "MAE",
+   "metric_raw": "MAE (m)",
+   "metric_kind": "ERROR",
+   "value": 0.226,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "VALIDATION",
+   "config": "linear kernel, scale factor default 1, data fusion of Landsat 8, Sentinel 2 and Planetscope",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 4,
+   "page_printed": 568,
+   "quote": "SVM 0.409 0.226"
+  },
+  {
+   "experiment_id": "X-SVM",
+   "dataset_id": "D-SURVEY",
+   "metric": "R2",
+   "metric_raw": "R2",
+   "metric_kind": "AGREEMENT",
+   "value": 0.89,
+   "unit": "",
+   "higher_is_better": true,
+   "split": "VALIDATION",
+   "config": "linear kernel, scale factor default 1, data fusion of Landsat 8, Sentinel 2 and Planetscope",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 4,
+   "page_printed": 568,
+   "quote": "SVM 0.89"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 5,
+   "page_printed": 569,
+   "quote": "care must be taken if the trained model is to be used over a dataset"
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 5,
+   "page_printed": 569,
+   "quote": "water deeper than 4 m is overestimated"
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 5,
+   "page_printed": 569,
+   "quote": "clear water will decrease the accuracy and also cause spurious"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 6,
+   "page_printed": 570,
+   "quote": "Further future investigation in this direction will include a"
+  }
+ ],
+ "conflicts": [
+  {
+   "field": "experiments[X-RF,X-SVM].sample_counts",
+   "values": [
+    "~6000 points per set",
+    "6727 training / 6585 validation"
+   ],
+   "sources": [
+    {
+     "page_pdf": 1,
+     "quote": "Each set was composed by a total of ~6000 points."
+    },
+    {
+     "page_pdf": 3,
+     "quote": "The split produced a"
+    }
+   ],
+   "chosen": "6727 training / 6585 validation",
+   "reason": "Methods section gives exact counts; abstract is an approximation."
+  },
+  {
+   "field": "paper.number_of_algorithms",
+   "values": [
+    2,
+    3
+   ],
+   "sources": [
+    {
+     "page_pdf": 3,
+     "quote": "two different algorithms were compared"
+    },
+    {
+     "page_pdf": 6,
+     "quote": "The study has compared three"
+    }
+   ],
+   "chosen": 2,
+   "reason": "Methods and results describe only SVM and RF; the conclusion's 'three' is not supported elsewhere."
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-RF].training.loss",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-RF].training.optimizer",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-RF].training.learning_rate",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-RF].training.batch_size",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-RF].training.epochs",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-RF].training.hardware",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-SVM].training.loss",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-SVM].training.optimizer",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-SVM].training.learning_rate",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-SVM].training.batch_size",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-SVM].training.epochs",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  },
+  {
+   "field": "experiments[X-SVM].training.hardware",
+   "searched": [
+    "Section 2.4 Data Processing",
+    "Sections 1.4.1 and 1.4.2 (labelled so in the PDF)",
+    "Section 3 Results",
+    "Section 4 Discussion"
+   ]
+  }
+ ]
+}

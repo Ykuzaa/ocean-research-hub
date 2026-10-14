@@ -1,0 +1,504 @@
+{
+  "source": {
+    "source_id": "maesstro-sst",
+    "file": ".data/golden-pdfs/maesstro-masked-autoencoders-for-sea-surface-temperature-rec.pdf",
+    "sha256_prefix": "5877febf73ef032e71c6bef8",
+    "pdf_pages": 15,
+    "printed_page_offset": 1308,
+    "extracted_by": "paper-extractor",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-MAESSTRO-SST",
+    "doi": "10.5194/os-20-1309-2024",
+    "title": "MAESSTRO: Masked Autoencoders for Sea Surface Temperature Reconstruction under Occlusion",
+    "year": 2024,
+    "venue": "Ocean Science",
+    "ocean_domains": [
+      "sst",
+      "eddies-fronts"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-MAESSTRO",
+      "canonical_name": "MAESSTRO",
+      "family": "TRANSFORMER",
+      "family_raw": "masked autoencoder with ViT-tiny encoder, patch size 4",
+      "architecture_note": "Masked autoencoder (MAE) with ViT-tiny encoder and decoder, adapted from He et al. (2022) to single-channel SST",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 1310,
+          "quote": "MAESSTRO adapts the masked autoencoder (MAE) from"
+        },
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 1310,
+          "quote": "4× 4 pixel patches, the ViT encoder can effectively process"
+        }
+      ]
+    },
+    {
+      "method_id": "M-MAE-IMAGENET",
+      "canonical_name": "ImageNet-pretrained MAE (He et al., 2022)",
+      "family": "TRANSFORMER",
+      "family_raw": "ImageNet-pretrained MAE",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 5,
+          "page_printed": 1313,
+          "quote": "existing ImageNet-pretrained MAE model in He et al."
+        }
+      ]
+    },
+    {
+      "method_id": "M-CUBIC-RBF",
+      "canonical_name": "Cubic RBF interpolation",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "cubic radial basis function interpolation",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 5,
+          "page_printed": 1313,
+          "quote": "cubic radial basis function (cubic RBF) interpolation, which is less popular but surpris-"
+        }
+      ]
+    },
+    {
+      "method_id": "M-KRIGING",
+      "canonical_name": "Kriging (linear and Gaussian variogram)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "Kriging",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 5,
+          "page_printed": 1313,
+          "quote": "Two variogram models were used in"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-LLC4320",
+      "canonical_name": "LLC4320 (MITgcm simulation)",
+      "variables": [
+        "SST"
+      ],
+      "spatial_resolution": "1/48 degree",
+      "temporal_resolution": "hourly",
+      "region": "global",
+      "period_start": "2011-09-13",
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 1311,
+          "quote": "LLC4320 utilizes 1/48° grid spacing on a lat–lon–cap (LLC)"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 3,
+          "page_printed": 1311,
+          "quote": "LLC4320 utilizes 1/48° grid spacing on a lat–lon–cap (LLC)"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 3,
+          "page_printed": 1311,
+          "quote": "used to train MAESSTRO produces hourly snapshots"
+        },
+        {
+          "field": "period_start",
+          "page_pdf": 3,
+          "page_printed": 1311,
+          "quote": "13 September 2011. LLC2160 has a lower spatial resolution"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-LLC2160",
+      "canonical_name": "LLC2160 (MITgcm simulation)",
+      "variables": [
+        "SST"
+      ],
+      "spatial_resolution": "1/24 degree",
+      "temporal_resolution": null,
+      "region": "global",
+      "period_start": null,
+      "period_end": null,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 1311,
+          "quote": "while LLC2160 uses 1 /24° grid spacing."
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 3,
+          "page_printed": 1311,
+          "quote": "while LLC2160 uses 1 /24° grid spacing."
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-VIIRS",
+      "canonical_name": "VIIRS Suomi NPP SST level-2P",
+      "variables": [
+        "SST"
+      ],
+      "spatial_resolution": "750 m",
+      "temporal_resolution": null,
+      "region": "California Current",
+      "period_start": "2021-01-16",
+      "period_end": "2021-01-16",
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 10,
+          "page_printed": 1318,
+          "quote": "high-resolution (750 m) VIIRS SST level-2P product"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 10,
+          "page_printed": 1318,
+          "quote": "high-resolution (750 m) VIIRS SST level-2P product"
+        },
+        {
+          "field": "region",
+          "page_pdf": 10,
+          "page_printed": 1318,
+          "quote": "Suite (VIIRS) in the California Current"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "reconstruction of randomly masked SST tiles",
+      "method_id": "M-MAESSTRO",
+      "dataset_ids": [
+        "D-LLC4320",
+        "D-LLC2160"
+      ],
+      "target_variable": "SST",
+      "training": {
+        "learning_rate": {
+          "value": 0.00015,
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Learning rate 0.00015"
+        },
+        "batch_size": {
+          "value": 1968,
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Batch size 1968 (82 per GPU)"
+        },
+        "epochs": {
+          "value": 300,
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Number of epochs 300"
+        },
+        "hardware": {
+          "value": "24 NVIDIA A100 GPUs with 40 GB RAM each",
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Number of GPUs 24 NVIDIA A100 GPUs with 40 GB RAM each"
+        },
+        "note": "Single training setup (Table A1) shared by both evaluation experiments; copied."
+      }
+    },
+    {
+      "experiment_id": "X-MAESSTRO-VIIRS",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "reconstruction of masked real VIIRS SST tile",
+      "method_id": "M-MAESSTRO",
+      "dataset_ids": [
+        "D-LLC4320",
+        "D-VIIRS"
+      ],
+      "target_variable": "SST",
+      "training": {
+        "learning_rate": {
+          "value": 0.00015,
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Learning rate 0.00015"
+        },
+        "batch_size": {
+          "value": 1968,
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Batch size 1968 (82 per GPU)"
+        },
+        "epochs": {
+          "value": 300,
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Number of epochs 300"
+        },
+        "hardware": {
+          "value": "24 NVIDIA A100 GPUs with 40 GB RAM each",
+          "page_pdf": 13,
+          "page_printed": 1321,
+          "quote": "Number of GPUs 24 NVIDIA A100 GPUs with 40 GB RAM each"
+        },
+        "note": "Single training setup (Table A1) shared by both evaluation experiments; copied."
+      }
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.0229,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "single tile, 80% masked, SST field",
+      "baseline_name": "Cubic RBF",
+      "baseline_value": 0.0342,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 6,
+      "page_printed": 1314,
+      "quote": "MAESSTRO (ours) 0.0229 0.990 0.00950 0.921",
+      "note": "Row label and values on the same line in Table 2 as extracted."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "CORRELATION",
+      "metric_raw": "Correlation",
+      "metric_kind": "AGREEMENT",
+      "value": 0.99,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "single tile, 80% masked, SST field",
+      "baseline_name": "Cubic RBF",
+      "baseline_value": 0.978,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 6,
+      "page_printed": 1314,
+      "quote": "MAESSTRO (ours) 0.0229 0.990 0.00950 0.921",
+      "note": "Row label and values on the same line in Table 2 as extracted."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "RMSE",
+      "metric_raw": "RMSE gradient",
+      "metric_kind": "ERROR",
+      "value": 0.0095,
+      "unit": "degC per pixel",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "single tile, 80% masked, SST gradient field",
+      "baseline_name": "Cubic RBF",
+      "baseline_value": 0.0127,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 6,
+      "page_printed": 1314,
+      "quote": "MAESSTRO (ours) 0.0229 0.990 0.00950 0.921",
+      "note": "Row label and values on the same line in Table 2 as extracted."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "CORRELATION",
+      "metric_raw": "Correlation gradient",
+      "metric_kind": "AGREEMENT",
+      "value": 0.921,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "single tile, 80% masked, SST gradient field",
+      "baseline_name": "Cubic RBF",
+      "baseline_value": 0.856,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 6,
+      "page_printed": 1314,
+      "quote": "MAESSTRO (ours) 0.0229 0.990 0.00950 0.921",
+      "note": "Row label and values on the same line in Table 2 as extracted."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.0342,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Cubic RBF reference row, single tile 80% masked",
+      "baseline_name": "Cubic RBF",
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 6,
+      "page_printed": 1314,
+      "quote": "Cubic RBF 0.0342 0.978 0.0127 0.856",
+      "note": "Row label and values on the same line in Table 2 as extracted."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.0549,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Linear-Kriging reference row, single tile 80% masked",
+      "baseline_name": "Linear-Kriging",
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 6,
+      "page_printed": 1314,
+      "quote": "Linear–Kriging 0.0549 0.938 0.0186 0.606",
+      "note": "Row label and values on the same line in Table 2 as extracted."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-LLC2160",
+      "dataset_id": "D-LLC2160",
+      "metric": "SPEEDUP",
+      "metric_raw": "Speed relative to cubic-RBF and Kriging",
+      "metric_kind": "EFFICIENCY",
+      "value": 5000,
+      "unit": "x",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "single CPU, global reconstruction of 1382 tiles of 128x128 (lower bound, 'over 5000 times')",
+      "baseline_name": "Cubic RBF / Kriging",
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 12,
+      "page_printed": 1320,
+      "quote": "being over 5000 times faster."
+    },
+    {
+      "experiment_id": "X-MAESSTRO-VIIRS",
+      "dataset_id": "D-VIIRS",
+      "metric": "RMSE",
+      "metric_raw": "RMSE (upper bound over masking ratios up to 0.9)",
+      "metric_kind": "ERROR",
+      "value": 0.1,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "VIIRS tile, 450 random masks per ratio, masking ratios 0.1-0.9; value is the stated upper bound",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 1318,
+      "quote": "0.1 °C for masking ratios of up to 0.9 and 0.05° for masking"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "page_pdf": 12,
+      "page_printed": 1320,
+      "quote": "Here, we have evaluated one"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 11,
+      "page_printed": 1319,
+      "quote": "This indicates the need to train MAESSTRO on SST data with real cloud masks"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 9,
+      "page_printed": 1317,
+      "quote": "MAESSTRO encounters out-of-domain (OOD) challenges"
+    },
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 3,
+      "page_printed": 1311,
+      "quote": "It is crucial to note that the foregoing are forced model"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 12,
+      "page_printed": 1320,
+      "quote": "next step, we plan to extend our methodology through further"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-MAESSTRO-LLC2160].training.loss",
+      "searched": [
+        "Section 2.4 Model training",
+        "Appendix A Table A1",
+        "full-text search for loss"
+      ]
+    },
+    {
+      "field": "experiments[X-MAESSTRO-LLC2160].training.optimizer",
+      "searched": [
+        "Section 2.4 Model training",
+        "Appendix A Table A1",
+        "full-text search for optimizer, Adam"
+      ]
+    },
+    {
+      "field": "experiments[X-MAESSTRO-VIIRS].training.loss",
+      "searched": [
+        "Section 2.4 Model training",
+        "Appendix A Table A1",
+        "full-text search for loss"
+      ]
+    },
+    {
+      "field": "experiments[X-MAESSTRO-VIIRS].training.optimizer",
+      "searched": [
+        "Section 2.4 Model training",
+        "Appendix A Table A1",
+        "full-text search for optimizer, Adam"
+      ]
+    }
+  ]
+}

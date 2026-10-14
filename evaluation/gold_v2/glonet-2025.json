@@ -15,6 +15,9 @@
   "year": 2025,
   "venue": "Machine Learning and Computation",
   "ocean_domains": [
+   "forecasting"
+  ],
+  "ocean_domains_raw": [
    "ocean forecasting",
    "physical oceanography"
   ]

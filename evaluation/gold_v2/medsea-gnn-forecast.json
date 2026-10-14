@@ -15,6 +15,9 @@
   "year": 2025,
   "venue": "arXiv:2506.23900v1 [physics.ao-ph]",
   "ocean_domains": [
+   "forecasting"
+  ],
+  "ocean_domains_raw": [
    "regional ocean forecasting",
    "Mediterranean Sea"
   ]

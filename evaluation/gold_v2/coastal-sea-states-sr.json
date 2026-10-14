@@ -15,6 +15,10 @@
   "year": 2023,
   "venue": "Applied Ocean Research",
   "ocean_domains": [
+   "waves",
+   "data-assimilation"
+  ],
+  "ocean_domains_raw": [
    "coastal waves",
    "spectral wave modelling",
    "super-resolution"

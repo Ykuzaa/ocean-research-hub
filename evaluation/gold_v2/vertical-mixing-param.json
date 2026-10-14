@@ -15,6 +15,9 @@
   "year": 2023,
   "venue": "Journal of Advances in Modeling Earth Systems (submitted; arXiv:2306.09045v3)",
   "ocean_domains": [
+   "parameterization"
+  ],
+  "ocean_domains_raw": [
    "ocean_surface_boundary_layer",
    "vertical_mixing_parameterization"
   ]

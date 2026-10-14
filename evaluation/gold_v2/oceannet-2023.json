@@ -15,6 +15,9 @@
   "year": 2023,
   "venue": "arXiv:2310.00813 (cs.LG)",
   "ocean_domains": [
+   "currents"
+  ],
+  "ocean_domains_raw": [
    "regional ocean circulation",
    "western boundary currents (Gulf Stream, Loop Current)"
   ]

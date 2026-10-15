@@ -181,7 +181,9 @@ function EverythingTable({ paper }: { paper: PaperDetailV2 }) {
   }
   for (const method of paper.methods) {
     rows.push({
-      label: method.role === "PROPOSED" ? "modèle proposé" : "comparé à",
+      label: method.role === "PROPOSED" ? "modèle proposé"
+        : method.role === "BASELINE" ? "comparé à"
+        : "modèle, rôle non précisé",
       value: `${method.name} — ${familyLabel(method.family)}`,
       quote: method.evidence[0]?.quote ?? null,
       page: method.evidence[0]?.page ?? null,
@@ -283,7 +285,10 @@ export default async function CorpusPaperPage({ params }: { params: Promise<{ sl
   }
 
   const proposed = paper.methods.filter((method) => method.role === "PROPOSED");
-  const baselines = paper.methods.filter((method) => method.role !== "PROPOSED");
+  const baselines = paper.methods.filter((method) => method.role === "BASELINE");
+  const unclassified = paper.methods.filter(
+    (method) => method.role !== "PROPOSED" && method.role !== "BASELINE",
+  );
   const allResults = [...paper.experiments.flatMap((experiment) => experiment.results), ...paper.orphan_results];
   const allTraining = paper.experiments.flatMap((experiment) => experiment.training);
 
@@ -335,6 +340,7 @@ export default async function CorpusPaperPage({ params }: { params: Promise<{ sl
           {[
             { key: "proposé par les auteurs", methods: proposed, strong: true },
             { key: "comparé à", methods: baselines, strong: false },
+            { key: "rôle non précisé par le papier", methods: unclassified, strong: false },
           ].filter((group) => group.methods.length > 0).map((group) => (
             <div key={group.key} className="rounded-xl border border-rule bg-sheet-2 p-4">
               <p className="text-xs uppercase tracking-wide text-ink-400">{group.key}</p>
@@ -409,11 +415,12 @@ export default async function CorpusPaperPage({ params }: { params: Promise<{ sl
         <Section title="Comment il a été entraîné" hint="Dépliez une ligne pour voir la phrase du papier.">
           {paper.experiments.length > 1
             ? paper.experiments
-                .filter((experiment) => experiment.training.length > 0)
-                .map((experiment, index) => (
+                .map((experiment, index) => ({ experiment, number: index + 1 }))
+                .filter(({ experiment }) => experiment.training.length > 0)
+                .map(({ experiment, number }) => (
                   <div key={experiment.id} className="min-w-0">
                     <p className="mb-2 text-sm text-ink-400">
-                      {`Expérience ${index + 1} — `}
+                      {`Expérience ${number} — `}
                       {[taskLabel(experiment.task), experiment.method, experiment.datasets.join(", ")]
                         .filter(Boolean).join(" · ")}
                     </p>

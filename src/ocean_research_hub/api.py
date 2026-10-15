@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from ocean_research_hub.corpus.repository import CorpusRepository
 from ocean_research_hub.corpus.web import register_corpus_routes
+from ocean_research_hub.corpus_v2.web import register_corpus_v2_routes
 from ocean_research_hub.ingestion.errors import (
     IngestionConflictError,
     IngestionError,
@@ -317,6 +318,16 @@ def create_app(
     # Issue #13 staging corpus: separate tables in the same database, never
     # written into the canonical `papers` table.
     register_corpus_routes(app, corpus_repository or CorpusRepository(database_path))
+
+    # Corpus v2: evidence-gated records read from the repository's JSON files, with the
+    # human audit ledger beside them. No database: the gate runs on the files in CI.
+    # The ledger is overridable so a demo or an end-to-end run never writes verdicts
+    # into the corpus nobody audited.
+    register_corpus_v2_routes(
+        app,
+        Path(os.getenv("OCEAN_GOLD_V2_DIR", "evaluation/gold_v2")),
+        Path(os.getenv("OCEAN_AUDIT_LEDGER", "evaluation/audit_v2/verdicts.json")),
+    )
 
     return app
 

@@ -1,0 +1,913 @@
+{
+ "source": {
+  "source_id": "observation-only-dl",
+  "file": ".data/golden-pdfs/observation-only-deep-learning-for-gappy-satellite-derived-o.pdf",
+  "sha256_prefix": "1b70322060328bd56e0d0b23",
+  "pdf_pages": 10,
+  "printed_page_offset": 0,
+  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-OBSERVATION-ONLY-DL",
+  "doi": null,
+  "title": "Observation-only learning of neural mapping schemes for gappy satellite-derived ocean colour parameters",
+  "year": null,
+  "venue": null,
+  "ocean_domains": [
+   "biogeochemistry",
+   "data-assimilation"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-4DVARNET-CNN",
+   "canonical_name": "4DVarNet (CNN prior)",
+   "family": "HYBRID_PHYSICS_ML",
+   "family_raw": "NN-based Variational Data Assimilation algorithm (4DVarNet)",
+   "architecture_note": "CNN as dynamical model phi inside variational cost; LSTM gradient solver",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "4DVarNet is a Neural Network (NN) based version of the traditional data assimilation approach 4DVar"
+    }
+   ]
+  },
+  {
+   "method_id": "M-4DVARNET-UNET",
+   "canonical_name": "4DVarNet (UNet prior)",
+   "family": "HYBRID_PHYSICS_ML",
+   "family_raw": "NN-based Variational Data Assimilation algorithm (4DVarNet)",
+   "architecture_note": "UNet as dynamical model phi inside variational cost; LSTM gradient solver",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "4DVarNet is a Neural Network (NN) based version of the traditional data assimilation approach 4DVar"
+    }
+   ]
+  },
+  {
+   "method_id": "M-DIRECT-CNN",
+   "canonical_name": "Direct inversion (CNN)",
+   "family": "CNN_GENERIC",
+   "family_raw": "simple Convolutional Neural Network",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "we propose testing a UNet [33] and a simple Convolutional"
+    }
+   ]
+  },
+  {
+   "method_id": "M-DIRECT-UNET",
+   "canonical_name": "Direct inversion (UNet)",
+   "family": "CNN_UNET",
+   "family_raw": "UNet",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "we propose testing a UNet [33] and a simple Convolutional"
+    }
+   ]
+  },
+  {
+   "method_id": "M-DINEOF",
+   "canonical_name": "DInEOF",
+   "family": "CLASSICAL_BASELINE",
+   "family_raw": "Data Interpolating Empirical Orthogonal Functions",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "DInEOF [25], is an iterative matrix completion approach"
+    }
+   ]
+  },
+  {
+   "method_id": "M-EDINEOF",
+   "canonical_name": "eDInEOF",
+   "family": "CLASSICAL_BASELINE",
+   "family_raw": "enhanced DInEOF with temporal filtering",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 3,
+     "page_printed": 3,
+     "quote": "eDInEOF, has been proposed in [27], consisting"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "canonical_name": "CMEMS Mediterranean multi-sensor ocean colour L3 (BBP443)",
+   "variables": [
+    "BBP443"
+   ],
+   "spatial_resolution": "1 km",
+   "temporal_resolution": "daily",
+   "region": "Mediterranean Sea (240x240 focus region)",
+   "period_start": "2017-01",
+   "period_end": "2021-12",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "We used the product [19] provided by the CMEMS that"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "with a 1 km"
+    },
+    {
+     "field": "temporal_resolution",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "a collection of daily, Multi-Sensor"
+    },
+    {
+     "field": "region",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "We used the Mediterranean Sea as a case study"
+    },
+    {
+     "field": "period_start",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "time period considered (Jan. 2017 to Dec. 2021)"
+    },
+    {
+     "field": "period_end",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "time period considered (Jan. 2017 to Dec. 2021)"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-BENCH-4DVN-CNN",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time interpolation of gappy satellite images",
+   "method_id": "M-4DVARNET-CNN",
+   "dataset_ids": [
+    "D-CMEMS-OC-MED-BBP443"
+   ],
+   "target_variable": "BBP443 (log10)",
+   "training": {
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "were trained up to 100 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-BENCH-4DVN-UNET",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time interpolation of gappy satellite images",
+   "method_id": "M-4DVARNET-UNET",
+   "dataset_ids": [
+    "D-CMEMS-OC-MED-BBP443"
+   ],
+   "target_variable": "BBP443 (log10)",
+   "training": {
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "were trained up to 100 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-BENCH-DIRECT-CNN",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time interpolation of gappy satellite images",
+   "method_id": "M-DIRECT-CNN",
+   "dataset_ids": [
+    "D-CMEMS-OC-MED-BBP443"
+   ],
+   "target_variable": "BBP443 (log10)",
+   "training": {
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "were trained up to 100 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-BENCH-DIRECT-UNET",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time interpolation of gappy satellite images",
+   "method_id": "M-DIRECT-UNET",
+   "dataset_ids": [
+    "D-CMEMS-OC-MED-BBP443"
+   ],
+   "target_variable": "BBP443 (log10)",
+   "training": {
+    "epochs": {
+     "value": "up to 100",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "were trained up to 100 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-PATTERNS-4DVN-CNN",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time interpolation of gappy satellite images",
+   "method_id": "M-4DVARNET-CNN",
+   "dataset_ids": [
+    "D-CMEMS-OC-MED-BBP443"
+   ],
+   "target_variable": "BBP443 (log10)",
+   "training": {}
+  },
+  {
+   "experiment_id": "X-SENSORS-4DVN-CNN",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time interpolation of gappy satellite images",
+   "method_id": "M-4DVARNET-CNN",
+   "dataset_ids": [
+    "D-CMEMS-OC-MED-BBP443"
+   ],
+   "target_variable": "BBP443 (log10)",
+   "training": {}
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-BENCH-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.0501,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, 4DVarNet (CNN)",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 0.0745,
+   "source_table": "Table I",
+   "is_best_in_table": true,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "4DVarNet (CNN) 0.0501 7.3"
+  },
+  {
+   "experiment_id": "X-BENCH-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "MRE",
+   "metric_kind": "ERROR",
+   "value": 7.3,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, 4DVarNet (CNN)",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 12.11,
+   "source_table": "Table I",
+   "is_best_in_table": true,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "4DVarNet (CNN) 0.0501 7.3"
+  },
+  {
+   "experiment_id": "X-BENCH-4DVN-UNET",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.052,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, 4DVarNet (UNet)",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 0.0745,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "4DVarNet (UNet) 0.0520 7.65"
+  },
+  {
+   "experiment_id": "X-BENCH-4DVN-UNET",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "MRE",
+   "metric_kind": "ERROR",
+   "value": 7.65,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, 4DVarNet (UNet)",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 12.11,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "4DVarNet (UNet) 0.0520 7.65"
+  },
+  {
+   "experiment_id": "X-BENCH-DIRECT-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.128,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, CNN",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 0.0745,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "CNN 0.128 21.9"
+  },
+  {
+   "experiment_id": "X-BENCH-DIRECT-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "MRE",
+   "metric_kind": "ERROR",
+   "value": 21.9,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, CNN",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 12.11,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "CNN 0.128 21.9"
+  },
+  {
+   "experiment_id": "X-BENCH-DIRECT-UNET",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.119,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, UNet",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 0.0745,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "UNet 0.119 18.9"
+  },
+  {
+   "experiment_id": "X-BENCH-DIRECT-UNET",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "MRE",
+   "metric_kind": "ERROR",
+   "value": 18.9,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "patch-based train/test, UNet",
+   "baseline_name": "eDInEOF",
+   "baseline_value": 12.11,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "UNet 0.119 18.9"
+  },
+  {
+   "experiment_id": "X-BENCH-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.0745,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "eDInEOF reference row, patch-based observations",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "eDInEOF 0.0745 12.11"
+  },
+  {
+   "experiment_id": "X-BENCH-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.0758,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "DInEOF reference row, patch-based observations",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table I",
+   "is_best_in_table": false,
+   "page_pdf": 5,
+   "page_printed": 5,
+   "quote": "DInEOF 0.0758 11.7"
+  },
+  {
+   "experiment_id": "X-PATTERNS-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.0271,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "train random-based / test random-based (column layout of Table II reconstructed, see note)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table II",
+   "is_best_in_table": true,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "4DVarNet (CNN) Random-based Random-based 0.0271 4.0"
+  },
+  {
+   "experiment_id": "X-PATTERNS-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.2361,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "train random-based / test sensor-based (layout reconstructed)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table II",
+   "is_best_in_table": false,
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "4DVarNet (CNN) Random-based Sensor-based 0.2361 42.8"
+  },
+  {
+   "experiment_id": "X-SENSORS-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.04426,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "all five sensors, 10% removed common support",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table III",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "All-sensors 0.04426 6.71 0.46"
+  },
+  {
+   "experiment_id": "X-SENSORS-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.06891,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "VIIRS-JPSS1 only (best single sensor)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table III",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "3 : VIIRS-JPSS1 0.06891 10.14 0.64"
+  },
+  {
+   "experiment_id": "X-SENSORS-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "RMSLE",
+   "metric_kind": "ERROR",
+   "value": 0.1444,
+   "unit": "log10 units",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "OLCI-S3B only (worst single sensor)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table III",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "5 : OLCI-S3B 0.1444 21.60 0.84"
+  },
+  {
+   "experiment_id": "X-SENSORS-4DVN-CNN",
+   "dataset_id": "D-CMEMS-OC-MED-BBP443",
+   "metric": "OTHER",
+   "metric_raw": "MRE",
+   "metric_kind": "ERROR",
+   "value": 6.71,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "all five sensors",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table III",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "All-sensors 0.04426 6.71 0.46"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "Although this paper focuses on a restricted area of the Mediterranean Sea"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "Future work will likely explore such generalization properties up to the global"
+  },
+  {
+   "theme": "DATA",
+   "page_pdf": 4,
+   "page_printed": 4,
+   "quote": "As a drawback, it makes the proportion of missing data and"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 6,
+   "page_printed": 6,
+   "quote": "one cannot directly compare the performances reached for the different testing observation"
+  }
+ ],
+ "conflicts": [],
+ "not_reported": [
+  {
+   "field": "experiments[X-BENCH-4DVN-CNN].training.loss",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-CNN].training.optimizer",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-CNN].training.learning_rate",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-CNN].training.batch_size",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-CNN].training.hardware",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-UNET].training.loss",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-UNET].training.optimizer",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-UNET].training.learning_rate",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-UNET].training.batch_size",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-4DVN-UNET].training.hardware",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-CNN].training.loss",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-CNN].training.optimizer",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-CNN].training.learning_rate",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-CNN].training.batch_size",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-CNN].training.hardware",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-UNET].training.loss",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-UNET].training.optimizer",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-UNET].training.learning_rate",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-UNET].training.batch_size",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-BENCH-DIRECT-UNET].training.hardware",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-PATTERNS-4DVN-CNN].training.loss",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-PATTERNS-4DVN-CNN].training.optimizer",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-PATTERNS-4DVN-CNN].training.learning_rate",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-PATTERNS-4DVN-CNN].training.batch_size",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-PATTERNS-4DVN-CNN].training.epochs",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-PATTERNS-4DVN-CNN].training.hardware",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-SENSORS-4DVN-CNN].training.loss",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-SENSORS-4DVN-CNN].training.optimizer",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-SENSORS-4DVN-CNN].training.learning_rate",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-SENSORS-4DVN-CNN].training.batch_size",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-SENSORS-4DVN-CNN].training.epochs",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "experiments[X-SENSORS-4DVN-CNN].training.hardware",
+   "searched": [
+    "Section IV Learning strategies",
+    "Section V Experiments (A-C)",
+    "Section VI Conclusion",
+    "Acknowledgements"
+   ]
+  },
+  {
+   "field": "paper.year",
+   "searched": [
+    "title block",
+    "footnotes",
+    "header (LaTeX template date only)"
+   ]
+  },
+  {
+   "field": "paper.doi",
+   "searched": [
+    "page 1",
+    "references"
+   ]
+  }
+ ]
+}

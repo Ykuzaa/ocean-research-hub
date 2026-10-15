@@ -1,0 +1,24 @@
+{
+  "source": {
+    "source_id": "dl-infer-ocean-dynamics",
+    "file": ".data/golden-pdfs/deep-learning-to-infer-ocean-dynamics.pdf",
+    "sha256_prefix": "ab332d0085af6478809cf751",
+    "pdf_pages": 27,
+    "printed_page_offset": -1,
+    "extracted_by": "paper-extractor",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-DL-INFER-OCEAN-DYNAMICS",
+    "doi": "10.1146/annurev-marine-040324-023244",
+    "title": "Deep Learning to Infer Ocean Dynamics",
+    "year": 2026,
+    "venue": "Annual Review of Marine Science",
+    "ocean_domains": ["reviews", "data-assimilation", "forecasting", "parameterization"]
+  },
+  "excluded": {
+    "reason": "Review article: it surveys published DL work on ocean dynamics and trains no ML model of its own.",
+    "page_pdf": 2,
+    "quote": "we review recent progress in applying DL to ocean dynamics, including"
+  }
+}

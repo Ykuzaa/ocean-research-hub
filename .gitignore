@@ -9,3 +9,4 @@ codex-run.log
 .env
 .env.*
 !.env.example
+evaluation/work/

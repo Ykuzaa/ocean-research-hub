@@ -1,0 +1,27 @@
+{
+ "source": {
+  "source_id": "unlocking-the-potential-of-deep-learning-for-marine-ecology",
+  "file": ".data/golden-pdfs/unlocking-the-potential-of-deep-learning-for-marine-ecology.pdf",
+  "sha256_prefix": "6c09458850f5c9295a2be7b0",
+  "pdf_pages": 44,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-DL-MARINE-ECOLOGY",
+  "doi": null,
+  "title": "Unlocking the potential of deep learning for marine ecology: overview, applications, and outlook",
+  "year": 2021,
+  "venue": "arXiv preprint (2109.14737)",
+  "ocean_domains": [
+   "marine-ecology",
+   "reviews"
+  ]
+ },
+ "excluded": {
+  "reason": "Review/tutorial. The case studies (fish, plankton, whales, etc.) summarise published work; no model is trained and no experiment is reported by the authors. Searched whole text for batch size, epoch, optimizer, GPU, RMSE: absent.",
+  "page_pdf": 3,
+  "quote": "We use established and future-looking case studies on\nplankton, ﬁshes, marine mammals, pollution, and nutrient cycling that involve"
+ }
+}

@@ -1,0 +1,674 @@
+{
+  "source": {
+    "source_id": "hybrid-ml-da-biogeo",
+    "file": ".data/golden-pdfs/hybrid-machine-learning-data-assimilation-for-marine-biogeoc.pdf",
+    "sha256_prefix": "e4ee3725c865e6828d597c3f",
+    "pdf_pages": 31,
+    "printed_page_offset": 0,
+    "extracted_by": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-HYBRID-ML-DA-BIOGEO",
+    "doi": null,
+    "title": "Hybrid machine learning data assimilation for marine biogeochemistry",
+    "year": 2025,
+    "venue": "arXiv:2504.05218 (physics.ao-ph)",
+    "ocean_domains": [
+      "biogeochemistry",
+      "data-assimilation"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-ML-OI",
+      "canonical_name": "ML-OI (hybrid machine-learning optimal interpolation)",
+      "family": "MLP_DNN",
+      "family_raw": "fully connected ANN",
+      "architecture_note": "Fully connected ANN tuned by AutoKeras (100 trials) that predicts state-dependent background correlations between total chlorophyll and unobserved variables; the correlations feed an OI/Kalman-type update with climatological variances. Network classified on itself (rule 5), coupling to the DA scheme recorded here.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "Each ML model is a fully connected ANN optimized using AutoKeras"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "We call this approach ML-OI"
+        }
+      ]
+    },
+    {
+      "method_id": "M-ML-ETE",
+      "canonical_name": "ML-EtE (end-to-end machine learning of EnKF updates)",
+      "family": "MLP_DNN",
+      "family_raw": "fully connected ANN",
+      "architecture_note": "Fully connected ANN tuned by AutoKeras (100 trials) that emulates the EnKF analysis increments of unobserved variables from the background state and the total chlorophyll increment; replaces only the analysis step, not the forecast model.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "Each ML model is a fully connected ANN optimized using AutoKeras"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "We call this approach ML-EtE"
+        }
+      ]
+    },
+    {
+      "method_id": "M-RUS",
+      "canonical_name": "RUS (reference univariate DA scheme)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "univariate scheme with climatological covariances",
+      "architecture_note": "Updates only total chlorophyll (and PFTs by stoichiometry) with climatological background variances; no learned parameters.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "Its purpose is to mimic existing DA systems used by several operational centres"
+        }
+      ]
+    },
+    {
+      "method_id": "M-ENKF",
+      "canonical_name": "Stochastic EnKF (gold standard)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "stochastic Ensemble Kalman Filter",
+      "architecture_note": "Ensemble-based flow-dependent covariances, no learned parameters; also generates training data for ML-EtE.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "The stochastic EnKF scheme, see e.g., Evensen (2003)"
+        }
+      ]
+    },
+    {
+      "method_id": "M-CLIC",
+      "canonical_name": "CliC (climatological correlations)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "non-ML climatological correlation update",
+      "architecture_note": "Same update as ML-OI but with purely climatological correlations from the EnKF run.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "A further non-ML-based scheme is used to update the extended range of variables"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-L4-SYNTH",
+      "canonical_name": "Synthetic GOTM-FABM-ERSEM ensembles at L4 (English Channel)",
+      "variables": [
+        "total chlorophyll",
+        "nitrate",
+        "ERSEM pelagic variables"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": "weekly samples (7-day assimilation cycle)",
+      "region": "L4, Western English Channel",
+      "period_start": "2000",
+      "period_end": "2014",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "is a highly biologically productive site with seasonally stratified dynamics"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "We generate training samples at seven day intervals across these free-runs"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-CWEC-SYNTH",
+      "canonical_name": "Synthetic GOTM-FABM-ERSEM ensembles at CWEC (Central Western English Channel)",
+      "variables": [
+        "total chlorophyll",
+        "ERSEM pelagic variables"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "Central Western English Channel",
+      "period_start": null,
+      "period_end": null,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "Besides the L4 site, we configure a setup for an additional location"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-ERA5",
+      "canonical_name": "ECMWF ERA5 (forcing)",
+      "variables": [
+        "meteorological forcing"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": null,
+      "period_end": null,
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "the ECMWF ERA5 dataset"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-ML-OI-NITRATE-L4",
+      "task": "DATA_ASSIMILATION",
+      "task_raw": "multivariate DA update of unobserved biogeochemical variables",
+      "method_id": "M-ML-OI",
+      "dataset_ids": [
+        "D-L4-SYNTH",
+        "D-ERA5"
+      ],
+      "target_variable": "nitrate (correlation with total chlorophyll)",
+      "training": {},
+      "note": "Offline correlation prediction and online cycled DA, nitrate only. Training setup (loss, optimizer, learning rate, batch size, epochs, hardware) is not given for any ML model; only an AutoKeras search over 100 trials is described (p9)."
+    },
+    {
+      "experiment_id": "X-ML-ETE-NITRATE-L4",
+      "task": "DATA_ASSIMILATION",
+      "task_raw": "multivariate DA update of unobserved biogeochemical variables",
+      "method_id": "M-ML-ETE",
+      "dataset_ids": [
+        "D-L4-SYNTH",
+        "D-ERA5"
+      ],
+      "target_variable": "nitrate analysis increment",
+      "training": {},
+      "note": "Online cycled DA, nitrate only. Training setup (loss, optimizer, learning rate, batch size, epochs, hardware) is not given for any ML model; only an AutoKeras search over 100 trials is described (p9)."
+    },
+    {
+      "experiment_id": "X-ML-OI-ALL-L4",
+      "task": "DATA_ASSIMILATION",
+      "task_raw": "multivariate DA update of unobserved biogeochemical variables",
+      "method_id": "M-ML-OI",
+      "dataset_ids": [
+        "D-L4-SYNTH",
+        "D-ERA5"
+      ],
+      "target_variable": "all pelagic variables (ALL and Excl. Zoo variants)",
+      "training": {},
+      "note": "Results only in Fig. 7. Training setup (loss, optimizer, learning rate, batch size, epochs, hardware) is not given for any ML model; only an AutoKeras search over 100 trials is described (p9)."
+    },
+    {
+      "experiment_id": "X-ML-ETE-ALL-L4",
+      "task": "DATA_ASSIMILATION",
+      "task_raw": "multivariate DA update of unobserved biogeochemical variables",
+      "method_id": "M-ML-ETE",
+      "dataset_ids": [
+        "D-L4-SYNTH",
+        "D-ERA5"
+      ],
+      "target_variable": "all pelagic variables",
+      "training": {},
+      "note": "Results only in Fig. 7. Training setup (loss, optimizer, learning rate, batch size, epochs, hardware) is not given for any ML model; only an AutoKeras search over 100 trials is described (p9)."
+    },
+    {
+      "experiment_id": "X-ML-OI-TRANSFER-CWEC",
+      "task": "DATA_ASSIMILATION",
+      "task_raw": "multivariate DA update of unobserved biogeochemical variables",
+      "method_id": "M-ML-OI",
+      "dataset_ids": [
+        "D-L4-SYNTH",
+        "D-CWEC-SYNTH"
+      ],
+      "target_variable": "all pelagic variables at unseen location",
+      "training": {},
+      "note": "Trained at L4, applied at CWEC; results only in Fig. 9. Training setup (loss, optimizer, learning rate, batch size, epochs, hardware) is not given for any ML model; only an AutoKeras search over 100 trials is described (p9)."
+    },
+    {
+      "experiment_id": "X-ML-ETE-TRANSFER-CWEC",
+      "task": "DATA_ASSIMILATION",
+      "task_raw": "multivariate DA update of unobserved biogeochemical variables",
+      "method_id": "M-ML-ETE",
+      "dataset_ids": [
+        "D-L4-SYNTH",
+        "D-CWEC-SYNTH"
+      ],
+      "target_variable": "all pelagic variables at unseen location",
+      "training": {},
+      "note": "Trained at L4, applied at CWEC; results only in Fig. 9. Training setup (loss, optimizer, learning rate, batch size, epochs, hardware) is not given for any ML model; only an AutoKeras search over 100 trials is described (p9)."
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-ML-OI-NITRATE-L4",
+      "dataset_id": "D-L4-SYNTH",
+      "metric": "RMSE",
+      "metric_raw": "RMS difference to true chlorophyll-nitrate correlation",
+      "metric_kind": "ERROR",
+      "value": 0.255,
+      "unit": "correlation",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "offline, 3-year test period 2018-2020, ML-OI",
+      "baseline_name": "daily climatology of correlations",
+      "baseline_value": 0.731,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 12,
+      "page_printed": 12,
+      "quote": "the ML model ( RMSE = 0.255) vastly outperforms the climatological statistics estimates (RMSE = 0.731)"
+    },
+    {
+      "experiment_id": "X-ML-OI-NITRATE-L4",
+      "dataset_id": "D-L4-SYNTH",
+      "metric": "OTHER",
+      "metric_raw": "relative improvement of correlation RMSE over climatology",
+      "metric_kind": "ERROR",
+      "value": 60,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "offline, 3-year test period, ML-OI vs climatology",
+      "baseline_name": "daily climatology of correlations",
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 12,
+      "page_printed": 12,
+      "quote": "which is an approximate 60% improvement"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "The availability of a reanalysis is a clear obstacle of this approach"
+    },
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "SHAP is somewhat limited in the presence of highly correlated features"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 21,
+      "page_printed": 21,
+      "quote": "in practice its extendability to a new location is limited by both availability of training data and to the new location"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 22,
+      "page_printed": 22,
+      "quote": "it is easy to hypothesise that the ML models have overfitted to L4"
+    },
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 23,
+      "page_printed": 23,
+      "quote": "A limitation of our two test locations is that they are not directly coupled"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-ML-OI-NITRATE-L4].training.loss",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-NITRATE-L4].training.optimizer",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-NITRATE-L4].training.learning_rate",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-NITRATE-L4].training.batch_size",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-NITRATE-L4].training.epochs",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-NITRATE-L4].training.hardware",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-NITRATE-L4].training.loss",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-NITRATE-L4].training.optimizer",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-NITRATE-L4].training.learning_rate",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-NITRATE-L4].training.batch_size",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-NITRATE-L4].training.epochs",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-NITRATE-L4].training.hardware",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-ALL-L4].training.loss",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-ALL-L4].training.optimizer",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-ALL-L4].training.learning_rate",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-ALL-L4].training.batch_size",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-ALL-L4].training.epochs",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-ALL-L4].training.hardware",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-ALL-L4].training.loss",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-ALL-L4].training.optimizer",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-ALL-L4].training.learning_rate",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-ALL-L4].training.batch_size",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-ALL-L4].training.epochs",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-ALL-L4].training.hardware",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-TRANSFER-CWEC].training.loss",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-TRANSFER-CWEC].training.optimizer",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-TRANSFER-CWEC].training.learning_rate",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-TRANSFER-CWEC].training.batch_size",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-TRANSFER-CWEC].training.epochs",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-OI-TRANSFER-CWEC].training.hardware",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-TRANSFER-CWEC].training.loss",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-TRANSFER-CWEC].training.optimizer",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-TRANSFER-CWEC].training.learning_rate",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-TRANSFER-CWEC].training.batch_size",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-TRANSFER-CWEC].training.epochs",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    },
+    {
+      "field": "experiments[X-ML-ETE-TRANSFER-CWEC].training.hardware",
+      "searched": [
+        "Methods (Sect. 3.4)",
+        "Sect. 3.2-3.3",
+        "Results (Sect. 4)",
+        "full-text search for batch size, learning rate, epoch, Adam, loss, GPU, NVIDIA, CPU, hours"
+      ]
+    }
+  ]
+}

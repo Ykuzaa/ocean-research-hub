@@ -1,0 +1,988 @@
+{
+  "source": {
+    "source_id": "joint-interpolation-learning",
+    "file": ".data/golden-pdfs/joint-interpolation-and-representation-learning-for-irregula.pdf",
+    "sha256_prefix": "f2b7231412189a389368574b",
+    "pdf_pages": 13,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-JOINT-INTERP",
+    "doi": "10.3389/fams.2021.655224",
+    "title": "Joint Interpolation and Representation Learning for Irregularly Sampled Satellite-Derived Geophysical Fields",
+    "year": 2021,
+    "venue": "Frontiers in Applied Mathematics and Statistics",
+    "ocean_domains": [
+      "data-assimilation"
+    ],
+    "ocean_domains_raw": [
+      "satellite_remote_sensing",
+      "interpolation_gap_filling"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-E2E-CONVAE",
+      "canonical_name": "FP(d)/G(d)-ConvAE (end-to-end energy-based interpolation with convolutional auto-encoder prior)",
+      "family": "HYBRID_PHYSICS_ML",
+      "family_raw": "end-to-end neural network with energy-based (variational) formulation, auto-encoder prior",
+      "architecture_note": "Learned energy U(X)=||X-psi(X)||^2 unrolled in an N_I-block iterative fixed-point (FP) or learned-gradient (G) interpolator, trained end-to-end. Prior psi = convolutional auto-encoder.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "page_pdf": 1,
+          "page_printed": 1,
+          "quote": "end-to-end neural network learning scheme, which relies on an energy-based formulation of the interpolation problem",
+          "field": "family"
+        }
+      ]
+    },
+    {
+      "method_id": "M-E2E-GENN",
+      "canonical_name": "FP(d)/G(d)-GENN (end-to-end energy-based interpolation with Gibbs energy neural network prior)",
+      "family": "HYBRID_PHYSICS_ML",
+      "family_raw": "neural-network-based Gibbs energy representation embedded in iterative variational solver",
+      "architecture_note": "Learned energy U(X)=||X-psi(X)||^2 unrolled in an N_I-block iterative fixed-point (FP) or learned-gradient (G) interpolator, trained end-to-end. Prior psi = Gibbs energy CNN (zero-centre kernel, average pooling x4, residual units). Auto-encoder alternative classified separately.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "we introduce neural network–based Gibbs energy representations",
+          "field": "family"
+        }
+      ]
+    },
+    {
+      "method_id": "M-OI",
+      "canonical_name": "Optimal interpolation (Gaussian covariance model)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "optimal interpolation",
+      "architecture_note": "Covariance parameters tuned empirically / by cross-validation, no neural network.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "we include an OI with a Gaussian covariance model tuned using cross-validation",
+          "field": "family"
+        }
+      ]
+    },
+    {
+      "method_id": "M-DINEOF",
+      "canonical_name": "DINEOF (EOF-based iterative projection)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "DINEOF / EOF projection",
+      "architecture_note": "EOF basis trained on gap-free data; PCA fit, no neural network.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "which uses a 20-dimensional EOF trained on the gap-free dataset",
+          "field": "family"
+        }
+      ]
+    },
+    {
+      "method_id": "M-ANDA",
+      "canonical_name": "AnDA (analog data assimilation)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "analog data assimilation with ensemble Kalman filter",
+      "architecture_note": "Requires a gap-free reference dataset; patch-based version.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "The AnDa scheme combines the exploitation of a gap-free reference dataset to design an analog dynamical model with a state-of-the-art ensemble",
+          "field": "family"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-MNIST-GAPS",
+      "canonical_name": "MNIST with simulated square gaps",
+      "variables": [
+        "grayscale_digit_image"
+      ],
+      "spatial_resolution": "28 x 28 pixels",
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "We evaluate the proposed framework on MNIST dataset for which we simulate missing data patterns.",
+          "field": "canonical_name"
+        },
+        {
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "dataset of 28 × 28 grayscale images of digits",
+          "field": "spatial_resolution"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "canonical_name": "NATL60 SST OSSE with METOP AVHRR cloud masks",
+      "variables": [
+        "sea_surface_temperature"
+      ],
+      "spatial_resolution": "0.05 degrees",
+      "temporal_resolution": null,
+      "region": "Open ocean, North East Atlantic (40.58N, 46.3W to 53.04N, 16.18W)",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "namely, NATL60 data",
+          "field": "canonical_name"
+        },
+        {
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "an open ocean region in the North East Atlantic",
+          "field": "region"
+        },
+        {
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "we randomly sample 400 128 × 512 × 11 image series as training data and 150 as the",
+          "field": "canonical_name",
+          "note": "400 training and 150 test series of 11 consecutive days, June to August (year not stated)."
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "canonical_name": "NATL60 SSH OSSE (nadir 4-altimeter 2013 and SWOT sampling), Gulf Stream",
+      "variables": [
+        "sea_surface_height",
+        "sea_surface_height_gradient_norm"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "Gulf Stream [33N, 43N; -65W, -55W]",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "The OSSE relies on NATL60 high-resolution deterministic",
+          "field": "canonical_name"
+        },
+        {
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "we focus on a region along the Gulf Stream",
+          "field": "region"
+        },
+        {
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "we use for evaluation purposes a 20-day test period in December",
+          "field": "canonical_name",
+          "note": "20-day test period in December; remaining data (minus 10 days either side) is training. Year not stated apart from 2013 nadir configuration."
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-OI-BASELINE-SSH",
+      "canonical_name": "Operational OI gridded altimeter fields (baseline)",
+      "variables": [
+        "sea_surface_height"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "Gulf Stream",
+      "period_start": null,
+      "period_end": null,
+      "role": "BASELINE_PRODUCT",
+      "evidence": [
+        {
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "we consider the operational processing chain",
+          "field": "canonical_name"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-MNIST-CONVAE",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "interpolation of irregularly sampled images + representation learning",
+      "method_id": "M-E2E-CONVAE",
+      "dataset_ids": [
+        "D-MNIST-GAPS"
+      ],
+      "target_variable": "grayscale_digit_image",
+      "training": {
+        "optimizer": {
+          "value": "adam",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "we use Adam optimizer",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "learning_rate": {
+          "value": "decreased from 1e-3 to 1e-6, every 50 epochs",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "typically from 1e-3 to 1e-6 every 50 epochs",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "batch_size": {
+          "value": 256,
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "we consider a batch size of 256"
+        },
+        "epochs": {
+          "value": 100,
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The training phase involved 100 epochs."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SST-CONVAE",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "interpolation of irregularly sampled SST fields",
+      "method_id": "M-E2E-CONVAE",
+      "dataset_ids": [
+        "D-NATL60-SST-OSSE"
+      ],
+      "target_variable": "sea_surface_temperature",
+      "training": {
+        "optimizer": {
+          "value": "adam",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "we use Adam optimizer",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "learning_rate": {
+          "value": "decreased from 1e-3 to 1e-6, every 50 epochs",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "typically from 1e-3 to 1e-6 every 50 epochs",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "batch_size": {
+          "value": 4,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "we considered a batch size of 4, 400 epochs and an early stopping"
+        },
+        "epochs": {
+          "value": 400,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "we considered a batch size of 4, 400 epochs and an early stopping"
+        },
+        "hardware": {
+          "value": "NVIDIA V100 GPU",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "using an NVIDIA V100 GPU for the considered space",
+          "note": "Stated for the space-time case studies (SST, SSH) in Section 3.3; copied."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SST-GENN",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "interpolation of irregularly sampled SST fields",
+      "method_id": "M-E2E-GENN",
+      "dataset_ids": [
+        "D-NATL60-SST-OSSE"
+      ],
+      "target_variable": "sea_surface_temperature",
+      "training": {
+        "optimizer": {
+          "value": "adam",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "we use Adam optimizer",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "learning_rate": {
+          "value": "decreased from 1e-3 to 1e-6, every 50 epochs",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "typically from 1e-3 to 1e-6 every 50 epochs",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "batch_size": {
+          "value": 4,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "we considered a batch size of 4, 400 epochs and an early stopping"
+        },
+        "epochs": {
+          "value": 400,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "we considered a batch size of 4, 400 epochs and an early stopping"
+        },
+        "hardware": {
+          "value": "NVIDIA V100 GPU",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "using an NVIDIA V100 GPU for the considered space",
+          "note": "Stated for the space-time case studies (SST, SSH) in Section 3.3; copied."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SSH-CONVAE",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "interpolation of irregularly sampled SSH fields (unsupervised and supervised)",
+      "method_id": "M-E2E-CONVAE",
+      "dataset_ids": [
+        "D-NATL60-SSH-OSSE",
+        "D-OI-BASELINE-SSH"
+      ],
+      "target_variable": "sea_surface_height_gradient_norm",
+      "training": {
+        "optimizer": {
+          "value": "adam",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "we use Adam optimizer",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "learning_rate": {
+          "value": "decreased from 1e-3 to 1e-6, every 50 epochs",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "typically from 1e-3 to 1e-6 every 50 epochs",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "batch_size": {
+          "value": 4,
+          "page_pdf": 9,
+          "page_printed": 9,
+          "note": "Paper writes the number as a word ('with a batch size of four and up to 300 epochs', Section 4.3); value 4 read from it, no digit-bearing quote exists.",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE"
+        },
+        "epochs": {
+          "value": 300,
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "with a batch size of four and up to 300 epochs",
+          "note": "'up to' 300 epochs, early stopping after 10 to 20 epochs in the unsupervised case."
+        },
+        "hardware": {
+          "value": "NVIDIA V100 GPU",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "using an NVIDIA V100 GPU for the considered space",
+          "note": "Stated for the space-time case studies (SST, SSH) in Section 3.3; copied."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SSH-GENN",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "interpolation of irregularly sampled SSH fields (unsupervised and supervised)",
+      "method_id": "M-E2E-GENN",
+      "dataset_ids": [
+        "D-NATL60-SSH-OSSE",
+        "D-OI-BASELINE-SSH"
+      ],
+      "target_variable": "sea_surface_height_gradient_norm",
+      "training": {
+        "optimizer": {
+          "value": "adam",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "we use Adam optimizer",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "learning_rate": {
+          "value": "decreased from 1e-3 to 1e-6, every 50 epochs",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "typically from 1e-3 to 1e-6 every 50 epochs",
+          "note": "Optimizer and learning-rate schedule are given once for all experiments (Section 3.3); copied here."
+        },
+        "batch_size": {
+          "value": 4,
+          "page_pdf": 9,
+          "page_printed": 9,
+          "note": "Paper writes the number as a word ('with a batch size of four and up to 300 epochs', Section 4.3); value 4 read from it, no digit-bearing quote exists.",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE"
+        },
+        "epochs": {
+          "value": 300,
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "with a batch size of four and up to 300 epochs",
+          "note": "'up to' 300 epochs, early stopping after 10 to 20 epochs in the unsupervised case."
+        },
+        "hardware": {
+          "value": "NVIDIA V100 GPU",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "using an NVIDIA V100 GPU for the considered space",
+          "note": "Stated for the space-time case studies (SST, SSH) in Section 3.3; copied."
+        }
+      }
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-MNIST-CONVAE",
+      "dataset_id": "D-MNIST-GAPS",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 44.12,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(15)-ConvAE, NS=3, WS=9, test",
+      "baseline_name": "DINEOF",
+      "baseline_value": -44.77,
+      "source_table": "Table 1",
+      "is_best_in_table": true,
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "FP(15)-ConvAE 46.91% (44.12%) 85.13% (83.79%) 91.87% (91.38%) 97.90"
+    },
+    {
+      "experiment_id": "X-MNIST-CONVAE",
+      "dataset_id": "D-MNIST-GAPS",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 43.76,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "G(14)-ConvAE, NS=3, WS=9, test",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "G (14)-ConvAE 46.74% (43.76%) 85.72% (83.98%) 92.09% (91.39%) 97.76"
+    },
+    {
+      "experiment_id": "X-MNIST-CONVAE",
+      "dataset_id": "D-MNIST-GAPS",
+      "metric": "OTHER",
+      "metric_raw": "R-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 83.79,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(15)-ConvAE, NS=3, WS=9, test",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "FP(15)-ConvAE 46.91% (44.12%) 85.13% (83.79%) 91.87% (91.38%) 97.90"
+    },
+    {
+      "experiment_id": "X-MNIST-CONVAE",
+      "dataset_id": "D-MNIST-GAPS",
+      "metric": "OTHER",
+      "metric_raw": "AE-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 91.38,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(15)-ConvAE, NS=3, WS=9, test",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "FP(15)-ConvAE 46.91% (44.12%) 85.13% (83.79%) 91.87% (91.38%) 97.90"
+    },
+    {
+      "experiment_id": "X-MNIST-CONVAE",
+      "dataset_id": "D-MNIST-GAPS",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 1.85,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(1)-ConvAE (zero filling), NS=3, WS=9, test",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 1",
+      "is_best_in_table": false,
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "FP(1)-ConvAE 3.55% (1.85%) 74.04% (72.93%) 89.21% (89.05%) 97.76"
+    },
+    {
+      "experiment_id": "X-SST-GENN",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 89.16,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "G(12)-GENN1, test",
+      "baseline_name": "OI",
+      "baseline_value": 57.29,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "57.29% for the OI vs. 89.16% for G (12)-GENN1 in terms of the interpolation score of the test dataset"
+    },
+    {
+      "experiment_id": "X-SST-GENN",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "R-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 90.0,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "G(12)-GENN1, test",
+      "baseline_name": "OI",
+      "baseline_value": 61.0,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "G (12)-GENN 1 89.83% (89.16%) 90.56% (90.00%) 92.23% (90.98%)"
+    },
+    {
+      "experiment_id": "X-SST-GENN",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "AE-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 90.98,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "G(12)-GENN1, test",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "G (12)-GENN 1 89.83% (89.16%) 90.56% (90.00%) 92.23% (90.98%)"
+    },
+    {
+      "experiment_id": "X-SST-GENN",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 87.45,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(15)-GENN1, test",
+      "baseline_name": "OI",
+      "baseline_value": 57.29,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "FP(15)-GENN 1 89.22% (87.45%) 90.07% (88.50%) 92.61% (90.18%)"
+    },
+    {
+      "experiment_id": "X-SST-GENN",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "AE-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": -172.68,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(1)-GENN1 (zero filling), test",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "FP(1)-GENN1 85.46% (79.39%) 86.71% (80.30%) −94.84% ( −172.68%)"
+    },
+    {
+      "experiment_id": "X-SST-CONVAE",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 88.0,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "G(8)-ConvAE2, test",
+      "baseline_name": "OI",
+      "baseline_value": 57.29,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "G (8)-ConvAE 2 90.47% (88.00%) 90.98% (88.39%) 86.33% (78.33%)"
+    },
+    {
+      "experiment_id": "X-SST-CONVAE",
+      "dataset_id": "D-NATL60-SST-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score (explained variance)",
+      "metric_kind": "SKILL",
+      "value": 85.02,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "FP(10)-ConvAE2, test",
+      "baseline_name": "OI",
+      "baseline_value": 57.29,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "FP(10)-ConvAE2 88.71% (85.02%) 89.14% (85.49%) 86.24% (80.76)"
+    },
+    {
+      "experiment_id": "X-SSH-GENN",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 85.61,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "unsupervised, FP(5)-GENN",
+      "baseline_name": "∇OI",
+      "baseline_value": 84.06,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇FP(5)−GENN 85.61 98.93 76.00"
+    },
+    {
+      "experiment_id": "X-SSH-GENN",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "R-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 98.93,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "unsupervised, FP(5)-GENN",
+      "baseline_name": "∇OI",
+      "baseline_value": 90.24,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇FP(5)−GENN 85.61 98.93 76.00"
+    },
+    {
+      "experiment_id": "X-SSH-GENN",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 88.28,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "supervised, FP(10)-GENN",
+      "baseline_name": "∇OI",
+      "baseline_value": 84.06,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇FP(10)−GENN 88.28 97.90 73.29"
+    },
+    {
+      "experiment_id": "X-SSH-GENN",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 87.93,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "supervised, G(10)-GENN",
+      "baseline_name": "∇OI",
+      "baseline_value": 84.06,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇G(10)−GENN 87.93 96.35 77.87"
+    },
+    {
+      "experiment_id": "X-SSH-CONVAE",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 78.54,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "unsupervised, FP(5)-ConvAE",
+      "baseline_name": "∇OI",
+      "baseline_value": 84.06,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇FP(5)−ConvAE 78.54 95.73 −35.26"
+    },
+    {
+      "experiment_id": "X-SSH-CONVAE",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 85.19,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "supervised, G(10)-ConvAE",
+      "baseline_name": "grad-OI (optimal interpolation)",
+      "baseline_value": 84.06,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇G(10)−ConvAE 85.19 97.90 −17.77"
+    },
+    {
+      "experiment_id": "X-SSH-GENN",
+      "dataset_id": "D-NATL60-SSH-OSSE",
+      "metric": "OTHER",
+      "metric_raw": "I-score on SSH gradient norm",
+      "metric_kind": "SKILL",
+      "value": 88.0,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "AnDA baseline (reference only)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 3",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "∇AnDA 88.00 92.53 –"
+    }
+  ],
+  "limitations": [
+    {
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "However, in the unsupervised case, we only report a relatively",
+      "theme": "GENERALIZATION"
+    },
+    {
+      "page_pdf": 12,
+      "page_printed": 12,
+      "quote": "For larger missing data above 90%, the experiments reported for the SSH",
+      "theme": "DATA"
+    },
+    {
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "These results suggest that auto-encoder architectures applied globally cannot account for the space",
+      "theme": "GENERALIZATION"
+    },
+    {
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "increasing the number of fixed-point iterations may result in numerical instabilities",
+      "theme": "OTHER"
+    },
+    {
+      "page_pdf": 4,
+      "page_printed": 4,
+      "quote": "This may prove numerically expensive and was not further investigated in this work.",
+      "theme": "COMPUTE"
+    },
+    {
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "In these experiments, gradient-based end-",
+      "theme": "OTHER"
+    },
+    {
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "future work could investigate these minimization schemes coupled with observation",
+      "theme": "FUTURE_WORK"
+    },
+    {
+      "page_pdf": 12,
+      "page_printed": 12,
+      "quote": "Overall, future work",
+      "theme": "FUTURE_WORK"
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "Table 1 vs text: DINConvAE I-score on MNIST (NS=3, WS=9)",
+      "values": [
+        -3.08,
+        1.2
+      ],
+      "sources": [
+        {
+          "page_pdf": 6,
+          "quote": "DINConvAE −1.21% ( −3.08%) 72.57% (71.96%) 93.42% (92.35%) 98.12"
+        },
+        {
+          "page_pdf": 7,
+          "quote": "I-score of -44.8 and 1.2% using an EOF decomposition"
+        }
+      ],
+      "chosen": -3.08,
+      "reason": "Table 1 gives negative I-scores for DINConvAE (-1.21 train, -3.08 test); the text drops the sign. Baseline only, no result row depends on it."
+    },
+    {
+      "field": "results[X-SSH-GENN supervised].config",
+      "values": [
+        "FP(5)-GENN",
+        "FP(10)-GENN"
+      ],
+      "sources": [
+        {
+          "page_pdf": 10,
+          "quote": "I-scores of ≈ 88.3% for FP(5)-GENN"
+        },
+        {
+          "page_pdf": 10,
+          "quote": "∇FP(10)−GENN 88.28 97.90 73.29"
+        }
+      ],
+      "chosen": "FP(10)-GENN",
+      "reason": "Text says the supervised 88.3% comes from FP(5)-GENN, but Table 3 attributes 88.28 to FP(10)-GENN (FP(5)-GENN supervised does not appear; unsupervised FP(5)-GENN is 85.61). Table row preferred; the Table 3 caption itself says FP(5)."
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "experiments[X-MNIST-CONVAE].training.loss",
+      "searched": [
+        "section 3.3",
+        "section 4 (4.1-4.3)",
+        "Tables 1-3"
+      ],
+      "note": "No loss function is stated."
+    },
+    {
+      "field": "experiments[X-MNIST-CONVAE].training.hardware",
+      "searched": [
+        "section 3.3",
+        "section 4.1"
+      ],
+      "note": "V100 GPU is stated only for the space-time case studies."
+    },
+    {
+      "field": "experiments[X-SST-CONVAE].training.loss",
+      "searched": [
+        "section 3.3",
+        "section 4 (4.1-4.3)",
+        "Tables 1-3"
+      ],
+      "note": "No loss function is stated."
+    },
+    {
+      "field": "experiments[X-SST-GENN].training.loss",
+      "searched": [
+        "section 3.3",
+        "section 4 (4.1-4.3)",
+        "Tables 1-3"
+      ],
+      "note": "No loss function is stated."
+    },
+    {
+      "field": "experiments[X-SSH-CONVAE].training.loss",
+      "searched": [
+        "section 3.3",
+        "section 4 (4.1-4.3)",
+        "Tables 1-3"
+      ],
+      "note": "No loss function stated for the unsupervised scheme; SSH supervised variant only says 'trained to minimize the reconstruction of the true field' (no formula)."
+    },
+    {
+      "field": "experiments[X-SSH-GENN].training.loss",
+      "searched": [
+        "section 3.3",
+        "section 4 (4.1-4.3)",
+        "Tables 1-3"
+      ],
+      "note": "No loss function stated for the unsupervised scheme; SSH supervised variant only says 'trained to minimize the reconstruction of the true field' (no formula)."
+    },
+    {
+      "field": "experiments[*].training.weight_decay/gradient_clipping/seed",
+      "searched": [
+        "section 3.3",
+        "section 4"
+      ]
+    },
+    {
+      "field": "experiments[*].training.params_count (ConvAE total for SSH, SST)",
+      "searched": [
+        "section 4.2"
+      ],
+      "note": "Approximate counts given for SST models (about 400,000 ConvAE1, 900,000 ConvAE2, 30,000 GENN1, 570,000 GENN2)."
+    },
+    {
+      "field": "datasets[D-NATL60-SSH-OSSE].temporal_resolution",
+      "searched": [
+        "Section 4.1 data description",
+        "Table 1",
+        "Figure captions"
+      ],
+      "note": "La phrase citée donne la fenêtre d'entrée de 5 jours, pas la résolution du jeu de données."
+    }
+  ]
+}

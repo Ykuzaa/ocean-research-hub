@@ -1,0 +1,788 @@
+{
+  "source": {
+    "source_id": "coastal-bathymetry-ml",
+    "file": ".data/golden-pdfs/machine-learning-based-estimation-of-coastal-bathymetry-from.pdf",
+    "sha256_prefix": "596da2141324550260e7e517",
+    "pdf_pages": 8,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-COASTAL-BATHYMETRY-ML",
+    "doi": "10.1109/JSTARS.2023.3326238",
+    "title": "Machine learning based estimation of coastal bathymetry from ICESat-2 and Sentinel-2 data",
+    "year": 2023,
+    "venue": "IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing",
+    "ocean_domains": [
+      "bathymetry"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-LBM",
+      "canonical_name": "Linear band model (Lyzenga)",
+      "family": "SYMBOLIC_REGRESSION",
+      "family_raw": "Linear band model (Lyzenga)",
+      "architecture_note": "multiple linear regression on log-transformed band reflectance",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "linear model can be constructed as follows via the multiple linear regression Function"
+        }
+      ]
+    },
+    {
+      "method_id": "M-RBM",
+      "canonical_name": "Ratio band model",
+      "family": "SYMBOLIC_REGRESSION",
+      "family_raw": "Ratio band model",
+      "architecture_note": "linear regression on log-ratio of Green and Blue reflectance",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "According to the ratio of two spectral bands, a linear model can be constructed as follows via the 'regress' Function in MATLAB"
+        }
+      ]
+    },
+    {
+      "method_id": "M-NN",
+      "canonical_name": "Neural network (MATLAB fitnet)",
+      "family": "MLP_DNN",
+      "family_raw": "Neural network (MATLAB fitnet)",
+      "architecture_note": "one hidden layer of 10 units",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we use the 'fitnet' Function provided by MATLAB software to fit a neural network with hidden layer size hiddenSizes of 10"
+        }
+      ]
+    },
+    {
+      "method_id": "M-SVM",
+      "canonical_name": "Support vector machine regression (RBF kernel)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "Support vector machine regression (RBF kernel)",
+      "architecture_note": "MATLAB fitrsvm, radial basis kernel",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we apply the 'fitrsvm' Function provided by MATLAB software to fit a SVM regression model"
+        }
+      ]
+    },
+    {
+      "method_id": "M-RF",
+      "canonical_name": "Random forest (MATLAB TreeBagger)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "Random forest (MATLAB TreeBagger)",
+      "architecture_note": "regression bagged trees",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we apply the 'TreeBagger' Function in MATLAB software to fit a Random Forest by specifying"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-SENTINEL2",
+      "canonical_name": "Sentinel-2 Level-2A annual median composite",
+      "variables": [
+        "Blue",
+        "Green",
+        "Red",
+        "NIR surface reflectance"
+      ],
+      "spatial_resolution": "10 m",
+      "temporal_resolution": null,
+      "region": "Dongsha Atoll, South China Sea",
+      "period_start": "2020-01-01",
+      "period_end": "2020-12-31",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "10-m resolution Blue, Green, Red, Near Infrared (NIR) bands are used for estimating shallow water bathymetry"
+        },
+        {
+          "field": "period",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "with cloudy pixel percentage less than 10% in 2020 are stacked together to composite a median image"
+        },
+        {
+          "field": "region",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "our proposed method is tested in the study area (Fig. 1), i.e., Dongsha Atoll"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-ICESAT2",
+      "canonical_name": "ICESat-2 ATL03 geolocated photons (prior bathymetry)",
+      "variables": [
+        "underwater elevation (EGM2008 datum)"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "Dongsha Atoll, South China Sea",
+      "period_start": "2019-04-22",
+      "period_end": "2020-09-19",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "the ICESat -2 Level-2 ATL03 datasets available on the NASA Earthdata Search website are collected to provide elevation information"
+        },
+        {
+          "field": "period",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "(acquired on 2019/04/ 22, 2019/10/21, 2020/02/25, 2020/03/22, 2020/04/20, 2020/07/20, and 2020/09/19 )"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-LBM",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "shallow water bathymetry retrieval from Sentinel-2 and ICESat-2",
+      "method_id": "M-LBM",
+      "dataset_ids": [
+        "D-SENTINEL2",
+        "D-ICESAT2"
+      ],
+      "target_variable": "shallow water bathymetry (underwater elevation, EGM2008 datum)",
+      "training": {
+        "loss": {
+          "value": "minimizing the bias",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "can be calculated by minimizing the bias between the estimated bathymetry",
+          "note": "Loss inferred only as the least-squares-type criterion the authors name: minimizing bias between estimate and prior bathymetry."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-RBM",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "shallow water bathymetry retrieval from Sentinel-2 and ICESat-2",
+      "method_id": "M-RBM",
+      "dataset_ids": [
+        "D-SENTINEL2",
+        "D-ICESAT2"
+      ],
+      "target_variable": "shallow water bathymetry (underwater elevation, EGM2008 datum)",
+      "training": {
+        "loss": {
+          "value": "minimizing the bias",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "can be calculated by minimizing the bias between the modeled bathymetry",
+          "note": "Loss inferred only as the least-squares-type criterion the authors name: minimizing bias between estimate and prior bathymetry."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-NN",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "shallow water bathymetry retrieval from Sentinel-2 and ICESat-2",
+      "method_id": "M-NN",
+      "dataset_ids": [
+        "D-SENTINEL2",
+        "D-ICESAT2"
+      ],
+      "target_variable": "shallow water bathymetry (underwater elevation, EGM2008 datum)",
+      "training": {
+        "optimizer": {
+          "value": "Levenberg-Marquardt backpropagation",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "(i.e., Levenberg-Marquardt backpropagation)",
+          "note": "Paper labels MATLAB training function 'trainbr' as Levenberg-Marquardt backpropagation."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SVM",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "shallow water bathymetry retrieval from Sentinel-2 and ICESat-2",
+      "method_id": "M-SVM",
+      "dataset_ids": [
+        "D-SENTINEL2",
+        "D-ICESAT2"
+      ],
+      "target_variable": "shallow water bathymetry (underwater elevation, EGM2008 datum)",
+      "training": {}
+    },
+    {
+      "experiment_id": "X-RF",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "shallow water bathymetry retrieval from Sentinel-2 and ICESat-2",
+      "method_id": "M-RF",
+      "dataset_ids": [
+        "D-SENTINEL2",
+        "D-ICESAT2"
+      ],
+      "target_variable": "shallow water bathymetry (underwater elevation, EGM2008 datum)",
+      "training": {}
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-SVM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.99,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, best of five models",
+      "baseline_name": "Ratio band model",
+      "baseline_value": 1.53,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "support vector machine exhibits the best performance (i.e., RMSE: 0.99m, MAPE: 4.19%, R 2: 0.91, Bias: -0.01m)"
+    },
+    {
+      "experiment_id": "X-SVM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "OTHER",
+      "metric_raw": "MAPE",
+      "metric_kind": "ERROR",
+      "value": 4.19,
+      "unit": "%",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, best of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "support vector machine exhibits the best performance (i.e., RMSE: 0.99m, MAPE: 4.19%, R 2: 0.91, Bias: -0.01m)"
+    },
+    {
+      "experiment_id": "X-SVM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "R2",
+      "metric_raw": "R2",
+      "metric_kind": "SKILL",
+      "value": 0.91,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, best of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "support vector machine exhibits the best performance (i.e., RMSE: 0.99m, MAPE: 4.19%, R 2: 0.91, Bias: -0.01m)"
+    },
+    {
+      "experiment_id": "X-SVM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "BIAS",
+      "metric_raw": "Bias",
+      "metric_kind": "ERROR",
+      "value": -0.01,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, best of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "support vector machine exhibits the best performance (i.e., RMSE: 0.99m, MAPE: 4.19%, R 2: 0.91, Bias: -0.01m)"
+    },
+    {
+      "experiment_id": "X-RBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 1.53,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, worst of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the ratio band model exhibits the worst performance (i.e., RMSE: 1.53m, MAPE: 7.51%, R2: 0.80, Bias: -0.26m)"
+    },
+    {
+      "experiment_id": "X-RBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "OTHER",
+      "metric_raw": "MAPE",
+      "metric_kind": "ERROR",
+      "value": 7.51,
+      "unit": "%",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, worst of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the ratio band model exhibits the worst performance (i.e., RMSE: 1.53m, MAPE: 7.51%, R2: 0.80, Bias: -0.26m)"
+    },
+    {
+      "experiment_id": "X-RBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "R2",
+      "metric_raw": "R2",
+      "metric_kind": "SKILL",
+      "value": 0.8,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, worst of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the ratio band model exhibits the worst performance (i.e., RMSE: 1.53m, MAPE: 7.51%, R2: 0.80, Bias: -0.26m)"
+    },
+    {
+      "experiment_id": "X-RBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "BIAS",
+      "metric_raw": "Bias",
+      "metric_kind": "ERROR",
+      "value": -0.26,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, whole shallow area, worst of five models",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the ratio band model exhibits the worst performance (i.e., RMSE: 1.53m, MAPE: 7.51%, R2: 0.80, Bias: -0.26m)"
+    },
+    {
+      "experiment_id": "X-LBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "BIAS",
+      "metric_raw": "Bias",
+      "metric_kind": "ERROR",
+      "value": -2.58,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TRAIN",
+      "config": "training, elevations -15 m to -10 m",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the linear band model (Bias: -2.58m) and the ratio band model (Bias: -3.41m) overestimate"
+    },
+    {
+      "experiment_id": "X-RBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "BIAS",
+      "metric_raw": "Bias",
+      "metric_kind": "ERROR",
+      "value": -3.41,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TRAIN",
+      "config": "training, elevations -15 m to -10 m",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the linear band model (Bias: -2.58m) and the ratio band model (Bias: -3.41m) overestimate"
+    },
+    {
+      "experiment_id": "X-LBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "BIAS",
+      "metric_raw": "Bias",
+      "metric_kind": "ERROR",
+      "value": -3.22,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, elevations -15 m to -10 m",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the linear band model (Bias: -3.22m) and the ratio band model (Bias: -3.97m) overestimate"
+    },
+    {
+      "experiment_id": "X-RBM",
+      "dataset_id": "D-ICESAT2",
+      "metric": "BIAS",
+      "metric_raw": "Bias",
+      "metric_kind": "ERROR",
+      "value": -3.97,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "VALIDATION",
+      "config": "validation, elevations -15 m to -10 m",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "the linear band model (Bias: -3.22m) and the ratio band model (Bias: -3.97m) overestimate"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "In general, our study area exhibits the characteristic of clear water and low turbidity"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "a systematic comparison of various deep learning methods is still lacking"
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "datasets[D-ICESAT2] training/validation year split",
+      "values": [
+        "train 2019, validate 2020",
+        "train 2020, validate 2019"
+      ],
+      "sources": [
+        {
+          "page_pdf": 2,
+          "quote": "We utilize ICESat-2 data acquired in 2019 for the training of several empirical models"
+        },
+        {
+          "page_pdf": 2,
+          "quote": "red dots are the ICESat-2 data acquired in 2020 for the training of empirical"
+        }
+      ],
+      "chosen": null,
+      "reason": "Body text and Fig. 1 caption on the same page disagree; not resolvable from the paper, so no year split is asserted."
+    },
+    {
+      "field": "results[SVM RMSE].value",
+      "values": [
+        0.99,
+        0.98
+      ],
+      "sources": [
+        {
+          "page_pdf": 5,
+          "quote": "support vector machine exhibits the best performance (i.e., RMSE: 0.99m"
+        },
+        {
+          "page_pdf": 5,
+          "quote": "three machine learning models (RMSE: 0.98m"
+        }
+      ],
+      "chosen": 0.99,
+      "reason": "Best single model (SVM, 0.99 m) is stated separately; the ML range lower bound 0.98 m is lower, so one is inconsistent. The explicit per-model figure was kept."
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "experiments[X-LBM].training.optimizer",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-LBM].training.learning_rate",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-LBM].training.batch_size",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-LBM].training.epochs",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-LBM].training.hardware",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RBM].training.optimizer",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RBM].training.learning_rate",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RBM].training.batch_size",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RBM].training.epochs",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RBM].training.hardware",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-NN].training.loss",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-NN].training.learning_rate",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-NN].training.batch_size",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-NN].training.epochs",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-NN].training.hardware",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-SVM].training.loss",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-SVM].training.optimizer",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-SVM].training.learning_rate",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-SVM].training.batch_size",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-SVM].training.epochs",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-SVM].training.hardware",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RF].training.loss",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RF].training.optimizer",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RF].training.learning_rate",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RF].training.batch_size",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RF].training.epochs",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-RF].training.hardware",
+      "searched": [
+        "II. Study area and data",
+        "III. Methodology (C. Estimating shallow water bathymetry)",
+        "IV. Results",
+        "V. Discussions and conclusion"
+      ]
+    }
+  ]
+}

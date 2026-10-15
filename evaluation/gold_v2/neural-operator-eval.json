@@ -1,0 +1,464 @@
+{
+  "source": {
+    "source_id": "neural-operator-eval",
+    "file": ".data/golden-pdfs/evaluation-of-deep-neural-operator-models-toward-ocean-forec.pdf",
+    "sha256_prefix": "6c9552e210a897ddda6db007",
+    "pdf_pages": 9,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-NEURAL-OPERATOR-EVAL",
+    "doi": null,
+    "title": "Evaluation of Deep Neural Operator Models toward Ocean Forecasting",
+    "year": 2023,
+    "venue": "arXiv:2308.11814v1 [cs.LG]",
+    "ocean_domains": [
+      "forecasting",
+      "neural-operators",
+      "currents"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-FCN",
+      "canonical_name": "FourCastNet (FCN)",
+      "family": "FNO_NEURAL_OPERATOR",
+      "family_raw": "FourCastNet (AFNO backbone with Vision Transformer token mixing)",
+      "architecture_note": "Also described as combining FNOs with Vision Transformers; classified on the AFNO backbone described in Sect. II-B (rule 4). Applied to ocean data by the authors with tuned hyperparameters.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "The AFNO model is the backbone of FourCastNet"
+        },
+        {
+          "field": "is_novel_in_paper",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "this work, we investigate the preliminary use of FourCastNet and Latent DeepONet within an oceanographic context."
+        }
+      ]
+    },
+    {
+      "method_id": "M-LDON",
+      "canonical_name": "Latent DeepONet (L-DoN)",
+      "family": "FNO_NEURAL_OPERATOR",
+      "family_raw": "Latent DeepONet (neural operator with autoencoder)",
+      "architecture_note": "DeepONet branch/trunk operator learned in the latent space of a pre-trained multi-layer autoencoder; no dedicated vocabulary entry for DeepONet, closest is neural operator.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "Latent DeepONet [4] is an extension of DeepONet to learn the operator from the latent representations of the input and output spaces."
+        },
+        {
+          "field": "is_novel_in_paper",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "this work, we investigate the preliminary use of FourCastNet and Latent DeepONet within an oceanographic context."
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-FPC",
+      "canonical_name": "MIT-MSEAS 2.29 simulated 2D flow past a cylinder (Re=200)",
+      "variables": [
+        "u",
+        "v"
+      ],
+      "spatial_resolution": "50x100 finite volumes",
+      "temporal_resolution": "0.01 s",
+      "region": null,
+      "period_start": "t=50 s",
+      "period_end": "t=500 s",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "To create the data sets for these idealized flow cases, we employ our MIT-MSEAS 2.29 finite-volume (FV) framework"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "sub-sampled every 0.01 s and saved for the whole"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "uses 50×100 second-order finite volumes"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-MAB",
+      "canonical_name": "MSEAS-PE data-assimilative reanalysis, Middle Atlantic Bight (SW06/AWACS 2006), regional 3 km domain",
+      "variables": [
+        "surface u",
+        "surface v"
+      ],
+      "spatial_resolution": "3 km",
+      "temporal_resolution": "hourly",
+      "region": "Middle Atlantic Bight",
+      "period_start": "2006-08-14",
+      "period_end": "2006-09-24",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "The MAB simulation data are an outgrowth of the real-time MSEAS-PE forecasts issued during the Shallow Water 2006 (SW06)"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "The FCN results presented in this paper are for the surface circulation in the regional (3 km) domain."
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "spanned Aug. 14 to Sep. 24, 2006, and was saved at hourly resolution providing a total of 1007 snapshots."
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-MB",
+      "canonical_name": "MSEAS-PE reanalysis, Massachusetts Bay (BIOMAPS), 333 m",
+      "variables": [
+        "surface u",
+        "surface v"
+      ],
+      "spatial_resolution": "333 m",
+      "temporal_resolution": "hourly",
+      "region": "Massachusetts Bay",
+      "period_start": "2019-08-11",
+      "period_end": "2019-09-13",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The present MB simulation was completed as a part of our"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "configured in a stand-alone mode with 333 m resolution"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The MB reanalysis spanned the period August 11 to September 13, 2019, and was saved at hourly resolution, providing 781 snapshots."
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-FCN-FPC",
+      "task": "FORECASTING",
+      "task_raw": "predicting idealized periodic vortex shedding of flow past a cylinder",
+      "method_id": "M-FCN",
+      "dataset_ids": [
+        "D-FPC"
+      ],
+      "target_variable": "2D velocity (u, v)",
+      "training": {
+        "loss": {
+          "value": "L2-norm",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "The loss function employed was the L2-norm."
+        },
+        "optimizer": {
+          "value": "stochastic gradient descent",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we use stochastic gradient descents to adjust",
+          "note": "General FCN training description (Sect. II-C), applied to all FCN experiments; the paper names no specific optimizer such as Adam."
+        },
+        "batch_size": {
+          "value": 2,
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "For FCN, we selected a global batch size of 2,"
+        },
+        "epochs": {
+          "value": "150 to 200",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "Training was executed for 150 to 200 epochs."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-LDON-FPC",
+      "task": "FORECASTING",
+      "task_raw": "predicting idealized periodic vortex shedding of flow past a cylinder",
+      "method_id": "M-LDON",
+      "dataset_ids": [
+        "D-FPC"
+      ],
+      "target_variable": "2D velocity (u, v)",
+      "training": {
+        "loss": {
+          "value": "L2-norm",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "The loss function employed was the L2-norm."
+        },
+        "optimizer": {
+          "value": "stochastic gradient descent",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we use stochastic gradient descents to adjust",
+          "note": "Paper says L-DoN training is 'otherwise similar' to FCN (Sect. II-C), which uses stochastic gradient descent; the paper names no specific optimizer."
+        },
+        "batch_size": {
+          "value": 2,
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "latent dimension of 16, batch size of 2,"
+        },
+        "epochs": {
+          "value": 1000,
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "Training was executed for 1000 epochs."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-FCN-MAB",
+      "task": "FORECASTING",
+      "task_raw": "surface velocity forecasting, 0 to 29 h lead times",
+      "method_id": "M-FCN",
+      "dataset_ids": [
+        "D-MAB"
+      ],
+      "target_variable": "surface velocity (u, v)",
+      "training": {
+        "loss": {
+          "value": "L2-norm",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The loss function employed was the L2-norm."
+        },
+        "optimizer": {
+          "value": "stochastic gradient descent",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we use stochastic gradient descents to adjust",
+          "note": "General FCN training description (Sect. II-C), applied to all FCN experiments; the paper names no specific optimizer such as Adam."
+        },
+        "batch_size": {
+          "value": 1,
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "has a tuned global batch size of 1,",
+          "note": "Tuned value of training-run 246; sensitivity study varied it from 1 to 12."
+        },
+        "epochs": {
+          "value": "about 150 to 200",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "model was trained for about 150 to 200 epochs."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-FCN-MB",
+      "task": "FORECASTING",
+      "task_raw": "surface velocity forecasting, 0 to 29 h lead times",
+      "method_id": "M-FCN",
+      "dataset_ids": [
+        "D-MB"
+      ],
+      "target_variable": "surface velocity (u, v)",
+      "training": {
+        "loss": {
+          "value": "L2-norm",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The loss function employed was the L2-norm.",
+          "note": "Loss is stated in the MAB paragraph (Sect. IV-A1); MB section says the setup is similar to MAB."
+        },
+        "optimizer": {
+          "value": "stochastic gradient descent",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "we use stochastic gradient descents to adjust",
+          "note": "General FCN training description (Sect. II-C), applied to all FCN experiments; the paper names no specific optimizer such as Adam."
+        },
+        "batch_size": {
+          "value": 6,
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "MB-training-run 264 that has a tuned global batch size of 6,"
+        }
+      }
+    }
+  ],
+  "results": [],
+  "limitations": [
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 3,
+      "page_printed": 3,
+      "quote": "but the phase and details of the structures can be lost over time."
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 5,
+      "page_printed": 5,
+      "quote": "We note that winds were not contained in the FCN inputs so FCN can only learn and predict their effects from indirect surface"
+    },
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "but somewhat underestimates the intensification over Stellwagen Bank."
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "experiments[*].training.batch_size",
+      "values": [
+        2,
+        1
+      ],
+      "sources": [
+        {
+          "page_pdf": 3,
+          "quote": "For FCN, we selected a global batch size of 2,"
+        },
+        {
+          "page_pdf": 5,
+          "quote": "has a tuned global batch size of 1,"
+        }
+      ],
+      "chosen": null,
+      "reason": "Recorded as requested. Both values describe FCN but in different experiments (flow past a cylinder on p.3, MAB training-run 246 on p.5; MB uses 6), so each experiment keeps its own value and nothing is overridden. The paper never states these as contradictory."
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "experiments[X-FCN-FPC].training.learning_rate",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "experiments[X-LDON-FPC].training.learning_rate",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V",
+        "Sect. II-A"
+      ]
+    },
+    {
+      "field": "experiments[X-FCN-MAB].training.learning_rate",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V",
+        "Paper only says it was that of the original FCN model [11], no value given (p.5)"
+      ]
+    },
+    {
+      "field": "experiments[X-FCN-MB].training.learning_rate",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "experiments[X-FCN-FPC].training.hardware",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "experiments[X-LDON-FPC].training.hardware",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "experiments[X-FCN-MAB].training.hardware",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "experiments[X-FCN-MB].training.hardware",
+      "searched": [
+        "Sect. II-C Training",
+        "Sect. III-B",
+        "Sect. IV-A1",
+        "Sect. IV-B1",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "experiments[X-FCN-MB].training.epochs",
+      "searched": [
+        "Sect. IV-B1 (only says sensitivity study similar to MAB)",
+        "Sect. IV-B2",
+        "Sect. V"
+      ]
+    },
+    {
+      "field": "results",
+      "searched": [
+        "Sect. III-B",
+        "Sect. IV-A2",
+        "Sect. IV-B2",
+        "Sect. V (results are in Figs. 1-4 and text ranges such as 5 to 50% of variability, no table or single value)"
+      ]
+    }
+  ]
+}

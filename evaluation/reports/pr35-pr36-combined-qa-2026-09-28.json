@@ -1,0 +1,222 @@
+{
+ "kind": "INDEPENDENT_QA",
+ "scope": "PR #35 (dd611bc) merged with PR #36 (1466667)",
+ "combined_merge_commit": "a953938 (local, not pushed)",
+ "run_at": "2026-09-28",
+ "runner": "Claude Code session (orchestrator), not the author of either PR",
+ "database": "copy of the local B16 database (SHA-256 e4f760d19dba054b08504bd55768f1fa9eb8977c858fc2b3f919d897de8f4cd9); original never written",
+ "pdf_sha256": {
+  "4dvarnet-ssh-2023.pdf": "bfad134ecdf1a4786ee4fdadc21746ab9e2106618513d8418a357cb39f9f0b88",
+  "oceannet-2023.pdf": "be82ff557769aff04b119490d6a2ebb718887a1e3962355ab10cc9a7291802e9",
+  "oceannet-2023-supplement.pdf": "c3e7f690fab8563d4bfb2728a594bc2adb8e4d42a50872a1e0c97e34f4d7adbf"
+ },
+ "software": {
+  "python_tests": "290 passed",
+  "frontend_tests": "8 passed",
+  "typecheck": "pass",
+  "build": "pass"
+ },
+ "verdict": "PASS",
+ "checks": [
+  {
+   "name": "populated copy has 94 audit events",
+   "pass": true,
+   "detail": "94"
+  },
+  {
+   "name": "migrations 0001-0003 recorded",
+   "pass": true,
+   "detail": "['0001_paper_records', '0002_research_intelligence', '0003_staging_corpus']"
+  },
+  {
+   "name": "0003 leaves every staging table byte-identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "re-running migrations is a no-op",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "append-only audit triggers present after migration",
+   "pass": true,
+   "detail": "2"
+  },
+  {
+   "name": "audit delete rejected",
+   "pass": true,
+   "detail": "scientific audit events are append-only"
+  },
+  {
+   "name": "CorpusRepository read on absent DB creates nothing",
+   "pass": true,
+   "detail": "exists=False parent=False"
+  },
+  {
+   "name": "API catalogue reads return 200 on absent DB",
+   "pass": true,
+   "detail": "{'/api/corpus': 200, '/api/corpus/papers': 200, '/api/corpus/claims': 200, '/api/corpus/research-gaps': 200, '/api/corpus/audits': 200, '/api/corpus/field-mappings': 200, '/api/corpus/import-runs': 200}"
+  },
+  {
+   "name": "API catalogue reads create no database file",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "API reads leave populated DB byte-identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "B16 reimport exits 0",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "B16 reimport: row counts unchanged (no duplicates)",
+   "pass": true,
+   "detail": "{'papers': 115, 'claims': 1867, 'markers': 69, 'mappings': 981, 'events': 94, 'doi_dupes': 0} -> {'papers': 115, 'claims': 1867, 'markers': 69, 'mappings': 981, 'events': 94, 'doi_dupes': 0}"
+  },
+  {
+   "name": "B16 reimport: zero created / updated",
+   "pass": true,
+   "detail": "created={} updated={}"
+  },
+  {
+   "name": "94 audit events preserved after reimport",
+   "pass": true,
+   "detail": "94"
+  },
+  {
+   "name": "reimport leaves staging_corpus_audit_events identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "reimport leaves staging_corpus_claims identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "reimport leaves staging_corpus_field_markers identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "reimport leaves staging_corpus_papers identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "reimport leaves staging_corpus_field_mappings identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "replay oai-0001-b16-scientific-audit.json exits 0",
+   "pass": true,
+   "detail": "{\"status\": \"RECORDED\", \"events\": 42, \"added\": 0}"
+  },
+  {
+   "name": "replay oai-0002-b16-scientific-audit.json exits 0",
+   "pass": true,
+   "detail": "{\"status\": \"RECORDED\", \"events\": 26, \"added\": 0}"
+  },
+  {
+   "name": "replay on populated DB is idempotent (94 events)",
+   "pass": true,
+   "detail": "94"
+  },
+  {
+   "name": "replay leaves audit table identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "replay refused when PDF hash differs",
+   "pass": true,
+   "detail": "{\"status\": \"REJECTED\", \"error\": \"primary_paper file is missing or its SHA-256 differs\"}"
+  },
+  {
+   "name": "fresh import Ocean_Research_Hub_COMPLET.xlsx",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh import Ocean_Research_Intelligence_EXPANDED_V2.xlsx",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh import Ocean_Research_Intelligence_ENRICHED.xlsx",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh import Ocean_Research_Intelligence_ENRICHED_B08.xlsx",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh import Ocean_Research_Intelligence_ENRICHED_B15.xlsx",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh import Ocean_Research_Intelligence_ENRICHED_B16.xlsx",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh replay oai-0001-b16-scientific-audit.json",
+   "pass": true,
+   "detail": "{\"status\": \"RECORDED\", \"events\": 42, \"added\": 42}"
+  },
+  {
+   "name": "fresh replay oai-0002-b16-scientific-audit.json",
+   "pass": true,
+   "detail": "{\"status\": \"RECORDED\", \"events\": 26, \"added\": 26}"
+  },
+  {
+   "name": "fresh DB reaches 68 distinct audited claims",
+   "pass": true,
+   "detail": "68"
+  },
+  {
+   "name": "fresh B16 reimport no-op",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "fresh vs live copy: staging_corpus_papers row count equal",
+   "pass": true,
+   "detail": "115 vs 115"
+  },
+  {
+   "name": "fresh vs live copy: staging_corpus_claims row count equal",
+   "pass": true,
+   "detail": "1867 vs 1867"
+  },
+  {
+   "name": "fresh vs live copy: staging_corpus_field_markers row count equal",
+   "pass": true,
+   "detail": "69 vs 69"
+  },
+  {
+   "name": "served mapping version is B16 with 981 PENDING rules in both DBs",
+   "pass": true,
+   "detail": "{'fresh': ('Ocean_Research_Intelligence_ENRICHED_B16.xlsx', 981, 981), 'live-copy': ('Ocean_Research_Intelligence_ENRICHED_B16.xlsx', 981, 981)}"
+  },
+  {
+   "name": "no mapping rule VALIDATED",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "no paper FULLY_VERIFIED",
+   "pass": true,
+   "detail": "{'PARTIALLY_VERIFIED': 2, 'NOT_VERIFIED': 113}"
+  }
+ ]
+}

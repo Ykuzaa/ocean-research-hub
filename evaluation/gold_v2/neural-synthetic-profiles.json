@@ -1,0 +1,1004 @@
+{
+ "source": {
+  "source_id": "neural-synthetic-profiles",
+  "file": ".data/golden-pdfs/neural-synthetic-profiles-from-remote-sensing-and-observatio.pdf",
+  "sha256_prefix": "0e42c832c70a5fd69f1dfc2d",
+  "pdf_pages": 34,
+  "printed_page_offset": -1,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-NESPRESO",
+  "doi": null,
+  "title": "Neural Synthetic Profiles from Remote Sensing and Observations (NeSPReSO) - Reconstructing temperature and salinity fields in the Gulf of Mexico.",
+  "year": 2025,
+  "venue": "Ocean Modelling (preprint)",
+  "ocean_domains": [
+   "subsurface",
+   "data-assimilation"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-NESPRESO",
+   "canonical_name": "NeSPReSO",
+   "family": "MLP_DNN",
+   "family_raw": "simple multilayer perceptron predicting PCA scores",
+   "architecture_note": "MLP (2 hidden layers of 512, ReLU, dropout 20%) predicting 30 PCA scores, then inverse PCA to rebuild T and S profiles",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "The neural network used in this study consists of a simple multilayer"
+    }
+   ]
+  },
+  {
+   "method_id": "M-MLR",
+   "canonical_name": "Multiple Linear Regression (MLR)",
+   "family": "CLASSICAL_ML",
+   "family_raw": "MLR on PCA scores",
+   "architecture_note": "degree 1 least-squares regression of PCS on the same inputs as the NN",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 15,
+     "page_printed": 14,
+     "quote": "as a baseline method for predicting the PCS from surface measurements"
+    }
+   ]
+  },
+  {
+   "method_id": "M-GEM",
+   "canonical_name": "Gravest Empirical Modes (GEM)",
+   "family": "CLASSICAL_ML",
+   "family_raw": "GEM, cubic smoothing spline fits of T and S against ADT",
+   "architecture_note": "spline fits per pressure level and month; no neural network",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 17,
+     "page_printed": 16,
+     "quote": "For each reference pressure value and for each month, a"
+    }
+   ]
+  },
+  {
+   "method_id": "M-ISOP",
+   "canonical_name": "Improved Synthetic Ocean Profile (ISOP)",
+   "family": "VARIATIONAL_ANALYSIS",
+   "family_raw": "ISOP, variational method with climatology and EOFs",
+   "architecture_note": "only aggregate statistics supplied by the US Navy, no individual profiles",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 8,
+     "quote": "The thermocline layer prediction employs a variational method, leveraging"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-ARGO",
+   "canonical_name": "Argo T/S profiles Gulf of Mexico",
+   "variables": [
+    "temperature",
+    "salinity"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "Gulf of Mexico",
+   "period_start": "2015",
+   "period_end": "2022",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 4,
+     "quote": "The main dataset for this study is a total of 4,145 temperature (T) and"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-GLIDER",
+   "canonical_name": "Seaglider missions 0006, 0010, 0012",
+   "variables": [
+    "temperature",
+    "salinity"
+   ],
+   "spatial_resolution": "3 km horizontal, 1 m vertical",
+   "temporal_resolution": null,
+   "region": "Gulf of Mexico",
+   "period_start": "2017-06",
+   "period_end": "2018-10",
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 6,
+     "quote": "This dataset comprises T and S profiles from three missions (0006, 0010,"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-ADT",
+   "canonical_name": "CMEMS ADT",
+   "variables": [
+    "ADT"
+   ],
+   "spatial_resolution": "1/4 degree",
+   "temporal_resolution": "daily",
+   "region": null,
+   "period_start": "1993",
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 6,
+     "quote": "CMEMS provides an ADT gridded product with a daily resolution and a"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-OISST",
+   "canonical_name": "OISST",
+   "variables": [
+    "SST"
+   ],
+   "spatial_resolution": "1/4 degree",
+   "temporal_resolution": "daily",
+   "region": null,
+   "period_start": "1981",
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 6,
+     "quote": "Optimum Interpolation Sea Surface Temperature (OISST) is a long-term"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-SMAP",
+   "canonical_name": "SMAP SSS",
+   "variables": [
+    "SSS"
+   ],
+   "spatial_resolution": "40 km",
+   "temporal_resolution": "daily",
+   "region": null,
+   "period_start": "2015",
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 8,
+     "page_printed": 7,
+     "quote": "SMAP SSS has been available since 2015 on a daily basis and has a resolution"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-ISOP",
+   "canonical_name": "ISOP statistics (US Navy)",
+   "variables": [
+    "temperature",
+    "salinity"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "Gulf of Mexico",
+   "period_start": null,
+   "period_end": null,
+   "role": "BASELINE_PRODUCT",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 9,
+     "page_printed": 8,
+     "quote": "The ISOP data used in this work was generated by the US Navy and"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "synthetic T and S profile generation from surface data",
+   "method_id": "M-NESPRESO",
+   "dataset_ids": [
+    "D-ARGO",
+    "D-ADT",
+    "D-OISST",
+    "D-SMAP"
+   ],
+   "target_variable": "temperature and salinity profiles 0-1800 m",
+   "training": {
+    "loss": {
+     "value": "weighed mean squared error (WMSE) of the PCS",
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "first term is the weighed mean squared error (WMSE) of the PCS, weighted",
+     "extra_evidence": [
+      {
+       "claim": "second term is functional MSE of T and S profiles",
+       "page_pdf": 14,
+       "page_printed": 13,
+       "quote": "The second term represents the functional mean squared error (FMSE), which is"
+      }
+     ]
+    },
+    "batch_size": {
+     "value": 300,
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "using a batch size of 300"
+    },
+    "epochs": {
+     "value": 8000,
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "a maximum number of 8000",
+     "extra_evidence": [
+      {
+       "claim": "early stopping after 500 epochs without validation improvement",
+       "page_pdf": 15,
+       "page_printed": 14,
+       "quote": "epochs and an early stopping mechanism of 500 epochs, if the loss value in"
+      }
+     ]
+    },
+    "hardware": {
+     "value": "single GPU",
+     "page_pdf": 15,
+     "page_printed": 14,
+     "quote": "Training the model on this setting took 8 minutes using a single"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "synthetic T and S profile generation from surface data, evaluated on glider sections",
+   "method_id": "M-NESPRESO",
+   "dataset_ids": [
+    "D-GLIDER",
+    "D-ADT",
+    "D-OISST",
+    "D-SMAP"
+   ],
+   "target_variable": "temperature and salinity profiles 0-1800 m",
+   "note": "Single training setup shared by the test-set and glider experiments (glider data are unseen by the model).",
+   "training": {
+    "loss": {
+     "value": "weighed mean squared error (WMSE) of the PCS",
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "first term is the weighed mean squared error (WMSE) of the PCS, weighted",
+     "extra_evidence": [
+      {
+       "claim": "second term is functional MSE of T and S profiles",
+       "page_pdf": 14,
+       "page_printed": 13,
+       "quote": "The second term represents the functional mean squared error (FMSE), which is"
+      }
+     ]
+    },
+    "batch_size": {
+     "value": 300,
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "using a batch size of 300"
+    },
+    "epochs": {
+     "value": 8000,
+     "page_pdf": 14,
+     "page_printed": 13,
+     "quote": "a maximum number of 8000",
+     "extra_evidence": [
+      {
+       "claim": "early stopping after 500 epochs without validation improvement",
+       "page_pdf": 15,
+       "page_printed": 14,
+       "quote": "epochs and an early stopping mechanism of 500 epochs, if the loss value in"
+      }
+     ]
+    },
+    "hardware": {
+     "value": "single GPU",
+     "page_pdf": 15,
+     "page_printed": 14,
+     "quote": "Training the model on this setting took 8 minutes using a single"
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.637,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "NeSPReSO, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "T NeSPReSO 0.430 0.816 0.802 0.587 0.301 0.083 0.682 0.637"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 1.116,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "GEM, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "GEM 1.468 1.419 1.094 0.854 0.394 0.125 1.195 1.116"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.768,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLR, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "MLR 0.380 1.031 0.944 0.699 0.357 0.087 0.823 0.768"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.598,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ISOP, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "ISOP 0.140 0.835 0.917 0.756 0.360 0.111 0.673 0.598"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.143,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "NeSPReSO, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "S NeSPReSO 0.280 0.139 0.116 0.088 0.032 0.009 0.154 0.143"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.225,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "GEM, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "GEM 0.478 0.193 0.163 0.122 0.046 0.009 0.241 0.225"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.162,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLR, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "MLR 0.299 0.154 0.155 0.112 0.044 0.009 0.173 0.162"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.21,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ISOP, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "ISOP 0.604 0.229 0.160 0.147 0.049 0.015 0.240 0.210"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "R2",
+   "metric_raw": "T R2 (Pearson)",
+   "metric_kind": "AGREEMENT",
+   "value": 0.997,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "NeSPReSO, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "T NeSPReSO 0.983 0.956 0.971 0.986 0.987 0.973 0.995 0.997"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "R2",
+   "metric_raw": "T R2 (Pearson)",
+   "metric_kind": "AGREEMENT",
+   "value": 0.991,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "GEM, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "GEM 0.773 0.870 0.949 0.970 0.978 0.941 0.986 0.991"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "R2",
+   "metric_raw": "T R2 (Pearson)",
+   "metric_kind": "AGREEMENT",
+   "value": 0.996,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "MLR, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "MLR 0.986 0.929 0.960 0.980 0.981 0.970 0.993 0.996"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "R2",
+   "metric_raw": "S R2 (Pearson)",
+   "metric_kind": "AGREEMENT",
+   "value": 0.975,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "NeSPReSO, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "S NeSPReSO 0.829 0.729 0.887 0.985 0.977 0.861 0.962 0.975"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "R2",
+   "metric_raw": "S R2 (Pearson)",
+   "metric_kind": "AGREEMENT",
+   "value": 0.939,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "GEM, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "GEM 0.337 0.411 0.789 0.971 0.958 0.833 0.905 0.939"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "R2",
+   "metric_raw": "S R2 (Pearson)",
+   "metric_kind": "AGREEMENT",
+   "value": 0.969,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "MLR, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "MLR 0.803 0.654 0.786 0.975 0.957 0.857 0.952 0.969"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "T bias",
+   "metric_kind": "ERROR",
+   "value": 0.001,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "NeSPReSO, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "T NeSPReSO 0.047 -0.038 0.015 0.016 0.005 0.003 0.001 0.001"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "T bias",
+   "metric_kind": "ERROR",
+   "value": -0.067,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "GEM, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "GEM -0.043 -0.153 -0.059 -0.036 0.006 0.006 -0.077 -0.067"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "T bias",
+   "metric_kind": "ERROR",
+   "value": -0.012,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLR, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "MLR -0.011 -0.041 0.016 -0.001 -0.010 0.000 -0.014 -0.012"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "T bias",
+   "metric_kind": "ERROR",
+   "value": 0.102,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ISOP, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "ISOP 0.022 0.186 0.203 0.137 -0.057 -0.074 0.127 0.102"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "S bias",
+   "metric_kind": "ERROR",
+   "value": 0.002,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "NeSPReSO, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "S NeSPReSO 0.012 -0.002 0.005 0.003 -0.001 0.000 0.003 0.002"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "S bias",
+   "metric_kind": "ERROR",
+   "value": -0.011,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "GEM, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "GEM -0.036 -0.010 -0.014 -0.005 0.002 0.000 -0.013 -0.011"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "S bias",
+   "metric_kind": "ERROR",
+   "value": -0.005,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "MLR, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "MLR -0.021 -0.007 0.002 0.001 -0.001 0.000 -0.005 -0.005"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "BIAS",
+   "metric_raw": "S bias",
+   "metric_kind": "ERROR",
+   "value": -0.043,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ISOP, depth range 0-1800 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 1 (depth range 0-1800 m)",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 19,
+   "quote": "ISOP -0.092 -0.086 -0.033 0.023 -0.009 -0.010 -0.048 -0.043"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.546,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0006, crossing #1",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0006, crossing #1 0.546 0.070 0.997 0.096 -0.006 0.988"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.096,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0006, crossing #1",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0006, crossing #1 0.546 0.070 0.997 0.096 -0.006 0.988"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.516,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0006, crossing #2",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0006, crossing #2 0.516 -0.119 0.998 0.094 -0.025 0.990"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.094,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0006, crossing #2",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0006, crossing #2 0.516 -0.119 0.998 0.094 -0.025 0.990"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.544,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0010",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0010 0.544 0.121 0.996 0.072 0.020 0.992"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.072,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0010",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0010 0.544 0.121 0.996 0.072 0.020 0.992"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "T RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.586,
+   "unit": "degC",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0012",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0012 0.586 0.003 0.997 0.086 -0.035 0.994"
+  },
+  {
+   "experiment_id": "X-GLIDER",
+   "dataset_id": "D-GLIDER",
+   "metric": "RMSE",
+   "metric_raw": "S RMSE",
+   "metric_kind": "ERROR",
+   "value": 0.086,
+   "unit": "PSU",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "Mission 0012",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 23,
+   "quote": "Mission 0012 0.586 0.003 0.997 0.086 -0.035 0.994"
+  },
+  {
+   "experiment_id": "X-ARGO-TEST",
+   "dataset_id": "D-ARGO",
+   "metric": "RUNTIME",
+   "metric_raw": "average processing time per profile on CPU",
+   "metric_kind": "EFFICIENCY",
+   "value": 60,
+   "unit": "microseconds",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "NeSPReSO; MLR 20, GEM 11600",
+   "baseline_name": "GEM",
+   "baseline_value": 11600,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 18,
+   "page_printed": 17,
+   "quote": "The average processing time per profile on CPU is around 60"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "DATA",
+   "page_pdf": 9,
+   "page_printed": 8,
+   "quote": "The provided data included only the average vertical statistics and binned spatial statistics of"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 18,
+   "page_printed": 17,
+   "quote": "synthetics was not derived from satellite sources like the other methods, may"
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 29,
+   "page_printed": 28,
+   "quote": "how will NeSPReSO perform in different oceanic regions with"
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 29,
+   "page_printed": 28,
+   "quote": "model’s current maximum depth range?"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 29,
+   "page_printed": 28,
+   "quote": "Future work should focus on addressing these questions, perhaps explor-"
+  },
+  {
+   "theme": "DATA",
+   "page_pdf": 6,
+   "page_printed": 5,
+   "quote": "Given that our Argo database has missing data beyond 1,800 meters"
+  }
+ ],
+ "conflicts": [],
+ "not_reported": [
+  {
+   "field": "experiments[X-ARGO-TEST].training.optimizer",
+   "searched": [
+    "Methods 3.2",
+    "Results",
+    "Conclusions",
+    "Data"
+   ]
+  },
+  {
+   "field": "experiments[X-ARGO-TEST].training.learning_rate",
+   "searched": [
+    "Methods 3.2",
+    "Results",
+    "Conclusions",
+    "Data"
+   ]
+  },
+  {
+   "field": "experiments[X-GLIDER].training.optimizer",
+   "searched": [
+    "Methods 3.2",
+    "Results",
+    "Conclusions",
+    "Data"
+   ]
+  },
+  {
+   "field": "experiments[X-GLIDER].training.learning_rate",
+   "searched": [
+    "Methods 3.2",
+    "Results",
+    "Conclusions",
+    "Data"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,803 @@
+{
+  "source": {
+    "source_id": "sdb-ml-optical",
+    "file": ".data/golden-pdfs/satellite-derived-bathymetry-using-machine-learning-and-opti.pdf",
+    "sha256_prefix": "1e1f7c0707bd49ba175be26b",
+    "pdf_pages": 17,
+    "printed_page_offset": 1141,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-SDB-ML-OPTICAL",
+    "doi": "10.1080/15481603.2022.2100597",
+    "title": "Satellite-derived bathymetry using machine learning and optimal Sentinel-2 imagery in South-West Florida coastal waters",
+    "year": 2022,
+    "venue": "GIScience & Remote Sensing",
+    "ocean_domains": [
+      "bathymetry"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-RFR",
+      "canonical_name": "Random forest regression (RFR)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "random forest regressor",
+      "architecture_note": "30 decision trees; features are Sentinel-2 bands 1 to 4, from one image (4 features) or combined across images (8 to 12 features). Three sub-models: individual-image, mean-band, combined-band.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 8,
+          "page_printed": 1149,
+          "quote": "This machine learning-based algorithm uses several decision trees for prediction"
+        },
+        {
+          "field": "is_novel_in_paper",
+          "page_pdf": 14,
+          "page_printed": 1155,
+          "quote": "This echoes other SDB studies (e.g. Sagawa et al. 2019), which used Landsat-8 image time-series data as input to a random forest model."
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-S2",
+      "canonical_name": "Sentinel-2 MSI imagery (Level-1C, atmospherically corrected)",
+      "variables": [
+        "coastal aerosol, blue, green, red bands (B1-B4)"
+      ],
+      "spatial_resolution": "10 m (visible/NIR bands)",
+      "temporal_resolution": "nominal revisit time of 5 days",
+      "region": "South-West Florida, Tampa to Marco Island (AOI 1-4)",
+      "period_start": "2016",
+      "period_end": "2018",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 4,
+          "page_printed": 1145,
+          "quote": "The Sentinel-2 Multi-Spectral Instrument (MSI) consists of twin satellites launched in 2015 and 2017"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 2,
+          "page_printed": 1143,
+          "quote": "relatively high spatial resolution of 10 m in the visible and near-infrared region"
+        },
+        {
+          "field": "region",
+          "page_pdf": 4,
+          "page_printed": 1145,
+          "quote": "The coastal strip from Tampa to Marco Island spans approximately 230 km and was divided into four main sub-regions"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-ALB",
+      "canonical_name": "NOAA airborne lidar bathymetry (Riegl VQ-880-G), 10 m DBM",
+      "variables": [
+        "water depth, MLLW datum"
+      ],
+      "spatial_resolution": "10 m",
+      "temporal_resolution": null,
+      "region": "Desoto to Marco Island, Gulf of Mexico coast of Florida",
+      "period_start": "2016",
+      "period_end": "2017",
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 15,
+          "page_printed": 1156,
+          "quote": "The ALB point clouds used in this study were collected using Riegl VQ-880-G topo-bathymetric lidar sensor."
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 6,
+          "page_printed": 1147,
+          "quote": "10 m spatial resolution Digital Bathymetric Models (DBMs) were created using arithmetic averaging"
+        },
+        {
+          "field": "role",
+          "page_pdf": 2,
+          "page_printed": 1143,
+          "quote": "The model calibration and validation were done using airborne lidar bathymetry (ALB)."
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-SDB-RFR-AOI1",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "satellite-derived bathymetry (regression of depth from Sentinel-2 bands)",
+      "method_id": "M-RFR",
+      "dataset_ids": [
+        "D-S2",
+        "D-ALB"
+      ],
+      "target_variable": "water depth (ALB-derived DBM)",
+      "training": {
+        "loss": {
+          "value": "sum of squared deviations about the mean (trees minimise it)",
+          "page_pdf": 8,
+          "page_printed": 1149,
+          "quote": "The trees are trained by minimizing the sum of squared deviations about the mean"
+        }
+      },
+      "note": "Same random forest setup for all four AOIs (30 trees, training-to-testing point ratio 1 to 3); training sample size differs per AOI (Table 2)."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI2",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "satellite-derived bathymetry (regression of depth from Sentinel-2 bands)",
+      "method_id": "M-RFR",
+      "dataset_ids": [
+        "D-S2",
+        "D-ALB"
+      ],
+      "target_variable": "water depth (ALB-derived DBM)",
+      "training": {
+        "loss": {
+          "value": "sum of squared deviations about the mean (trees minimise it)",
+          "page_pdf": 8,
+          "page_printed": 1149,
+          "quote": "The trees are trained by minimizing the sum of squared deviations about the mean"
+        }
+      },
+      "note": "Same random forest setup for all four AOIs (30 trees, training-to-testing point ratio 1 to 3); training sample size differs per AOI (Table 2)."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI3",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "satellite-derived bathymetry (regression of depth from Sentinel-2 bands)",
+      "method_id": "M-RFR",
+      "dataset_ids": [
+        "D-S2",
+        "D-ALB"
+      ],
+      "target_variable": "water depth (ALB-derived DBM)",
+      "training": {
+        "loss": {
+          "value": "sum of squared deviations about the mean (trees minimise it)",
+          "page_pdf": 8,
+          "page_printed": 1149,
+          "quote": "The trees are trained by minimizing the sum of squared deviations about the mean"
+        }
+      },
+      "note": "Same random forest setup for all four AOIs (30 trees, training-to-testing point ratio 1 to 3); training sample size differs per AOI (Table 2)."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI4",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "satellite-derived bathymetry (regression of depth from Sentinel-2 bands)",
+      "method_id": "M-RFR",
+      "dataset_ids": [
+        "D-S2",
+        "D-ALB"
+      ],
+      "target_variable": "water depth (ALB-derived DBM)",
+      "training": {
+        "loss": {
+          "value": "sum of squared deviations about the mean (trees minimise it)",
+          "page_pdf": 8,
+          "page_printed": 1149,
+          "quote": "The trees are trained by minimizing the sum of squared deviations about the mean"
+        }
+      },
+      "note": "Same random forest setup for all four AOIs (30 trees, training-to-testing point ratio 1 to 3); training sample size differs per AOI (Table 2)."
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-SDB-RFR-AOI1",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.35,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.36,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2,3 12 6500 19,800 0.35 5.68 0.25 0.19 0.35",
+      "note": "Row label 'AOI 1' sits on the preceding/first line of the AOI block."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI1",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "MAE",
+      "metric_raw": "MAE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.25,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.26,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2,3 12 6500 19,800 0.35 5.68 0.25 0.19 0.35"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI1",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "OTHER",
+      "metric_raw": "RMSE/max depth (%)",
+      "metric_kind": "ERROR",
+      "value": 5.68,
+      "unit": "%",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 5.84,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2,3 12 6500 19,800 0.35 5.68 0.25 0.19 0.35"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI1",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.36,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "mean-band sub-model",
+      "baseline_name": null,
+      "baseline_value": null,
+      "is_best_in_table": false,
+      "quote": "Mean 1,2,3 4 6500 19,800 0.36 5.84 0.26 0.18 0.36"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI2",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.34,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.46,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2,3 12 6500 20,400 0.34 4.14 0.23 0.17 0.34",
+      "note": "Row label 'AOI 2' sits on the preceding/first line of the AOI block."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI2",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "MAE",
+      "metric_raw": "MAE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.23,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.31,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2,3 12 6500 20,400 0.34 4.14 0.23 0.17 0.34"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI2",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "OTHER",
+      "metric_raw": "RMSE/max depth (%)",
+      "metric_kind": "ERROR",
+      "value": 4.14,
+      "unit": "%",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 5.61,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2,3 12 6500 20,400 0.34 4.14 0.23 0.17 0.34"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI2",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.46,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "mean-band sub-model",
+      "baseline_name": null,
+      "baseline_value": null,
+      "is_best_in_table": false,
+      "quote": "Mean 1,2,3 4 6500 20,400 0.46 5.61 0.31 0.22 0.45"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI3",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.65,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.67,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2 8 8000 37,000 0.65 4.81 0.45 0.31 0.64",
+      "note": "Row label 'AOI 3' sits on the preceding/first line of the AOI block."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI3",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "MAE",
+      "metric_raw": "MAE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.45,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.49,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2 8 8000 37,000 0.65 4.81 0.45 0.31 0.64"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI3",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "OTHER",
+      "metric_raw": "RMSE/max depth (%)",
+      "metric_kind": "ERROR",
+      "value": 4.81,
+      "unit": "%",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 4.96,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2 8 8000 37,000 0.65 4.81 0.45 0.31 0.64"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI3",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.67,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "mean-band sub-model",
+      "baseline_name": null,
+      "baseline_value": null,
+      "is_best_in_table": false,
+      "quote": "Mean 1,2 4 8000 37,000 0.67 4.96 0.49 0.36 0.65"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI4",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.41,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.5,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2 8 6000 19,600 0.41 7.31 0.29 0.19 0.41",
+      "note": "Row label 'AOI 4' sits on the preceding/first line of the AOI block."
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI4",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "MAE",
+      "metric_raw": "MAE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.29,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 0.34,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2 8 6000 19,600 0.41 7.31 0.29 0.19 0.41"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI4",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "OTHER",
+      "metric_raw": "RMSE/max depth (%)",
+      "metric_kind": "ERROR",
+      "value": 7.31,
+      "unit": "%",
+      "higher_is_better": false,
+      "config": "combined-band sub-model",
+      "baseline_name": "mean-band sub-model",
+      "baseline_value": 8.91,
+      "is_best_in_table": true,
+      "quote": "Comb 1,2 8 6000 19,600 0.41 7.31 0.29 0.19 0.41"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI4",
+      "dataset_id": "D-ALB",
+      "split": "TEST",
+      "source_table": "Table 2",
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.5,
+      "unit": "m",
+      "higher_is_better": false,
+      "config": "mean-band sub-model",
+      "baseline_name": null,
+      "baseline_value": null,
+      "is_best_in_table": false,
+      "quote": "Mean 1,2 4 6000 19,600 0.50 8.91 0.34 0.22 0.49"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI1",
+      "dataset_id": "D-ALB",
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.44,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "individual-image sub-model, image 1",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "quote": "AOI 1 1 4 6500 19,800 0.44 7.14 0.32 0.24 0.44"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI2",
+      "dataset_id": "D-ALB",
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.4,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "individual-image sub-model, image 1",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "quote": "AOI 2 1 4 6500 20,400 0.40 4.87 0.30 0.24 0.39"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI3",
+      "dataset_id": "D-ALB",
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.72,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "individual-image sub-model, image 1",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "quote": "AOI 3 1 4 8000 37,000 0.72 5.33 0.53 0.40 0.72"
+    },
+    {
+      "experiment_id": "X-SDB-RFR-AOI4",
+      "dataset_id": "D-ALB",
+      "metric": "RMSE",
+      "metric_raw": "RMSE (m)",
+      "metric_kind": "ERROR",
+      "value": 0.47,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "individual-image sub-model, image 1",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 1151,
+      "quote": "AOI 4 1 4 6000 19,600 0.47 8.37 0.33 0.22 0.45"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "quote": "The proposed model is dependent on the quality of the Sentinel-2 imagery used.",
+      "page_pdf": 14,
+      "page_printed": 1155
+    },
+    {
+      "theme": "EVALUATION",
+      "quote": "The temporal data acquisition discrepancies of Sentinel-2 images and ALB data constitute the major proportion of uncertainty in the obtained RMSEs of the present study.",
+      "page_pdf": 15,
+      "page_printed": 1156
+    },
+    {
+      "theme": "UNCERTAINTY",
+      "quote": "the modest tendency of RFR model for overfitting biases can be identified as part of the uncertainties in the depth estimation accuracy levels reported.",
+      "page_pdf": 15,
+      "page_printed": 1156
+    },
+    {
+      "theme": "DATA",
+      "quote": "part of the uncertainties in the achieved RMSEs can be attributed to the accuracy of the ALB datasets used for training and validation.",
+      "page_pdf": 15,
+      "page_printed": 1156
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "quote": "in relation to SDB are suggested.",
+      "page_pdf": 14,
+      "page_printed": 1155
+    },
+    {
+      "theme": "PHYSICS",
+      "quote": "The spatial distribution of the prediction errors needs to be studied further to better understand the factors including the inherent environmental conditions contributing to high or low errors.",
+      "page_pdf": 14,
+      "page_printed": 1155
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-SDB-RFR-AOI1].training.optimizer",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI1].training.learning_rate",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI1].training.batch_size",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI1].training.epochs",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI1].training.hardware",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI2].training.optimizer",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI2].training.learning_rate",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI2].training.batch_size",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI2].training.epochs",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI2].training.hardware",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI3].training.optimizer",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI3].training.learning_rate",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI3].training.batch_size",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI3].training.epochs",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI3].training.hardware",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI4].training.optimizer",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI4].training.learning_rate",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI4].training.batch_size",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI4].training.epochs",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SDB-RFR-AOI4].training.hardware",
+      "searched": [
+        "2.4.2 Random forest regressor model",
+        "2.4.4 RFR model implementation",
+        "3.2 Assessment of RFR models performance",
+        "4 Discussion"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "report_kind": "INDEPENDENT_SCIENTIFIC_AUDIT",
+  "persistence_status": "RECORDED",
+  "auditor_id": "scientific-auditor:/root/scientific_audit_proposals",
+  "audited_at": "2026-09-29",
+  "paper": {
+    "paper_id": "OAI-0091",
+    "title": "Detecting small seamounts in multibeam data using convolutional neural networks",
+    "doi": "10.3389/fmars.2025.1613061",
+    "conclusion": "NOT_VERIFIED",
+    "conclusion_note": "The source motivates the proposed study, but the proposal is an AI interpretation rather than an author-reported completed benchmark or established research gap.",
+    "status_counts": {"VERIFIED": 0, "PARTIALLY_VERIFIED": 0, "NOT_VERIFIED": 1, "NOT_REPORTED": 0, "CONFLICT": 0, "EXTRACTION_ERROR": 0}
+  },
+  "sources": {
+    "primary_paper": {
+      "source_kind": "PRIMARY_PAPER",
+      "edition": "PUBLISHED_PDF_FRONTIERS_2025",
+      "path": ".data/golden-pdfs/oai-0091-fmars-2025-1613061.pdf",
+      "download_url": "https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2025.1613061/pdf",
+      "sha256": "68b32d70ba677a595e5b87ba6a384c8b38e3680be7d0db598538148fb50b0df3",
+      "pages": 18,
+      "doi": "10.3389/fmars.2025.1613061"
+    }
+  },
+  "claims": [
+    {
+      "claim_id": "B04-0401",
+      "field_path": "gap.domain_shift",
+      "extracted_value": "Benchmark bathymetry domain adaptation with geographically separated test cruises.",
+      "experiment_id": null,
+      "provenance_type": "AI_INTERPRETATION",
+      "final_status": "NOT_VERIFIED",
+      "confidence": 0.99,
+      "value_support": "SOURCE_GROUNDED_INTERPRETATION",
+      "source_kind": "PRIMARY_PAPER",
+      "source_edition": "PUBLISHED_PDF_FRONTIERS_2025",
+      "section": "Study design; 4.2 Training; 4.3.7 Balancing generalization and model complexity; Conclusion/future work",
+      "page": 3,
+      "locator": "PDF pp. 3, 7, 9, and 15-17: Atlantic-training/Indian-evaluation design; MSM75/MSM88 training cruises; OOD limitation; cross-regional result and domain-adaptation recommendation",
+      "evidence_summary": "The model uses Atlantic cruise data for training and an Indian Ocean cruise for evaluation; performance declines under morphological domain shift, and the authors recommend domain adaptation or transfer learning for unfamiliar regions.",
+      "audit_note": "Benchmarking domain adaptation with separated cruises is a faithful AI proposal, not an author-reported completed benchmark or established novelty. Retain AI_INTERPRETATION and NOT_VERIFIED."
+    }
+  ],
+  "unresolved": [
+    "The proposal's comparative value and novelty require a broader literature review; this claim audit does not establish them."
+  ]
+}

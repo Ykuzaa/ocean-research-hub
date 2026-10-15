@@ -1,0 +1,466 @@
+{
+ "source": {
+  "source_id": "multimodal-4dvarnet",
+  "file": ".data/golden-pdfs/multimodal-4dvarnets-for-the-reconstruction-of-sea-surface-d.pdf",
+  "sha256_prefix": "73045f52b73dfe865f11ad26",
+  "pdf_pages": 17,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-MULTIMODAL-4DVARNET",
+  "doi": null,
+  "title": "Multimodal 4DVarNets for the reconstruction of sea surface dynamics from SST-SSH synergies",
+  "year": 2023,
+  "venue": "arXiv preprint (arXiv:2207.01372v2)",
+  "ocean_domains": [
+   "ssh-altimetry",
+   "sst",
+   "data-assimilation"
+  ],
+  "ocean_domains_raw": [
+   "sea surface dynamics",
+   "satellite altimetry",
+   "sea surface temperature",
+   "data assimilation"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-4DVARNET-MM",
+   "canonical_name": "Multimodal 4DVarNet",
+   "family": "HYBRID_PHYSICS_ML",
+   "family_raw": "4DVarNet (trainable variational formulation with trainable gradient-based solver)",
+   "architecture_note": "Learned prior Phi is a two-scale residual U-Net with bilinear blocks, solver is a convolutional LSTM (150-dimensional) iterating K=5 to 15 gradient steps, optional trainable multimodal observation term (1-layer linear ConvNet or 4-layer tanh ConvNet). Classified on rule 1: learned network embedded in a variational solver.",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "end-to-end neural architectures with three main trainable"
+    },
+    {
+     "field": "is_novel_in_paper",
+     "page_pdf": 2,
+     "page_printed": 2,
+     "quote": "extend 4DVarNet schemes introduced in"
+    },
+    {
+     "field": "architecture_note",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "two-scale residual U-Net architecture"
+    }
+   ]
+  },
+  {
+   "method_id": "M-DUACS-OI",
+   "canonical_name": "DUACS optimal interpolation",
+   "family": "CLASSICAL_BASELINE",
+   "family_raw": "operational optimal interpolation",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 8,
+     "page_printed": 8,
+     "quote": "DUACS [47] SSH only 0.92 1.22 11.15 0% 0% 44.9%"
+    }
+   ]
+  },
+  {
+   "method_id": "M-UNET-BASELINE",
+   "canonical_name": "U-Net direct inversion",
+   "family": "CNN_UNET",
+   "family_raw": "U-Net",
+   "architecture_note": "Trained on gappy data with an initial zero-filling strategy; SSH-only and SSH-SST configurations.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 8,
+     "page_printed": 8,
+     "quote": "Here, we train U-Net architectures"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-NATL60-OSSE",
+   "canonical_name": "NATL60 OSSE (Gulf Stream, nadir and SWOT altimetry)",
+   "variables": [
+    "SSH"
+   ],
+   "spatial_resolution": "1/20 degree",
+   "temporal_resolution": "daily",
+   "region": "Gulf Stream, 10x10 degree area",
+   "period_start": "2012-10",
+   "period_end": "2013-09",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "Observing System Simulation Experiment (OSSE) for nadir and wide-swath"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "with a daily time resolution and a 1/20◦ spatial resolution"
+    },
+    {
+     "field": "period",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "from October 2012 to September 2013"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-NATL60-SST",
+   "canonical_name": "NATL60 simulated SST observations",
+   "variables": [
+    "SST"
+   ],
+   "spatial_resolution": "1/20 degree (training); 1/10 to 1/2 degree (evaluation)",
+   "temporal_resolution": "daily",
+   "region": "Gulf Stream, 10x10 degree area",
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "we assume gap-free"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "we consider SST observations"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "space-time reconstruction of sea surface height from irregularly-sampled altimetry and SST",
+   "method_id": "M-4DVARNET-MM",
+   "dataset_ids": [
+    "D-NATL60-OSSE",
+    "D-NATL60-SST"
+   ],
+   "target_variable": "sea surface height (SSH)",
+   "training": {
+    "loss": {
+     "value": "weighted sum of reconstruction error terms",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "the training loss typically involves a weighted sum of the reconstruction error for reconstructed",
+     "extra_evidence": [
+      {
+       "claim": "overall loss also includes gradient and prior-regularisation terms with weights",
+       "page_pdf": 5,
+       "page_printed": 5,
+       "quote": "the overall training loss is computed as a weighted sum of these different terms"
+      }
+     ]
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "The training procedure exploits Adam optimizer"
+    },
+    "learning_rate": {
+     "value": 0.001,
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "Adam optimizer with a 1e-3 learning rate"
+    },
+    "epochs": {
+     "value": 400,
+     "page_pdf": 5,
+     "page_printed": 5,
+     "quote": "learning rate over 400 epochs"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-UNET-BASELINE",
+   "task": "GAP_FILLING_RECONSTRUCTION",
+   "task_raw": "direct learning-based inversion of SSH from gappy data",
+   "method_id": "M-UNET-BASELINE",
+   "dataset_ids": [
+    "D-NATL60-OSSE",
+    "D-NATL60-SST"
+   ],
+   "target_variable": "sea surface height (SSH)",
+   "training": {}
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "mu (normalized RMSE-based score)",
+   "metric_kind": "SKILL",
+   "value": 0.97,
+   "unit": "1",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "SSH-SST-NL (non-linear multimodal observation term)",
+   "baseline_name": "DUACS",
+   "baseline_value": 0.92,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "SSH-SST-NL 0.97 0.50 2.47 83.8% 81.4% 91.8%"
+  },
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "RESOLVED_SPATIAL_SCALE",
+   "metric_raw": "lambda_x",
+   "metric_kind": "SCALE",
+   "value": 0.5,
+   "unit": "degree",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "SSH-SST-NL",
+   "baseline_name": "DUACS",
+   "baseline_value": 1.22,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "SSH-SST-NL 0.97 0.50 2.47 83.8% 81.4% 91.8%"
+  },
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "RESOLVED_TEMPORAL_SCALE",
+   "metric_raw": "lambda_t",
+   "metric_kind": "SCALE",
+   "value": 2.47,
+   "unit": "days",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "SSH-SST-NL",
+   "baseline_name": "DUACS",
+   "baseline_value": 11.15,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "SSH-SST-NL 0.97 0.50 2.47 83.8% 81.4% 91.8%"
+  },
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "SKILL_SCORE",
+   "metric_raw": "tau_SSH (relative MSE gain vs DUACS)",
+   "metric_kind": "SKILL",
+   "value": 83.8,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "SSH-SST-NL",
+   "baseline_name": "DUACS",
+   "baseline_value": 0,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "SSH-SST-NL 0.97 0.50 2.47 83.8% 81.4% 91.8%"
+  },
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "RESOLVED_TEMPORAL_SCALE",
+   "metric_raw": "lambda_t",
+   "metric_kind": "SCALE",
+   "value": 5.3,
+   "unit": "days",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "4DVarNet SSH only (no SST)",
+   "baseline_name": "DUACS",
+   "baseline_value": 11.15,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "4DVarNet SSH only 0.96 0.67 5.3 71.4% 65.1% 83.7%"
+  },
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "SKILL_SCORE",
+   "metric_raw": "tau_SSH (relative MSE gain vs DUACS)",
+   "metric_kind": "SKILL",
+   "value": 71.4,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "4DVarNet SSH only (no SST)",
+   "baseline_name": "DUACS",
+   "baseline_value": 0,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "4DVarNet SSH only 0.96 0.67 5.3 71.4% 65.1% 83.7%"
+  },
+  {
+   "experiment_id": "X-4DVARNET-MM",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "RESOLVED_TEMPORAL_SCALE",
+   "metric_raw": "lambda_t",
+   "metric_kind": "SCALE",
+   "value": 5.65,
+   "unit": "days",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "SSH-SST-NL, SST coarsened to 1/2 degree",
+   "baseline_name": "4DVarNet SSH only",
+   "baseline_value": 5.3,
+   "source_table": "Table 4",
+   "is_best_in_table": false,
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "1/2◦ 0.95 0.88 5.65 61.5% 53.1% 77.3%"
+  },
+  {
+   "experiment_id": "X-UNET-BASELINE",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "RESOLVED_TEMPORAL_SCALE",
+   "metric_raw": "lambda_t",
+   "metric_kind": "SCALE",
+   "value": 37.0,
+   "unit": "days",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "U-Net, SSH and SST inputs",
+   "baseline_name": "DUACS",
+   "baseline_value": 11.15,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "SSH and SST 0.95 1.09 37.0 54.6% 56.(% 79.6%"
+  },
+  {
+   "experiment_id": "X-UNET-BASELINE",
+   "dataset_id": "D-NATL60-OSSE",
+   "metric": "SKILL_SCORE",
+   "metric_raw": "tau_SSH (relative MSE gain vs DUACS)",
+   "metric_kind": "SKILL",
+   "value": 54.6,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "U-Net, SSH and SST inputs",
+   "baseline_name": "DUACS",
+   "baseline_value": 0,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "SSH and SST 0.95 1.09 37.0 54.6% 56.(% 79.6%"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "DATA",
+   "page_pdf": 7,
+   "page_printed": 7,
+   "quote": "Larger training datasets and data augmentation may provide relevant solutions"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 9,
+   "page_printed": 9,
+   "quote": "Future work could explore how gappy SST observations would affect the reconstruction performance"
+  }
+ ],
+ "conflicts": [
+  {
+   "field": "datasets[D-NATL60-OSSE].period",
+   "values": [
+    "training February 2013 to September 2013; validation January 2012",
+    "dataset period October 2012 to September 2013"
+   ],
+   "sources": [
+    {
+     "page_pdf": 6,
+     "quote": "as validation dataset data from January 2012"
+    },
+    {
+     "page_pdf": 6,
+     "quote": "from October 2012 to September 2013"
+    }
+   ],
+   "chosen": "2012-10 to 2013-09",
+   "reason": "Validation month January 2012 falls before the stated dataset period (likely a typo for January 2013); dataset period kept, split dates not stored."
+  },
+  {
+   "field": "results (lambda_x of 4DVarNet SSH only)",
+   "values": [
+    0.67,
+    0.68
+   ],
+   "sources": [
+    {
+     "page_pdf": 8,
+     "quote": "4DVarNet SSH only 0.96 0.67 5.3 71.4% 65.1% 83.7%"
+    },
+    {
+     "page_pdf": 8,
+     "quote": "0.50◦ vs 0.68◦ and 1.22◦"
+    }
+   ],
+   "chosen": 0.67,
+   "reason": "Table 3 and Table 1 give 0.67, text gives 0.68; table kept. Not stored as a result row."
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-4DVARNET-MM].training.batch_size",
+   "searched": [
+    "Section 3.2",
+    "Section 4.1",
+    "whole text search for 'batch'"
+   ]
+  },
+  {
+   "field": "experiments[X-4DVARNET-MM].training.hardware",
+   "searched": [
+    "Section 3.2",
+    "Section 4.1",
+    "whole text search for GPU/NVIDIA; Acknowledgements only mention Azure and GENCI-IDRIS GPU resources without stating what was used"
+   ]
+  },
+  {
+   "field": "experiments[X-UNET-BASELINE].training",
+   "searched": [
+    "Section 4.3 (only architecture and zero-filling strategy described)"
+   ]
+  }
+ ]
+}

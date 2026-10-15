@@ -1,0 +1,24 @@
+{
+  "source": {
+    "source_id": "mhw-prediction",
+    "file": ".data/golden-pdfs/machine-learning-techniques-for-marine-heatwave-prediction-a.pdf",
+    "sha256_prefix": "ed48a1b9d0a03d4664f17d5a",
+    "pdf_pages": 20,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-MHW-PREDICTION-REVIEW",
+    "doi": "10.1007/s44295-025-00076-1",
+    "title": "Machine learning techniques for marine heatwave prediction: a comprehensive review",
+    "year": 2025,
+    "venue": "Intelligent Marine Technology and Systems",
+    "ocean_domains": []
+  },
+  "excluded": {
+    "reason": "Literature review: the paper trains no ML model of its own and reports no experiments.",
+    "page_pdf": 1,
+    "quote": "In this review, we examine the application of traditional machine learning (ML) and deep learning (DL) methods"
+  }
+}

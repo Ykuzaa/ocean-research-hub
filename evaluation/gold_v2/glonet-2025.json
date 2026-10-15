@@ -1,0 +1,208 @@
+{
+ "source": {
+  "source_id": "glonet-2025",
+  "file": ".data/golden-pdfs/glonet-2025.pdf",
+  "sha256_prefix": "bc9627304aefb8c29b1eb069",
+  "pdf_pages": 34,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5 subagent",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-GLONET",
+  "doi": "",
+  "title": "GLONET: Mercator's end-to-end neural Global Ocean forecasting system",
+  "year": 2025,
+  "venue": "Machine Learning and Computation",
+  "ocean_domains": [
+   "forecasting"
+  ],
+  "ocean_domains_raw": [
+   "ocean forecasting",
+   "physical oceanography"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-GLONET",
+   "canonical_name": "GLONET",
+   "family": "FNO_NEURAL_OPERATOR",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "GLONET leverages Fourier neural operators"
+    }
+   ]
+  },
+  {
+   "method_id": "M-XIHE",
+   "canonical_name": "Xihe",
+   "family": "TRANSFORMER",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "vision and Swin transformers (Khan et al., 2022; Z. Liu et al., 2021) were combined"
+    }
+   ]
+  },
+  {
+   "method_id": "M-GLO12",
+   "canonical_name": "GLO12",
+   "family": "CLASSICAL_BASELINE",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "GLO12, a physics-driven model, integrates governing physical equations"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-GLORYS12",
+   "canonical_name": "GLORYS12",
+   "variables": [
+    "temperature",
+    "salinity",
+    "currents",
+    "sea surface height"
+   ],
+   "spatial_resolution": "1/12 deg (interpolated to 1/4 deg for GLONET)",
+   "temporal_resolution": "daily mean",
+   "region": "global",
+   "period_start": "1993",
+   "period_end": "2019 (train); 2020 validation",
+   "role": "PRIMARY",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "GLORYS12 reanalysis (Lellouche et al., 2021) provides a gap-free"
+    },
+    {
+     "field": "period_start",
+     "page_pdf": 8,
+     "page_printed": 8,
+     "quote": "The training set consists of daily mean GLORYS12 reanalysis outputs from 1993 to 2019"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-GLONET-FORECAST",
+   "task": "FORECASTING",
+   "method_id": "M-GLONET",
+   "dataset_ids": [
+    "D-GLORYS12"
+   ],
+   "target_variable": "temperature, salinity, U/V currents, SSH (10-day forecast)",
+   "training": {
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "using Adam’s optimizer (Kingma, 2014)"
+    },
+    "learning_rate": {
+     "value": "decreasing from e-4 to e-5",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE"
+    },
+    "hardware": {
+     "value": "32 40G-A100 GPUs, around 3 weeks",
+     "page_pdf": 9,
+     "page_printed": 9,
+     "quote": "The overall training took around 3 weeks while using a total of 32"
+    }
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-GLONET-FORECAST",
+   "dataset_id": "D-GLORYS12",
+   "metric": "OTHER",
+   "value": 25,
+   "unit": "km",
+   "split": "TEST",
+   "config": "Lagrangian trajectory Euclidean distance error reduction vs Xihe at 10-day lead, vs GLORYS12 trajectories, Jan-Jul 2024",
+   "baseline_name": "Xihe",
+   "baseline_value": null,
+   "source_table": null,
+   "page_pdf": 25,
+   "page_printed": 25,
+   "quote": "reduces the Euclidean distance error by approximately 25 km"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 26,
+   "page_printed": 26,
+   "quote": "but also to a noticeable gap in surface predictions such as SST"
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 19,
+   "page_printed": 19,
+   "quote": "it also reveals a limitation in using RMSE as the primary metric for evaluating data-driven models"
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 28,
+   "page_printed": 28,
+   "quote": "the inherent limitations of purely data-driven methodologies"
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[X-GLONET-FORECAST].training.loss",
+   "searched": [
+    "section 3.2 (only 'suitable loss function (e.g., mean squared error)' as generic example)",
+    "section 2"
+   ]
+  },
+  {
+   "field": "experiments[X-GLONET-FORECAST].training.batch_size",
+   "searched": [
+    "section 3.2",
+    "section 3.1",
+    "section 2"
+   ]
+  },
+  {
+   "field": "experiments[X-GLONET-FORECAST].training.epochs",
+   "searched": [
+    "section 3.2",
+    "section 3.1"
+   ]
+  },
+  {
+   "field": "results.RMSE numeric values",
+   "searched": [
+    "section 4 (results given only in figures 2,4,5,9; no numeric tables)"
+   ]
+  },
+  {
+   "field": "paper.doi",
+   "searched": [
+    "first pages"
+   ]
+  }
+ ]
+}

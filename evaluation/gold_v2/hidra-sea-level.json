@@ -1,0 +1,738 @@
+{
+ "source": {
+  "source_id": "hidra-sea-level",
+  "file": ".data/golden-pdfs/hidra-d-deep-learning-model-for-dense-sea-level-forecasting.pdf",
+  "sha256_prefix": "ec8f3a094ac97a59c04016a1",
+  "pdf_pages": 19,
+  "printed_page_offset": 2176,
+  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-HIDRA-D",
+  "doi": "10.5194/gmd-19-2177-2026",
+  "title": "HIDRA-D: deep-learning model for dense sea level forecasting using sparse altimetry and tide gauge data",
+  "year": 2026,
+  "venue": "Geoscientific Model Development",
+  "ocean_domains": [
+   "forecasting",
+   "ssh-altimetry"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-HIDRAD",
+   "canonical_name": "HIDRA-D",
+   "family": "MLP_DNN",
+   "family_raw": "HIDRA3 module (3D/1D convolutional geophysical encoder) plus fully connected Dense decoder predicting low-frequency 2D Fourier coefficients",
+   "architecture_note": "Backbone HIDRA3 uses 3D and 1D convolutions in its Geophysical Encoder; classified on the new Dense decoder (stack of fully connected layers with SELU, dropout, residuals) followed by a fixed inverse 2D DFT.",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 7,
+     "page_printed": 2183,
+     "quote": "a dense (fully connected) layer with 8192 output channels"
+    }
+   ]
+  },
+  {
+   "method_id": "M-NEMO",
+   "canonical_name": "NEMO (CMEMS Mediterranean analysis and forecast)",
+   "family": "CLASSICAL_BASELINE",
+   "family_raw": "NEMO v4.2 general circulation model",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 5,
+     "page_printed": 2181,
+     "quote": "Nucleus for European Modelling of the Ocean"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-ADT",
+   "canonical_name": "Copernicus along-track satellite altimetry SEALEVEL_EUR_PHY_L3_MY_008_061 (ADT)",
+   "variables": [
+    "absolute dynamic topography (SLA + ocean tide + MDT + DAC)"
+   ],
+   "spatial_resolution": "1 Hz along-track (about 7 km), binned to 94x115 grid",
+   "temporal_resolution": "irregular along-track",
+   "region": "Adriatic Sea",
+   "period_start": "2000",
+   "period_end": "2022",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 4,
+     "page_printed": 2180,
+     "quote": "SEALEVEL_EUR_PHY_L3_MY_008_061"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-TG",
+   "canonical_name": "Adriatic tide gauge SSH (11 stations)",
+   "variables": [
+    "sea surface height",
+    "astronomical tide"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": "hourly (downsampled from 1 or 10 min)",
+   "region": "Adriatic Sea",
+   "period_start": "2000",
+   "period_end": "2022",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 2179,
+     "quote": "The following tide gauges along the Adriatic coast are considered in this study for SSH measurements"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-ERA5",
+   "canonical_name": "ERA5 reanalysis",
+   "variables": [
+    "10 m winds",
+    "mean sea level pressure",
+    "SST",
+    "wave parameters",
+    "swell"
+   ],
+   "spatial_resolution": "subsampled to 9x12 grid",
+   "temporal_resolution": "hourly",
+   "region": "Adriatic Sea",
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 2179,
+     "quote": "we employed ERA5 reanalysis data (Hersbach et al., 2023) for training"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-EPS",
+   "canonical_name": "ECMWF Ensemble Prediction System (50 members)",
+   "variables": [
+    "atmospheric forcing fields"
+   ],
+   "spatial_resolution": "subsampled to 9x12 grid",
+   "temporal_resolution": null,
+   "region": "Adriatic Sea",
+   "period_start": "2019-06",
+   "period_end": "2020",
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 3,
+     "page_printed": 2179,
+     "quote": "Ensemble Prediction System (EPS) data (Leutbecher and Palmer, 2007) for evaluation"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-NEMO",
+   "canonical_name": "CMEMS Mediterranean Sea Physical Analysis and Forecasting (NEMO v4.2)",
+   "variables": [
+    "sea level"
+   ],
+   "spatial_resolution": "1/24 degree (about 4 km)",
+   "temporal_resolution": "hourly",
+   "region": "Mediterranean Sea (Adriatic subset)",
+   "period_start": null,
+   "period_end": null,
+   "role": "BASELINE_PRODUCT",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 2181,
+     "quote": "Mediterranean Sea Physical Analysis and Forecasting model"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-HIDRAD-ADT",
+   "task": "FORECASTING",
+   "task_raw": "dense (gridded) sea level forecasting evaluated against satellite ADT",
+   "method_id": "M-HIDRAD",
+   "dataset_ids": [
+    "D-ADT",
+    "D-TG",
+    "D-ERA5",
+    "D-EPS",
+    "D-NEMO"
+   ],
+   "target_variable": "absolute dynamic topography (dense 94x115 hourly grid, 72 h horizon)",
+   "training": {
+    "loss": {
+     "value": "multi-component loss function",
+     "page_pdf": 8,
+     "page_printed": 2184,
+     "quote": "trained end-to-end using a multi-component loss function",
+     "extra_evidence": [
+      {
+       "claim": "L2 is a mean squared error against satellite ADT (weights 100, 1, 1 for L1, L2, L3)",
+       "page_pdf": 8,
+       "page_printed": 2184,
+       "quote": "measures the mean squared error between the dense ADT"
+      }
+     ]
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "We use the AdamW optimizer (Loshchilov and Hutter, 2017)"
+    },
+    "learning_rate": {
+     "value": 1e-05,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Initial learning rate 10^-5 read on PDF page 9 (Training details); exponent is a superscript. A higher rate 10^-3 is used for the tide gauge displacements."
+    },
+    "batch_size": {
+     "value": 128,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "batch size of 128 data samples"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "The model is trained for 50 epochs"
+    },
+    "hardware": {
+     "value": "1 x NVIDIA A100 Tensor Core GPU, about 12 h of training",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "approximately 12 h on a system equipped with an NVIDIA A100 Tensor Core GPU"
+    }
+   }
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "task": "FORECASTING",
+   "task_raw": "leave-one-tide-gauge-out evaluation at coastal locations",
+   "method_id": "M-HIDRAD",
+   "dataset_ids": [
+    "D-ADT",
+    "D-TG",
+    "D-ERA5",
+    "D-EPS",
+    "D-NEMO"
+   ],
+   "target_variable": "sea surface height at the left-out tide gauge",
+   "training": {
+    "loss": {
+     "value": "multi-component loss function",
+     "page_pdf": 8,
+     "page_printed": 2184,
+     "quote": "trained end-to-end using a multi-component loss function",
+     "extra_evidence": [
+      {
+       "claim": "L2 is a mean squared error against satellite ADT (weights 100, 1, 1 for L1, L2, L3)",
+       "page_pdf": 8,
+       "page_printed": 2184,
+       "quote": "measures the mean squared error between the dense ADT"
+      }
+     ]
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "We use the AdamW optimizer (Loshchilov and Hutter, 2017)"
+    },
+    "learning_rate": {
+     "value": 1e-05,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Initial learning rate 10^-5 read on PDF page 9 (Training details); exponent is a superscript. A higher rate 10^-3 is used for the tide gauge displacements."
+    },
+    "batch_size": {
+     "value": 128,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "batch size of 128 data samples"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "The model is trained for 50 epochs"
+    },
+    "hardware": {
+     "value": "1 x NVIDIA A100 Tensor Core GPU, about 12 h of training",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "approximately 12 h on a system equipped with an NVIDIA A100 Tensor Core GPU"
+    },
+    "note": "Single training setup reported for HIDRA-D; copied to every HIDRA-D experiment. One separate model is trained per excluded gauge."
+   }
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG-BIASCORR",
+   "task": "FORECASTING",
+   "task_raw": "leave-one-out with 12 h dynamic local bias correction",
+   "method_id": "M-HIDRAD",
+   "dataset_ids": [
+    "D-ADT",
+    "D-TG",
+    "D-ERA5",
+    "D-EPS",
+    "D-NEMO"
+   ],
+   "target_variable": "sea surface height at the left-out tide gauge",
+   "training": {
+    "loss": {
+     "value": "multi-component loss function",
+     "page_pdf": 8,
+     "page_printed": 2184,
+     "quote": "trained end-to-end using a multi-component loss function",
+     "extra_evidence": [
+      {
+       "claim": "L2 is a mean squared error against satellite ADT (weights 100, 1, 1 for L1, L2, L3)",
+       "page_pdf": 8,
+       "page_printed": 2184,
+       "quote": "measures the mean squared error between the dense ADT"
+      }
+     ]
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "We use the AdamW optimizer (Loshchilov and Hutter, 2017)"
+    },
+    "learning_rate": {
+     "value": 1e-05,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Initial learning rate 10^-5 read on PDF page 9 (Training details); exponent is a superscript. A higher rate 10^-3 is used for the tide gauge displacements."
+    },
+    "batch_size": {
+     "value": 128,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "batch size of 128 data samples"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "The model is trained for 50 epochs"
+    },
+    "hardware": {
+     "value": "1 x NVIDIA A100 Tensor Core GPU, about 12 h of training",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "approximately 12 h on a system equipped with an NVIDIA A100 Tensor Core GPU"
+    },
+    "note": "Single training setup reported for HIDRA-D; copied to every HIDRA-D experiment."
+   }
+  },
+  {
+   "experiment_id": "X-HIDRAD-SCALE-ABLATION",
+   "task": "FORECASTING",
+   "task_raw": "ablation of the spatial scale threshold (Fourier submatrix size)",
+   "method_id": "M-HIDRAD",
+   "dataset_ids": [
+    "D-ADT",
+    "D-TG",
+    "D-ERA5",
+    "D-EPS"
+   ],
+   "target_variable": "ADT and tide gauge SSH",
+   "training": {
+    "loss": {
+     "value": "multi-component loss function",
+     "page_pdf": 8,
+     "page_printed": 2184,
+     "quote": "trained end-to-end using a multi-component loss function",
+     "extra_evidence": [
+      {
+       "claim": "L2 is a mean squared error against satellite ADT (weights 100, 1, 1 for L1, L2, L3)",
+       "page_pdf": 8,
+       "page_printed": 2184,
+       "quote": "measures the mean squared error between the dense ADT"
+      }
+     ]
+    },
+    "optimizer": {
+     "value": "AdamW",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "We use the AdamW optimizer (Loshchilov and Hutter, 2017)"
+    },
+    "learning_rate": {
+     "value": 1e-05,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+     "note": "Initial learning rate 10^-5 read on PDF page 9 (Training details); exponent is a superscript. A higher rate 10^-3 is used for the tide gauge displacements."
+    },
+    "batch_size": {
+     "value": 128,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "batch size of 128 data samples"
+    },
+    "epochs": {
+     "value": 50,
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "The model is trained for 50 epochs"
+    },
+    "hardware": {
+     "value": "1 x NVIDIA A100 Tensor Core GPU, about 12 h of training",
+     "page_pdf": 9,
+     "page_printed": 2185,
+     "quote": "approximately 12 h on a system equipped with an NVIDIA A100 Tensor Core GPU"
+    },
+    "note": "Single training setup reported for HIDRA-D; copied to every HIDRA-D experiment."
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-HIDRAD-ADT",
+   "dataset_id": "D-ADT",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.49,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "HIDRA-D vs satellite ADT, Adriatic basin, Jun 2019 to end 2020",
+   "baseline_name": "NEMO",
+   "baseline_value": 4.85,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 9,
+   "page_printed": 2185,
+   "quote": "HIDRA-D 3.49 4.82"
+  },
+  {
+   "experiment_id": "X-HIDRAD-ADT",
+   "dataset_id": "D-ADT",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 4.82,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "HIDRA-D vs satellite ADT, Adriatic basin, Jun 2019 to end 2020",
+   "baseline_name": "NEMO",
+   "baseline_value": 6.17,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 9,
+   "page_printed": 2185,
+   "quote": "HIDRA-D 3.49 4.82"
+  },
+  {
+   "experiment_id": "X-HIDRAD-ADT",
+   "dataset_id": "D-ADT",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 5.37,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "northern Adriatic only (latitude above 43.5 N)",
+   "baseline_name": "NEMO",
+   "baseline_value": 6.79,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 9,
+   "page_printed": 2185,
+   "quote": "HIDRA-D performs better with an RMSE of 5.37 cm compared to 6.79 cm for NEMO"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "dataset_id": "D-TG",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.61,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "leave-one-tide-gauge-out HIDRA-DN, overall, mean over lead times and gauges",
+   "baseline_name": "NEMO",
+   "baseline_value": 3.82,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 12,
+   "page_printed": 2188,
+   "quote": "HIDRA-DN 3.61 4.83 95.24",
+   "note": "NEMO overall row label sits on the line 'Overall NEMO 3.82 4.95 95.25'"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "dataset_id": "D-TG",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 4.83,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "leave-one-tide-gauge-out HIDRA-DN, overall",
+   "baseline_name": "NEMO",
+   "baseline_value": 4.95,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 12,
+   "page_printed": 2188,
+   "quote": "HIDRA-DN 3.61 4.83 95.24"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "dataset_id": "D-TG",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 5.41,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "leave-one-tide-gauge-out HIDRA-DN, low SSH values",
+   "baseline_name": "NEMO",
+   "baseline_value": 7.08,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 12,
+   "page_printed": 2188,
+   "quote": "HIDRA-DN 5.41 6.49 85.76"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "dataset_id": "D-TG",
+   "metric": "F1",
+   "metric_raw": "F1",
+   "metric_kind": "SKILL",
+   "value": 92.49,
+   "unit": "%",
+   "higher_is_better": true,
+   "split": "CROSS_VALIDATION",
+   "config": "leave-one-tide-gauge-out HIDRA-DN, low SSH values",
+   "baseline_name": "NEMO",
+   "baseline_value": 80.78,
+   "source_table": "Table 3",
+   "is_best_in_table": true,
+   "page_pdf": 12,
+   "page_printed": 2188,
+   "quote": "HIDRA-DN 5.41 6.49 85.76 3.94 89.03 99.33 92.49"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "dataset_id": "D-TG",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 8.61,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "leave-one-tide-gauge-out HIDRA-DN, high SSH values",
+   "baseline_name": "NEMO",
+   "baseline_value": 6.05,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 12,
+   "page_printed": 2188,
+   "quote": "HIDRA-DN 8.61 11.26 69.82"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG",
+   "dataset_id": "D-TG",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 11.26,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "leave-one-tide-gauge-out HIDRA-DN, high SSH values",
+   "baseline_name": "NEMO",
+   "baseline_value": 8.39,
+   "source_table": "Table 3",
+   "is_best_in_table": false,
+   "page_pdf": 12,
+   "page_printed": 2188,
+   "quote": "HIDRA-DN 8.61 11.26 69.82"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG-BIASCORR",
+   "dataset_id": "D-TG",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.31,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "HIDRA-DN with 12 h dynamic bias correction, overall",
+   "baseline_name": "NEMOb",
+   "baseline_value": 2.65,
+   "source_table": "Table 4",
+   "is_best_in_table": false,
+   "page_pdf": 13,
+   "page_printed": 2189,
+   "quote": "b 3.31 4.61 95.09",
+   "note": "Row label HIDRA-DN_b is split over two lines; quote starts at the subscript b"
+  },
+  {
+   "experiment_id": "X-HIDRAD-LOO-TG-BIASCORR",
+   "dataset_id": "D-TG",
+   "metric": "RMSE",
+   "metric_raw": "RMSE",
+   "metric_kind": "ERROR",
+   "value": 4.61,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "HIDRA-DN with 12 h dynamic bias correction, overall",
+   "baseline_name": "NEMOb",
+   "baseline_value": 3.56,
+   "source_table": "Table 4",
+   "is_best_in_table": false,
+   "page_pdf": 13,
+   "page_printed": 2189,
+   "quote": "b 3.31 4.61 95.09",
+   "note": "Row label HIDRA-DN_b is split over two lines; quote starts at the subscript b"
+  },
+  {
+   "experiment_id": "X-HIDRAD-SCALE-ABLATION",
+   "dataset_id": "D-ADT",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.49,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "reference lambda_R = 150 km (5x5 and 4x5 Fourier submatrices), satellite ADT",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 5",
+   "is_best_in_table": true,
+   "page_pdf": 14,
+   "page_printed": 2190,
+   "quote": "HIDRA-D 3.49"
+  },
+  {
+   "experiment_id": "X-HIDRAD-SCALE-ABLATION",
+   "dataset_id": "D-TG",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.61,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "CROSS_VALIDATION",
+   "config": "reference lambda_R = 150 km, tide gauge SSH cross-validation",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 5",
+   "is_best_in_table": true,
+   "page_pdf": 14,
+   "page_printed": 2190,
+   "quote": "HIDRA-DN 3.61"
+  },
+  {
+   "experiment_id": "X-HIDRAD-SCALE-ABLATION",
+   "dataset_id": "D-ADT",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.51,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "4x4 submatrices, satellite ADT",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 5",
+   "is_best_in_table": false,
+   "page_pdf": 14,
+   "page_printed": 2190,
+   "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+   "note": "Row label 'HIDRA-D4x4' contains a multiplication symbol; value 3.51 read from Table 5."
+  },
+  {
+   "experiment_id": "X-HIDRAD-SCALE-ABLATION",
+   "dataset_id": "D-ADT",
+   "metric": "MAE",
+   "metric_raw": "MAE",
+   "metric_kind": "ERROR",
+   "value": 3.5,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "6x6 submatrices, satellite ADT",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 5",
+   "is_best_in_table": false,
+   "page_pdf": 14,
+   "page_printed": 2190,
+   "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+   "note": "Row label 'HIDRA-D 6x6' contains a multiplication symbol; value 3.50 read from Table 5."
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 15,
+   "page_printed": 2191,
+   "quote": "A limitation of data-driven approaches like HIDRA-D, compared to process-based numerical models, is their lack of physical interpretability."
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 15,
+   "page_printed": 2191,
+   "quote": "application to new regions requires retraining on local datasets"
+  },
+  {
+   "theme": "DATA",
+   "page_pdf": 11,
+   "page_printed": 2187,
+   "quote": "the probability of a satellite track capturing the peak of a transient short-duration storm surge is low"
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 15,
+   "page_printed": 2191,
+   "quote": "We plan to adapt and evaluate the architecture in other ocean basins"
+  }
+ ],
+ "conflicts": [],
+ "not_reported": []
+}

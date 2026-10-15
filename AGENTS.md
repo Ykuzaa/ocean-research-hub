@@ -130,6 +130,36 @@ The Scientific Auditor is not allowed to convert a plausible inference into a re
 6. Scientific Auditor reruns scientific validation when applicable.
 7. Only then may the feature be considered ready to merge.
 
+## Producer–auditor–QA separation
+
+Scientific and mapping review uses three distinct responsibilities:
+
+1. A **producer** prepares an immutable, hash-bound audit packet from the
+   imported row, the exact source edition and the current proposal. The
+   producer may implement tooling and suggest a mapping, but may not record its
+   own suggestion as an audit decision.
+2. An independent **Scientific Auditor** checks that packet against the exact
+   primary source and appends a decision. Agentic auditors are permitted; a
+   separate mandatory human approval for every batch is not required. The
+   auditor must be distinct from the producer and any dissent must remain
+   explicit rather than being resolved silently.
+3. **QA** independently tests packet binding, append-only storage, replay,
+   stale-decision behavior and the absence of accidental promotion. QA does
+   not replace scientific audit.
+
+Every recorded validation must retain the exact value or mapping examined,
+source name and edition/version, source SHA-256, evidence and page/section/
+locator, `auditor_id`, audit date and justification. Record the effective
+auditor model and reasoning metadata when the runtime exposes them; otherwise
+store `null`/`NOT_EXPOSED` and never infer them from requested routing.
+
+A validated field-path mapping means only that the source-to-canonical
+correspondence was independently reviewed. It does **not** make any claim
+`VERIFIED`. A paper may be `VERIFIED` only after an independent PAPER-level
+attestation documents a complete field-by-field review scope covering the
+paper, relevant supplements and relevant author code, with no unresolved
+markers, conflicts or blockers.
+
 ## Required workflow for a paper
 
 `INGESTED → PARSED → EXTRACTED → SCIENTIFIC_AUDIT → VERIFIED/PARTIAL/REJECTED`
@@ -275,7 +305,9 @@ Each extracted scientific field should support at least:
 
 ## Golden dataset and evaluation
 
-Maintain a curated `evaluation/golden_dataset/` with manually verified papers.
+Maintain a curated `evaluation/golden_dataset/` with independently verified
+papers. The verifier must be distinct from the extraction producer; it may be
+an agentic Scientific Auditor and does not require a separate human approval.
 
 Track per field family:
 - precision

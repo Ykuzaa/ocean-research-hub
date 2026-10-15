@@ -1,0 +1,427 @@
+{
+  "source": {
+    "source_id": "bgc-digital-twin",
+    "file": ".data/golden-pdfs/future-digital-twins-emulating-a-highly-complex-marine-bioge.pdf",
+    "sha256_prefix": "2885a6692ef2345fd14c7f8c",
+    "pdf_pages": 16,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-BGC-DIGITAL-TWIN",
+    "doi": "10.3389/fmars.2023.1058837",
+    "title": "Future digital twins: emulating a highly complex marine biogeochemical model with machine learning to predict hypoxia",
+    "year": 2023,
+    "venue": "Frontiers in Marine Science",
+    "ocean_domains": [
+      "biogeochemistry",
+      "forecasting"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-GP",
+      "canonical_name": "Gaussian process emulator (SE-ARD kernel)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "Gaussian Process emulator",
+      "architecture_note": "Squared exponential kernel with automatic relevance determination; also used for GP-based total effect sensitivity analysis.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "use the squared exponential kernel with automatic relevance determination"
+        }
+      ]
+    },
+    {
+      "method_id": "M-LSTM",
+      "canonical_name": "LSTM neural network emulator",
+      "family": "RNN_LSTM_GRU",
+      "family_raw": "Long Short-Term Memory (LSTM) Neural Network",
+      "architecture_note": "One LSTM layer per input variable, outputs concatenated into a fully connected output layer of size 50; Keras with TensorFlow backend.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "with the number of LSTM layers matching the number of input variables"
+        }
+      ]
+    },
+    {
+      "method_id": "M-MLP",
+      "canonical_name": "Multilayer perceptron neural network emulator",
+      "family": "MLP_DNN",
+      "family_raw": "standard Multilayer Perceptron (MLP) Neural Network",
+      "architecture_note": "Three hidden layers, neurons per layer set to ten times the number of inputs, PCA reducing inputs by 30-50%; TensorFlow.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "The MLP NN model had three hidden layers"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-NWES-REANALYSIS",
+      "canonical_name": "UK Met Office NWES NEMO-FABM-ERSEM reanalysis (CMEMS)",
+      "variables": [
+        "oxygen",
+        "PFT chlorophyll",
+        "temperature",
+        "salinity"
+      ],
+      "spatial_resolution": "7 km",
+      "temporal_resolution": "daily",
+      "region": "North-West European Shelf (L4 station and German Bight location)",
+      "period_start": "1998",
+      "period_end": "2020",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "We base this work on a 23 year data (1998-2020), with daily resolution"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "7 km spatial resolution on the Atlantic Meridional Margin (AMM7)"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-ERA5-RIVER",
+      "canonical_name": "ERA5 atmospheric forcing and riverine discharge forcing",
+      "variables": [
+        "short-wave radiation",
+        "10m wind",
+        "specific humidity",
+        "sea level pressure",
+        "riverine nutrients and runoff"
+      ],
+      "spatial_resolution": "31 km (ERA5 HRES)",
+      "temporal_resolution": "hourly (ERA5), daily (riverine)",
+      "region": "North-West European Shelf",
+      "period_start": null,
+      "period_end": null,
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The atmospheric forcing data were obtained from an hourly and 31 km resolution realization (HRES) of the ERA5 data-set"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-GB-MLP",
+      "task": "EMULATION_SURROGATE",
+      "task_raw": "emulate ERSEM to predict and forecast oxygen anomalies at German Bight",
+      "method_id": "M-MLP",
+      "dataset_ids": [
+        "D-NWES-REANALYSIS"
+      ],
+      "target_variable": "oxygen anomaly (full water column, 10 m)",
+      "note": "Training setup given once for the MLP; copied as stated.",
+      "training": {
+        "loss": {
+          "value": "RMSE",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "the MLP NN model used the Adam optimizer and RMSE as a loss function"
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "the MLP NN model used the Adam optimizer and RMSE as a loss function"
+        },
+        "epochs": {
+          "value": "15 (typical)",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "The model was typically trained on 15 epochs"
+        }
+      }
+    },
+    {
+      "experiment_id": "X-L4-MLP",
+      "task": "EMULATION_SURROGATE",
+      "task_raw": "emulate ERSEM to predict and forecast oxygen anomalies at L4 (MinSc, MedSc, MaxSc)",
+      "method_id": "M-MLP",
+      "dataset_ids": [
+        "D-NWES-REANALYSIS",
+        "D-ERA5-RIVER"
+      ],
+      "target_variable": "oxygen anomaly (50 vertical levels)",
+      "note": "Training setup given once for the MLP; copied as stated.",
+      "training": {
+        "loss": {
+          "value": "RMSE",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "the MLP NN model used the Adam optimizer and RMSE as a loss function"
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "the MLP NN model used the Adam optimizer and RMSE as a loss function"
+        },
+        "epochs": {
+          "value": "15 (typical)",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "The model was typically trained on 15 epochs"
+        }
+      }
+    },
+    {
+      "experiment_id": "X-L4-LSTM",
+      "task": "EMULATION_SURROGATE",
+      "task_raw": "emulate ERSEM to predict oxygen anomalies at L4",
+      "method_id": "M-LSTM",
+      "dataset_ids": [
+        "D-NWES-REANALYSIS",
+        "D-ERA5-RIVER"
+      ],
+      "target_variable": "oxygen anomaly (50 vertical levels)",
+      "training": {
+        "loss": {
+          "value": "RMSE",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "using the Adam optimizer and RMSE as a loss function"
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "using the Adam optimizer and RMSE as a loss function"
+        },
+        "epochs": {
+          "value": "20",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "were trained for 20 epochs"
+        }
+      }
+    },
+    {
+      "experiment_id": "X-L4-GP",
+      "task": "EMULATION_SURROGATE",
+      "task_raw": "emulate ERSEM to predict oxygen anomalies and sensitivity analysis at L4",
+      "method_id": "M-GP",
+      "dataset_ids": [
+        "D-NWES-REANALYSIS",
+        "D-ERA5-RIVER"
+      ],
+      "target_variable": "oxygen anomaly (50 vertical levels)",
+      "training": {}
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-GB-MLP",
+      "dataset_id": "D-NWES-REANALYSIS",
+      "metric": "CORRELATION",
+      "metric_raw": "Pearson correlation of forecast",
+      "metric_kind": "SKILL",
+      "value": 0.6,
+      "unit": "R",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "SST-only inputs, forecast lead time about 17 days",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "the Pearson correlation drops from well over R=0.9 to about R=0.6 at"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "page_pdf": 1,
+      "page_printed": 1,
+      "quote": "limitations imposed by the spatio-temporal resolution of the training/validation data"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 13,
+      "page_printed": 13,
+      "quote": "it turned out that the ML models performed poorly on the L4 interpolated anomaly inputs"
+    },
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 11,
+      "page_printed": 11,
+      "quote": "We suspect this discrepancy is an artefact of the emulated ERSEM model"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-GB-MLP].training.learning_rate",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-GB-MLP].training.batch_size",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-GB-MLP].training.hardware",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-MLP].training.learning_rate",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-MLP].training.batch_size",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-MLP].training.hardware",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-LSTM].training.learning_rate",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-LSTM].training.batch_size",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-LSTM].training.hardware",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-GP].training.loss",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-GP].training.optimizer",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-GP].training.learning_rate",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-GP].training.batch_size",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-GP].training.epochs",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-L4-GP].training.hardware",
+      "searched": [
+        "2.5 ML models",
+        "2.5.1-2.5.3",
+        "2.6 ML forecasting",
+        "3 Results and discussion"
+      ]
+    },
+    {
+      "field": "results[MaxSc correlation]",
+      "searched": [
+        "Figure 10 caption",
+        "Section 3.3"
+      ],
+      "note": "Le papier n'énonce qu'une borne (R > 0.6), jamais une corrélation mesurée."
+    }
+  ]
+}

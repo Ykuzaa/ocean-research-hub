@@ -1,0 +1,404 @@
+{
+  "source": {
+    "source_id": "dincae-2-2022",
+    "file": ".data/golden-pdfs/dincae-2-2022.pdf",
+    "sha256_prefix": "017757e5a2394713d7c18f9b",
+    "pdf_pages": 14,
+    "printed_page_offset": 2182,
+    "extracted_by": "claude-opus-5 (reference pass, read by hand)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-DINCAE2",
+    "doi": "10.5194/gmd-15-2183-2022",
+    "title": "DINCAE 2.0: multivariate convolutional neural network with error estimates to reconstruct sea surface temperature satellite and altimetry observations",
+    "year": 2022,
+    "venue": "Geoscientific Model Development",
+    "venue_type": "JOURNAL",
+    "open_access": true,
+    "ocean_domains": [
+      "data-assimilation"
+    ],
+    "ocean_domains_raw": [
+      "satellite_remote_sensing",
+      "data_assimilation_interpolation",
+      "ocean_state_reconstruction"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-DINCAE2",
+      "canonical_name": "DINCAE 2.0",
+      "family": "CNN_AUTOENCODER",
+      "is_novel_in_paper": true,
+      "evidence": [
+        {
+          "field": "family",
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "Table 1. Layers of the neural network for the gridded datasets. Note that every convolution is followed by a RELU activation function."
+        }
+      ],
+      "role": "PROPOSED",
+      "family_raw": "DINCAE 2.0",
+      "architecture_note": "convolutional autoencoder with sum (residual) skip connections, 25 layers"
+    },
+    {
+      "method_id": "M-DINCAE1",
+      "canonical_name": "DINCAE 1.0",
+      "family": "CNN_AUTOENCODER",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "family_raw": "DINCAE 1.0",
+      "architecture_note": null
+    },
+    {
+      "method_id": "M-DIVAND",
+      "canonical_name": "DIVAnd",
+      "family": "VARIATIONAL_ANALYSIS",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "family_raw": "DIVAnd",
+      "architecture_note": null
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-MODIS-SST-ADRIATIC",
+      "canonical_name": "MODIS Terra Level 3 SST Thermal IR Daily 4km Nighttime v2014.0",
+      "doi": "10.5067/MODST-1D4N4",
+      "variables": [
+        "sea_surface_temperature"
+      ],
+      "spatial_resolution": "4 km",
+      "temporal_resolution": "daily",
+      "region": "Adriatic Sea",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_printed": 2186,
+          "page_pdf": 4,
+          "quote": "Sea Surface Temperature (MODIS Terra Level 3 SST Thermal IR Daily 4km Nighttime v2014.0"
+        }
+      ],
+      "role": "PRIMARY_TRAINING"
+    },
+    {
+      "dataset_id": "D-ALTIMETRY-MED",
+      "canonical_name": "Along-track satellite altimetry, Mediterranean Sea (22 missions)",
+      "variables": [
+        "sea_surface_height"
+      ],
+      "region": "7 W to 37 E, 30 to 46 N",
+      "period_start": "1993-01-01",
+      "period_end": "2019-05-13",
+      "evidence": [
+        {
+          "field": "period",
+          "page_printed": 2186,
+          "page_pdf": 4,
+          "quote": "Altimetry data from 1 January 1993 to 13 May 2019 cov- ering 7 W to 37 E and from 30 to 46 N from 22 satellite missions operating during this time frame are used."
+        }
+      ],
+      "role": "PRIMARY_TRAINING"
+    },
+    {
+      "dataset_id": "D-AVHRR-OI-L4",
+      "canonical_name": "AVHRR_OI-NCEI-L4-GLOB-v2.0",
+      "variables": [
+        "sea_surface_temperature"
+      ],
+      "role": "AUXILIARY_COVARIABLE"
+    },
+    {
+      "dataset_id": "D-AVHRR-LIGURIAN",
+      "canonical_name": "AVHRR sea surface temperature, Ligurian Sea (Barth et al., 2020 test case)",
+      "variables": [
+        "sea_surface_temperature"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "Ligurian Sea",
+      "period_start": null,
+      "period_end": null,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_printed": 2189,
+          "page_pdf": 7,
+          "quote": "The new type of skip connection was first tested with the"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-GRIDDED-ADRIATIC",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "method_id": "M-DINCAE2",
+      "dataset_ids": [
+        "D-MODIS-SST-ADRIATIC"
+      ],
+      "target_variable": "sea_surface_temperature",
+      "training": {
+        "optimizer": {
+          "value": "adam",
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "All numerical experiments used the Adam optimizer"
+        },
+        "beta1": {
+          "value": 0.9,
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "with the standard parameter for the exponential decay rate for the first moment 1= 0.9"
+        },
+        "beta2": {
+          "value": 0.999,
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "and for the second moment 1= 0.999",
+          "note": "The paper prints beta1 twice; the second occurrence is beta2 by definition. Stored as beta2 with the printing error flagged."
+        },
+        "epsilon": {
+          "value": 1e-08,
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "note": "The symbol epsilon = 10^-8 is printed as math; PDF text extraction mangles it. Value read from the rendered page, quote deliberately not stored rather than stored wrong.",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE"
+        },
+        "learning_rate": {
+          "value": 0.00058,
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "The learning rate for the Adam optimizer is 0.00058."
+        },
+        "lr_schedule": {
+          "value": "learning rate halved every 1/decay epochs",
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "every 1/ decay epochs, the learning rates is halved"
+        },
+        "batch_size": {
+          "value": 32,
+          "unit": "time_instances",
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "The batch size includes 32 time instances"
+        },
+        "weight_decay_l2": {
+          "value": 0.0001,
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "note": "The paper prints the L2 beta as 10^-4; PDF text extraction truncates the exponent, so no quote can carry the value."
+        },
+        "gradient_clipping": {
+          "value": 5,
+          "page_printed": 2188,
+          "page_pdf": 6,
+          "quote": "The absolute value of the gradients is clipped to 5 in order to stabilize the training."
+        },
+        "hyperparameter_search": {
+          "value": "bayesian_optimization",
+          "tool": "scikit-optimize",
+          "page_printed": 2189,
+          "page_pdf": 7,
+          "quote": "The hyper-parameters of the neural network mentioned previously have been determined by Bayesian optimization"
+        },
+        "framework": {
+          "value": "Julia + Knet",
+          "page_printed": 2187,
+          "page_pdf": 5,
+          "quote": "we decided to rewrite DINCAE in Julia. Porting DINCAE to Julia with the package Knet"
+        }
+      },
+      "task_raw": "gap filling reconstruction"
+    },
+    {
+      "experiment_id": "X-ALTIMETRY-MED",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "method_id": "M-DINCAE2",
+      "dataset_ids": [
+        "D-ALTIMETRY-MED"
+      ],
+      "target_variable": "sea_surface_height",
+      "training": {
+        "time_window_days": {
+          "value": 27,
+          "page_printed": 2189,
+          "page_pdf": 7,
+          "quote": "27 time days (centered around the target time) are used to derive gridded altimetry data."
+        },
+        "epochs": {
+          "value": 1000,
+          "page_printed": 2187,
+          "page_pdf": 5,
+          "quote": "The neural network is optimized during 1000 epochs and the intermediate results are saved every 25 epochs."
+        }
+      },
+      "task_raw": "gap filling reconstruction"
+    },
+    {
+      "experiment_id": "X-GRIDDED-LIGURIAN",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "task_raw": "reconstruction of missing satellite SST data",
+      "method_id": "M-DINCAE2",
+      "dataset_ids": [
+        "D-AVHRR-LIGURIAN"
+      ],
+      "target_variable": "sea_surface_temperature",
+      "training": {
+        "train_time_hours": {
+          "value": 1.9,
+          "page_printed": 2187,
+          "page_pdf": 5,
+          "quote": "cut down the runtime from 3.5 to 1.9 h",
+          "note": "Measured on the AVHRR case from Barth et al. (2020), not on the Adriatic case."
+        }
+      },
+      "note": "Reuses the training setup of the Adriatic case; the paper states none separately."
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-GRIDDED-LIGURIAN",
+      "dataset_id": "D-AVHRR-LIGURIAN",
+      "metric": "RMSE",
+      "value": 0.3604,
+      "unit": "degC",
+      "split": "TEST",
+      "config": "sum skip connections",
+      "baseline_name": "cat skip connections (DINCAE 1.0 style)",
+      "baseline_value": 0.3835,
+      "page_printed": 2189,
+      "page_pdf": 7,
+      "quote": "The previous best result (in terms of RMS) was 0.3835 C using the cat skip connection. With the new approach this RMS error is reduced to 0.3604 C.",
+      "metric_raw": "RMS error",
+      "metric_kind": "ERROR",
+      "higher_is_better": false,
+      "is_best_in_table": false
+    },
+    {
+      "experiment_id": "X-GRIDDED-ADRIATIC",
+      "dataset_id": "D-MODIS-SST-ADRIATIC",
+      "metric": "RMSE",
+      "value": 0.66,
+      "unit": "degC",
+      "split": "TEST",
+      "config": "no auxiliary parameters, cat skip connections",
+      "source_table": "Table 2",
+      "page_printed": 2190,
+      "page_pdf": 8,
+      "quote": "none 0.66 (0.06 1.02) 0.60 (0.05 0.93) 0.55 (0.04 0.84)",
+      "metric_raw": "RMS error",
+      "metric_kind": "ERROR",
+      "higher_is_better": false,
+      "is_best_in_table": false
+    },
+    {
+      "experiment_id": "X-GRIDDED-ADRIATIC",
+      "dataset_id": "D-MODIS-SST-ADRIATIC",
+      "metric": "RMSE",
+      "value": 0.54,
+      "unit": "degC",
+      "split": "TEST",
+      "config": "chlor_a + wind_speed + uwnd + vwnd, sum skip connections and refinement",
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_printed": 2190,
+      "page_pdf": 8,
+      "quote": "chlor_a, wind_speed, uwnd, vwnd 0.66 (0.06 1.03) 0.57 (0.05 0.88) 0.54 (0.05 0.82)",
+      "metric_raw": "RMS error",
+      "metric_kind": "ERROR",
+      "higher_is_better": false
+    },
+    {
+      "experiment_id": "X-ALTIMETRY-MED",
+      "dataset_id": "D-ALTIMETRY-MED",
+      "metric": "RMSE",
+      "value": 3.58,
+      "unit": "cm",
+      "split": "TEST",
+      "config": "neural network, altimetry only",
+      "baseline_name": "DIVAnd",
+      "baseline_value": 3.6,
+      "page_printed": 2191,
+      "page_pdf": 9,
+      "quote": "The best performing neural network had a RMS error of 3.58 cm, which is only slightly better than results of DIV And (3.60 cm).",
+      "metric_raw": "RMS error",
+      "metric_kind": "ERROR",
+      "higher_is_better": false,
+      "is_best_in_table": false
+    },
+    {
+      "experiment_id": "X-ALTIMETRY-MED",
+      "dataset_id": "D-ALTIMETRY-MED",
+      "metric": "RMSE",
+      "value": 3.47,
+      "unit": "cm",
+      "split": "TEST",
+      "config": "neural network with Mediterranean SST as co-variable",
+      "baseline_name": "DIVAnd",
+      "baseline_value": 3.6,
+      "page_printed": 2191,
+      "page_pdf": 9,
+      "quote": "When using the Mediterranean sea surface temperature as a co-variable we obtained a RMS error relative to the test dataset of 3.47 cm",
+      "metric_raw": "RMS error",
+      "metric_kind": "ERROR",
+      "higher_is_better": false,
+      "is_best_in_table": false
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "experiments[X-ALTIMETRY-MED].training.batch_size",
+      "searched": [
+        "section 4 Implementation",
+        "section 3.2",
+        "Table 1"
+      ]
+    },
+    {
+      "field": "experiments[*].training.params_count",
+      "searched": [
+        "Table 1",
+        "section 4 Implementation"
+      ],
+      "note": "Per-layer filter counts are given; no total parameter count is stated."
+    },
+    {
+      "field": "experiments[*].energy_or_carbon",
+      "searched": [
+        "section 4 Implementation"
+      ]
+    },
+    {
+      "field": "limitations",
+      "searched": [
+        "section 5 Results and discussion",
+        "section 6 Conclusions"
+      ],
+      "note": "The conclusions state improvements only; the authors formulate no limitation of their own."
+    },
+    {
+      "field": "experiments[X-GRIDDED-ADRIATIC].training.epochs",
+      "searched": [
+        "Section 2 method",
+        "Section 4 implementation",
+        "Section 5 Adriatic test case"
+      ],
+      "note": "Les 1000 époques sont énoncées dans le paragraphe du cas altimétrie, pas pour le cas Adriatique."
+    },
+    {
+      "field": "experiments[X-GRIDDED-ADRIATIC].training.hardware",
+      "searched": [
+        "Section 4 implementation"
+      ],
+      "note": "Le GTX 1080 / i7-7700 est donné pour le portage Python TensorFlow 1.15, pas pour les essais DINCAE 2.0 en Julia rapportés ici."
+    }
+  ],
+  "limitations": [],
+  "conflicts": []
+}

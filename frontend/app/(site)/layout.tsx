@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/app/(site)/components/SiteHeader";
 import { SiteFooter } from "@/app/(site)/components/SiteFooter";
+import type { ReactNode } from "react";
 
 /**
  * Public product surface. It is deliberately a different room from the
@@ -7,7 +8,7 @@ import { SiteFooter } from "@/app/(site)/components/SiteFooter";
  * the public story addresses an international research audience, so this
  * subtree declares its own language.
  */
-export default function SiteLayout({ children }: LayoutProps<"/">) {
+export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div lang="en" className="site-root flex min-h-full flex-1 flex-col">
       <a href="#main-content" className="sr-only z-50 rounded bg-sheet-0 px-4 py-3 text-ink-900 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">

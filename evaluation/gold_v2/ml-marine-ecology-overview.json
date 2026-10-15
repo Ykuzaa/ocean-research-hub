@@ -1,0 +1,27 @@
+{
+ "source": {
+  "source_id": "machine-learning-in-marine-ecology-an-overview-of-techniques",
+  "file": ".data/golden-pdfs/machine-learning-in-marine-ecology-an-overview-of-techniques.pdf",
+  "sha256_prefix": "f4bfa77fb75f88ad191c48e5",
+  "pdf_pages": 26,
+  "printed_page_offset": 1827,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-ML-MARINE-ECOLOGY-OVERVIEW",
+  "doi": "10.1093/icesjms/fsad100",
+  "title": "Machine learning in marine ecology: an overview of techniques and applications",
+  "year": 2023,
+  "venue": "ICES Journal of Marine Science",
+  "ocean_domains": [
+   "marine-ecology",
+   "reviews"
+  ]
+ },
+ "excluded": {
+  "reason": "Literature review of ~1000 publications; no model is trained by the authors and no experiment is reported. Searched whole text for batch size, learning rate, epoch, optimizer, GPU, RMSE: absent (Adam only in reference authors).",
+  "page_pdf": 3,
+  "quote": "We built a database of∼1000 publications\nthat implement such techniques to analyse marine ecology data."
+ }
+}

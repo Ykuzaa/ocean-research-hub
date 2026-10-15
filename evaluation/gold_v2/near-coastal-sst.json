@@ -1,0 +1,363 @@
+{
+  "source": {
+    "source_id": "near-coastal-sst",
+    "file": ".data/golden-pdfs/a-deep-learning-approach-for-near-coastal-sea-surface-temper.pdf",
+    "sha256_prefix": "54c31e1fc20debd54e305ab4",
+    "pdf_pages": 15,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-NEARCOAST-SST",
+    "doi": "10.3389/fmars.2026.1798048",
+    "title": "A deep learning approach for near-coastal sea surface temperature prediction",
+    "year": 2026,
+    "venue": "Frontiers in Marine Science",
+    "ocean_domains": [
+      "forecasting",
+      "sst"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-ATTN-PMF-SEGRNN",
+      "canonical_name": "Attn-PMF SegRNN",
+      "family": "RNN_LSTM_GRU",
+      "family_raw": "Segment Recurrent Neural Network (SegRNN) with attention-enhanced parallel multi-step forecast decoder",
+      "architecture_note": "GRU-based segment encoder; recurrent decoder initialisation replaced by global temporal attention over all encoder states, residual fusion, LayerNorm and FFN. Classified on the recurrent backbone; attention is not a separate backbone in the vocabulary.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "Building upon the Segment Recurrent Neural Network"
+        },
+        {
+          "field": "family",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The encoder processes segmented inputs through GRU cells"
+        },
+        {
+          "field": "architecture_note",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "we introduce a global temporal attention mechanism"
+        }
+      ]
+    },
+    {
+      "method_id": "M-FIO-COM",
+      "canonical_name": "FIO-COM",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "operational numerical ocean model",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "FIO-COM forecasts serve as the"
+        },
+        {
+          "field": "role",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "operational baseline for benchmarking"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-ECS-STATION-SST",
+      "canonical_name": "East China Sea coastal station SST observations (31 stations)",
+      "variables": [
+        "sea surface temperature"
+      ],
+      "spatial_resolution": "station-level",
+      "temporal_resolution": "hourly",
+      "region": "East China Sea",
+      "period_start": "2021-01-01",
+      "period_end": "2024-07-25",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "hourly sea surface temperature measurements from a network of 31"
+        },
+        {
+          "field": "region",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "marine stations distributed throughout the coastal waters of the East China Sea"
+        },
+        {
+          "field": "period",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "from January 1, 2021,"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-FIO-COM",
+      "canonical_name": "FIO-COM SST forecasts",
+      "variables": [
+        "sea surface temperature"
+      ],
+      "spatial_resolution": "10-25 km",
+      "temporal_resolution": "3-hourly",
+      "region": "East China Sea",
+      "period_start": null,
+      "period_end": null,
+      "role": "BASELINE_PRODUCT",
+      "evidence": [
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "generates SST forecasts at 3-hourly intervals"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 13,
+          "page_printed": 13,
+          "quote": "The coarse spatial resolution (10–25 km)"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "task": "FORECASTING",
+      "task_raw": "station-level near-coastal SST prediction, 96 h horizon",
+      "method_id": "M-ATTN-PMF-SEGRNN",
+      "dataset_ids": [
+        "D-ECS-STATION-SST",
+        "D-FIO-COM"
+      ],
+      "target_variable": "sea surface temperature",
+      "training": {
+        "loss": {
+          "value": "Time-Segmented Weighted hybrid loss (TSW-Loss)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "we propose a Time-Segmented Weighted hybrid loss function (TSW-Loss)",
+          "extra_evidence": [
+            {
+              "claim": "weighted ensemble of MAE and RMSE over four forecast segments",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "TSW-Loss constructs a weighted ensemble"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "standard laptop with an entry-level GPU",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "requiring only a standard laptop equipped with an entry-level GPU",
+          "extra_evidence": [
+            {
+              "claim": "example GPU: NVIDIA GTX 1650, 4 GB memory",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "(e.g., NVIDIA GTX 1650, 4 GB memory)"
+            }
+          ]
+        }
+      },
+      "note": "One station-specific model per station; same training setup for all stations."
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "dataset_id": "D-ECS-STATION-SST",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.4,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "31 stations, 1-24 h, domain-average (upper bound)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 7,
+      "page_printed": 7,
+      "quote": "the domain-averaged RMSE remains\nbelow 0.4 °C"
+    },
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "dataset_id": "D-ECS-STATION-SST",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.8,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "31 stations, 73-96 h, ensemble mean (approximate)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 7,
+      "page_printed": 7,
+      "quote": "the ensemble mean\nreaches approximately 0.8 °C"
+    },
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "dataset_id": "D-ECS-STATION-SST",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.3,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "10 stations with FIO-COM, 3-24 h",
+      "baseline_name": "FIO-COM",
+      "baseline_value": 1.2,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "(green dashed line, mean ≈ 0.3 °C)"
+    },
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "dataset_id": "D-ECS-STATION-SST",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.48,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "10 stations with FIO-COM, 27-48 h",
+      "baseline_name": "FIO-COM",
+      "baseline_value": 1.2,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "AI\nmaintains RMSE near 0.48 °C versus 1.2 °C for FIO-COM"
+    },
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "dataset_id": "D-ECS-STATION-SST",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.6,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "10 stations with FIO-COM, 51-72 h",
+      "baseline_name": "FIO-COM",
+      "baseline_value": 1.2,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "the gap widens to 0.6 °C versus 1.2 °C"
+    },
+    {
+      "experiment_id": "X-NEARCOAST-SST-FORECAST",
+      "dataset_id": "D-ECS-STATION-SST",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.74,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "10 stations with FIO-COM, 75-96 h",
+      "baseline_name": "FIO-COM",
+      "baseline_value": 1.2,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "AI achieves\n0.74 °C while FIO-COM degrades to 1.2 °C"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 13,
+      "page_printed": 13,
+      "quote": "does not exploit\nspatial relationships among neighboring stations"
+    },
+    {
+      "theme": "UNCERTAINTY",
+      "page_pdf": 13,
+      "page_printed": 13,
+      "quote": "probabilistic forecasts with uncertainty"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 13,
+      "page_printed": 13,
+      "quote": "performance under extreme events (e.g., typhoons, marine"
+    },
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 13,
+      "page_printed": 13,
+      "quote": "controlled ablation experiments"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-NEARCOAST-SST-FORECAST].training.optimizer",
+      "searched": [
+        "2.2.3 Training strategy",
+        "Computational Requirements",
+        "Results",
+        "Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-NEARCOAST-SST-FORECAST].training.learning_rate",
+      "searched": [
+        "2.2.3 Training strategy",
+        "Computational Requirements",
+        "Results",
+        "Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-NEARCOAST-SST-FORECAST].training.batch_size",
+      "searched": [
+        "2.2.3 Training strategy",
+        "Computational Requirements",
+        "Results",
+        "Conclusions"
+      ]
+    },
+    {
+      "field": "experiments[X-NEARCOAST-SST-FORECAST].training.epochs",
+      "searched": [
+        "2.2.3 Training strategy",
+        "Computational Requirements",
+        "Results",
+        "Conclusions"
+      ]
+    }
+  ]
+}

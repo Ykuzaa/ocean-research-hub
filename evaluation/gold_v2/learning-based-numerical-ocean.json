@@ -1,0 +1,32 @@
+{
+  "source": {
+    "source_id": "learning-based-numerical-ocean",
+    "file": ".data/golden-pdfs/learning-based-methods-and-the-future-of-numerical-ocean-and.pdf",
+    "sha256_prefix": "8c172a4c03088c845eb691fd",
+    "pdf_pages": 26,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14",
+    "printed_page_offset": 0
+  },
+  "paper": {
+    "paper_id": "P-LEARNING-BASED-NUMERICAL-OCEAN",
+    "doi": null,
+    "title": "Learning-Based Methods and the Future of Numerical Ocean and Sea Ice Modeling",
+    "year": 2027,
+    "venue": "Annual Review of Marine Science",
+    "ocean_domains": [
+      "reviews",
+      "forecasting",
+      "data-assimilation",
+      "parameterization",
+      "sea-ice",
+      "subsurface",
+      "foundation-models"
+    ]
+  },
+  "excluded": {
+    "reason": "Review article synthesising published work; the authors train no model of their own. No batch size, learning rate, epoch, optimizer or Adam term appears anywhere in the text.",
+    "page_pdf": 1,
+    "quote": "This review explores how AI"
+  }
+}

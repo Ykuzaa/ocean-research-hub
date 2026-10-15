@@ -1,0 +1,372 @@
+{
+  "batch_kind": "FIELD_PATH_MAPPING_AUDIT_PACKET_BATCH",
+  "schema_version": 1,
+  "producer_id": "developer:/root/developer_audit",
+  "notice": "Producer packets only; no audit decision or validation is recorded.",
+  "paths": [
+    "limitations.memory",
+    "limitations.swot_noise",
+    "reproducibility.code_archive",
+    "reproducibility.framework"
+  ],
+  "packets": [
+    {
+      "packet_sha256": "7749ca4dd578f9a60ece98d87c8f95741dd541d6e2111b2c7b2af55032aa3f8a",
+      "packet": {
+        "packet_kind": "FIELD_PATH_MAPPING_AUDIT_PACKET",
+        "schema_version": 1,
+        "version_id": "workbook:084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f",
+        "producer_id": "developer:/root/developer_audit",
+        "source": {
+          "name": "Ocean_Research_Intelligence_ENRICHED_B16.xlsx",
+          "sha256": "084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f"
+        },
+        "source_mapping": {
+          "original_path": "limitations.memory",
+          "decision": "AMBIGUOUS",
+          "canonical_path": null,
+          "basis": "Workbook source candidate category=limitations; no canonical field selected. Supplied basis: B16 explicit mapping; original field path retained.",
+          "provenance_type": "AI_INTERPRETATION",
+          "source_candidate": {
+            "canonical_category": "limitations",
+            "field_path": "limitations.memory",
+            "mapping_basis": "B16 explicit mapping; original field path retained.",
+            "n_rows": 1
+          }
+        },
+        "producer_proposal": {
+          "decision": "MAPPED",
+          "canonical_path": "limitations.author_reported",
+          "reason": "Synonym or container field; original path kept as qualifier."
+        },
+        "proposal_source": {
+          "name": "b16-field-path-map-prereview.json",
+          "sha256": "1478b3d9935fb1cb37990fcca074b3abd3e99995963bc8533e4b5e251156d00d"
+        },
+        "prereview_rule": {
+          "original_path": "limitations.memory",
+          "source_decision": "AMBIGUOUS",
+          "source_canonical_path": null,
+          "n_claims": 1,
+          "n_papers": 1,
+          "claim_types": [
+            "AUTHOR_REPORTED_LIMITATION"
+          ],
+          "claim_ids": [
+            "B16-0015"
+          ],
+          "proposed_decision": "MAPPED",
+          "proposed_canonical_path": "limitations.author_reported",
+          "reason": "Synonym or container field; original path kept as qualifier.",
+          "auditor_verdict": "CONCUR",
+          "auditor_reason": "Agree. The claim(s) (B16-0015) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness.",
+          "auditor_offending_claim_ids": [],
+          "provenance_type": "AI_INTERPRETATION",
+          "review_status": "PENDING",
+          "independent_validation_required": true
+        },
+        "claims": [
+          {
+            "claim_id": "B16-0015",
+            "paper_id": "OAI-0001",
+            "claim_fingerprint": "e02cf64d35a3dce9cbf8f7a26517c6a5a1889bdcf45923585019b9c3b48f87d0",
+            "value": "GPU memory limits direct large-domain training",
+            "unit": null,
+            "experiment_id": "OAI-0001:B16_SOURCE_REVIEW",
+            "claim_type": "AUTHOR_REPORTED_LIMITATION",
+            "subject_scope": "4DVarNet-SSH; prior-network parameters differ from total solver parameters.",
+            "source": {
+              "doi": "10.5194/gmd-16-2119-2023",
+              "edition": "PUBLISHED_HTML",
+              "url": "https://gmd.copernicus.org/articles/16/2119/2023/",
+              "pdf_page": null,
+              "section": "3.4",
+              "locator": "3.4",
+              "verbatim_evidence": null,
+              "evidence_review": "SOURCE_SECTION_READ"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "packet_sha256": "c99e26bf60cb8a257255b3a39b715fcd37495616720f1c1ac1961439606a9a6b",
+      "packet": {
+        "packet_kind": "FIELD_PATH_MAPPING_AUDIT_PACKET",
+        "schema_version": 1,
+        "version_id": "workbook:084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f",
+        "producer_id": "developer:/root/developer_audit",
+        "source": {
+          "name": "Ocean_Research_Intelligence_ENRICHED_B16.xlsx",
+          "sha256": "084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f"
+        },
+        "source_mapping": {
+          "original_path": "limitations.swot_noise",
+          "decision": "AMBIGUOUS",
+          "canonical_path": null,
+          "basis": "Workbook source candidate category=limitations; no canonical field selected. Supplied basis: B16 explicit mapping; original field path retained.",
+          "provenance_type": "AI_INTERPRETATION",
+          "source_candidate": {
+            "canonical_category": "limitations",
+            "field_path": "limitations.swot_noise",
+            "mapping_basis": "B16 explicit mapping; original field path retained.",
+            "n_rows": 1
+          }
+        },
+        "producer_proposal": {
+          "decision": "MAPPED",
+          "canonical_path": "limitations.author_reported",
+          "reason": "Synonym or container field; original path kept as qualifier."
+        },
+        "proposal_source": {
+          "name": "b16-field-path-map-prereview.json",
+          "sha256": "1478b3d9935fb1cb37990fcca074b3abd3e99995963bc8533e4b5e251156d00d"
+        },
+        "prereview_rule": {
+          "original_path": "limitations.swot_noise",
+          "source_decision": "AMBIGUOUS",
+          "source_canonical_path": null,
+          "n_claims": 1,
+          "n_papers": 1,
+          "claim_types": [
+            "AUTHOR_REPORTED_LIMITATION"
+          ],
+          "claim_ids": [
+            "B16-0018"
+          ],
+          "proposed_decision": "MAPPED",
+          "proposed_canonical_path": "limitations.author_reported",
+          "reason": "Synonym or container field; original path kept as qualifier.",
+          "auditor_verdict": "CONCUR",
+          "auditor_reason": "Agree. The claim(s) (B16-0018) are AUTHOR_REPORTED_LIMITATION about the paper's own model, data or study, not review-level statements and not a baseline's weakness.",
+          "auditor_offending_claim_ids": [],
+          "provenance_type": "AI_INTERPRETATION",
+          "review_status": "PENDING",
+          "independent_validation_required": true
+        },
+        "claims": [
+          {
+            "claim_id": "B16-0018",
+            "paper_id": "OAI-0001",
+            "claim_fingerprint": "3dad3b67f647504ad4486b7e45366a5da5e9571244ee7ab825f38f4e337bbc09",
+            "value": "Experiments assume error-free SWOT",
+            "unit": null,
+            "experiment_id": "OAI-0001:B16_SOURCE_REVIEW",
+            "claim_type": "AUTHOR_REPORTED_LIMITATION",
+            "subject_scope": "4DVarNet-SSH; prior-network parameters differ from total solver parameters.",
+            "source": {
+              "doi": "10.5194/gmd-16-2119-2023",
+              "edition": "PUBLISHED_HTML",
+              "url": "https://gmd.copernicus.org/articles/16/2119/2023/",
+              "pdf_page": null,
+              "section": "6 Conclusions",
+              "locator": "6 Conclusions",
+              "verbatim_evidence": null,
+              "evidence_review": "SOURCE_SECTION_READ"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "packet_sha256": "852870b197e914471a662c20369cee311fe5864886299d91547eca58a2d7ed0c",
+      "packet": {
+        "packet_kind": "FIELD_PATH_MAPPING_AUDIT_PACKET",
+        "schema_version": 1,
+        "version_id": "workbook:084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f",
+        "producer_id": "developer:/root/developer_audit",
+        "source": {
+          "name": "Ocean_Research_Intelligence_ENRICHED_B16.xlsx",
+          "sha256": "084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f"
+        },
+        "source_mapping": {
+          "original_path": "reproducibility.code_archive",
+          "decision": "AMBIGUOUS",
+          "canonical_path": null,
+          "basis": "Workbook source candidate category=code; no canonical field selected. Supplied basis: B16 explicit mapping; original field path retained.",
+          "provenance_type": "AI_INTERPRETATION",
+          "source_candidate": {
+            "canonical_category": "code",
+            "field_path": "reproducibility.code_archive",
+            "mapping_basis": "B16 explicit mapping; original field path retained.",
+            "n_rows": 1
+          }
+        },
+        "producer_proposal": {
+          "decision": "MAPPED",
+          "canonical_path": "reproducibility.code_url",
+          "reason": "Synonym or container field; original path kept as qualifier."
+        },
+        "proposal_source": {
+          "name": "b16-field-path-map-prereview.json",
+          "sha256": "1478b3d9935fb1cb37990fcca074b3abd3e99995963bc8533e4b5e251156d00d"
+        },
+        "prereview_rule": {
+          "original_path": "reproducibility.code_archive",
+          "source_decision": "AMBIGUOUS",
+          "source_canonical_path": null,
+          "n_claims": 1,
+          "n_papers": 1,
+          "claim_types": [
+            "AUTHOR_REPORTED_FACT"
+          ],
+          "claim_ids": [
+            "B16-0016"
+          ],
+          "proposed_decision": "MAPPED",
+          "proposed_canonical_path": "reproducibility.code_url",
+          "reason": "Synonym or container field; original path kept as qualifier.",
+          "auditor_verdict": "CONCUR",
+          "auditor_reason": "Agree. It is a URL.",
+          "auditor_offending_claim_ids": [],
+          "provenance_type": "AI_INTERPRETATION",
+          "review_status": "PENDING",
+          "independent_validation_required": true
+        },
+        "claims": [
+          {
+            "claim_id": "B16-0016",
+            "paper_id": "OAI-0001",
+            "claim_fingerprint": "769ff126b0fb4c6a2a000041b0cdcd16a70f474ab06722cdb6f8e62cb884c804",
+            "value": "https://doi.org/10.5281/zenodo.7186322",
+            "unit": null,
+            "experiment_id": "OAI-0001:B16_SOURCE_REVIEW",
+            "claim_type": "AUTHOR_REPORTED_FACT",
+            "subject_scope": "4DVarNet-SSH; prior-network parameters differ from total solver parameters.",
+            "source": {
+              "doi": "10.5194/gmd-16-2119-2023",
+              "edition": "PUBLISHED_HTML",
+              "url": "https://gmd.copernicus.org/articles/16/2119/2023/",
+              "pdf_page": null,
+              "section": "3.4",
+              "locator": "3.4",
+              "verbatim_evidence": null,
+              "evidence_review": "SOURCE_SECTION_READ"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "packet_sha256": "02ce33d5f6e190a7a479751735ff239248bef055c5e062cfc4e141a4e9ace24a",
+      "packet": {
+        "packet_kind": "FIELD_PATH_MAPPING_AUDIT_PACKET",
+        "schema_version": 1,
+        "version_id": "workbook:084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f",
+        "producer_id": "developer:/root/developer_audit",
+        "source": {
+          "name": "Ocean_Research_Intelligence_ENRICHED_B16.xlsx",
+          "sha256": "084ecf1c254b1044c4e3075b97e79dac9f5522b5821aa8cbb5b05b27c1f0238f"
+        },
+        "source_mapping": {
+          "original_path": "reproducibility.framework",
+          "decision": "AMBIGUOUS",
+          "canonical_path": null,
+          "basis": "Workbook source candidate category=code; no canonical field selected. Supplied basis: AI_INTERPRETATION: rule-based mapping (keyword on field_path); original field_path unchanged",
+          "provenance_type": "AI_INTERPRETATION",
+          "source_candidate": {
+            "canonical_category": "code",
+            "field_path": "reproducibility.framework",
+            "mapping_basis": "AI_INTERPRETATION: rule-based mapping (keyword on field_path); original field_path unchanged",
+            "n_rows": 3
+          }
+        },
+        "producer_proposal": {
+          "decision": "MAPPED",
+          "canonical_path": "reproducibility.dependencies",
+          "reason": "Synonym or container field; original path kept as qualifier."
+        },
+        "proposal_source": {
+          "name": "b16-field-path-map-prereview.json",
+          "sha256": "1478b3d9935fb1cb37990fcca074b3abd3e99995963bc8533e4b5e251156d00d"
+        },
+        "prereview_rule": {
+          "original_path": "reproducibility.framework",
+          "source_decision": "AMBIGUOUS",
+          "source_canonical_path": null,
+          "n_claims": 3,
+          "n_papers": 3,
+          "claim_types": [
+            "AUTHOR_REPORTED_FACT"
+          ],
+          "claim_ids": [
+            "B06-0125",
+            "B07-0136",
+            "B16-0017"
+          ],
+          "proposed_decision": "MAPPED",
+          "proposed_canonical_path": "reproducibility.dependencies",
+          "reason": "Synonym or container field; original path kept as qualifier.",
+          "auditor_verdict": "CONCUR",
+          "auditor_reason": "Agree.",
+          "auditor_offending_claim_ids": [],
+          "provenance_type": "AI_INTERPRETATION",
+          "review_status": "PENDING",
+          "independent_validation_required": true
+        },
+        "claims": [
+          {
+            "claim_id": "B06-0125",
+            "paper_id": "OAI-0046",
+            "claim_fingerprint": "636e1c8afbc6c50f7d3185f4cfa0fc6f132074f9b32f6bc41ac932942573481c",
+            "value": "PyTorch; Python 3.10; CUDA 12.4.",
+            "unit": null,
+            "experiment_id": null,
+            "claim_type": "AUTHOR_REPORTED_FACT",
+            "subject_scope": "Study configuration; use field and locator for experiment/variant.",
+            "source": {
+              "doi": "10.3390/rs17172954",
+              "edition": "PUBLISHED_PAPER_COPY",
+              "url": "https://www.researchgate.net/publication/394987936_Reconstruction_of_the_Subsurface_Temperature_and_Salinity_in_the_South_China_Sea_Using_Deep-Learning_Techniques_with_a_Physical_Guidance",
+              "pdf_page": "7",
+              "section": "2.3, p.7",
+              "locator": "2.3, p.7",
+              "verbatim_evidence": null,
+              "evidence_review": "SOURCE_SECTION_READ"
+            }
+          },
+          {
+            "claim_id": "B07-0136",
+            "paper_id": "OAI-0098",
+            "claim_fingerprint": "68a98ec7bfa60bddfc3e5a5dd068c6571ddea0b28707dca693888a7048a52e80",
+            "value": "PyTorch",
+            "unit": null,
+            "experiment_id": null,
+            "claim_type": "AUTHOR_REPORTED_FACT",
+            "subject_scope": "Synthetic idealized AMOC; ODE and U-Net prior variants.",
+            "source": {
+              "doi": "10.1029/2024MS004462",
+              "edition": "PUBLISHED_PAPER_COPY",
+              "url": "https://www.researchgate.net/publication/390975877_Neural_Data_Assimilation_for_Regime_Shift_Monitoring_of_an_Idealized_AMOC_Chaotic_Model",
+              "pdf_page": null,
+              "section": "3.3",
+              "locator": "3.3",
+              "verbatim_evidence": null,
+              "evidence_review": "SOURCE_SECTION_READ"
+            }
+          },
+          {
+            "claim_id": "B16-0017",
+            "paper_id": "OAI-0001",
+            "claim_fingerprint": "ccef476240633f1a343a59a99c8978b523d0847f5f1f3c131056a08e206cd889",
+            "value": "PyTorch; Lightning; Hydra",
+            "unit": null,
+            "experiment_id": "OAI-0001:B16_SOURCE_REVIEW",
+            "claim_type": "AUTHOR_REPORTED_FACT",
+            "subject_scope": "4DVarNet-SSH; prior-network parameters differ from total solver parameters.",
+            "source": {
+              "doi": "10.5194/gmd-16-2119-2023",
+              "edition": "PUBLISHED_HTML",
+              "url": "https://gmd.copernicus.org/articles/16/2119/2023/",
+              "pdf_page": null,
+              "section": "3.4",
+              "locator": "3.4",
+              "verbatim_evidence": null,
+              "evidence_review": "SOURCE_SECTION_READ"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

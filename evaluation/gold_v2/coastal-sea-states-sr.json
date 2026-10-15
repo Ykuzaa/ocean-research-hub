@@ -1,0 +1,1141 @@
+{
+ "source": {
+  "source_id": "coastal-sea-states-sr",
+  "file": ".data/golden-pdfs/a-deep-learning-super-resolution-model-to-speed-up-computati.pdf",
+  "sha256_prefix": "402b2df536c8397c685bdb66",
+  "pdf_pages": 38,
+  "printed_page_offset": -2,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-14"
+ },
+ "paper": {
+  "paper_id": "P-KUEHN2023-SR-SWAN",
+  "doi": "10.1016/j.apor.2023.103776",
+  "title": "A deep learning super-resolution model to speed up computations of coastal sea states",
+  "year": 2023,
+  "venue": "Applied Ocean Research",
+  "ocean_domains": [
+   "waves",
+   "data-assimilation"
+  ],
+  "ocean_domains_raw": [
+   "coastal waves",
+   "spectral wave modelling",
+   "super-resolution"
+  ]
+ },
+ "methods": [
+  {
+   "method_id": "M-DSCMS",
+   "canonical_name": "DSC/MS (Downsampled Skip Connections Multi-Scale) network",
+   "family": "CNN_GENERIC",
+   "family_raw": "Downsampled Skip Connections Multi-Scale neural network",
+   "architecture_note": "Max-pooling down/upsampling submodel with skip connections combined with a multi-scale model of convolutional filters of varying sizes; adapted from Fukami et al. (2019). Not called U-Net or autoencoder by the paper.",
+   "is_novel_in_paper": false,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 7,
+     "page_printed": 5,
+     "quote": "The DSC/MS model is composed of two parts, a submodel employing skip connections and max-pooling"
+    },
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 3,
+     "quote": "we apply the Downsampled Skip Connections Multi-Scale (DSC/MS) neural network"
+    }
+   ]
+  },
+  {
+   "method_id": "M-SURROGATE",
+   "canonical_name": "Surrogate model (dense network + DSC/MS)",
+   "family": "CNN_GENERIC",
+   "family_raw": "surrogate model",
+   "architecture_note": "Flattened wave spectrum transformed by a dense network to bathymetry size, concatenated with bathymetry and passed to the same DSC/MS model; classified on the DSC/MS backbone, dense front-end recorded here.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 8,
+     "page_printed": 6,
+     "quote": "is flattened and transformed with a dense neural network to the same dimension as the bathymetry."
+    },
+    {
+     "field": "family",
+     "page_pdf": 8,
+     "page_printed": 6,
+     "quote": "passed to the same DSC/MS model"
+    }
+   ]
+  },
+  {
+   "method_id": "M-CNN",
+   "canonical_name": "Simple CNN baseline (upsampling + 3 conv layers)",
+   "family": "CNN_GENERIC",
+   "family_raw": "Convolutional Neural Network (CNN)",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 10,
+     "page_printed": 8,
+     "quote": "Ontheotherhand,theCNNiscomposedofaninitialupsamplinglayer,3hiddenconvolutionallayerswithakernel"
+    }
+   ]
+  },
+  {
+   "method_id": "M-FCNN",
+   "canonical_name": "Fully-connected neural network baseline (2 hidden layers)",
+   "family": "MLP_DNN",
+   "family_raw": "Fully-Connected Neural Network (FCNN)",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 10,
+     "page_printed": 8,
+     "quote": "We use a FCNN of two hidden layers with a Rectified Linear Unit (ReLU) activation."
+    }
+   ]
+  },
+  {
+   "method_id": "M-SWAN",
+   "canonical_name": "SWAN third-generation spectral wave model",
+   "family": "CLASSICAL_BASELINE",
+   "family_raw": "third-generation spectral wave model SWAN",
+   "architecture_note": "Physics-based numerical model producing the low- and high-resolution fields; no learned parameters.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 5,
+     "page_printed": 3,
+     "quote": "withthethird-generationspectralwavemodelSWAN"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-SWAN-HR",
+   "canonical_name": "SWAN high-resolution nested-grid computation, Biarritz (ground truth)",
+   "variables": [
+    "significant wave height",
+    "mean wave period Tm02",
+    "mean wave direction"
+   ],
+   "spatial_resolution": "50 m (160 x 160 cells)",
+   "temporal_resolution": "hourly",
+   "region": "Coastal area near Biarritz (SW France)",
+   "period_start": "2018-01-01",
+   "period_end": "2019-12-31",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 3,
+     "quote": "for a part of the coastal area near Biarritz"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 6,
+     "page_printed": 4,
+     "quote": "we chose a grid with 160 x 160 quadratic cells"
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 6,
+     "page_printed": 4,
+     "quote": "Given the faster computation times and the lower computational load, we deemed50m"
+    },
+    {
+     "field": "temporal_resolution",
+     "page_pdf": 8,
+     "page_printed": 6,
+     "quote": "In our case, the sampling interval is one hour in both the high- and low-resolution data set."
+    },
+    {
+     "field": "period",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "January01,2018andDecember31,2019."
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-SWAN-LR",
+   "canonical_name": "SWAN low-resolution computation, Biarritz (network input)",
+   "variables": [
+    "significant wave height",
+    "mean wave period Tm02",
+    "mean wave direction"
+   ],
+   "spatial_resolution": "800 m (10 x 10 cells)",
+   "temporal_resolution": "hourly",
+   "region": "Coastal area near Biarritz (SW France)",
+   "period_start": "2018-01-01",
+   "period_end": "2019-12-31",
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 6,
+     "page_printed": 4,
+     "quote": "The LR grid that we convert to a higher resolution has 10 x 10 quadratic cells"
+    },
+    {
+     "field": "period",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "January01,2018andDecember31,2019."
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-HOMERE",
+   "canonical_name": "HOMERE hindcast database (spectral boundary conditions)",
+   "variables": [
+    "wave spectrum"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "Donostia buoy location",
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 5,
+     "page_printed": 3,
+     "quote": "taken from the HOMERE hindcast database"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-BATHY-SHOM",
+   "canonical_name": "SHOM bathymetric Digital Terrain Model (Atlantic facade)",
+   "variables": [
+    "bathymetry"
+   ],
+   "spatial_resolution": null,
+   "temporal_resolution": null,
+   "region": "French Atlantic coast",
+   "period_start": null,
+   "period_end": null,
+   "role": "AUXILIARY_COVARIABLE",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 6,
+     "page_printed": 4,
+     "quote": "The bathymetry data were obtained from the publicly available Digital Terrain Model"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-SR-HS",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "super-resolution of low-resolution SWAN output",
+   "method_id": "M-DSCMS",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "significant wave height Hs",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count."
+   }
+  },
+  {
+   "experiment_id": "X-SR-TM02",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "super-resolution of low-resolution SWAN output",
+   "method_id": "M-DSCMS",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "mean wave period Tm02",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count."
+   }
+  },
+  {
+   "experiment_id": "X-SR-DIR",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "super-resolution of low-resolution SWAN output",
+   "method_id": "M-DSCMS",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "mean wave direction Dir",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count."
+   }
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "super-resolution of low-resolution SWAN output with targeted data augmentation (900 extra stationary runs)",
+   "method_id": "M-DSCMS",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "significant wave height Hs",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count. Augmentation adds 900 stationary SWAN runs to the training set (p17)."
+   }
+  },
+  {
+   "experiment_id": "X-SURROGATE-HS",
+   "task": "EMULATION_SURROGATE",
+   "task_raw": "surrogate model replacing the whole SWAN computation",
+   "method_id": "M-SURROGATE",
+   "dataset_ids": [
+    "D-BATHY-SHOM",
+    "D-HOMERE",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "significant wave height Hs",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count. Surrogate uses min-max normalised input (p8)."
+   }
+  },
+  {
+   "experiment_id": "X-ARCH-DSCMS",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "architecture sanity comparison, Table 1",
+   "method_id": "M-DSCMS",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "not stated in Table 1 (MAE in cm; the 0.85 cm maximum matches the worst DSC/MS Hs run on p11)",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count."
+   }
+  },
+  {
+   "experiment_id": "X-ARCH-CNN",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "architecture sanity comparison, Table 1",
+   "method_id": "M-CNN",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "not stated in Table 1 (MAE in cm)",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count."
+   }
+  },
+  {
+   "experiment_id": "X-ARCH-FCNN",
+   "task": "SUPER_RESOLUTION",
+   "task_raw": "architecture sanity comparison, Table 1",
+   "method_id": "M-FCNN",
+   "dataset_ids": [
+    "D-SWAN-LR",
+    "D-SWAN-HR"
+   ],
+   "target_variable": "not stated in Table 1 (MAE in cm)",
+   "training": {
+    "loss": {
+     "value": "L1 / mean absolute error (MAE)",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "thenetworksaretrainedbyusingtheL1/meanabsoluteerror(MAE)"
+    },
+    "optimizer": {
+     "value": "Adam",
+     "page_pdf": 9,
+     "page_printed": 7,
+     "quote": "We train the models with ADAM"
+    },
+    "hardware": {
+     "value": "NVIDIA GeForce RTX 2070 Max-Q",
+     "page_pdf": 23,
+     "page_printed": 21,
+     "quote": "a NVIDIA GeForce RTX 2070 Max-Q was used"
+    },
+    "note": "Single training setup described for all models (workflow, subsection 2.4 and appendix A.1); copied. Early stopping with patience of 30 epochs is reported (p9, p32) but no maximum epoch count."
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "mean absolute error",
+   "metric_kind": "ERROR",
+   "value": 0.7,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "worst of 6 training runs, whole test year, whole domain",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 27,
+   "page_printed": 25,
+   "quote": "absoluteerrorof 0.7cm"
+  },
+  {
+   "experiment_id": "X-SR-TM02",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "mean absolute error",
+   "metric_kind": "ERROR",
+   "value": 0.04,
+   "unit": "s",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "worst of 6 training runs, whole test year, whole domain",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 27,
+   "page_printed": 25,
+   "quote": "absoluteerrorof 0.7cm,0.04s"
+  },
+  {
+   "experiment_id": "X-SR-DIR",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "mean absolute error",
+   "metric_kind": "ERROR",
+   "value": 0.3,
+   "unit": "degree",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "worst of 6 training runs, whole test year, whole domain",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 27,
+   "page_printed": 25,
+   "quote": "absoluteerrorof 0.7cm,0.04s,and0.3"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "SPEEDUP",
+   "metric_raw": "speed-up vs direct HR SWAN",
+   "metric_kind": "EFFICIENCY",
+   "value": 50,
+   "unit": "x",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "GPU inference plus LR SWAN run, 2 years, excluding one-time data creation and training",
+   "baseline_name": "direct HR SWAN computation",
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 23,
+   "page_printed": 21,
+   "quote": "the gain in computation time is more than 50-fold"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RUNTIME",
+   "metric_raw": "overall time with GPU inference + LR SWAN",
+   "metric_kind": "EFFICIENCY",
+   "value": 8.5,
+   "unit": "min",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "2 years of data; direct HR SWAN took 7.5 h (baseline_value not stored, unit differs)",
+   "baseline_name": "direct HR SWAN computation",
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 23,
+   "page_printed": 21,
+   "quote": "the overall time amounts to8.5min"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "SPEEDUP",
+   "metric_raw": "speed-up vs direct HR SWAN, CPU inference",
+   "metric_kind": "EFFICIENCY",
+   "value": 25,
+   "unit": "x",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "prediction on CPU (about 17 min total), more than 25-fold",
+   "baseline_name": "direct HR SWAN computation",
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 23,
+   "page_printed": 21,
+   "quote": "still a more than 25-fold speed-up"
+  },
+  {
+   "experiment_id": "X-SURROGATE-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "SPEEDUP",
+   "metric_raw": "speed-up vs direct HR SWAN, GPU",
+   "metric_kind": "EFFICIENCY",
+   "value": 900,
+   "unit": "x",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "30 s on GPU for two years",
+   "baseline_name": "direct HR SWAN computation",
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 24,
+   "page_printed": 22,
+   "quote": "the model is 900-times faster"
+  },
+  {
+   "experiment_id": "X-SURROGATE-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "best surrogate Hs MAE over 6 runs",
+   "metric_kind": "ERROR",
+   "value": 1.4,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "best of 6 surrogate runs; worst DSC/MS run is 0.85 cm",
+   "baseline_name": "DSC/MS worst run",
+   "baseline_value": 0.85,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 11,
+   "page_printed": 9,
+   "quote": "surrogatemodelhasaMAEof 1.40cm"
+  },
+  {
+   "experiment_id": "X-SURROGATE-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE at P2",
+   "metric_kind": "ERROR",
+   "value": 3.97,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "location P2 (10 m depth), whole test year",
+   "baseline_name": "DSC/MS super-resolution",
+   "baseline_value": 1.51,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 15,
+   "page_printed": 13,
+   "quote": "compared to3.97cm at P2"
+  },
+  {
+   "experiment_id": "X-SURROGATE-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE at P3",
+   "metric_kind": "ERROR",
+   "value": 3.98,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "location P3 (15 m depth), whole test year",
+   "baseline_name": "DSC/MS super-resolution",
+   "baseline_value": 2.62,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 15,
+   "page_printed": 13,
+   "quote": "and2.62cm instead of3.98cm at P3"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE at P2",
+   "metric_kind": "ERROR",
+   "value": 1.51,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "location P2 (10 m depth), whole test year",
+   "baseline_name": "surrogate model",
+   "baseline_value": 3.97,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 15,
+   "page_printed": 13,
+   "quote": "namely a RMSE of1.51cm"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE at P3",
+   "metric_kind": "ERROR",
+   "value": 2.62,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "location P3 (15 m depth), whole test year",
+   "baseline_name": "surrogate model",
+   "baseline_value": 3.98,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 15,
+   "page_printed": 13,
+   "quote": "and2.62cm instead of3.98cm at P3"
+  },
+  {
+   "experiment_id": "X-ARCH-DSCMS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "mean MAE over 6 runs",
+   "metric_kind": "ERROR",
+   "value": 0.71,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "DSC/MS, 134k parameters, mean over 6 runs; LR input row is 11.29 cm",
+   "baseline_name": "LR input",
+   "baseline_value": 11.29,
+   "source_table": "Table 1",
+   "is_best_in_table": true,
+   "page_pdf": 10,
+   "page_printed": 8,
+   "quote": "DSC/MS 134k 0.61 0.85 0.71"
+  },
+  {
+   "experiment_id": "X-ARCH-CNN",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "mean MAE over 6 runs",
+   "metric_kind": "ERROR",
+   "value": 8.0,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "CNN, 19k parameters, mean over 6 runs",
+   "baseline_name": "LR input",
+   "baseline_value": 11.29,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 10,
+   "page_printed": 8,
+   "quote": "CNN 19k 7.85 8.23 8.00"
+  },
+  {
+   "experiment_id": "X-ARCH-FCNN",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "MAE",
+   "metric_raw": "mean MAE over 6 runs",
+   "metric_kind": "ERROR",
+   "value": 0.98,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "FCNN, 286,000k parameters, mean over 6 runs",
+   "baseline_name": "LR input",
+   "baseline_value": 11.29,
+   "source_table": "Table 1",
+   "is_best_in_table": false,
+   "page_pdf": 10,
+   "page_printed": 8,
+   "quote": "FCNN 286,000k 0.79 1.23 0.98"
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 2.1,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P1, With DA, 5% largest Hs, RMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "P1 With DA -0.9 2.1 0.5",
+   "note": "Table 2 rows quoted as extracted; each 'Without DA' row belongs to the location row above it."
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "NRMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 0.5,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P1, With DA, 5% largest Hs, NRMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": true,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "P1 With DA -0.9 2.1 0.5"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 6.5,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P1, Without DA, 5% largest Hs, RMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "Without DA -4.1 6.5 2.9"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "NRMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 2.9,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P1, Without DA, 5% largest Hs, NRMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "Without DA -4.1 6.5 2.9"
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 4.2,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P2, With DA, 5% largest Hs, RMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "P2 With DA -3.2 4.2 0.9"
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "NRMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 0.9,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P2, With DA, 5% largest Hs, NRMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "P2 With DA -3.2 4.2 0.9"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 4.6,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P2, Without DA, 5% largest Hs, RMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "Without DA 1.5 4.6 1.0"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "NRMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 1.0,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P2, Without DA, 5% largest Hs, NRMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "Without DA 1.5 4.6 1.0"
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 6.5,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P3, With DA, 5% largest Hs, RMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "P3 With DA -4.1 6.5 1.3"
+  },
+  {
+   "experiment_id": "X-SR-HS-DA",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "NRMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 1.3,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P3, With DA, 5% largest Hs, NRMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "P3 With DA -4.1 6.5 1.3"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "RMSE",
+   "metric_raw": "RMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 8.0,
+   "unit": "cm",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P3, Without DA, 5% largest Hs, RMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "Without DA 0.0 8.0 1.6"
+  },
+  {
+   "experiment_id": "X-SR-HS",
+   "dataset_id": "D-SWAN-HR",
+   "metric": "NORMALIZED_ERROR_SCORE",
+   "metric_raw": "NRMSE (5% largest wave heights)",
+   "metric_kind": "ERROR",
+   "value": 1.6,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "P3, Without DA, 5% largest Hs, NRMSE",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": "Table 2",
+   "is_best_in_table": false,
+   "page_pdf": 20,
+   "page_printed": 18,
+   "quote": "Without DA 0.0 8.0 1.6"
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 26,
+   "page_printed": 24,
+   "quote": "showthatthetrainedmodelsarelocation-specific,evenifbathymetryisaddedasaninput,sothatfornow,anewmodel"
+  },
+  {
+   "theme": "DATA",
+   "page_pdf": 27,
+   "page_printed": 25,
+   "quote": "Showed limitations in ranges with small amounts of training data."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 26,
+   "page_printed": 24,
+   "quote": "computations that are out of distribution at best and non-physical at worst."
+  },
+  {
+   "theme": "COMPUTE",
+   "page_pdf": 25,
+   "page_printed": 23,
+   "quote": "we trained one model for each wave variable, which increases the training time considerably."
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 26,
+   "page_printed": 24,
+   "quote": "less clear features might be more difficult to reconstruct and results could be less coherent in time."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 6,
+   "page_printed": 4,
+   "quote": "we use basic, yet realistic settings for the SWAN computations."
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 27,
+   "page_printed": 25,
+   "quote": "moreresearchhastobeundertakentogeneralizethisapproachtoanytypeofgrid."
+  },
+  {
+   "theme": "FUTURE_WORK",
+   "page_pdf": 26,
+   "page_printed": 24,
+   "quote": "Anotheroutstanding question ishow themodel performsin termsof windversus swellseas,"
+  }
+ ],
+ "conflicts": [
+  {
+   "field": "methods[M-SURROGATE].architecture_note (dense output size)",
+   "values": [
+    256000,
+    25600
+   ],
+   "sources": [
+    {
+     "page_pdf": 8,
+     "quote": "upsamples the spectrum to 256,000 elements"
+    },
+    {
+     "page_pdf": 32,
+     "quote": "ofsize 25600 withoutactivationfunction"
+    }
+   ],
+   "chosen": null,
+   "reason": "Text says 256,000 elements reshaped into 160x160 (= 25,600 cells); the appendix FCNN uses 25600 for the same 160x160 output. Probable typo in the main text, not resolved; not used in any stored value."
+  },
+  {
+   "field": "methods[M-SURROGATE].architecture_note (frequency bins)",
+   "values": [
+    25,
+    32
+   ],
+   "sources": [
+    {
+     "page_pdf": 6,
+     "quote": "is divided into 25 logarithmically-spaced partitions"
+    },
+    {
+     "page_pdf": 8,
+     "quote": "consisting of 32 frequency and 24 directional bins"
+    }
+   ],
+   "chosen": null,
+   "reason": "Section 2.1 gives 25 frequency partitions for the SWAN runs; section 2.3 says the boundary-condition spectrum has 32 frequency bins and calls it identical. Not resolved; not used in any stored value."
+  }
+ ],
+ "not_reported": [
+  {
+   "field": "experiments[*].training.learning_rate",
+   "searched": [
+    "section 2.4 Workflow",
+    "section 2.5 Application",
+    "appendix A.1",
+    "full text"
+   ]
+  },
+  {
+   "field": "experiments[*].training.batch_size",
+   "searched": [
+    "section 2.4 Workflow",
+    "section 2.5 Application",
+    "appendix A.1",
+    "full text"
+   ]
+  },
+  {
+   "field": "experiments[*].training.epochs",
+   "searched": [
+    "section 2.4 Workflow",
+    "section 2.5 Application",
+    "appendix A.1",
+    "full text"
+   ],
+   "note": "Only early stopping with patience of 30 epochs is reported (p9: 'early stopping after 30 epochs'; p32: 'earlystoppingandapatienceof30'); no number of training epochs or maximum."
+  }
+ ]
+}

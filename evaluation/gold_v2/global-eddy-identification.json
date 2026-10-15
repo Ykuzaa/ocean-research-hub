@@ -1,0 +1,452 @@
+{
+  "source": {
+    "source_id": "S-GLOBAL-EDDY-IDENTIFICATION",
+    "file": ".data/golden-pdfs/global-oceanic-eddy-identification-a-deep-learning-method-fr.pdf",
+    "sha256_prefix": "2174d45172f1606ef79591b7",
+    "pdf_pages": 15,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-GLOBAL-EDDY-IDENTIFICATION",
+    "doi": "10.3389/fmars.2021.646926",
+    "title": "Global Oceanic Eddy Identification: A Deep Learning Method From Argo Profiles and Altimetry Data",
+    "year": 2021,
+    "venue": "Frontiers in Marine Science",
+    "ocean_domains": [
+      "eddies-fronts",
+      "subsurface",
+      "ssh-altimetry"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-CNN-XGBOOST",
+      "canonical_name": "CNN-XGBoost",
+      "family": "OTHER",
+      "family_raw": "hybrid CNN-XGBoost (CNN feature extractor feeding XGBoost classifier)",
+      "architecture_note": "Six CNN building blocks (conv, batch norm, activation, pooling) produce a 64-dimensional feature vector input to XGBoost together with position, month and profile features. No vocabulary entry for CNN + gradient-boosted trees; OTHER chosen over CNN_GENERIC/CLASSICAL_ML.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "to develop a novel hybrid CNN-XGBoost model for fully learning the"
+        },
+        {
+          "field": "architecture_note",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "We use six CNN building blocks with convolutional,"
+        }
+      ]
+    },
+    {
+      "method_id": "M-CNN",
+      "canonical_name": "CNN (profile classifier alone)",
+      "family": "CNN_GENERIC",
+      "family_raw": "CNN",
+      "architecture_note": "1-D CNN on PDA profile vector, used as ablation of the hybrid.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "A supervised CNN model is proposed to extract features from"
+        }
+      ]
+    },
+    {
+      "method_id": "M-XGBOOST",
+      "canonical_name": "XGBoost (profile classifier alone)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "XGBoost",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "XGBoost is a highly"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-ARGO-PDA",
+      "canonical_name": "Argo profiles (potential density anomaly), 2002-2019",
+      "variables": [
+        "potential density anomaly",
+        "temperature",
+        "salinity"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": "2002-01",
+      "period_end": "2019-10",
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "The Array for Real-time Geostrophic Oceanography (Argo) data"
+        },
+        {
+          "field": "period",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "also spanned from January 2002 to October 2019"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-AVISO-SLA",
+      "canonical_name": "AVISO delayed-time merged SLA (altimeter eddy labels)",
+      "variables": [
+        "sea level anomaly"
+      ],
+      "spatial_resolution": "1/4 degree",
+      "temporal_resolution": "daily",
+      "region": null,
+      "period_start": "2002-01",
+      "period_end": "2019-10",
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "The sea level anomaly (SLA) data used in this study is"
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "The SLA dataset spanned 18 years, from January 2002 to October 2019, and had a daily temporal resolution and a"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "note": "1/4 deg x 1/4 deg given with degree symbols on p3 (also p2); quote crosses symbols."
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-CNN-XGBOOST",
+      "task": "CLASSIFICATION_SEGMENTATION",
+      "task_raw": "eddy identification: classify Argo PDA profiles as AE, CE or non-eddy",
+      "method_id": "M-CNN-XGBOOST",
+      "dataset_ids": [
+        "D-ARGO-PDA",
+        "D-AVISO-SLA"
+      ],
+      "target_variable": "eddy class (AE/CE/OE) of Argo profile",
+      "training": {
+        "loss": {
+          "value": "cross-entropy",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "We used cross-entropy as the loss function, and"
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the optimization algorithm of the training process adopts Adam"
+        },
+        "learning_rate": {
+          "value": 0.0005,
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "uses 0.0005 as the value of the learning rate"
+        },
+        "epochs": {
+          "value": 100,
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "After 100 epochs of training, the test accuracy of the CNN model can",
+          "note": "100 epochs refer to the CNN stage; XGBoost stage is 100 boosting iterations."
+        },
+        "hardware": {
+          "value": "Intel i7-9700F CPU @3.00 GHz, 32 GB memory",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "on a computer with an Intel i7-9700F CPU @3.00 GHz with 32 GB memory, Windows"
+        }
+      }
+    },
+    {
+      "experiment_id": "X-CNN",
+      "task": "CLASSIFICATION_SEGMENTATION",
+      "task_raw": "eddy identification, CNN alone",
+      "method_id": "M-CNN",
+      "dataset_ids": [
+        "D-ARGO-PDA",
+        "D-AVISO-SLA"
+      ],
+      "target_variable": "eddy class (AE/CE/OE) of Argo profile",
+      "training": {
+        "loss": {
+          "value": "cross-entropy",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "We used cross-entropy as the loss function, and"
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the optimization algorithm of the training process adopts Adam"
+        },
+        "learning_rate": {
+          "value": 0.0005,
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "uses 0.0005 as the value of the learning rate"
+        },
+        "epochs": {
+          "value": 100,
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "After 100 epochs of training, the test accuracy of the CNN model can",
+          "note": "100 epochs refer to the CNN stage; XGBoost stage is 100 boosting iterations."
+        },
+        "hardware": {
+          "value": "Intel i7-9700F CPU @3.00 GHz, 32 GB memory",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "on a computer with an Intel i7-9700F CPU @3.00 GHz with 32 GB memory, Windows"
+        },
+        "note": "CNN stage training described once in the paper; reused for the CNN-alone baseline."
+      }
+    },
+    {
+      "experiment_id": "X-XGBOOST",
+      "task": "CLASSIFICATION_SEGMENTATION",
+      "task_raw": "eddy identification, XGBoost alone",
+      "method_id": "M-XGBOOST",
+      "dataset_ids": [
+        "D-ARGO-PDA",
+        "D-AVISO-SLA"
+      ],
+      "target_variable": "eddy class (AE/CE/OE) of Argo profile",
+      "training": {
+        "loss": {
+          "value": "softmax for multiclass classification (objective function)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "The objective function is softmax for multiclass"
+        },
+        "hardware": {
+          "value": "Intel i7-9700F CPU @3.00 GHz, 32 GB memory",
+          "page_pdf": 4,
+          "page_printed": 4,
+          "quote": "on a computer with an Intel i7-9700F CPU @3.00 GHz with 32 GB memory, Windows"
+        },
+        "note": "XGBoost-alone baseline: boosting hyperparameters (eta 0.4, gamma 0.8, max_depth 10, min_child_weight 1) chosen by Bayesian optimization; 100 boosting iterations, not epochs."
+      }
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-CNN-XGBOOST",
+      "dataset_id": "D-ARGO-PDA",
+      "metric": "ACCURACY",
+      "metric_raw": "Accuracy",
+      "metric_kind": "AGREEMENT",
+      "value": 98.3,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "UNSPECIFIED",
+      "config": "AE/CE/OE 3-class profile classification",
+      "baseline_name": "CNN",
+      "baseline_value": 93.8,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "CNN-XGBoost 221 min 98.3% 0 0.06% 0 1.41%"
+    },
+    {
+      "experiment_id": "X-CNN",
+      "dataset_id": "D-ARGO-PDA",
+      "metric": "ACCURACY",
+      "metric_raw": "Accuracy",
+      "metric_kind": "AGREEMENT",
+      "value": 93.8,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "UNSPECIFIED",
+      "config": "CNN alone",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "CNN 138 min 93.8% 0.43% 0.98% 1.12% 2.88%"
+    },
+    {
+      "experiment_id": "X-XGBOOST",
+      "dataset_id": "D-ARGO-PDA",
+      "metric": "ACCURACY",
+      "metric_raw": "Accuracy",
+      "metric_kind": "AGREEMENT",
+      "value": 92.1,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "UNSPECIFIED",
+      "config": "XGBoost alone",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "XGBoost 43 min 92.1% 0.65% 1.56% 1.62% 3.19%"
+    },
+    {
+      "experiment_id": "X-CNN-XGBOOST",
+      "dataset_id": "D-ARGO-PDA",
+      "metric": "RUNTIME",
+      "metric_raw": "Running time",
+      "metric_kind": "EFFICIENCY",
+      "value": 221,
+      "unit": "min",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "CNN-XGBoost",
+      "baseline_name": "XGBoost",
+      "baseline_value": 43,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "CNN-XGBoost 221 min 98.3% 0 0.06% 0 1.41%"
+    },
+    {
+      "experiment_id": "X-CNN",
+      "dataset_id": "D-ARGO-PDA",
+      "metric": "RUNTIME",
+      "metric_raw": "Running time",
+      "metric_kind": "EFFICIENCY",
+      "value": 138,
+      "unit": "min",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "CNN alone",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "CNN 138 min 93.8% 0.43% 0.98% 1.12% 2.88%"
+    },
+    {
+      "experiment_id": "X-XGBOOST",
+      "dataset_id": "D-ARGO-PDA",
+      "metric": "RUNTIME",
+      "metric_raw": "Running time",
+      "metric_kind": "EFFICIENCY",
+      "value": 43,
+      "unit": "min",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "XGBoost alone",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "XGBoost 43 min 92.1% 0.65% 1.56% 1.62% 3.19%"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 4,
+      "page_printed": 4,
+      "quote": "At present, there is no clear"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 12,
+      "page_printed": 12,
+      "quote": "but only the recognition of the eddy point"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 14,
+      "page_printed": 14,
+      "quote": "based on the deep learning method, the inversion of eddy"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-CNN-XGBOOST].training.batch_size",
+      "searched": [
+        "Materials and Methods",
+        "Model Training Process",
+        "Conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-CNN].training.batch_size",
+      "searched": [
+        "Materials and Methods",
+        "Model Training Process",
+        "Conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-XGBOOST].training.batch_size",
+      "searched": [
+        "Materials and Methods",
+        "Model Training Process",
+        "Conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-XGBOOST].training.optimizer",
+      "searched": [
+        "Materials and Methods",
+        "Model Training Process",
+        "Conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-XGBOOST].training.learning_rate",
+      "searched": [
+        "Materials and Methods",
+        "Model Training Process",
+        "Conclusion"
+      ]
+    },
+    {
+      "field": "experiments[X-XGBOOST].training.epochs",
+      "searched": [
+        "Materials and Methods",
+        "Model Training Process",
+        "Conclusion"
+      ]
+    }
+  ]
+}

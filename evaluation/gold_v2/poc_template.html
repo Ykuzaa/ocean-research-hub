@@ -171,6 +171,13 @@
     <div class="finding"><p id="rc-note"></p></div>
   </section>
 
+  <section id="edition">
+    <h2 id="ed-title"></h2>
+    <p class="lede" style="margin-top:.75rem" id="ed-lede"></p>
+    <div class="bars" id="ed-bars"></div>
+    <div class="finding"><p id="ed-note"></p></div>
+  </section>
+
   <section id="couverture">
     <h2>Couverture du domaine</h2>
     <p class="lede" style="margin-top:.75rem">Tâche par famille d'architecture, en nombre de papiers. Les cases vides sont des combinaisons que personne n'a publiées dans ce corpus — un point de départ pour chercher un trou, pas une preuve qu'il est intéressant.</p>
@@ -273,6 +280,35 @@
     + (agg.shared_cells === 0 ? "aucune n'est partagée par deux papiers." : `${agg.shared_cells} sont partagées par au moins deux papiers.`));
   text("cmp-note", `Ce que les papiers permettent en revanche : comparer chaque méthode à la baseline que ses propres `
     + `auteurs ont retenue. Les ${agg.results} résultats des fiches conservent cette paire.`);
+
+  /* ---------- quelle édition a été lue ---------- */
+  const EDITION = {
+    VERSION_OF_RECORD: "version publiée par la revue",
+    ACCEPTED_MANUSCRIPT: "manuscrit accepté, non encore composé",
+    AUTHOR_MANUSCRIPT: "manuscrit d'auteur, déposé nulle part",
+    PREPRINT: "préimpression",
+  };
+  const edTotal = Object.values(agg.editions).reduce((a, b) => a + b, 0);
+  const edOther = edTotal - (agg.editions.VERSION_OF_RECORD || 0);
+  text("ed-title", `${edOther} des ${edTotal} fichiers lus ne sont pas l'article publié`);
+  text("ed-lede", `Le tableau d'une préimpression n'est pas toujours celui de l'article publié. `
+    + `Comparer un chiffre de l'un à un chiffre de l'autre sans que rien ne marque la différence change `
+    + `silencieusement ce que les deux veulent dire. Chaque enregistrement dit donc quelle édition a été lue, `
+    + `et le prouve par une citation du fichier lui-même, relocalisée par le même contrôle déterministe.`);
+  document.getElementById("ed-bars").innerHTML = Object.entries(agg.editions)
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, n]) => {
+      const pct = Math.round((n / edTotal) * 100);
+      return `<div class="bar"><span>${EDITION[key] || key}</span>`
+        + `<span class="track" role="img" aria-label="${n} sur ${edTotal}"><i style="width:${Math.max(pct, 0.4)}%"></i></span>`
+        + `<span>${n}/${edTotal}</span></div>`;
+    }).join("");
+  text("ed-note", `Un DOI ne suffit pas à prouver qu'un fichier est l'article publié : un manuscrit accepté `
+    + `imprime le DOI de l'article qu'il va devenir. Un enregistrement déclaré « version publiée » doit donc `
+    + `porter en plus, sur la page citée, une marque que seul un article publié a — ligne de citation, dates `
+    + `éditoriales, copyright ou numéro d'article. L'édition décrit le fichier lu, pas le statut du papier : `
+    + `un fichier arXiv dont l'article est paru depuis reste une préimpression, parce que les chiffres du `
+    + `corpus viennent du fichier arXiv.`);
 
   /* ---------- accès aux sources ---------- */
   if (agg.access) {

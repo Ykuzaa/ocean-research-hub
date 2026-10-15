@@ -436,3 +436,44 @@ export function entityName(kind: EntityKind, name: string): string {
   if (kind === "task") return taskLabel(name);
   return name;
 }
+
+/* ---------- interroger le corpus (issue #24) ---------- */
+
+export type AskUnderstood = {
+  fields: string[]; themes: string[]; tasks: string[]; families: string[];
+  dataset_groups: string[]; variables: string[]; methods: string[];
+};
+
+export type AskBlock =
+  | { kind: "training"; field: string; reported: number; of: number; values: Array<{
+      slug: string; title: string; experiment: string; task: string; family: string | null;
+      method: string | null; value: unknown; unit: string | null; page: number | null;
+      quote: string | null; note: string | null;
+    }> }
+  | { kind: "results"; count: number; values: Array<{
+      slug: string; title: string; experiment: string; metric: string | null;
+      metric_raw: string | null; value: number | null; unit: string | null; split: string | null;
+      config: string | null; baseline_name: string | null; baseline_value: number | null;
+      page: number | null; quote: string | null;
+    }> }
+  | { kind: "limitations"; count: number; values: Array<{
+      slug: string; title: string; theme: string; quote: string | null; page: number | null;
+    }> }
+  | { kind: "experiments"; count: number; values: Array<{
+      slug: string; title: string; experiment: string; task: string; family: string | null;
+      method: string | null; datasets: string[]; variable: string | null; reported: string[];
+    }> };
+
+export type AskAnswer = {
+  question: string;
+  understood: AskUnderstood;
+  understood_nothing: boolean;
+  experiments_matched: number;
+  papers_matched: number;
+  answers: AskBlock[];
+  caveats: string[];
+};
+
+export function askCorpus(question: string): Promise<AskAnswer> {
+  return v2(`/api/v2/ask?q=${encodeURIComponent(question)}`);
+}

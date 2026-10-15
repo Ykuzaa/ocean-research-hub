@@ -15,7 +15,7 @@ from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import audit, entities, recheck, store
+from . import ask, audit, entities, recheck, store
 from .build_poc import build
 
 SOURCING_NOTICE = (
@@ -154,6 +154,11 @@ def register_corpus_v2_routes(
         if detail is None:
             return error(404, "NOT_FOUND", f"no {kind} named {name!r} in the corpus")
         return {"notice": SOURCING_NOTICE, **detail}
+
+    @app.get("/api/v2/ask")
+    async def v2_ask(q: str = Query(min_length=1, max_length=400)) -> dict[str, Any]:
+        """A question becomes filters over the claims, never a generated answer (issue #24)."""
+        return {"notice": SOURCING_NOTICE, **ask.answer(q, gold_dir)}
 
     @app.get("/api/v2/review/progress")
     async def v2_progress() -> dict[str, Any]:

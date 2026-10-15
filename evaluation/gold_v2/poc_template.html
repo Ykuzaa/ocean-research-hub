@@ -283,7 +283,7 @@
 
   /* ---------- quelle édition a été lue ---------- */
   const EDITION = {
-    VERSION_OF_RECORD: "version publiée par la revue",
+    VERSION_OF_RECORD: "version publiée par l'éditeur",
     ACCEPTED_MANUSCRIPT: "manuscrit accepté, non encore composé",
     AUTHOR_MANUSCRIPT: "manuscrit d'auteur, déposé nulle part",
     PREPRINT: "préimpression",
@@ -299,7 +299,7 @@
     .sort((a, b) => b[1] - a[1])
     .map(([key, n]) => {
       const pct = Math.round((n / edTotal) * 100);
-      return `<div class="bar"><span>${EDITION[key] || key}</span>`
+      return `<div class="bar"><span>${esc(EDITION[key] || key)}</span>`
         + `<span class="track" role="img" aria-label="${n} sur ${edTotal}"><i style="width:${Math.max(pct, 0.4)}%"></i></span>`
         + `<span>${n}/${edTotal}</span></div>`;
     }).join("");
@@ -379,6 +379,9 @@
           <span class="rmeta">${esc(p.year || "")} · exclu du corpus</span>
         </summary>
         <div class="rbody">
+          <h4>Édition lue</h4>
+          <p style="margin-top:.4rem">${esc(EDITION[p.edition] || p.edition || "—")}</p>
+          ${p.edition_evidence ? quote(p.edition_evidence.quote, p.edition_evidence.page_pdf) : ""}
           <h4>Motif d'exclusion</h4>
           <p style="margin-top:.4rem">${esc(p.excluded.reason)}</p>
           ${quote(p.excluded.quote, p.excluded.page_pdf)}
@@ -437,6 +440,17 @@
           <div><div class="k">venue</div><div class="v" style="font-family:var(--font-body)">${esc(p.venue || "—")}</div></div>
           <div><div class="k">doi</div><div class="v">${esc(p.doi || "—")}</div></div>
           <div><div class="k">pdf sha256</div><div class="v">${esc(p.sha || "—")}</div></div>
+          <div><div class="k">édition lue</div><div class="v" style="font-family:var(--font-body)">${
+            p.edition
+              ? (p.edition_evidence && p.edition_evidence.quote
+                  ? `<button type="button" aria-expanded="false" data-target="ed${pi}">${esc(EDITION[p.edition] || p.edition)}</button>`
+                  : esc(EDITION[p.edition] || p.edition))
+              : "—"
+          }</div>${
+            p.edition && p.edition_evidence && p.edition_evidence.quote
+              ? `<div id="ed${pi}" hidden>${quote(p.edition_evidence.quote, p.edition_evidence.page_pdf)}</div>`
+              : ""
+          }</div>
           <div><div class="k">méthode proposée</div><div class="v">${esc(p.proposed.join(", ") || "—")}</div></div>
           <div><div class="k">baselines comparées</div><div class="v">${esc(p.baselines.join(", ") || "—")}</div></div>
         </div>

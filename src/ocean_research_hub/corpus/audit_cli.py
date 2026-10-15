@@ -21,6 +21,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         payload = json.loads(args.event.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError("scientific audit event must be a JSON object")
         stored = CorpusRepository(args.database).record_audit(payload)
     except (OSError, json.JSONDecodeError, ValueError, CorpusNotFoundError) as exc:
         print(json.dumps({"status": "REJECTED", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)

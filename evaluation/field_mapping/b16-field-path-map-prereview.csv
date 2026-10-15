@@ -1,4 +1,4 @@
-original_path,source_decision,proposed_decision,proposed_canonical_path,n_claims,n_papers,claim_types,reason,auditor_verdict,human_decision,human_reviewer,reviewed_at
+original_path,source_decision,proposed_decision,proposed_canonical_path,n_claims,n_papers,claim_types,reason,auditor_verdict,independent_decision,auditor_id,audited_at
 ablations.components,AMBIGUOUS,MAPPED,results.ablation,1,1,AUTHOR_REPORTED_FACT,Synonym or container field; original path kept as qualifier.,CONCUR,,,
 ablations.design,AMBIGUOUS,MAPPED,results.ablation,1,1,AUTHOR_REPORTED_FACT,Synonym or container field; original path kept as qualifier.,CONCUR,,,
 ablations.domain_size,AMBIGUOUS,MAPPED,results.ablation,1,1,AUTHOR_REPORTED_FACT,Synonym or container field; original path kept as qualifier.,CONCUR,,,

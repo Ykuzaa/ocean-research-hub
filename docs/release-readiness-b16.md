@@ -108,7 +108,7 @@ Open finding before merge: the staging DDL exists twice (`SCHEMA` in
 identical today, but nothing prevents drift. After the merge, load one from the
 other or add an equality test.
 
-### #29 field-path mapping: pre-review done, human validation still required
+### #29 field-path mapping: pre-review done, independent validation still required
 
 `evaluation/field_mapping/` holds a versioned `AI_INTERPRETATION` pre-review of
 all 981 B16 `FIELD_PATH_MAP` rules (`build.py` + `proposals.py` reproduce it
@@ -129,10 +129,13 @@ dissents were accepted and returned to pending.
 | UNMAPPED, with reason | 17 | – |
 | Pending (incl. 14 guard blocks, 22 auditor dissents) | 567 | – |
 
-**No rule is `VALIDATED` and no projection is applied.** #29 requires a human
-to validate each rule (CSV has `human_decision` / `human_reviewer` /
-`reviewed_at` columns). The auditor also flagged claim-level items for the
-human reviewer (values taken from open-review author replies B05-0149/0150/0151,
+**No rule is `VALIDATED` and no projection is applied.** #29 requires a
+recorded decision from an independent Scientific Auditor that did not produce
+the proposal; a separate human approval is not mandatory. The CSV reserves
+`independent_decision` / `auditor_id` / `audited_at` columns. The pre-review
+above remains historical `AI_INTERPRETATION` and is not promoted
+retroactively. It also flagged claim-level items for the later auditor (values
+taken from open-review author replies B05-0149/0150/0151,
 inferred row assignments B14-0012/B12-0003, B06-0137 possibly a sweep point)
 and guard gaps to close before any projection code is written (`CODE_REPOSITORY`
 scope into `data.*`, review scopes into non-results fields, conflict notes on
@@ -149,9 +152,12 @@ scientific review failed. #31 depends on #19. Neither was touched.
 1. ~~Independent QA of PR #36 and its combined head with PR #35~~ — done
    2026-09-28 (PASS, above). Remaining: close the SCHEMA/0003 duplication, PR
    review of both drafts, and the Sourcery dynamic-SQL note on #35.
-2. Human validation of the #29 pre-review (`evaluation/field_mapping/*.csv`),
-   starting with the 325 auditor-concurred rules; then implement projection with
-   the guard gaps above closed, keeping each original path and wording.
+2. Independent validation of the #29 pre-review
+   (`evaluation/field_mapping/*.csv`), starting with a source-checked batch of
+   auditor-concurred rules. The producer and auditor must differ; dissent stays
+   explicit until a documented resolution. Then implement projection with the
+   guard gaps above closed, keeping each original path and wording. A validated
+   mapping never changes a claim's verification state.
 3. Obtain and hash-pin primary PDFs, supplements and relevant code for the
    21 audit candidates. Check every populated claim and every required absence
    against its exact edition, page/section/locator, value, unit and experiment;

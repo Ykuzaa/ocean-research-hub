@@ -1,8 +1,8 @@
 {
  "auditor_role": "Scientific Auditor (independent AI, Claude subagent)",
  "provenance_type": "AI_INTERPRETATION",
- "review_status": "PENDING_HUMAN_VALIDATION",
- "limitations": "No PDFs, supplements or code were consulted. Verdicts judge only whether each proposed canonical field is semantically correct for the stored claim text (value, unit, claim_type, subject_scope, source_section, notes), not whether the claims are true or correctly extracted. Nothing here is VALIDATED; this output is itself an AI_INTERPRETATION that awaits human validation. CONCUR on container targets (results.quantitative_results, encoder/decoder, lr_schedule, loss_weights) assumes the original path, unit and experiment_id stay visible alongside the canonical field as #29 specifies; if the UI shows only the canonical field, those concurrences do not hold.",
+ "review_status": "PRE_REVIEW_ONLY_PENDING_INDEPENDENT_VALIDATION",
+ "limitations": "No PDFs, supplements or code were consulted. Verdicts judge only whether each proposed canonical field is semantically correct for the stored claim text (value, unit, claim_type, subject_scope, source_section, notes), not whether the claims are true or correctly extracted. Nothing here is VALIDATED; this historical pre-review remains an AI_INTERPRETATION and must not be promoted retroactively. A later decision may be recorded by an independent Scientific Auditor distinct from the producer; human approval is not mandatory. CONCUR on container targets (results.quantitative_results, encoder/decoder, lr_schedule, loss_weights) assumes the original path, unit and experiment_id stay visible alongside the canonical field as #29 specifies; if the UI shows only the canonical field, those concurrences do not hold.",
  "verdicts": [
   {
    "rule_id": "ablations.components",

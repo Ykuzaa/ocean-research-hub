@@ -113,13 +113,14 @@ for original, proposed, decision in rules:
         if v.get("alternative_target"):
             rec["auditor_alternative_target"] = v["alternative_target"]
         if v["verdict"].startswith("DISSENT") and rec["proposed_decision"] == "MAPPED":
-            # Auditor dissent wins: the rule returns to pending for human decision.
+            # Auditor dissent wins: the rule returns to pending for a documented
+            # decision by an independent auditor distinct from the producer.
             rec = {**rec, "proposed_decision": "AMBIGUOUS", "proposed_canonical_path": None,
                    "blocked_candidate": rec["proposed_canonical_path"],
                    "reason": "Independent Scientific Auditor dissent: " + v["reason"]}
             stats["auditor_dissent"] += 1
     rec.update({"provenance_type": "AI_INTERPRETATION", "review_status": "PENDING",
-                "human_validation_required": True})
+                "independent_validation_required": True})
     stats[(decision, rec["proposed_decision"])] += 1
     rows.append({**base, **rec})
 
@@ -127,12 +128,13 @@ claims_mapped = sum(r["n_claims"] for r in rows if r["proposed_decision"] == "MA
 doc = {
     "kind": "FIELD_PATH_MAPPING_PREREVIEW",
     "issue": 29,
-    "status": "PROPOSAL_PENDING_HUMAN_VALIDATION",
+    "status": "PROPOSAL_PENDING_INDEPENDENT_VALIDATION",
     "provenance_type": "AI_INTERPRETATION",
     "note": ("Pre-review proposals only. No rule is VALIDATED and no projection is applied; "
-             "#29 requires human validation of every rule before projection."),
-    "independent_audit": ("Scientific Auditor (independent AI subagent) reviewed every non-identity rule and every claim "
-                          "under it against the stored claim text; no PDF access. AI_INTERPRETATION, not a validation.")
+             "#29 requires a recorded decision by an independent auditor distinct from the producer."),
+    "independent_audit": (f"Scientific Auditor (independent AI subagent) issued {len(verdicts)} pre-review verdicts "
+                          "against stored claim text; no PDF access. The remaining rules, including identity rules, "
+                          "were not covered by that verdict file. AI_INTERPRETATION, not a validation.")
                          if verdicts else None,
     "source_mapping_version": version[0],
     "source_workbook_sha256": version[1],
@@ -151,9 +153,10 @@ doc = {
 out.mkdir(parents=True, exist_ok=True)
 (out / "b16-field-path-map-prereview.json").write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
 with open(out / "b16-field-path-map-prereview.csv", "w", newline="") as f:
-    w = csv.writer(f)
+    w = csv.writer(f, lineterminator="\n")
     w.writerow(["original_path", "source_decision", "proposed_decision", "proposed_canonical_path",
-                "n_claims", "n_papers", "claim_types", "reason", "auditor_verdict", "human_decision", "human_reviewer", "reviewed_at"])
+                "n_claims", "n_papers", "claim_types", "reason", "auditor_verdict",
+                "independent_decision", "auditor_id", "audited_at"])
     for r in rows:
         w.writerow([r["original_path"], r["source_decision"], r["proposed_decision"],
                     r["proposed_canonical_path"] or "", r["n_claims"], r["n_papers"],

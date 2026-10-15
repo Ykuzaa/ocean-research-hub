@@ -22,13 +22,14 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import string
 from contextlib import closing
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
-from uuid import uuid4
+from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from .workbook import (
     PENDING_AUDIT_MARKERS, SUPPLEMENT, StagingWorkbook, WorkbookValidationError, claim_fingerprint_payload, is_marker,
@@ -171,6 +172,8 @@ CREATE TABLE IF NOT EXISTS staging_corpus_audit_events (
     search_scope TEXT,
     target_fingerprint TEXT NOT NULL,
     reviewed_json TEXT NOT NULL,
+    auditor_model TEXT,
+    auditor_reasoning_effort TEXT,
     created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS staging_corpus_audit_target
@@ -204,6 +207,54 @@ CREATE TABLE IF NOT EXISTS staging_corpus_field_mappings (
     PRIMARY KEY (version_id, original_path),
     CHECK (review_status != 'VALIDATED' OR (auditor_id IS NOT NULL AND reviewed_at IS NOT NULL)),
     CHECK (decision != 'MAPPED' OR canonical_path IS NOT NULL)
+);
+CREATE TABLE IF NOT EXISTS staging_corpus_mapping_audit_packets (
+    packet_sha256 TEXT PRIMARY KEY,
+    version_id TEXT NOT NULL,
+    original_path TEXT NOT NULL,
+    producer_id TEXT NOT NULL,
+    source_name TEXT NOT NULL,
+    source_sha256 TEXT NOT NULL,
+    proposal_decision TEXT NOT NULL CHECK (proposal_decision IN ('MAPPED', 'UNMAPPED', 'AMBIGUOUS')),
+    proposal_canonical_path TEXT,
+    packet_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (version_id, original_path)
+        REFERENCES staging_corpus_field_mappings(version_id, original_path),
+    CHECK (length(packet_sha256) = 64 AND packet_sha256 NOT GLOB '*[^0-9a-f]*'),
+    CHECK (
+        (proposal_decision = 'MAPPED' AND proposal_canonical_path IS NOT NULL)
+        OR (proposal_decision != 'MAPPED' AND proposal_canonical_path IS NULL)
+    )
+);
+CREATE TABLE IF NOT EXISTS staging_corpus_mapping_audit_events (
+    event_id TEXT PRIMARY KEY,
+    packet_sha256 TEXT NOT NULL REFERENCES staging_corpus_mapping_audit_packets(packet_sha256),
+    version_id TEXT NOT NULL,
+    original_path TEXT NOT NULL,
+    decision TEXT NOT NULL CHECK (decision IN ('MAPPED', 'UNMAPPED', 'AMBIGUOUS')),
+    canonical_path TEXT,
+    review_status TEXT NOT NULL CHECK (review_status IN ('VALIDATED', 'REJECTED')),
+    justification TEXT NOT NULL,
+    producer_id TEXT NOT NULL,
+    auditor_id TEXT NOT NULL,
+    audited_at TEXT NOT NULL,
+    auditor_model TEXT,
+    auditor_reasoning_effort TEXT,
+    source_name TEXT NOT NULL,
+    source_sha256 TEXT NOT NULL,
+    evidence TEXT NOT NULL,
+    locator TEXT NOT NULL,
+    evidence_sources_json TEXT NOT NULL,
+    reviewed_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (version_id, original_path)
+        REFERENCES staging_corpus_field_mappings(version_id, original_path),
+    CHECK (producer_id != auditor_id),
+    CHECK (
+        (decision = 'MAPPED' AND canonical_path IS NOT NULL)
+        OR (decision != 'MAPPED' AND canonical_path IS NULL)
+    )
 );
 -- Fail visibly rather than grandfathering invalid historical attestations.
 CREATE TABLE IF NOT EXISTS staging_corpus_claim_audit_bindings (
@@ -562,6 +613,126 @@ BEGIN
     SELECT RAISE(ABORT, 'audited claim content is immutable');
 END;
 
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_versions_no_update
+BEFORE UPDATE ON staging_corpus_mapping_versions
+BEGIN
+    SELECT RAISE(ABORT, 'mapping source versions are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_versions_no_delete
+BEFORE DELETE ON staging_corpus_mapping_versions
+BEGIN
+    SELECT RAISE(ABORT, 'mapping source versions are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_field_mappings_no_update
+BEFORE UPDATE ON staging_corpus_field_mappings
+BEGIN
+    SELECT RAISE(ABORT, 'source mapping proposals are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_field_mappings_no_delete
+BEFORE DELETE ON staging_corpus_field_mappings
+BEGIN
+    SELECT RAISE(ABORT, 'source mapping proposals are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_packets_no_update
+BEFORE UPDATE ON staging_corpus_mapping_audit_packets
+BEGIN
+    SELECT RAISE(ABORT, 'mapping audit packets are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_packets_no_delete
+BEFORE DELETE ON staging_corpus_mapping_audit_packets
+BEGIN
+    SELECT RAISE(ABORT, 'mapping audit packets are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_packet_binding
+BEFORE INSERT ON staging_corpus_mapping_audit_packets
+WHEN json_valid(NEW.packet_json) = 0
+ OR NOT EXISTS (
+    SELECT 1
+    FROM staging_corpus_field_mappings AS mapping
+    JOIN staging_corpus_mapping_versions AS version
+      ON version.version_id = mapping.version_id
+    WHERE mapping.version_id = NEW.version_id
+      AND mapping.original_path = NEW.original_path
+      AND version.source_name = NEW.source_name
+      AND version.workbook_sha256 = NEW.source_sha256
+      AND json_extract(NEW.packet_json, '$.packet_kind') = 'FIELD_PATH_MAPPING_AUDIT_PACKET'
+      AND json_extract(NEW.packet_json, '$.schema_version') = 1
+      AND json_extract(NEW.packet_json, '$.version_id') = mapping.version_id
+      AND json_extract(NEW.packet_json, '$.producer_id') = NEW.producer_id
+      AND json_extract(NEW.packet_json, '$.source.name') = version.source_name
+      AND json_extract(NEW.packet_json, '$.source.sha256') = version.workbook_sha256
+      AND json_extract(NEW.packet_json, '$.source_mapping.original_path') = mapping.original_path
+      AND json_extract(NEW.packet_json, '$.source_mapping.decision') = mapping.decision
+      AND json_extract(NEW.packet_json, '$.source_mapping.canonical_path') IS mapping.canonical_path
+      AND json_extract(NEW.packet_json, '$.source_mapping.basis') = mapping.basis
+      AND json_extract(NEW.packet_json, '$.source_mapping.provenance_type') = mapping.provenance_type
+      AND json_extract(NEW.packet_json, '$.producer_proposal.decision') = NEW.proposal_decision
+      AND json_extract(NEW.packet_json, '$.producer_proposal.canonical_path') IS NEW.proposal_canonical_path
+      AND json_type(NEW.packet_json, '$.producer_proposal.reason') = 'text'
+ )
+ OR (
+    NEW.proposal_decision = 'MAPPED'
+    AND NOT EXISTS (
+        SELECT 1 FROM staging_corpus_field_contract
+        WHERE field_path = NEW.proposal_canonical_path
+    )
+ )
+BEGIN
+    SELECT RAISE(ABORT, 'mapping packet must bind the exact source rule and a contract target');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_audits_no_update
+BEFORE UPDATE ON staging_corpus_mapping_audit_events
+BEGIN
+    SELECT RAISE(ABORT, 'mapping audit events are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_audits_no_delete
+BEFORE DELETE ON staging_corpus_mapping_audit_events
+BEGIN
+    SELECT RAISE(ABORT, 'mapping audit events are append-only');
+END;
+CREATE TRIGGER IF NOT EXISTS staging_corpus_mapping_audit_binding
+BEFORE INSERT ON staging_corpus_mapping_audit_events
+WHEN json_valid(NEW.reviewed_json) = 0
+ OR json_valid(NEW.evidence_sources_json) = 0
+ OR json_type(NEW.evidence_sources_json) != 'array'
+ OR json_array_length(NEW.evidence_sources_json) = 0
+ OR EXISTS (
+    SELECT 1 FROM json_each(NEW.evidence_sources_json) AS source
+    WHERE COALESCE(trim(json_extract(source.value, '$.name')), '') = ''
+       OR COALESCE(trim(json_extract(source.value, '$.edition')), '') = ''
+       OR length(json_extract(source.value, '$.sha256')) != 64
+       OR lower(json_extract(source.value, '$.sha256')) GLOB '*[^0-9a-f]*'
+ )
+ OR NOT EXISTS (
+    SELECT 1 FROM staging_corpus_mapping_audit_packets AS packet
+    WHERE packet.packet_sha256 = NEW.packet_sha256
+      AND packet.version_id = NEW.version_id
+      AND packet.original_path = NEW.original_path
+      AND packet.producer_id = NEW.producer_id
+      AND packet.source_name = NEW.source_name
+      AND packet.source_sha256 = NEW.source_sha256
+      AND packet.packet_json = NEW.reviewed_json
+ )
+ OR (
+    NEW.decision = 'MAPPED'
+    AND NOT EXISTS (
+        SELECT 1 FROM staging_corpus_field_contract
+        WHERE field_path = NEW.canonical_path
+    )
+ )
+ OR (
+    NEW.review_status = 'VALIDATED'
+    AND NOT EXISTS (
+        SELECT 1 FROM staging_corpus_mapping_audit_packets AS packet
+        WHERE packet.packet_sha256 = NEW.packet_sha256
+          AND packet.proposal_decision = NEW.decision
+          AND packet.proposal_canonical_path IS NEW.canonical_path
+    )
+ )
+BEGIN
+    SELECT RAISE(ABORT, 'mapping audit must bind the exact source rule and a contract target');
+END;
+
 
 CREATE TRIGGER IF NOT EXISTS staging_corpus_claim_status_insert
 BEFORE INSERT ON staging_corpus_claims
@@ -777,8 +948,53 @@ class CorpusRepository:
     def _initialize_schema(cls, connection: sqlite3.Connection) -> None:
         schema, guards = SCHEMA.split(AUDIT_GUARD_MARKER, 1)
         connection.executescript(schema)
+        # Runtime metadata was added after scientific audit events were already
+        # in use. Nullable additive columns preserve every historical event;
+        # null means the effective runtime did not expose the value.
+        scientific_audit_columns = {
+            row["name"] for row in connection.execute("PRAGMA table_info(staging_corpus_audit_events)")
+        }
+        for column in ("auditor_model", "auditor_reasoning_effort"):
+            if column not in scientific_audit_columns:
+                connection.execute(f"ALTER TABLE staging_corpus_audit_events ADD COLUMN {column} TEXT")
+        # A short-lived local schema created mapping audit events before packets
+        # and runtime-effort metadata were introduced. It was never a released
+        # migration and no legitimate event should exist in it. Rebuild an empty
+        # interim table; if it contains anything, fail visibly so an operator can
+        # preserve and migrate those rows rather than silently discarding them.
+        mapping_audit_columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(staging_corpus_mapping_audit_events)")
+        }
+        required_mapping_audit_columns = {"packet_sha256", "auditor_reasoning_effort"}
+        if not required_mapping_audit_columns <= mapping_audit_columns:
+            event_count = connection.execute(
+                "SELECT COUNT(*) FROM staging_corpus_mapping_audit_events"
+            ).fetchone()[0]
+            if event_count:
+                missing = sorted(required_mapping_audit_columns - mapping_audit_columns)
+                raise sqlite3.IntegrityError(
+                    "incompatible local mapping-audit schema contains "
+                    f"{event_count} event(s) and lacks {missing}; explicit data migration is required"
+                )
+            connection.execute("DROP TABLE staging_corpus_mapping_audit_events")
+            connection.executescript(schema)
+        mapping_audit_columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(staging_corpus_mapping_audit_events)")
+        }
+        if "evidence_sources_json" not in mapping_audit_columns:
+            # Existing local rows are retained with NULL rather than receiving
+            # invented primary-source metadata. New writes are rejected unless
+            # they supply an explicit non-empty source list.
+            connection.execute(
+                "ALTER TABLE staging_corpus_mapping_audit_events ADD COLUMN evidence_sources_json TEXT"
+            )
         with connection:
             cls._sync_claim_audit_bindings(connection)
+        # Refresh the insert guard so an existing local database receives the
+        # current packet/source validation rather than keeping an older trigger.
+        connection.execute("DROP TRIGGER IF EXISTS staging_corpus_mapping_audit_binding")
         connection.executescript(guards)
 
     @staticmethod
@@ -1559,6 +1775,13 @@ class CorpusRepository:
             "provenance_type": provenance,
             "source_kind": source_kind,
         }
+        for metadata_key in ("auditor_model", "auditor_reasoning_effort"):
+            runtime_value = event.get(metadata_key)
+            if runtime_value is not None and not isinstance(runtime_value, str):
+                raise ValueError(f"{metadata_key} must be a string, null, or NOT_EXPOSED")
+            normalized[metadata_key] = runtime_value.strip() if isinstance(runtime_value, str) else None
+            if normalized[metadata_key] == "":
+                normalized[metadata_key] = None
         with closing(self._ready(write=True)) as connection, connection:
             target = connection.execute(
                 f"SELECT * FROM {table} WHERE {key} = ?", (str(event["target_id"]),)
@@ -1604,8 +1827,9 @@ class CorpusRepository:
                 """INSERT INTO staging_corpus_audit_events (
                        event_id, target_kind, target_id, decision, justification, auditor_id,
                        audited_at, provenance_type, source_kind, source_edition, page, section,
-                       locator, evidence, search_scope, target_fingerprint, reviewed_json, created_at
-                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                       locator, evidence, search_scope, target_fingerprint, reviewed_json,
+                       auditor_model, auditor_reasoning_effort, created_at
+                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     normalized["event_id"], target_kind, str(event["target_id"]), decision,
                     str(event["justification"]).strip(), str(event["auditor_id"]).strip(),
@@ -1613,6 +1837,7 @@ class CorpusRepository:
                     str(event["source_edition"]).strip(), event.get("page"),
                     event.get("section"), event.get("locator"), event.get("evidence"),
                     event.get("search_scope"), target["fingerprint"], _canonical(reviewed),
+                    normalized["auditor_model"], normalized["auditor_reasoning_effort"],
                     datetime.now(UTC).isoformat(),
                 ),
             )
@@ -1621,6 +1846,8 @@ class CorpusRepository:
     @staticmethod
     def _audit_event(row: sqlite3.Row) -> dict[str, Any]:
         event = {key: row[key] for key in row.keys() if key not in {"created_at", "reviewed_json"}}
+        event.setdefault("auditor_model", None)
+        event.setdefault("auditor_reasoning_effort", None)
         event["reviewed"] = json.loads(row["reviewed_json"])
         return event
 
@@ -1644,8 +1871,306 @@ class CorpusRepository:
             ).fetchall()
         return [self._audit_event(row) for row in rows]
 
+    @staticmethod
+    def _mapping_audit_event(row: sqlite3.Row) -> dict[str, Any]:
+        event = {
+            key: row[key]
+            for key in row.keys()
+            if key not in {"created_at", "reviewed_json", "evidence_sources_json"}
+        }
+        packet = json.loads(row["reviewed_json"])
+        event["packet"] = packet
+        event["evidence_sources"] = json.loads(row["evidence_sources_json"] or "[]")
+        proposal = packet["producer_proposal"]
+        event["dissent"] = (
+            event["review_status"] == "REJECTED"
+            or event["decision"] != proposal["decision"]
+            or event["canonical_path"] != proposal.get("canonical_path")
+        )
+        return event
+
+    @staticmethod
+    def _table_exists(connection: sqlite3.Connection, table: str) -> bool:
+        return connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (table,)
+        ).fetchone() is not None
+
+    @staticmethod
+    def _validate_audited_at(value: Any) -> str:
+        raw = str(value or "").strip()
+        if not raw:
+            raise ValueError("mapping audit lacks audited_at")
+        try:
+            parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("audited_at must be an ISO-8601 timezone-aware timestamp") from exc
+        if parsed.tzinfo is None:
+            raise ValueError("audited_at must be an ISO-8601 timezone-aware timestamp")
+        return raw
+
+    @staticmethod
+    def _validate_evidence_sources(decision_payload: dict[str, Any]) -> list[dict[str, str]]:
+        """Pin a decision to named, edition-bound, hash-identified primary sources."""
+        raw = decision_payload.get("evidence_sources")
+        if not isinstance(raw, list) or not raw:
+            raise ValueError("mapping audit requires a non-empty evidence_sources list")
+        sources: list[dict[str, str]] = []
+        for entry in raw:
+            if not isinstance(entry, dict):
+                raise ValueError("each evidence_sources entry must be an object")
+            name = str(entry.get("name") or "").strip()
+            edition = str(entry.get("edition") or "").strip()
+            digest = str(entry.get("sha256") or "").strip().lower()
+            if not name or not edition:
+                raise ValueError("each evidence_sources entry requires name and edition")
+            if len(digest) != 64 or digest.strip(string.hexdigits):
+                raise ValueError("each evidence_sources entry requires a 64-hex SHA-256 digest")
+            sources.append({"name": name, "edition": edition, "sha256": digest})
+        return sources
+
+    @staticmethod
+    def _validate_mapping_audit_report(
+        connection: sqlite3.Connection, report: dict[str, Any],
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Validate one independent decision without changing mapping or claim rows."""
+        if report.get("report_kind") != "INDEPENDENT_MAPPING_AUDIT":
+            raise ValueError("report is not an independent mapping audit")
+        packet = report.get("packet")
+        decision_payload = report.get("audit_decision")
+        if not isinstance(packet, dict) or not isinstance(decision_payload, dict):
+            raise ValueError("mapping audit requires packet and audit_decision objects")
+        packet_sha256 = str(report.get("packet_sha256") or "").strip().lower()
+        calculated_sha256 = _fingerprint(packet)
+        if packet_sha256 != calculated_sha256:
+            raise ValueError(
+                f"packet SHA-256 differs: supplied {packet_sha256 or 'missing'}, calculated {calculated_sha256}"
+            )
+        if packet.get("packet_kind") != "FIELD_PATH_MAPPING_AUDIT_PACKET" or packet.get("schema_version") != 1:
+            raise ValueError("unsupported mapping audit packet kind or schema version")
+        version_id = str(packet.get("version_id") or "").strip()
+        producer_id = str(packet.get("producer_id") or "").strip()
+        source = packet.get("source")
+        source_mapping = packet.get("source_mapping")
+        proposal = packet.get("producer_proposal")
+        if not version_id or not producer_id:
+            raise ValueError("mapping packet requires version_id and producer_id")
+        if not all(isinstance(item, dict) for item in (source, source_mapping, proposal)):
+            raise ValueError("mapping packet requires source, source_mapping, and producer_proposal objects")
+        original_path = str(source_mapping.get("original_path") or "").strip()
+        stored = connection.execute(
+            """SELECT mapping.*, version.source_name, version.workbook_sha256
+               FROM staging_corpus_field_mappings AS mapping
+               JOIN staging_corpus_mapping_versions AS version
+                 ON version.version_id = mapping.version_id
+               WHERE mapping.version_id = ? AND mapping.original_path = ?""",
+            (version_id, original_path),
+        ).fetchone()
+        if stored is None:
+            raise CorpusNotFoundError(f"mapping {version_id}:{original_path} was not found")
+        expected_source = {"name": stored["source_name"], "sha256": stored["workbook_sha256"]}
+        expected_mapping = {
+            "original_path": stored["original_path"],
+            "decision": stored["decision"],
+            "canonical_path": stored["canonical_path"],
+            "basis": stored["basis"],
+            "provenance_type": stored["provenance_type"],
+            "source_candidate": json.loads(stored["source_candidate"]) if stored["source_candidate"] else None,
+        }
+        if source != expected_source:
+            raise ValueError("packet source name or SHA-256 differs from the stored mapping version")
+        if source_mapping != expected_mapping:
+            raise ValueError("packet source_mapping differs from the exact stored mapping row")
+        proposal_decision = str(proposal.get("decision") or "").upper()
+        proposal_target = proposal.get("canonical_path")
+        if proposal_decision not in {"MAPPED", "UNMAPPED", "AMBIGUOUS"}:
+            raise ValueError("producer proposal decision must be MAPPED, UNMAPPED, or AMBIGUOUS")
+        if proposal.get("decision") != proposal_decision:
+            raise ValueError("producer proposal decision must use its canonical uppercase spelling")
+        if not str(proposal.get("reason") or "").strip():
+            raise ValueError("producer proposal requires a reason")
+        if (proposal_decision == "MAPPED") != (isinstance(proposal_target, str) and bool(proposal_target.strip())):
+            raise ValueError("only a MAPPED producer proposal may carry a canonical_path")
+        if proposal_decision == "MAPPED" and connection.execute(
+            "SELECT 1 FROM staging_corpus_field_contract WHERE field_path = ?", (proposal_target,)
+        ).fetchone() is None:
+            raise ValueError("producer proposal target is outside the canonical field contract")
+
+        auditor_id = str(decision_payload.get("auditor_id") or "").strip()
+        if not auditor_id:
+            raise ValueError("mapping audit lacks auditor_id")
+        if auditor_id == producer_id:
+            raise ValueError("mapping producer and auditor must be distinct")
+        audit_decision = str(decision_payload.get("decision") or "").upper()
+        review_status = str(decision_payload.get("review_status") or "").upper()
+        audit_target = decision_payload.get("canonical_path")
+        if audit_decision not in {"MAPPED", "UNMAPPED", "AMBIGUOUS"}:
+            raise ValueError("audit decision must be MAPPED, UNMAPPED, or AMBIGUOUS")
+        if review_status not in {"VALIDATED", "REJECTED"}:
+            raise ValueError("mapping review_status must be VALIDATED or REJECTED")
+        if (audit_decision == "MAPPED") != (isinstance(audit_target, str) and bool(audit_target.strip())):
+            raise ValueError("only a MAPPED audit decision may carry a canonical_path")
+        if audit_decision == "MAPPED" and connection.execute(
+            "SELECT 1 FROM staging_corpus_field_contract WHERE field_path = ?", (audit_target,)
+        ).fetchone() is None:
+            raise ValueError("auditor mapping target is outside the canonical field contract")
+        if review_status == "VALIDATED" and (
+            audit_decision != proposal_decision or audit_target != proposal_target
+        ):
+            raise ValueError("VALIDATED must attest the exact producer proposal; use REJECTED for dissent")
+        justification = str(decision_payload.get("justification") or "").strip()
+        evidence = str(decision_payload.get("evidence") or "").strip()
+        locator = str(decision_payload.get("locator") or "").strip()
+        if not justification or not evidence or not locator:
+            raise ValueError("mapping audit requires justification, evidence, and locator")
+        audited_at = CorpusRepository._validate_audited_at(decision_payload.get("audited_at"))
+        evidence_sources = CorpusRepository._validate_evidence_sources(decision_payload)
+        runtime: dict[str, str | None] = {}
+        for key in ("auditor_model", "auditor_reasoning_effort"):
+            value = decision_payload.get(key)
+            if value is not None and not isinstance(value, str):
+                raise ValueError(f"{key} must be a string, null, or NOT_EXPOSED")
+            runtime[key] = value.strip() if isinstance(value, str) else None
+            if runtime[key] == "":
+                runtime[key] = None
+
+        normalized = {
+            "packet_sha256": packet_sha256,
+            "version_id": version_id,
+            "original_path": original_path,
+            "decision": audit_decision,
+            "canonical_path": audit_target,
+            "review_status": review_status,
+            "justification": justification,
+            "producer_id": producer_id,
+            "auditor_id": auditor_id,
+            "audited_at": audited_at,
+            **runtime,
+            "source_name": stored["source_name"],
+            "source_sha256": stored["workbook_sha256"],
+            "evidence": evidence,
+            "locator": locator,
+            "evidence_sources": evidence_sources,
+        }
+        normalized["event_id"] = str(uuid5(NAMESPACE_URL, _canonical(normalized)))
+        normalized["packet"] = packet
+        return normalized, {
+            "proposal_decision": proposal_decision,
+            "proposal_canonical_path": proposal_target,
+        }
+
+    def record_mapping_audit(
+        self, report: dict[str, Any], *, dry_run: bool = False,
+    ) -> dict[str, Any]:
+        """Validate and idempotently append a hash-bound mapping audit report."""
+        if dry_run:
+            with closing(self._ready()) as connection:
+                normalized, _ = self._validate_mapping_audit_report(connection, report)
+                already_recorded = self._table_exists(connection, "staging_corpus_mapping_audit_events") and (
+                    connection.execute(
+                        "SELECT 1 FROM staging_corpus_mapping_audit_events WHERE event_id = ?",
+                        (normalized["event_id"],),
+                    ).fetchone() is not None
+                )
+            return {**normalized, "appended": False, "already_recorded": already_recorded}
+
+        with closing(self._ready(write=True)) as connection, connection:
+            normalized, proposal = self._validate_mapping_audit_report(connection, report)
+            packet_json = _canonical(normalized["packet"])
+            stored_packet = connection.execute(
+                "SELECT packet_json FROM staging_corpus_mapping_audit_packets WHERE packet_sha256 = ?",
+                (normalized["packet_sha256"],),
+            ).fetchone()
+            if stored_packet is None:
+                connection.execute(
+                    """INSERT INTO staging_corpus_mapping_audit_packets (
+                           packet_sha256, version_id, original_path, producer_id, source_name,
+                           source_sha256, proposal_decision, proposal_canonical_path, packet_json,
+                           created_at
+                       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        normalized["packet_sha256"], normalized["version_id"],
+                        normalized["original_path"], normalized["producer_id"],
+                        normalized["source_name"], normalized["source_sha256"],
+                        proposal["proposal_decision"], proposal["proposal_canonical_path"],
+                        packet_json, datetime.now(UTC).isoformat(),
+                    ),
+                )
+            elif stored_packet["packet_json"] != packet_json:
+                raise sqlite3.IntegrityError("packet SHA-256 is already bound to different content")
+            # A replay of the identical decision is a no-op, but any other
+            # rejection must surface instead of being swallowed as "unchanged".
+            appended = connection.execute(
+                "SELECT 1 FROM staging_corpus_mapping_audit_events WHERE event_id = ?",
+                (normalized["event_id"],),
+            ).fetchone() is None
+            if appended:
+                connection.execute(
+                    """INSERT INTO staging_corpus_mapping_audit_events (
+                           event_id, packet_sha256, version_id, original_path, decision, canonical_path,
+                           review_status, justification, producer_id, auditor_id, audited_at,
+                           auditor_model, auditor_reasoning_effort, source_name, source_sha256,
+                           evidence, locator, evidence_sources_json, reviewed_json, created_at
+                       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        normalized["event_id"], normalized["packet_sha256"], normalized["version_id"],
+                        normalized["original_path"], normalized["decision"], normalized["canonical_path"],
+                        normalized["review_status"], normalized["justification"], normalized["producer_id"],
+                        normalized["auditor_id"], normalized["audited_at"], normalized["auditor_model"],
+                        normalized["auditor_reasoning_effort"], normalized["source_name"],
+                        normalized["source_sha256"], normalized["evidence"], normalized["locator"],
+                        _canonical(normalized["evidence_sources"]), packet_json,
+                        datetime.now(UTC).isoformat(),
+                    ),
+                )
+        return {**normalized, "appended": appended, "already_recorded": not appended}
+
+    def list_mapping_audits(
+        self, *, version_id: str | None = None, original_path: str | None = None,
+    ) -> list[dict[str, Any]]:
+        clauses: list[str] = []
+        parameters: list[str] = []
+        if version_id:
+            clauses.append("version_id = ?")
+            parameters.append(version_id)
+        if original_path:
+            clauses.append("original_path = ?")
+            parameters.append(original_path)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with closing(self._ready()) as connection:
+            if not self._table_exists(connection, "staging_corpus_mapping_audit_events"):
+                return []
+            current_version = connection.execute(
+                "SELECT version.version_id FROM staging_corpus_mapping_versions AS version "
+                "JOIN staging_corpus_import_runs AS run ON run.id = version.import_run_id "
+                "ORDER BY run.imported_at DESC, version.version_id DESC LIMIT 1"
+            ).fetchone()
+            rows = connection.execute(
+                f"SELECT * FROM staging_corpus_mapping_audit_events {where} "
+                "ORDER BY julianday(audited_at), created_at, event_id",
+                parameters,
+            ).fetchall()
+        events = [self._mapping_audit_event(row) for row in rows]
+        current_version_id = current_version["version_id"] if current_version else None
+        latest: dict[tuple[str, str], str] = {}
+        for event in events:
+            latest[(event["version_id"], event["original_path"])] = event["event_id"]
+        for event in events:
+            latest_for_rule = latest[(event["version_id"], event["original_path"])] == event["event_id"]
+            event["current"] = latest_for_rule and event["version_id"] == current_version_id
+            event["stale_reason"] = (
+                None if event["current"] else
+                "MAPPING_VERSION_SUPERSEDED" if event["version_id"] != current_version_id else
+                "SUPERSEDED_BY_LATER_MAPPING_AUDIT"
+            )
+        return events
+
     def field_mappings(self, version_id: str | None = None) -> dict[str, Any]:
         with closing(self._ready()) as connection:
+            current_version = connection.execute(
+                "SELECT v.version_id FROM staging_corpus_mapping_versions v "
+                "JOIN staging_corpus_import_runs r ON r.id = v.import_run_id "
+                "ORDER BY r.imported_at DESC, v.version_id DESC LIMIT 1"
+            ).fetchone()
             version = (
                 connection.execute(
                     "SELECT * FROM staging_corpus_mapping_versions WHERE version_id = ?", (version_id,)
@@ -1662,6 +2187,21 @@ class CorpusRepository:
                 "SELECT * FROM staging_corpus_field_mappings WHERE version_id = ? ORDER BY original_path",
                 (version["version_id"],),
             ).fetchall()
+            audit_rows = (
+                connection.execute(
+                    "SELECT * FROM staging_corpus_mapping_audit_events WHERE version_id = ? "
+                    "ORDER BY julianday(audited_at), created_at, event_id",
+                    (version["version_id"],),
+                ).fetchall()
+                if self._table_exists(connection, "staging_corpus_mapping_audit_events") else []
+            )
+        latest_audits: dict[str, dict[str, Any]] = {}
+        for audit_row in audit_rows:
+            latest_audits[audit_row["original_path"]] = self._mapping_audit_event(audit_row)
+        current_version_id = current_version["version_id"] if current_version else None
+        for latest in latest_audits.values():
+            latest["current"] = latest["version_id"] == current_version_id
+            latest["stale_reason"] = None if latest["current"] else "MAPPING_VERSION_SUPERSEDED"
         return {
             "version": {
                 "version_id": version["version_id"], "source_name": version["source_name"],
@@ -1671,10 +2211,30 @@ class CorpusRepository:
                 {
                     "original_path": row["original_path"], "canonical_path": row["canonical_path"],
                     "decision": row["decision"], "basis": row["basis"],
-                    "provenance_type": row["provenance_type"], "review_status": row["review_status"],
+                    "provenance_type": row["provenance_type"],
+                    "review_status": row["review_status"],
+                    "source_review_status": row["review_status"],
                     "auditor_id": row["auditor_id"], "reviewed_at": row["reviewed_at"],
                     "source_candidate": json.loads(row["source_candidate"]) if row["source_candidate"] else None,
-                    "projection_applied": row["review_status"] == "VALIDATED" and row["decision"] == "MAPPED",
+                    "latest_audit": latest_audits.get(row["original_path"]),
+                    "effective_review_status": (
+                        latest_audits[row["original_path"]]["review_status"]
+                        if row["original_path"] in latest_audits else row["review_status"]
+                    ),
+                    "effective_decision": (
+                        latest_audits[row["original_path"]]["decision"]
+                        if row["original_path"] in latest_audits else row["decision"]
+                    ),
+                    "effective_canonical_path": (
+                        latest_audits[row["original_path"]]["canonical_path"]
+                        if row["original_path"] in latest_audits else row["canonical_path"]
+                    ),
+                    "effective_current": bool(
+                        latest_audits.get(row["original_path"], {}).get("current")
+                    ),
+                    # Mapping validation never rewrites or promotes scientific claims. Projection
+                    # is a separate, not-yet-implemented operation with its own safety gates.
+                    "projection_applied": False,
                 }
                 for row in rows
             ],

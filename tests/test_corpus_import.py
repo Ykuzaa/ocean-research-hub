@@ -1607,3 +1607,55 @@ def test_audit_is_bound_to_the_reviewed_version_and_cannot_verify_a_review_label
     paper = b16_repository.get_paper("OAI-0001")
     assert paper["verification_state"] != "FULLY_VERIFIED"
     assert paper["audit_counts"]["stale"] == 1
+
+
+def test_scientific_audit_runtime_metadata_is_additive_and_not_inferred(
+    b16_repository: CorpusRepository, tmp_path: Path,
+) -> None:
+    # Simulate the schema used before runtime fields existed. Its event must be
+    # retained with null metadata after additive migration, not invented values.
+    legacy_database = tmp_path / "legacy-scientific-audit.db"
+    with sqlite3.connect(legacy_database) as connection:
+        connection.execute(
+            """CREATE TABLE staging_corpus_audit_events (
+                   event_id TEXT PRIMARY KEY, target_kind TEXT NOT NULL, target_id TEXT NOT NULL,
+                   decision TEXT NOT NULL, justification TEXT NOT NULL, auditor_id TEXT NOT NULL,
+                   audited_at TEXT NOT NULL, provenance_type TEXT NOT NULL, source_kind TEXT NOT NULL,
+                   source_edition TEXT NOT NULL, page INTEGER, section TEXT, locator TEXT, evidence TEXT,
+                   search_scope TEXT, target_fingerprint TEXT NOT NULL, reviewed_json TEXT NOT NULL,
+                   created_at TEXT NOT NULL
+               )"""
+        )
+        connection.execute(
+            """INSERT INTO staging_corpus_audit_events VALUES (
+                   'legacy-event', 'CLAIM', 'missing-claim', 'NOT_VERIFIED', 'Historical event',
+                   'auditor:legacy', '2026-09-30T12:00:00+00:00', 'AUTHOR_REPORTED_FACT',
+                   'PRIMARY_PAPER', 'published PDF', NULL, NULL, NULL, NULL, NULL,
+                   'legacy-fingerprint', '{}', '2026-09-30T12:00:00+00:00'
+               )"""
+        )
+    legacy = CorpusRepository(legacy_database)
+    legacy.initialize()
+    migrated = legacy.list_audits()[0]
+    assert migrated["auditor_model"] is None
+    assert migrated["auditor_reasoning_effort"] is None
+
+    claim = b16_repository.get_claim("ORI-0001")
+    recorded = b16_repository.record_audit({
+        "target_kind": "CLAIM", "target_id": claim["claim_id"], "decision": "VERIFIED",
+        "justification": "Independent source inspection for runtime metadata regression coverage.",
+        "auditor_id": "scientific-auditor:test", "audited_at": "2026-09-30T12:00:00+00:00",
+        "provenance_type": claim["claim_type"], "source_kind": "PRIMARY_PAPER",
+        "source_edition": "published PDF", "page": 1, "section": "Methods",
+        "locator": "paragraph 1", "evidence": "Exact author-reported passage was inspected.",
+        "auditor_model": "NOT_EXPOSED", "auditor_reasoning_effort": "NOT_EXPOSED",
+        "reviewed": {
+            "value": claim["value"], "unit": claim["unit"],
+            "experiment_id": claim["experiment_id"], "field_path": claim["field_path"],
+        },
+    })
+    assert recorded["auditor_model"] == "NOT_EXPOSED"
+    assert recorded["auditor_reasoning_effort"] == "NOT_EXPOSED"
+    new_event = b16_repository.list_audits(target_id=claim["claim_id"])[0]
+    assert new_event["auditor_model"] == "NOT_EXPOSED"
+    assert new_event["auditor_reasoning_effort"] == "NOT_EXPOSED"

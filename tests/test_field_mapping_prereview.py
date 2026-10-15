@@ -26,11 +26,13 @@ def _sheet_column(name, column, workbook=B16):
 
 def test_prereview_is_pending_ai_interpretation_only():
     doc = _load()
-    assert doc["status"] == "PROPOSAL_PENDING_HUMAN_VALIDATION"
+    assert doc["status"] == "PROPOSAL_PENDING_INDEPENDENT_VALIDATION"
     for rule in doc["rules"]:
         assert rule["provenance_type"] == "AI_INTERPRETATION"
         assert rule["review_status"] == "PENDING"
-        assert rule["human_validation_required"] is True
+        assert rule["independent_validation_required"] is True
+        # A pre-review is not an audit decision and cannot promote a rule.
+        assert "independent_decision" not in rule
 
 
 def test_prereview_covers_exactly_the_b16_map():
@@ -60,4 +62,4 @@ def test_csv_matches_json():
     assert [(r["original_path"], r["proposed_decision"]) for r in rows] == [
         (r["original_path"], r["proposed_decision"]) for r in doc["rules"]
     ]
-    assert all(not r["human_decision"] for r in rows)
+    assert all(not r["independent_decision"] for r in rows)

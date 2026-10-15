@@ -33,6 +33,8 @@ def _event(report: dict, item: dict, source: dict) -> dict:
         "target_kind": "CLAIM", "target_id": item["claim_id"],
         "decision": item["final_status"], "justification": item["audit_note"],
         "auditor_id": report["auditor_id"], "audited_at": report["audited_at"],
+        "auditor_model": report.get("auditor_model"),
+        "auditor_reasoning_effort": report.get("auditor_reasoning_effort"),
         "provenance_type": provenance, "source_kind": item["source_kind"],
         "source_edition": f"{item['source_edition']} sha256:{source['sha256']}"
         + (f"; corroborating {supporting[0]['source_kind']} sha256:{supporting[0]['sha256']}" if supporting else ""),
@@ -55,6 +57,7 @@ def _event(report: dict, item: dict, source: dict) -> dict:
 def _same_decision(left: dict, right: dict) -> bool:
     fields = (
         "target_kind", "target_id", "decision", "justification", "auditor_id",
+        "auditor_model", "auditor_reasoning_effort",
         "audited_at", "provenance_type", "source_kind", "source_edition",
         "page", "section", "locator", "evidence", "search_scope", "reviewed",
     )

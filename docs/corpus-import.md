@@ -158,6 +158,50 @@ versioned `AI_INTERPRETATION` candidate. Exact contract-path matches may carry a
 proposed canonical path, but every rule starts `PENDING`; only `VALIDATED`
 rules are eligible for projection. The workbook never validates its own map.
 
+Mapping validation follows the same independence boundary as scientific
+audit. A producer prepares a canonical, hash-bound packet containing the exact
+workbook version, source mapping and proposed decision. A different Scientific
+Auditor checks the correspondence against the source material and appends a
+decision with the examined value, evidence, locator, identity, date and
+justification. Effective model and reasoning metadata are stored only when the
+runtime exposes them; otherwise they are recorded as `NOT_EXPOSED`. A separate
+human approval is not required. Producer/auditor disagreement remains an
+explicit rejected or pending decision until a later documented audit resolves
+it, and QA independently checks binding, replay, immutability, stale decisions
+and contradictory cases.
+
+A `VALIDATED` mapping establishes only a reviewed source-to-contract
+correspondence. It does not modify the original path or value, does not promote
+any claim to `VERIFIED`, and does not make a paper fully verified. Paper-level
+verification still requires an independent, complete field-by-field audit of
+the declared paper, supplement and relevant author-code scope, with no
+unresolved markers, conflicts or blockers.
+
+The first producer batch is reproducible from the imported B16 database and
+the pending pre-review:
+
+```bash
+uv run python evaluation/field_mapping/prepare_audit_packets.py \
+  .data/ocean-research-hub.db \
+  evaluation/field_mapping/b16-field-path-map-prereview.json \
+  evaluation/field_mapping/b16-oai0001-mapping-audit-packets.json
+```
+
+This command prepares packets only; it cannot record a decision. After a
+distinct Scientific Auditor adds one `INDEPENDENT_MAPPING_AUDIT` report per
+packet, validate and replay each report through the guarded service:
+
+```bash
+uv run ocean-research-hub-mapping-audit-report path/to/report.json \
+  --database .data/ocean-research-hub.db --dry-run
+uv run ocean-research-hub-mapping-audit-report path/to/report.json \
+  --database .data/ocean-research-hub.db
+```
+
+Replaying identical content is idempotent. Later decisions append new events;
+older decisions and decisions tied to a superseded mapping version remain
+visible as stale. Projection is deliberately separate and is not yet enabled.
+
 ## Recording an independent audit
 
 Audits are append-only events bound to the exact imported row fingerprint and

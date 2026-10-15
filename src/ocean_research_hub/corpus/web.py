@@ -101,6 +101,19 @@ def register_corpus_routes(app: FastAPI, repository: CorpusRepository) -> None:
     async def corpus_field_mappings(version_id: str | None = None) -> dict[str, Any]:
         return repository.field_mappings(version_id)
 
+    @app.get("/api/corpus/mapping-audits")
+    async def corpus_mapping_audits(
+        version_id: str | None = None, original_path: str | None = None,
+    ) -> dict[str, Any]:
+        events = repository.list_mapping_audits(
+            version_id=version_id, original_path=original_path,
+        )
+        return {
+            "notice": "Mapping validation does not verify or promote any scientific claim.",
+            "total": len(events),
+            "mapping_audit_events": events,
+        }
+
     @app.get("/corpus", response_class=HTMLResponse)
     async def corpus_page(q: str | None = None, domain: str | None = None) -> HTMLResponse:
         papers, total = repository.list_papers(query=q, domain=domain, limit=500)

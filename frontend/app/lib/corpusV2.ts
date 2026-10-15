@@ -95,6 +95,9 @@ export type PaperSummaryV2 = {
   /** Quelle édition du papier a été lue. Un chiffre lu sur une préimpression n'est pas
    *  forcément celui de l'article publié, donc l'app le dit au lieu de le supposer. */
   edition: Edition | null;
+  /** DOI de l'article publié quand le fichier lu n'en imprime aucun: une recherche sur
+   *  ce DOI doit retrouver le papier, sans pour autant le présenter comme sa source. */
+  resolved_from_doi: string | null;
   audit: PaperAudit;
 };
 

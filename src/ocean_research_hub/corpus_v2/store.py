@@ -259,11 +259,22 @@ def paper_summary(slug: str, record: dict) -> dict:
         "datasets": [d["canonical_name"] for d in record.get("datasets", [])],
         "experiment_count": len(experiments),
         "result_count": len(record.get("results", [])),
-        "claim_count": sum(1 for _ in walk(record)),
+        # The denominator the app shows under the audit count, so it must be the number
+        # of claims: the gated nodes minus provenance, plus the values no sentence can
+        # carry. Counting gated nodes alone overstated it by the edition evidence and
+        # understated it by every VALUE_READ_NO_SAFE_QUOTE.
+        "claim_count": (
+            sum(1 for path, _ in walk(record) if path not in PROVENANCE_PATHS)
+            + sum(1 for _ in walk_unquoted(record))
+        ),
         "pdf_pages": record["source"].get("pdf_pages"),
         # Which file the claims were read from: half the corpus is not the published
         # article, and a reader has to see that before comparing two papers' numbers.
         "edition": record["source"].get("edition"),
+        # The DOI of the published article when the file read prints none, so a search
+        # for it still finds the paper. Kept distinct from `doi`, which is the identifier
+        # the file itself carries.
+        "resolved_from_doi": (record["source"].get("resolved_from") or {}).get("doi"),
     }
 
 

@@ -33,7 +33,8 @@ EDITIONS = (
 SIGNALS: tuple[tuple[str, str], ...] = (
     (r"arxiv[:\s]*\d{4}\.\d{4,5}", "PREPRINT"),
     (r"arxiv preprint|eartharxiv|essoar|biorxiv", "PREPRINT"),
-    (r"manuscript submitted to|submitted to [A-Z]", "PREPRINT"),
+    # `classify` casefolds first, so these patterns are written in lower case.
+    (r"manuscript submitted to|preprint submitted to", "PREPRINT"),
     (r"this (?:is a |)preprint|preprint (?:submitted|under|has not|repository)", "PREPRINT"),
     (r"non-?peer reviewed preprint|not (?:yet |)(?:been |)peer[- ]reviewed", "PREPRINT"),
     (r"accepted manuscript|author accepted manuscript", "ACCEPTED_MANUSCRIPT"),
@@ -61,3 +62,27 @@ def classify(quote: str) -> str | None:
         if re.search(pattern, text):
             return edition
     return None
+
+
+#: A DOI alone does not prove a file is the published article: an accepted manuscript and
+#: a publisher's proof print the DOI of the article they will become. So a record labelled
+#: `VERSION_OF_RECORD` must also have, somewhere on the page its evidence cites, a mark
+#: only a published article carries — the citation line, the editorial dates, the
+#: copyright line, or the article number. `test_corpus_v2_edition` asserts it against the
+#: page text, so the weakest label in the vocabulary is the one with two checks on it.
+PUBLICATION_MARKERS: tuple[tuple[str, str], ...] = (
+    ("citation line", r"\b\d{1,4}\s*\(\d{1,3}\)\s*[:,]\s*\d+"
+                      r"|\(\s*(?:19|20)\d\d\s*\)\s*\d{1,4}\s*:\s*\d{1,6}"
+                      r"|\b\d{1,3},\s*\d{1,5}\s*[-\u2013]\s*\d{1,5},\s*(?:19|20)\d\d"
+                      r"|\bvol(?:ume)?\.?\s*\d+"),
+    ("editorial dates", r"received[^.]{0,120}(?:accepted|published)"
+                        r"|published\s*(?:online|:)?\s*\d|advance access publication"),
+    ("copyright", r"\u00a9|\(c\)\s*(?:19|20)\d\d|\bcopyright\b"),
+    ("article number", r"\bissn\b|article\s*(?:no\.?|number)\s*\d|\be\d{4}[a-z]{2}\d{5,}"),
+)
+
+
+def publication_markers(page_text: str) -> list[str]:
+    """The marks of a published article found on a page, if any."""
+    text = re.sub(r"\s+", " ", page_text).casefold()
+    return [name for name, pattern in PUBLICATION_MARKERS if re.search(pattern, text)]

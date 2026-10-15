@@ -8,6 +8,8 @@ import httpx
 from hashlib import sha256
 from typing import Any
 
+from pydantic import BaseModel
+
 from ocean_research_hub.schemas.paper_record import (
     Bibliography,
     EvidenceField,
@@ -21,10 +23,12 @@ from ocean_research_hub.schemas.paper_record import (
     TextListField,
     VerificationStatus,
 )
+from ocean_research_hub.research.models import SourceEditionCreate, SourceEditionType
 
 from .errors import (
     IngestionConflictError,
     IngestionError,
+    InvalidArxivError,
     InvalidDoiError,
     MetadataProviderError,
     ParserError,
@@ -41,6 +45,9 @@ from .pdf import PdfParser, ScientificExtractor, read_pdf_path
 from .repository import PaperRepository
 
 DOI_PATTERN = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
+ARXIV_PATTERN = re.compile(
+    r"^(?:\d{4}\.\d{4,5}|[a-z][a-z.\-]+/\d{7})(?:v\d+)?$", re.IGNORECASE
+)
 
 
 def normalize_doi(value: str) -> str:
@@ -61,6 +68,18 @@ def normalize_doi(value: str) -> str:
     return normalized
 
 
+def normalize_arxiv(value: str) -> str:
+    normalized = value.strip()
+    for prefix in ("https://arxiv.org/abs/", "http://arxiv.org/abs/", "arxiv:"):
+        if normalized.lower().startswith(prefix):
+            normalized = normalized[len(prefix):]
+            break
+    normalized = normalized.strip().lower()
+    if not ARXIV_PATTERN.fullmatch(normalized):
+        raise InvalidArxivError(f"invalid arXiv identifier: {value}")
+    return re.sub(r"v\d+$", "", normalized)
+
+
 class PaperIngestionService:
     def __init__(
         self,
@@ -78,6 +97,7 @@ class PaperIngestionService:
         self.scientific_extractor = scientific_extractor or ScientificExtractor()
 
     async def ingest(self, request: IngestPaperRequest) -> IngestPaperResponse:
+        source_edition: SourceEditionCreate | None = None
         requested_doi = normalize_doi(request.doi) if request.doi else None
         metadata = request.metadata
         # A DOI can identify a caller-supplied parsed record without authorizing a
@@ -99,11 +119,17 @@ class PaperIngestionService:
         metadata_doi = (
             normalize_doi(metadata.doi) if metadata and metadata.doi else None
         )
+        metadata_arxiv = (
+            normalize_arxiv(metadata.arxiv) if metadata and metadata.arxiv else None
+        )
+        if metadata is not None and metadata_arxiv is not None:
+            metadata = metadata.model_copy(update={"arxiv": metadata_arxiv})
         if requested_doi and metadata_doi and requested_doi != metadata_doi:
             raise IngestionConflictError(
                 f"requested DOI {requested_doi} does not match metadata DOI {metadata_doi}"
             )
         canonical_doi = requested_doi or metadata_doi
+        canonical_arxiv = metadata_arxiv
 
         extraction_warnings: list[str] = []
         if request.parsed_paper is None and (request.pdf_path is not None or request.pdf_url is not None or (metadata and metadata.pdf_url)):
@@ -119,6 +145,15 @@ class PaperIngestionService:
                         content, source_name = response.content, str(pdf_url).rsplit("/", 1)[-1] or "paper.pdf"
                 except (httpx.HTTPError, OSError) as exc:
                     raise ParserError(f"could not download PDF source: {pdf_url}") from exc
+            content_hash = sha256(content).hexdigest()
+            source_edition = SourceEditionCreate(
+                edition_key=f"pdf-sha256:{content_hash}",
+                source_type=SourceEditionType.PRIMARY_PDF,
+                uri=pdf_url,
+                content_hash=content_hash,
+                version_label=source_name,
+                is_primary=True,
+            )
             parsed_pdf = self.pdf_parser.parse(content, source_name=source_name)
             extracted = self.scientific_extractor.extract(parsed_pdf)
             record = extracted.record
@@ -138,6 +173,13 @@ class PaperIngestionService:
             workflow_status = PaperWorkflowStatus.EXTRACTED
 
         record = record.model_copy(deep=True)
+        # Keep the source's claims separate from bibliography subsequently filled
+        # from a metadata provider. The latter must not acquire primary provenance.
+        source_record = record.model_copy(deep=True)
+        source_json = json.dumps(
+            source_record.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+        )
+        source_hash = sha256(source_json.encode("utf-8")).hexdigest()
         warnings: list[str] = extraction_warnings
         if metadata is not None:
             self._merge_metadata(record.paper, metadata, canonical_doi, warnings)
@@ -159,13 +201,62 @@ class PaperIngestionService:
             record.paper.doi = TextField.model_validate(doi_field)
             canonical_doi = canonical_doi or normalized_record_doi
 
+        record_arxiv = record.paper.arxiv.value
+        if record_arxiv is not None:
+            normalized_record_arxiv = normalize_arxiv(record_arxiv)
+            if canonical_arxiv and normalized_record_arxiv != canonical_arxiv:
+                raise IngestionConflictError(
+                    f"parsed paper arXiv ID {normalized_record_arxiv} does not match "
+                    f"metadata arXiv ID {canonical_arxiv}"
+                )
+            arxiv_field = record.paper.arxiv.model_dump()
+            arxiv_field["value"] = normalized_record_arxiv
+            record.paper.arxiv = TextField.model_validate(arxiv_field)
+            canonical_arxiv = canonical_arxiv or normalized_record_arxiv
+
         canonical_json = json.dumps(
             record.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
         )
+        record_hash = sha256(canonical_json.encode("utf-8")).hexdigest()
+        if source_edition is None:
+            if request.parsed_paper is not None:
+                source_edition = SourceEditionCreate(
+                    edition_key=f"paper-record-sha256:{source_hash}",
+                    source_type=SourceEditionType.OTHER,
+                    content_hash=f"paper-record:{source_hash}",
+                    version_label="canonical PaperRecord import",
+                    is_primary=self._has_primary_source_evidence(record),
+                )
+            elif metadata is not None:
+                source_type = (
+                    SourceEditionType.CROSSREF_METADATA
+                    if metadata.source_origin is SourceOrigin.CROSSREF_METADATA
+                    else SourceEditionType.PUBLISHER_METADATA
+                    if metadata.source_origin is SourceOrigin.PUBLISHER_METADATA
+                    else SourceEditionType.OTHER
+                )
+                source_edition = SourceEditionCreate(
+                    edition_key=f"metadata:{metadata.source_origin.value}:{canonical_doi or record_hash}",
+                    source_type=source_type,
+                    uri=metadata.publisher_url,
+                    version_label=metadata.source_origin.value,
+                )
         identity_key = (
             f"doi:{canonical_doi}"
             if canonical_doi
+            else f"arxiv:{canonical_arxiv}"
+            if canonical_arxiv
             else f"content:{sha256(canonical_json.encode('utf-8')).hexdigest()}"
+        )
+        identifiers = {
+            key: value for key, value in {
+                "DOI": canonical_doi, "ARXIV": canonical_arxiv,
+            }.items() if value is not None
+        }
+        snapshot_for_ingest = getattr(self.repository, "snapshot_for_ingest", None)
+        previous = (
+            snapshot_for_ingest(identity_key, canonical_doi, identifiers)
+            if snapshot_for_ingest is not None else None
         )
         try:
             paper, created = self.repository.create_or_get(
@@ -174,12 +265,57 @@ class PaperIngestionService:
                 record=record,
                 workflow_status=workflow_status,
                 warnings=warnings,
+                identifiers=identifiers,
             )
+            sync_research_record = getattr(self.repository, "sync_research_record", None)
+            if sync_research_record is not None:
+                try:
+                    # Project only claims supplied by this edition. Bibliography
+                    # filled from secondary metadata is not a claim of the PDF or
+                    # parsed primary record; explicit missing fields remain visible.
+                    sync_research_record(
+                        paper.id,
+                        source_record if source_edition and source_edition.is_primary else record,
+                        source_edition,
+                        include_missing_bibliography=True,
+                    )
+                except Exception:
+                    if created:
+                        discard_created = getattr(self.repository, "discard_created", None)
+                        if discard_created is not None:
+                            discard_created(paper.id)
+                    elif previous is not None:
+                        restore = getattr(self.repository, "restore_failed_upgrade", None)
+                        if restore is not None:
+                            current_json = json.dumps(
+                                paper.record.model_dump(mode="json"),
+                                sort_keys=True, separators=(",", ":"),
+                            )
+                            restore(previous, sha256(current_json.encode("utf-8")).hexdigest())
+                    raise
         except IngestionError:
             raise
         except Exception as exc:
             raise PersistenceError("paper repository write failed") from exc
         return IngestPaperResponse(created=created, paper=paper)
+
+    @staticmethod
+    def _has_primary_source_evidence(record: PaperRecord) -> bool:
+        """Do not label a structured import primary unless its evidence says so."""
+        def fields(model: BaseModel):
+            for name in type(model).model_fields:
+                value = getattr(model, name)
+                if isinstance(value, EvidenceField):
+                    yield value
+                elif isinstance(value, BaseModel):
+                    yield from fields(value)
+
+        return any(
+            evidence.is_primary_author_source
+            for field in fields(record)
+            for evidence in (field.source, *field.sources)
+            if evidence.is_supplied
+        )
 
     @staticmethod
     def _merge_metadata(

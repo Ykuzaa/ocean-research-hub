@@ -3,6 +3,11 @@
   "source_id": "observation-only-dl",
   "file": ".data/golden-pdfs/observation-only-deep-learning-for-gappy-satellite-derived-o.pdf",
   "sha256_prefix": "1b70322060328bd56e0d0b23",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2503.11532v1 [eess.IV] 14 Mar 2025"
+  },
   "pdf_pages": 10,
   "printed_page_offset": 0,
   "extracted_by": "paper-extractor (claude-sonnet-5-5)",

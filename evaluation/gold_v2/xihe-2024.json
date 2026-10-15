@@ -3,6 +3,11 @@
   "source_id": "xihe-2024",
   "file": ".data/golden-pdfs/xihe-2024.pdf",
   "sha256_prefix": "a7d1c25ed007983fb496ab17",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2402.02995v4 [physics.ao-ph] 22 Oct 2024"
+  },
   "pdf_pages": 18,
   "printed_page_offset": 0,
   "extracted_by": "claude-sonnet-5-5",

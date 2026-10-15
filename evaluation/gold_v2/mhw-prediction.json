@@ -3,6 +3,11 @@
     "source_id": "mhw-prediction",
     "file": ".data/golden-pdfs/machine-learning-techniques-for-marine-heatwave-prediction-a.pdf",
     "sha256_prefix": "ed48a1b9d0a03d4664f17d5a",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "https://doi.org/10.1007/s44295-025-00076-1"
+    },
     "pdf_pages": 20,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

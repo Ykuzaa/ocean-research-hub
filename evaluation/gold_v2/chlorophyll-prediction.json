@@ -3,6 +3,11 @@
     "source_id": "chlorophyll-prediction",
     "file": ".data/golden-pdfs/spatiotemporal-prediction-of-chlorophyll-a-in-semi-enclosed.pdf",
     "sha256_prefix": "b8709561b0f4b98a95385f2f",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "Rep (2026). https://doi.org/10.1038/"
+    },
     "pdf_pages": 59,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

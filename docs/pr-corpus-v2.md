@@ -5,15 +5,20 @@ verbatim quotes. This branch replaces that with a corpus where the unit of recor
 **experiment** and the **result**, and where no value exists without the sentence it was
 read from.
 
-- **43 records** — 37 papers read in full, 6 recorded as reviews that train no model.
-- **137 experiments, 433 measured results, 1,424 sourced claims.**
+- **45 records** — 38 papers read in full, 7 recorded as reviews that train no model.
+- **141 experiments, 442 measured results, 1,463 sourced claims.**
 - `corpus_v2.gate` re-locates every quote on the page it cites and checks the stored value
-  follows from it. 43/43 records pass with no warning, on every commit, in CI.
+  follows from it. 45/45 records pass with no warning. It runs where the source PDFs are,
+  which is **not** CI: they are 369 MB of publisher files and are not versioned, so the
+  gate's 45 tests skip there, visibly, instead of passing on nothing.
 - Every claim was then read a **second time, independently, against the PDF**, to check it
   was read in the right context: 1,388 confirmed, 36 flagged, every flag ruled on, 31
   records corrected.
+- Each record says which **edition** of the paper was read — published article, accepted
+  manuscript, author manuscript or preprint — and proves it with a quote the gate
+  relocates. 22 of the 45 were read in a preprint.
 - The three states stay three different words: **sourced → re-checked → audited**. 0 of
-  the 1,424 claims is audited by a human, and every surface says so.
+  the 1,463 claims is audited by a human, and every surface says so.
 
 ## What you can do with it
 

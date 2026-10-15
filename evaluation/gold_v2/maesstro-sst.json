@@ -3,6 +3,11 @@
     "source_id": "maesstro-sst",
     "file": ".data/golden-pdfs/maesstro-masked-autoencoders-for-sea-surface-temperature-rec.pdf",
     "sha256_prefix": "5877febf73ef032e71c6bef8",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "https://doi.org/10.5194/os-20-1309-2024"
+    },
     "pdf_pages": 15,
     "printed_page_offset": 1308,
     "extracted_by": "paper-extractor",

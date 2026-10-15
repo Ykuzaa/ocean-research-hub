@@ -3,6 +3,11 @@
     "source_id": "oai-0101-arxiv-2512.04452v1",
     "file": ".data/golden-pdfs/oai-0101-arxiv-2512.04452v1.pdf",
     "sha256_prefix": "cb4cd3dba2e4c903a9343eba",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2512.04452v1 [physics.ao-ph] 4 Dec 2025"
+    },
     "pdf_pages": 48,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5 subagent",

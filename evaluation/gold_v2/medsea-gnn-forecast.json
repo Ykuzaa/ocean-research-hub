@@ -3,6 +3,11 @@
   "source_id": "medsea-gnn-forecast",
   "file": ".data/golden-pdfs/accurate-mediterranean-sea-forecasting-via-graph-based-deep.pdf",
   "sha256_prefix": "99a540eab58859593944941d",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2506.23900v1 [physics.ao-ph] 30 Jun 2025"
+  },
   "pdf_pages": 39,
   "printed_page_offset": 0,
   "extracted_by": "paper-extractor (claude-sonnet-5-5)",

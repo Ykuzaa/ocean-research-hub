@@ -3,6 +3,11 @@
     "source_id": "near-coastal-sst",
     "file": ".data/golden-pdfs/a-deep-learning-approach-for-near-coastal-sea-surface-temper.pdf",
     "sha256_prefix": "54c31e1fc20debd54e305ab4",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fmars.2026.1798048"
+    },
     "pdf_pages": 15,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor",

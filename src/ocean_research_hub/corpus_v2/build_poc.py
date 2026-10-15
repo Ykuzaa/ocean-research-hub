@@ -72,6 +72,8 @@ def _paper_view(path: pathlib.Path) -> dict:
         "doi": record["paper"].get("doi"),
         "pdf_pages": record["source"].get("pdf_pages"),
         "sha": record["source"].get("sha256_prefix"),
+        "edition": record["source"].get("edition"),
+        "edition_evidence": record["source"].get("edition_evidence"),
         "domains": record["paper"].get("ocean_domains", []),
         "excluded": record.get("excluded"),
         "proposed": [m["canonical_name"] for m in record.get("methods", [])
@@ -134,6 +136,9 @@ def build(gold_dir: pathlib.Path, manifest: pathlib.Path | None = None) -> dict:
         "cells": len(cells),
         "shared_cells": len(shared),
         "figures_only": [paper["slug"] for paper in usable if not paper["results"]],
+        # The edition of every file read, excluded papers included: it describes the
+        # source, not the usefulness of what was extracted from it.
+        "editions": dict(collections.Counter(paper["edition"] for paper in views)),
         "access": access_report(manifest) if manifest else None,
         "recheck": recheck.progress(store.all_claims(gold_dir), recheck.load_ledger(),
                                     recheck.load_triage()),
@@ -162,6 +167,9 @@ def main() -> int:
     print(f"{agg['experiments']} expériences, {agg['results']} résultats, {agg['quotes']} citations")
     print(f"comparabilité: {agg['shared_cells']} cellule(s) partagée(s) sur {agg['cells']}")
     print(f"résultats uniquement en figures: {len(agg['figures_only'])} papier(s)")
+    editions = ", ".join(f"{count} {name.lower().replace('_', ' ')}"
+                         for name, count in sorted(agg["editions"].items(), key=lambda kv: -kv[1]))
+    print(f"éditions lues: {editions}")
     r = agg["recheck"]
     print(f"seconde lecture: {r['confirmed']}/{r['claims']} confirmées, {r['flagged']} signalées "
           f"({r['corrected']} corrigées, {r['flag_dismissed']} écartées)")

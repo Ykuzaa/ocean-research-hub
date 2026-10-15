@@ -3,6 +3,11 @@
     "source_id": "fno-ocean-dynamics",
     "file": ".data/golden-pdfs/streamlining-ocean-dynamics-modeling-with-fourier-neural-ope.pdf",
     "sha256_prefix": "558a62fa9b4aa9a769e5d9f3",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2404.05768v2 [cs.LG] 10 Apr 2024"
+    },
     "pdf_pages": 15,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

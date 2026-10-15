@@ -3,6 +3,11 @@
     "source_id": "learning-based-numerical-ocean",
     "file": ".data/golden-pdfs/learning-based-methods-and-the-future-of-numerical-ocean-and.pdf",
     "sha256_prefix": "8c172a4c03088c845eb691fd",
+    "edition": "ACCEPTED_MANUSCRIPT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "https://doi.org/10.1146/((please add"
+    },
     "pdf_pages": 26,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",
     "extracted_at": "2026-10-14",

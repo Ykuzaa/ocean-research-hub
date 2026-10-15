@@ -3,6 +3,11 @@
     "source_id": "hybrid-ml-da-biogeo",
     "file": ".data/golden-pdfs/hybrid-machine-learning-data-assimilation-for-marine-biogeoc.pdf",
     "sha256_prefix": "e4ee3725c865e6828d597c3f",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2504.05218v1 [physics.ao-ph] 7 Apr 2025"
+    },
     "pdf_pages": 31,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5",

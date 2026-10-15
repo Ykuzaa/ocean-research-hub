@@ -3,6 +3,11 @@
     "source_id": "4dvarnet-ssh-2023",
     "file": ".data/golden-pdfs/4dvarnet-ssh-2023.pdf",
     "sha256_prefix": "bfad134ecdf1a4786ee4fdad",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "https://doi.org/10.5194/gmd-16-2119-2023"
+    },
     "pdf_pages": 29,
     "printed_page_offset": 2118,
     "extracted_by": "claude-sonnet-5-5",

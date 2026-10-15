@@ -3,6 +3,11 @@
   "source_id": "hidra-sea-level",
   "file": ".data/golden-pdfs/hidra-d-deep-learning-model-for-dense-sea-level-forecasting.pdf",
   "sha256_prefix": "ec8f3a094ac97a59c04016a1",
+  "edition": "VERSION_OF_RECORD",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "https://doi.org/10.5194/gmd-19-2177-2026"
+  },
   "pdf_pages": 19,
   "printed_page_offset": 2176,
   "extracted_by": "paper-extractor (claude-sonnet-5-5)",

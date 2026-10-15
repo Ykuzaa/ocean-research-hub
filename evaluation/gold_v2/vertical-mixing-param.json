@@ -3,6 +3,11 @@
     "source_id": "vertical-mixing-param",
     "file": ".data/golden-pdfs/parameterizing-vertical-mixing-coefficients-in-the-ocean-sur.pdf",
     "sha256_prefix": "8f17aac5aedf75ed45285601",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2306.09045v3 [physics.ao-ph] 6 Sep 2023"
+    },
     "pdf_pages": 35,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

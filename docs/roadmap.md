@@ -17,8 +17,8 @@ It is not a leaderboard, and it cannot become one from this literature: of 117
 
 | State | What guarantees it | Where it stands |
 |---|---|---|
-| **sourced** | `corpus_v2.gate` re-locates the quote on the page it cites and checks the value follows from it | 1,424 claims, 43/43 records pass |
-| **re-checked** | a second independent machine reading of the paper, checking the value was read in the right context | 1,424 claims, 1,388 confirmed, 36 flagged and all ruled on |
+| **sourced** | `corpus_v2.gate` re-locates the quote on the page it cites and checks the value follows from it | 1,463 claims, 45/45 records pass |
+| **re-checked** | a second independent machine reading of the paper, checking the value was read in the right context | 1,463 claims, 1,427 confirmed, 36 flagged and all ruled on |
 | **audited** | a person reads the paper and signs a verdict in `/revue` | **0** |
 
 The third row is the one that matters, and no amount of compute moves it. The audit queue

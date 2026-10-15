@@ -3,6 +3,11 @@
   "source_id": "neural-synthetic-profiles",
   "file": ".data/golden-pdfs/neural-synthetic-profiles-from-remote-sensing-and-observatio.pdf",
   "sha256_prefix": "0e42c832c70a5fd69f1dfc2d",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 2,
+   "quote": "Preprint submitted to Ocean Modelling January 31, 2025"
+  },
   "pdf_pages": 34,
   "printed_page_offset": -1,
   "extracted_by": "claude-sonnet-5-5",

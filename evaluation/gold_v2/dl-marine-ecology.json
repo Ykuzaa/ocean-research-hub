@@ -3,6 +3,11 @@
   "source_id": "unlocking-the-potential-of-deep-learning-for-marine-ecology",
   "file": ".data/golden-pdfs/unlocking-the-potential-of-deep-learning-for-marine-ecology.pdf",
   "sha256_prefix": "6c09458850f5c9295a2be7b0",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2109.14737v1 [cs.LG] 29 Sep 2021"
+  },
   "pdf_pages": 44,
   "printed_page_offset": 0,
   "extracted_by": "claude-sonnet-5-5",

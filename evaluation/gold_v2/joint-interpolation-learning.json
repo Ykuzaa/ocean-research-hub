@@ -3,6 +3,11 @@
     "source_id": "joint-interpolation-learning",
     "file": ".data/golden-pdfs/joint-interpolation-and-representation-learning-for-irregula.pdf",
     "sha256_prefix": "f2b7231412189a389368574b",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fams.2021.655224"
+    },
     "pdf_pages": 13,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

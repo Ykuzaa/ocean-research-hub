@@ -9,10 +9,12 @@ The scientific and multi-agent operating contract is in [`AGENTS.md`](AGENTS.md)
 
 ## Corpus v2: every value with the sentence it was read from
 
-The evidence-gated corpus lives in `evaluation/gold_v2/` — 43 records, 137 experiments,
-434 measured results, 1,450 claims, each carrying a verbatim quote and its PDF page, all
-re-located on every commit by `corpus_v2.gate`. Browse it at `/corpus`, audit it at
-`/revue`. The pipeline, the API, the states and the measured ceilings are in
+The evidence-gated corpus lives in `evaluation/gold_v2/` — 45 records, 141 experiments,
+442 measured results, 1,463 claims, each carrying a verbatim quote and its PDF page, all
+re-located by `corpus_v2.gate` wherever the source PDFs are (not in CI: they are not
+versioned). Each record also says **which edition of the paper was read** and proves it
+with a quote: 22 of the 45 were read in a preprint, not in the published article. Browse
+it at `/corpus`, audit it at `/revue`. The pipeline, the API, the states and the measured ceilings are in
 [`docs/corpus-v2.md`](docs/corpus-v2.md); the extraction contract is in
 [`evaluation/gold_v2/SCHEMA.md`](evaluation/gold_v2/SCHEMA.md).
 

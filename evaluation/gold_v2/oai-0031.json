@@ -3,6 +3,11 @@
     "source_id": "oai-0031-fmars-2023-1079286",
     "file": ".data/golden-pdfs/oai-0031-fmars-2023-1079286.pdf",
     "sha256_prefix": "aecde959829c0e36bec232d4",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fmars.2023.1079286"
+    },
     "pdf_pages": 10,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5",

@@ -26,11 +26,21 @@ def client(tmp_path: pathlib.Path) -> TestClient:
 
 @pytest.mark.parametrize("path", RECORDS, ids=[p.stem for p in RECORDS])
 def test_claims_cover_everything_the_gate_checks_and_more(path: pathlib.Path) -> None:
-    """The audit queue may never be narrower than the deterministic gate."""
+    """The audit queue may never be narrower than the deterministic gate.
+
+    The one admitted exception is provenance: a node that says which edition of the
+    paper was read carries no value, so a human verdict on it would mean nothing. The
+    gate still relocates its quote and `test_corpus_v2_edition` still proves the label
+    follows from it, so nothing goes unchecked — it is checked somewhere else.
+    """
     record = json.loads(path.read_text())
     claims = list(store.claims(path.stem, record))
-    assert {path_ for path_, _ in walk(record)} <= {claim["path"] for claim in claims}
-    assert len(claims) == len(list(walk(record))) + len(list(store.walk_unquoted(record)))
+    gated = {path_ for path_, _ in walk(record)}
+    assert gated - store.PROVENANCE_PATHS <= {claim["path"] for claim in claims}
+    assert not gated & store.PROVENANCE_PATHS & {claim["path"] for claim in claims}
+    assert len(claims) == (
+        len(gated - store.PROVENANCE_PATHS) + len(list(store.walk_unquoted(record)))
+    )
 
 
 @pytest.mark.parametrize("path", RECORDS, ids=[p.stem for p in RECORDS])

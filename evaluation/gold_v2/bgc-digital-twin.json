@@ -3,6 +3,11 @@
     "source_id": "bgc-digital-twin",
     "file": ".data/golden-pdfs/future-digital-twins-emulating-a-highly-complex-marine-bioge.pdf",
     "sha256_prefix": "2885a6692ef2345fd14c7f8c",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fmars.2023.1058837"
+    },
     "pdf_pages": 16,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor",

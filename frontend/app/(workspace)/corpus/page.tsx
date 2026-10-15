@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ApiError } from "@/app/lib/api";
-import { familyLabel, getCorpusSummary, listCorpusV2Papers, taskLabel } from "@/app/lib/corpusV2";
+import {
+  EDITION_LABEL, familyLabel, getCorpusSummary, listCorpusV2Papers, taskLabel } from "@/app/lib/corpusV2";
 
 function one(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -144,6 +145,11 @@ export default async function CorpusPage({
               <p className="mt-1 text-sm text-ink-400">
                 {[paper.year, paper.venue, paper.doi].filter(Boolean).join(" · ")}
               </p>
+              {paper.edition && paper.edition !== "VERSION_OF_RECORD" ? (
+                <p className="mt-1 text-xs text-ink-600">
+                  Lu dans une {EDITION_LABEL[paper.edition]}, pas dans l’article publié
+                </p>
+              ) : null}
               {paper.excluded ? (
                 <p className="mt-2 text-sm text-ink-600">Écarté : {paper.excluded}</p>
               ) : (

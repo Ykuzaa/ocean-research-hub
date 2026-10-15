@@ -71,6 +71,30 @@ The ledger is `evaluation/audit_v2/verdicts.json`, overridable with `OCEAN_AUDIT
 corpus. It is written through a temporary file: an interrupted session cannot truncate
 the verdicts already given.
 
+## Which edition of the paper was read
+
+A preprint's table is not always the published one. Half of this corpus was read in a
+file that is not the version of record, so every record names its edition and proves it
+with a quote from the file itself:
+
+| Edition | Records | What it means |
+|---|---|---|
+| `PREPRINT` | 22 | an arXiv or EarthArXiv deposit, or a "submitted to" footer |
+| `VERSION_OF_RECORD` | 20 | the publisher's typeset article |
+| `ACCEPTED_MANUSCRIPT` | 2 | accepted, not typeset: an IEEE early-access page, a proof |
+| `AUTHOR_MANUSCRIPT` | 1 | the authors' own file, deposited nowhere |
+
+The proof is a node the gate relocates like any other quote, and
+`corpus_v2.edition.classify` must read the declared label back out of it
+(`tests/test_corpus_v2_edition.py`), so a label its own evidence does not carry fails the
+build. The evidence node carries no `value`, so it never enters the human audit queue:
+there is nothing left for a verdict to settle that the gate and the classifier do not.
+
+The edition describes **the file that was read**, not the paper's publication status. An
+arXiv file whose article has since appeared in a journal stays `PREPRINT`, because the
+numbers in the corpus came from the arXiv file. `/corpus` says so on every row that is
+not the published article, and the record page carries the caveat and the proof.
+
 ## The states, and what each one promises
 
 | State | Meaning |
@@ -121,7 +145,7 @@ PDFs, and those are not in the repository (369 MB of publisher files). Those tes
 therefore *skipped* in CI, visibly, and run locally where the PDFs are:
 
 ```bash
-uv run pytest tests/test_corpus_v2.py -q    # 43 records gated, locally
+uv run pytest tests/test_corpus_v2.py -q    # 45 records gated, locally
 ```
 
 A green tick in CI means the structure, the ledgers and the app hold. It does not mean the

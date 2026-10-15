@@ -3,6 +3,11 @@
     "source_id": "local-to-largescale-mapping",
     "file": ".data/golden-pdfs/from-local-training-to-large-scale-mapping-a-comparative-ass.pdf",
     "sha256_prefix": "ecf661ce2555020beefa0300",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2606.02764v1 [cs.CV] 1 Jun 2026"
+    },
     "pdf_pages": 42,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

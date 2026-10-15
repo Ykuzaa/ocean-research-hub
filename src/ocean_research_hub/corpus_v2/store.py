@@ -30,6 +30,12 @@ TRAINING_ORDER = ("loss", "optimizer", "learning_rate", "batch_size", "epochs", 
 
 _TOKENS = re.compile(r"([A-Za-z_][A-Za-z_0-9]*)|\[(\d+)\]")
 
+#: Quoted nodes that are provenance, not a claim about the science. The gate proves the
+#: quote exists and `test_corpus_v2_edition` proves the declared edition follows from it,
+#: so there is nothing left for a human verdict to add — and a claim nobody can rule on
+#: would sit in the queue for ever.
+PROVENANCE_PATHS = frozenset({"source.edition_evidence"})
+
 #: Results carry the measurement, so they are audited first; identity evidence last.
 KIND_PRIORITY = {
     "RESULT": 0,
@@ -184,6 +190,8 @@ def walk_unquoted(node: Any, path: str = "") -> Iterator[tuple[str, dict]]:
 def claims(slug: str, record: dict) -> Iterator[dict]:
     """One claim per value carrying evidence: every quoted node, plus the unquotable ones."""
     for path, node in list(walk(record)) + list(walk_unquoted(record)):
+        if path in PROVENANCE_PATHS:
+            continue
         tokens = _parse(path)
         kind, field, context = _context(record, tokens, node)
         value = node.get("value", node.get("claim"))
@@ -253,6 +261,9 @@ def paper_summary(slug: str, record: dict) -> dict:
         "result_count": len(record.get("results", [])),
         "claim_count": sum(1 for _ in walk(record)),
         "pdf_pages": record["source"].get("pdf_pages"),
+        # Which file the claims were read from: half the corpus is not the published
+        # article, and a reader has to see that before comparing two papers' numbers.
+        "edition": record["source"].get("edition"),
     }
 
 

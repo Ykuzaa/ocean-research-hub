@@ -3,6 +3,11 @@
     "source_id": "oai-0091-fmars-2025-1613061",
     "file": ".data/golden-pdfs/oai-0091-fmars-2025-1613061.pdf",
     "sha256_prefix": "68b32d70ba677a595e5b87ba",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fmars.2025.1613061"
+    },
     "pdf_pages": 18,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5 subagent",

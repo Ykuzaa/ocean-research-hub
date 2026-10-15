@@ -3,6 +3,11 @@
     "source_id": "ml-mixing-equations",
     "file": ".data/golden-pdfs/machine-learned-equations-for-vertical-mixing-coefficients-i.pdf",
     "sha256_prefix": "337808fd1fb2b60f1a4aa850",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "e2026GL122106.https://doi.org/10.1029/"
+    },
     "pdf_pages": 12,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5",

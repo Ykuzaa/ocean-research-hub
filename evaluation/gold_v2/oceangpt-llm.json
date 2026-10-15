@@ -3,6 +3,11 @@
     "source_id": "oceangpt-llm",
     "file": ".data/golden-pdfs/oceangpt-a-large-language-model-for-ocean-science-tasks.pdf",
     "sha256_prefix": "6de7931af232b841e27a4692",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "August 11-16, 2024 ©2024 Association for Computational Linguistics"
+    },
     "pdf_pages": 16,
     "printed_page_offset": 3356,
     "extracted_by": "paper-extractor",

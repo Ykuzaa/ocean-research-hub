@@ -353,3 +353,86 @@ export function roleLabel(role: string): string {
 export function fieldLabel(field: string): string {
   return FIELD_LABEL[field] ?? field.replace(/_/g, " ");
 }
+
+/* ---------- vues par entité (issues #22, #23) ---------- */
+
+export type EntityKind = "family" | "task" | "dataset" | "dataset_group" | "variable" | "method";
+
+export type Reporting = Record<string, { reported: number; of: number }>;
+
+export type EntitySummary = {
+  name: string;
+  papers: number;
+  experiments: number;
+  results: number;
+  tasks: Record<string, number>;
+  families: Record<string, number>;
+  datasets: Record<string, number>;
+  variables: Record<string, number>;
+  methods: Record<string, number>;
+  metrics: Record<string, number>;
+  reporting: Reporting;
+};
+
+export type EntityDetail = EntitySummary & {
+  kind: EntityKind;
+  paper_list: Array<{ slug: string; title: string; year: number | null }>;
+  experiment_list: Array<{
+    slug: string; id: string; task: string; method: string | null; family: string | null;
+    datasets: string[]; variable: string | null; reported: string[]; missing: string[]; results: number;
+  }>;
+  problems: Array<{ theme: string; slug: string; title: string; quote: string | null; page: number | null }>;
+  comparability: string;
+};
+
+export type Analysis = {
+  notice: string;
+  entities: Record<EntityKind, EntitySummary[]>;
+  coverage: {
+    tasks: string[];
+    families: string[];
+    matrix: Array<{ task: string; cells: Array<{ family: string; papers: number }> }>;
+    empty_cells: Array<{ task: string; family: string }>;
+    caveat: string;
+  };
+  problems: Record<string, {
+    papers: number;
+    items: Array<{ slug: string; title: string; quote: string | null; page: number | null }>;
+  }>;
+};
+
+export function getAnalysis(): Promise<Analysis> {
+  return v2("/api/v2/analysis");
+}
+
+export function getEntity(kind: EntityKind, name: string): Promise<EntityDetail> {
+  return v2(`/api/v2/entities/${kind}/${encodeURIComponent(name)}`);
+}
+
+export const ENTITY_LABEL: Record<EntityKind, string> = {
+  family: "architecture",
+  task: "objectif",
+  dataset: "jeu de données (nom du papier)",
+  dataset_group: "source de données",
+  variable: "variable prédite",
+  method: "méthode nommée",
+};
+
+export const THEME_LABEL: Record<string, string> = {
+  DATA: "données",
+  COMPUTE: "calcul",
+  GENERALIZATION: "généralisation",
+  PHYSICS: "physique",
+  UNCERTAINTY: "incertitude",
+  REPRODUCIBILITY: "reproductibilité",
+  EVALUATION: "évaluation",
+  FUTURE_WORK: "suite annoncée",
+  OTHER: "autre",
+};
+
+/** The label a page shows for an entity name, by kind. */
+export function entityName(kind: EntityKind, name: string): string {
+  if (kind === "family") return familyLabel(name);
+  if (kind === "task") return taskLabel(name);
+  return name;
+}

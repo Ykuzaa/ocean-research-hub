@@ -177,3 +177,64 @@ def test_queue_can_be_narrowed_to_one_paper(client: TestClient) -> None:
     queue = client.get("/api/v2/review/queue", params={"slug": "dincae-2-2022", "limit": 50}).json()
     assert queue["claims"]
     assert {claim["slug"] for claim in queue["claims"]} == {"dincae-2-2022"}
+
+
+# --- entity views (issues #22, #23) -------------------------------------------------
+
+def test_entity_views_are_built_only_from_sourced_experiments() -> None:
+    from ocean_research_hub.corpus_v2 import entities
+
+    overview = entities.overview(GOLD)
+    experiments = sum(len(p["experiments"]) for p in
+                      [store.paper_detail(s, r) for s, r in store.load_records(GOLD)])
+    # Every experiment is indexed under its task, so the task counts must add up exactly.
+    assert sum(row["experiments"] for row in overview["entities"]["task"]) == experiments
+    assert {row["name"] for row in overview["entities"]["family"]} <= set(
+        json.loads((GOLD / "dincae-2-2022.json").read_text()) and
+        {"CNN_UNET", "CNN_AUTOENCODER", "CNN_GENERIC", "MLP_DNN", "TRANSFORMER",
+         "FNO_NEURAL_OPERATOR", "NEURAL_ODE", "GNN", "RNN_LSTM_GRU", "CNN_RNN_HYBRID",
+         "DIFFUSION", "GAN", "SYMBOLIC_REGRESSION", "HYBRID_PHYSICS_ML",
+         "VARIATIONAL_ANALYSIS", "CLASSICAL_ML", "CLASSICAL_BASELINE", "OTHER"})
+
+
+def test_reporting_rates_are_a_share_of_the_experiments_they_cover() -> None:
+    from ocean_research_hub.corpus_v2 import entities
+
+    for kind, rows in entities.overview(GOLD)["entities"].items():
+        for row in rows:
+            for field, rate in row["reporting"].items():
+                assert rate["of"] == row["experiments"], (kind, row["name"], field)
+                assert 0 <= rate["reported"] <= rate["of"], (kind, row["name"], field)
+
+
+def test_the_coverage_matrix_counts_papers_not_experiments() -> None:
+    from ocean_research_hub.corpus_v2 import entities
+
+    coverage = entities.overview(GOLD)["coverage"]
+    filled = [cell for row in coverage["matrix"] for cell in row["cells"] if cell["papers"]]
+    assert filled, "the corpus has at least one task-family pair"
+    assert len(coverage["empty_cells"]) + len(filled) == len(coverage["tasks"]) * len(coverage["families"])
+    assert "pas une opportunité de recherche démontrée" in coverage["caveat"]
+
+
+def test_a_dataset_group_gathers_the_names_the_papers_use() -> None:
+    from ocean_research_hub.corpus_v2 import entities
+
+    assert entities.dataset_group("ERA5 reanalysis (ECMWF)") == "ERA5"
+    assert entities.dataset_group("ERA5 atmospheric forcing and riverine discharge forcing") == "ERA5"
+    # An unmatched name stays itself rather than being forced into a bucket.
+    assert entities.dataset_group("A completely unknown product") == "A completely unknown product"
+    groups = {row["name"]: row for row in entities.overview(GOLD)["entities"]["dataset_group"]}
+    assert groups["ERA5"]["papers"] > 1
+
+
+def test_entity_endpoints_serve_detail_and_refuse_the_unknown(client: TestClient) -> None:
+    overview = client.get("/api/v2/analysis").json()
+    assert overview["entities"]["family"]
+    name = overview["entities"]["family"][0]["name"]
+    detail = client.get(f"/api/v2/entities/family/{name}").json()
+    assert detail["papers"] >= 1
+    assert detail["paper_list"] and detail["experiment_list"]
+    assert "pas un classement" in detail["comparability"]
+    assert client.get("/api/v2/entities/family/NOT_A_FAMILY").status_code == 404
+    assert client.get("/api/v2/entities/not_a_kind/x").status_code == 404

@@ -8,6 +8,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
           <Link href="/" className="font-display text-xl font-semibold">Ocean Research Hub</Link>
           <nav className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-ink-600">
             <Link href="/corpus">Corpus</Link>
+            <Link href="/analyse">Analyse</Link>
             <Link href="/revue">Audit</Link>
             <Link href="/explore">Catalogue</Link>
             <Link href="/compare">Comparer</Link>

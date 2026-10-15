@@ -15,7 +15,7 @@ from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import audit, recheck, store
+from . import audit, entities, recheck, store
 from .build_poc import build
 
 SOURCING_NOTICE = (
@@ -142,6 +142,18 @@ def register_corpus_v2_routes(
             return error(422, failure.code, str(failure))
         return {"verdict": verdict,
                 "progress": audit.progress(store.all_claims(gold_dir), audit.load(ledger))}
+
+    @app.get("/api/v2/analysis")
+    async def v2_analysis() -> dict[str, Any]:
+        """Entity-first views and the field's empty cells (issues #22 and #23)."""
+        return {"notice": SOURCING_NOTICE, **entities.overview(gold_dir)}
+
+    @app.get("/api/v2/entities/{kind}/{name:path}", response_model=None)
+    async def v2_entity(kind: str, name: str) -> dict[str, Any] | JSONResponse:
+        detail = entities.detail(kind, name, gold_dir)
+        if detail is None:
+            return error(404, "NOT_FOUND", f"no {kind} named {name!r} in the corpus")
+        return {"notice": SOURCING_NOTICE, **detail}
 
     @app.get("/api/v2/review/progress")
     async def v2_progress() -> dict[str, Any]:

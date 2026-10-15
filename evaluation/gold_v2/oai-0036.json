@@ -1,293 +1,296 @@
 {
- "source": {
-  "source_id": "oai-0036-s41598-025-23682-9",
-  "file": ".data/golden-pdfs/oai-0036-s41598-025-23682-9.pdf",
-  "sha256_prefix": "10f2e89adee7cf9aa1b1845e",
-  "pdf_pages": 17,
-  "printed_page_offset": 0,
-  "extracted_by": "claude-sonnet-5-5",
-  "extracted_at": "2026-10-14"
- },
- "paper": {
-  "paper_id": "P-4DVARNET-SST-NBS",
-  "doi": "10.1038/s41598-025-23682-9",
-  "title": "Multiscale neural assimilation scheme for high-resolution sea surface temperature reconstruction from satellite observations",
-  "year": 2025,
-  "venue": "Scientific Reports",
-  "ocean_domains": [
-   "sst",
-   "data-assimilation"
+  "source": {
+    "source_id": "oai-0036-s41598-025-23682-9",
+    "file": ".data/golden-pdfs/oai-0036-s41598-025-23682-9.pdf",
+    "sha256_prefix": "10f2e89adee7cf9aa1b1845e",
+    "pdf_pages": 17,
+    "printed_page_offset": 0,
+    "extracted_by": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-4DVARNET-SST-NBS",
+    "doi": "10.1038/s41598-025-23682-9",
+    "title": "Multiscale neural assimilation scheme for high-resolution sea surface temperature reconstruction from satellite observations",
+    "year": 2025,
+    "venue": "Scientific Reports",
+    "ocean_domains": [
+      "sst",
+      "data-assimilation"
+    ],
+    "ocean_domains_raw": [
+      "sea surface temperature",
+      "data assimilation",
+      "North and Baltic Seas"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-4DVARNET-MS",
+      "canonical_name": "Multiscale 4DVarNet with VAE prior",
+      "family": "HYBRID_PHYSICS_ML",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "an end-to-end deep learning framework that leverages variational DA to jointly learn solvers and prior models"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "We use as prior operator a two-scale UNet-"
+        }
+      ]
+    },
+    {
+      "method_id": "M-DMIOI",
+      "canonical_name": "DMI Optimal Interpolation (DMI-OI)",
+      "family": "CLASSICAL_BASELINE",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 1,
+          "page_printed": 1,
+          "quote": "Danish Meteorological Institute’ s DMI Optimal Interpolation (OI) SST product"
+        }
+      ]
+    }
   ],
-  "ocean_domains_raw": [
-   "sea surface temperature",
-   "data assimilation",
-   "North and Baltic Seas"
+  "datasets": [
+    {
+      "dataset_id": "D-CMEMS-L3S-L4",
+      "canonical_name": "CMEMS North/Baltic Sea SST L3S (input) and DMI-OI L4",
+      "variables": [
+        "SST"
+      ],
+      "spatial_resolution": "0.02 deg x 0.02 deg (L4)",
+      "temporal_resolution": "daily",
+      "region": "North Sea and Baltic Sea",
+      "period_start": "2019-04",
+      "period_end": "2020-12",
+      "role": "PRIMARY",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "It is a daily, gap-free SST field blending information from various sensors with 0.02"
+        },
+        {
+          "field": "period_start",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "trained on less than 2 years of data (Apr. 2019 - Dec. 2020)"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-SLSTR",
+      "canonical_name": "Sentinel 3 SLSTR SST",
+      "variables": [
+        "SST"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": "daily",
+      "region": "North Sea and Baltic Sea",
+      "period_start": "2021-01",
+      "period_end": "2021-12",
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "(ii) Sentinel 3 SLSTR SST. Sentinel 3 SLSTR Sea Surface Temperature represents the kinetic temperature of wa-"
+        },
+        {
+          "field": "role",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "we use RMSE spatial and temporal metrics based on the Sentinel 3 SLSTR independent satellite dataset"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-HADIOD",
+      "canonical_name": "HadIOD in-situ SST observations",
+      "variables": [
+        "SST"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": "2021",
+      "period_end": "2021",
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "Data was obtained from the Met Office"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-SST-RECON",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "method_id": "M-4DVARNET-MS",
+      "dataset_ids": [
+        "D-CMEMS-L3S-L4",
+        "D-SLSTR"
+      ],
+      "target_variable": "sea surface temperature (daily near-real-time L4)",
+      "training": {
+        "epochs": {
+          "value": 500,
+          "page_pdf": 10,
+          "page_printed": 10,
+          "quote": "The model was trained on the same single GPU for 500 epochs"
+        },
+        "hardware": {
+          "value": "single NVIDIA A100 80 GB GPU, approx. 8 hours training",
+          "page_pdf": 10,
+          "page_printed": 10,
+          "quote": "single Nvidia GPU NVIDIA A100 with 80 GB of RAM"
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SST-UQ",
+      "task": "GAP_FILLING_RECONSTRUCTION",
+      "method_id": "M-4DVARNET-MS",
+      "dataset_ids": [
+        "D-CMEMS-L3S-L4",
+        "D-SLSTR"
+      ],
+      "target_variable": "SST posterior ensemble (50 conditional simulations), CRPS evaluation",
+      "training": {}
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-SST-RECON",
+      "dataset_id": "D-SLSTR",
+      "metric": "RMSE",
+      "value": 0.41,
+      "unit": "K",
+      "split": "TEST",
+      "config": "all North and Baltic Seas, 2021",
+      "baseline_name": "DMI-OI",
+      "baseline_value": 0.43,
+      "source_table": "Table 1",
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "4DVarNet 0.41 0.16 45"
+    },
+    {
+      "experiment_id": "X-SST-RECON",
+      "dataset_id": "D-SLSTR",
+      "metric": "RMSE",
+      "value": 0.36,
+      "unit": "K",
+      "split": "TEST",
+      "config": "Baltic D1, regional training",
+      "baseline_name": "DMI-OI",
+      "baseline_value": 0.37,
+      "source_table": "Table 1",
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "4DV arNet (regional training) 0.36 0.26 57"
+    },
+    {
+      "experiment_id": "X-SST-RECON",
+      "dataset_id": "D-SLSTR",
+      "metric": "RMSE",
+      "value": 0.39,
+      "unit": "K",
+      "split": "TEST",
+      "config": "D3 local training",
+      "baseline_name": "DMI-OI",
+      "baseline_value": 0.41,
+      "source_table": "Table 1",
+      "page_pdf": 8,
+      "page_printed": 8,
+      "quote": "4DV arNet (D3 local training) 0.39 0.21 33",
+      "is_best_in_table": true
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "page_pdf": 14,
+      "page_printed": 14,
+      "quote": "model performance is tightly coupled to the quality and density of training data"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 14,
+      "page_printed": 14,
+      "quote": "Another open question concerns the robustness of the model under anomalous or extreme conditions"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "training dataset is not optimally suited to handle such a low spatial coverage"
+    },
+    {
+      "theme": "UNCERTAINTY",
+      "page_pdf": 15,
+      "page_printed": 15,
+      "quote": "model assumption may not always hold, especially in cases where the coarse component itself is uncertain"
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "experiments[X-SST-RECON].training.optimizer",
+      "searched": [
+        "Methods",
+        "Results",
+        "Discussion",
+        "dump keywords Adam/optimizer"
+      ]
+    },
+    {
+      "field": "experiments[X-SST-RECON].training.learning_rate",
+      "searched": [
+        "Methods",
+        "Results",
+        "Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SST-RECON].training.batch_size",
+      "searched": [
+        "Methods",
+        "Results",
+        "Discussion"
+      ]
+    },
+    {
+      "field": "experiments[X-SST-UQ].training",
+      "searched": [
+        "Methods",
+        "Uncertainty quantification section"
+      ]
+    },
+    {
+      "field": "experiments[X-SSH-VAE].training.loss",
+      "searched": [
+        "Section Method",
+        "Eq. 8",
+        "Fig. 3"
+      ],
+      "note": "La perte à trois termes citée décrit l'entraînement bout-en-bout que les auteurs écartent explicitement pour cause de mémoire GPU; le papier ne donne pas la perte du dispositif retenu sous une forme citable."
+    }
   ]
- },
- "methods": [
-  {
-   "method_id": "M-4DVARNET-MS",
-   "canonical_name": "Multiscale 4DVarNet with VAE prior",
-   "family": "HYBRID_PHYSICS_ML",
-   "is_novel_in_paper": true,
-   "role": "PROPOSED",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "an end-to-end deep learning framework that leverages variational DA to jointly learn solvers and prior models"
-    },
-    {
-     "field": "canonical_name",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "We use as prior operator a two-scale UNet-"
-    }
-   ]
-  },
-  {
-   "method_id": "M-DMIOI",
-   "canonical_name": "DMI Optimal Interpolation (DMI-OI)",
-   "family": "CLASSICAL_BASELINE",
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 1,
-     "page_printed": 1,
-     "quote": "Danish Meteorological Institute’ s DMI Optimal Interpolation (OI) SST product"
-    }
-   ]
-  }
- ],
- "datasets": [
-  {
-   "dataset_id": "D-CMEMS-L3S-L4",
-   "canonical_name": "CMEMS North/Baltic Sea SST L3S (input) and DMI-OI L4",
-   "variables": [
-    "SST"
-   ],
-   "spatial_resolution": "0.02 deg x 0.02 deg (L4)",
-   "temporal_resolution": "daily",
-   "region": "North Sea and Baltic Sea",
-   "period_start": "2019-04",
-   "period_end": "2020-12",
-   "role": "PRIMARY",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "It is a daily, gap-free SST field blending information from various sensors with 0.02"
-    },
-    {
-     "field": "period_start",
-     "page_pdf": 9,
-     "page_printed": 9,
-     "quote": "trained on less than 2 years of data (Apr. 2019 - Dec. 2020)"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-SLSTR",
-   "canonical_name": "Sentinel 3 SLSTR SST",
-   "variables": [
-    "SST"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": "daily",
-   "region": "North Sea and Baltic Sea",
-   "period_start": "2021-01",
-   "period_end": "2021-12",
-   "role": "PRIMARY",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "(ii) Sentinel 3 SLSTR SST. Sentinel 3 SLSTR Sea Surface Temperature represents the kinetic temperature of wa-"
-    },
-    {
-     "field": "role",
-     "page_pdf": 6,
-     "page_printed": 6,
-     "quote": "we use RMSE spatial and temporal metrics based on the Sentinel 3 SLSTR independent satellite dataset"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-HADIOD",
-   "canonical_name": "HadIOD in-situ SST observations",
-   "variables": [
-    "SST"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": null,
-   "period_start": "2021",
-   "period_end": "2021",
-   "role": "AUXILIARY_COVARIABLE",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "Data was obtained from the Met Office"
-    }
-   ]
-  }
- ],
- "experiments": [
-  {
-   "experiment_id": "X-SST-RECON",
-   "task": "GAP_FILLING_RECONSTRUCTION",
-   "method_id": "M-4DVARNET-MS",
-   "dataset_ids": [
-    "D-CMEMS-L3S-L4",
-    "D-SLSTR"
-   ],
-   "target_variable": "sea surface temperature (daily near-real-time L4)",
-   "training": {
-    "loss": {
-     "value": "MSE of the solver output, MSE of the VAE reconstruction and KL divergence (beta-VAE weighting)",
-     "page_pdf": 6,
-     "page_printed": 6,
-     "quote": "MSE of the solver output, MSE of the V AE reconstruction and KL divergence associated to the V AE"
-    },
-    "epochs": {
-     "value": 500,
-     "page_pdf": 10,
-     "page_printed": 10,
-     "quote": "The model was trained on the same single GPU for 500 epochs"
-    },
-    "hardware": {
-     "value": "single NVIDIA A100 80 GB GPU, approx. 8 hours training",
-     "page_pdf": 10,
-     "page_printed": 10,
-     "quote": "single Nvidia GPU NVIDIA A100 with 80 GB of RAM"
-    }
-   }
-  },
-  {
-   "experiment_id": "X-SST-UQ",
-   "task": "GAP_FILLING_RECONSTRUCTION",
-   "method_id": "M-4DVARNET-MS",
-   "dataset_ids": [
-    "D-CMEMS-L3S-L4",
-    "D-SLSTR"
-   ],
-   "target_variable": "SST posterior ensemble (50 conditional simulations), CRPS evaluation",
-   "training": {}
-  }
- ],
- "results": [
-  {
-   "experiment_id": "X-SST-RECON",
-   "dataset_id": "D-SLSTR",
-   "metric": "RMSE",
-   "value": 0.41,
-   "unit": "K",
-   "split": "TEST",
-   "config": "all North and Baltic Seas, 2021",
-   "baseline_name": "DMI-OI",
-   "baseline_value": 0.43,
-   "source_table": "Table 1",
-   "page_pdf": 8,
-   "page_printed": 8,
-   "quote": "4DVarNet 0.41 0.16 45"
-  },
-  {
-   "experiment_id": "X-SST-RECON",
-   "dataset_id": "D-SLSTR",
-   "metric": "RMSE",
-   "value": 0.36,
-   "unit": "K",
-   "split": "TEST",
-   "config": "Baltic D1, regional training",
-   "baseline_name": "DMI-OI",
-   "baseline_value": 0.37,
-   "source_table": "Table 1",
-   "page_pdf": 8,
-   "page_printed": 8,
-   "quote": "4DV arNet (regional training) 0.36 0.26 57"
-  },
-  {
-   "experiment_id": "X-SST-RECON",
-   "dataset_id": "D-SLSTR",
-   "metric": "RMSE",
-   "value": 0.39,
-   "unit": "K",
-   "split": "TEST",
-   "config": "D3 local training",
-   "baseline_name": "DMI-OI",
-   "baseline_value": 0.41,
-   "source_table": "Table 1",
-   "page_pdf": 8,
-   "page_printed": 8,
-   "quote": "4DV arNet (D3 local training) 0.39 0.21 33",
-   "is_best_in_table": true
-  }
- ],
- "limitations": [
-  {
-   "theme": "DATA",
-   "page_pdf": 14,
-   "page_printed": 14,
-   "quote": "model performance is tightly coupled to the quality and density of training data"
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 14,
-   "page_printed": 14,
-   "quote": "Another open question concerns the robustness of the model under anomalous or extreme conditions"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "training dataset is not optimally suited to handle such a low spatial coverage"
-  },
-  {
-   "theme": "UNCERTAINTY",
-   "page_pdf": 15,
-   "page_printed": 15,
-   "quote": "model assumption may not always hold, especially in cases where the coarse component itself is uncertain"
-  }
- ],
- "not_reported": [
-  {
-   "field": "experiments[X-SST-RECON].training.optimizer",
-   "searched": [
-    "Methods",
-    "Results",
-    "Discussion",
-    "dump keywords Adam/optimizer"
-   ]
-  },
-  {
-   "field": "experiments[X-SST-RECON].training.learning_rate",
-   "searched": [
-    "Methods",
-    "Results",
-    "Discussion"
-   ]
-  },
-  {
-   "field": "experiments[X-SST-RECON].training.batch_size",
-   "searched": [
-    "Methods",
-    "Results",
-    "Discussion"
-   ]
-  },
-  {
-   "field": "experiments[X-SST-UQ].training",
-   "searched": [
-    "Methods",
-    "Uncertainty quantification section"
-   ]
-  }
- ]
 }

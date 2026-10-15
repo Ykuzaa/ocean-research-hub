@@ -321,12 +321,6 @@
   "results": [],
   "limitations": [
     {
-      "theme": "EVALUATION",
-      "page_pdf": 1,
-      "page_printed": 1,
-      "quote": "For realistic ocean surface flows and our preliminary study,"
-    },
-    {
       "theme": "GENERALIZATION",
       "page_pdf": 3,
       "page_printed": 3,
@@ -343,12 +337,6 @@
       "page_pdf": 6,
       "page_printed": 6,
       "quote": "but somewhat underestimates the intensification over Stellwagen Bank."
-    },
-    {
-      "theme": "FUTURE_WORK",
-      "page_pdf": 7,
-      "page_printed": 7,
-      "quote": "The results show promise for future ocean research and applications."
     }
   ],
   "conflicts": [

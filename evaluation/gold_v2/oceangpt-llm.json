@@ -1,291 +1,285 @@
 {
- "source": {
-  "source_id": "oceangpt-llm",
-  "file": ".data/golden-pdfs/oceangpt-a-large-language-model-for-ocean-science-tasks.pdf",
-  "sha256_prefix": "6de7931af232b841e27a4692",
-  "pdf_pages": 16,
-  "printed_page_offset": 3356,
-  "extracted_by": "paper-extractor",
-  "extracted_at": "2026-10-14"
- },
- "paper": {
-  "paper_id": "P-OCEANGPT",
-  "doi": null,
-  "title": "OceanGPT: A Large Language Model for Ocean Science Tasks",
-  "year": 2024,
-  "venue": "ACL 2024 (Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics, Volume 1: Long Papers)",
-  "ocean_domains": [
-   "llm-agents",
-   "foundation-models",
-   "benchmarks"
-  ]
- },
- "methods": [
-  {
-   "method_id": "M-OCEANGPT",
-   "canonical_name": "OceanGPT",
-   "family": "TRANSFORMER",
-   "family_raw": "LLM pre-trained from LLaMA-2 and LoRA instruction-tuned",
-   "architecture_note": "Decoder-only LLM; the paper does not describe the architecture itself, only the LLaMA-2 base. Released at 7B (also 2B MiniCPM and 8B Llama-3 versions). Instruction data built with DoInstruct (gpt-3.5-turbo agents).",
-   "is_novel_in_paper": true,
-   "role": "PROPOSED",
-   "evidence": [
+  "source": {
+    "source_id": "oceangpt-llm",
+    "file": ".data/golden-pdfs/oceangpt-a-large-language-model-for-ocean-science-tasks.pdf",
+    "sha256_prefix": "6de7931af232b841e27a4692",
+    "pdf_pages": 16,
+    "printed_page_offset": 3356,
+    "extracted_by": "paper-extractor",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-OCEANGPT",
+    "doi": null,
+    "title": "OceanGPT: A Large Language Model for Ocean Science Tasks",
+    "year": 2024,
+    "venue": "ACL 2024 (Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics, Volume 1: Long Papers)",
+    "ocean_domains": [
+      "llm-agents",
+      "foundation-models",
+      "benchmarks"
+    ]
+  },
+  "methods": [
     {
-     "field": "family",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "we pre-train our"
+      "method_id": "M-OCEANGPT",
+      "canonical_name": "OceanGPT",
+      "family": "OTHER",
+      "family_raw": "LLM (le papier ne décrit pas l architecture)",
+      "architecture_note": "Decoder-only LLM; the paper does not describe the architecture itself, only the LLaMA-2 base. Released at 7B (also 2B MiniCPM and 8B Llama-3 versions). Instruction data built with DoInstruct (gpt-3.5-turbo agents). Règle 9: le papier ne nomme jamais son architecture, « transformeur » viendrait d une connaissance extérieure.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "we pre-train our"
+        },
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3359,
+          "quote": "pre-train an ocean LLM based on LLaMA-2"
+        }
+      ]
     },
     {
-     "field": "family",
-     "page_pdf": 3,
-     "page_printed": 3359,
-     "quote": "pre-train an ocean LLM based on LLaMA-2"
-    }
-   ]
-  },
-  {
-   "method_id": "M-LLAMA2CHAT",
-   "canonical_name": "Llama-2-7b-chat-hf",
-   "family": "TRANSFORMER",
-   "family_raw": "chat LLM",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "We use the chat version of LLaMA-2"
-    }
-   ]
-  },
-  {
-   "method_id": "M-VICUNA",
-   "canonical_name": "Vicuna-1.5-7b",
-   "family": "TRANSFORMER",
-   "family_raw": "chat LLM",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "We also use Vicuna-1.5"
-    }
-   ]
-  },
-  {
-   "method_id": "M-CHATGLM2",
-   "canonical_name": "ChatGLM2-6B",
-   "family": "TRANSFORMER",
-   "family_raw": "chat LLM (GLM)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "We further use ChatGLM2-6B"
-    }
-   ]
-  }
- ],
- "datasets": [
-  {
-   "dataset_id": "D-OCEANCORPUS",
-   "canonical_name": "Ocean pre-training corpus",
-   "variables": [
-    "text"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": null,
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 3,
-     "page_printed": 3359,
-     "quote": "we firstly collect a raw corpus of 67,633 doc-"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-DOINSTRUCT",
-   "canonical_name": "DoInstruct ocean instruction dataset",
-   "variables": [
-    "instruction-output pairs"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": null,
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 5,
-     "page_printed": 3361,
-     "quote": "We use DOINSTRUCT to expand more than 150,000 instruc-"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-OCEANBENCH",
-   "canonical_name": "OceanBench",
-   "variables": [
-    "15 ocean-related tasks"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": null,
-   "period_start": null,
-   "period_end": null,
-   "role": "EVALUATION",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "Our benchmark in-"
+      "method_id": "M-LLAMA2CHAT",
+      "canonical_name": "Llama-2-7b-chat-hf",
+      "family": "OTHER",
+      "family_raw": "LLM (le papier ne décrit pas l architecture)",
+      "architecture_note": "Règle 9: le papier ne nomme jamais son architecture, « transformeur » viendrait d une connaissance extérieure.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "We use the chat version of LLaMA-2"
+        }
+      ]
     },
     {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "cludes a total of 15 ocean-related tasks such as"
+      "method_id": "M-VICUNA",
+      "canonical_name": "Vicuna-1.5-7b",
+      "family": "OTHER",
+      "family_raw": "LLM (le papier ne décrit pas l architecture)",
+      "architecture_note": "Règle 9: le papier ne nomme jamais son architecture, « transformeur » viendrait d une connaissance extérieure.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "We also use Vicuna-1.5"
+        }
+      ]
+    },
+    {
+      "method_id": "M-CHATGLM2",
+      "canonical_name": "ChatGLM2-6B",
+      "family": "OTHER",
+      "family_raw": "LLM (le papier ne décrit pas l architecture)",
+      "architecture_note": "Règle 9: le papier ne nomme jamais son architecture, « transformeur » viendrait d une connaissance extérieure.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "We further use ChatGLM2-6B"
+        }
+      ]
     }
-   ]
-  }
- ],
- "experiments": [
-  {
-   "experiment_id": "X-OCEANBENCH",
-   "task": "OTHER",
-   "task_raw": "Instruction-following question answering and text generation on 15 ocean-science language tasks (OceanBench), pairwise win rate vs open-source chat LLMs",
-   "method_id": "M-OCEANGPT",
-   "dataset_ids": [
-    "D-OCEANCORPUS",
-    "D-DOINSTRUCT",
-    "D-OCEANBENCH"
-   ],
-   "target_variable": "LLM answer quality (pairwise preference)",
-   "training": {
-    "batch_size": {
-     "value": 512,
-     "page_pdf": 12,
-     "page_printed": 3368,
-     "quote": "Batch Size 512",
-     "source_table": "Table 2",
-     "note": "Table 2 (Appendix A) fine-tuning hyperparameters; row label is on the same line."
+  ],
+  "datasets": [
+    {
+      "dataset_id": "D-OCEANCORPUS",
+      "canonical_name": "Ocean pre-training corpus",
+      "variables": [
+        "text"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3359,
+          "quote": "we firstly collect a raw corpus of 67,633 doc-"
+        }
+      ]
     },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 12,
-     "page_printed": 3368,
-     "quote": "Epoch 10",
-     "source_table": "Table 2"
+    {
+      "dataset_id": "D-DOINSTRUCT",
+      "canonical_name": "DoInstruct ocean instruction dataset",
+      "variables": [
+        "instruction-output pairs"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 5,
+          "page_printed": 3361,
+          "quote": "We use DOINSTRUCT to expand more than 150,000 instruc-"
+        }
+      ]
     },
-    "learning_rate": {
-     "value": 0.0001,
-     "page_pdf": 12,
-     "page_printed": 3368,
-     "quote": "",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "source_table": "Table 2",
-     "note": "Table 2 row 'Learning Rate (LR) 1e- 4' (page 12); quote crosses a mathematical symbol, so none stored. Applies to LoRA fine-tuning stage only."
-    },
-    "hardware": {
-     "value": "six NVIDIA A800 GPUs (pre-training: seven days)",
-     "page_pdf": 6,
-     "page_printed": 3362,
-     "quote": "for seven days with six A800 Nvidia",
-     "extra_evidence": [
-      {
-       "claim": "Device NVIDIA A800, GPU number 6 (Table 2, fine-tuning)",
-       "page_pdf": 12,
-       "page_printed": 3368,
-       "quote": "GPU number 6"
+    {
+      "dataset_id": "D-OCEANBENCH",
+      "canonical_name": "OceanBench",
+      "variables": [
+        "15 ocean-related tasks"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": null,
+      "period_start": null,
+      "period_end": null,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "Our benchmark in-"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "cludes a total of 15 ocean-related tasks such as"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-OCEANBENCH",
+      "task": "OTHER",
+      "task_raw": "Instruction-following question answering and text generation on 15 ocean-science language tasks (OceanBench), pairwise win rate vs open-source chat LLMs",
+      "method_id": "M-OCEANGPT",
+      "dataset_ids": [
+        "D-OCEANCORPUS",
+        "D-DOINSTRUCT",
+        "D-OCEANBENCH"
+      ],
+      "target_variable": "LLM answer quality (pairwise preference)",
+      "training": {
+        "batch_size": {
+          "value": 512,
+          "page_pdf": 12,
+          "page_printed": 3368,
+          "quote": "Batch Size 512",
+          "source_table": "Table 2",
+          "note": "Table 2 (Appendix A) fine-tuning hyperparameters; row label is on the same line."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 12,
+          "page_printed": 3368,
+          "quote": "Epoch 10",
+          "source_table": "Table 2"
+        },
+        "learning_rate": {
+          "value": 0.0001,
+          "page_pdf": 12,
+          "page_printed": 3368,
+          "quote": "",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "source_table": "Table 2",
+          "note": "Table 2 row 'Learning Rate (LR) 1e- 4' (page 12); quote crosses a mathematical symbol, so none stored. Applies to LoRA fine-tuning stage only."
+        },
+        "hardware": {
+          "value": "six NVIDIA A800 GPUs (pre-training: seven days)",
+          "page_pdf": 6,
+          "page_printed": 3362,
+          "quote": "for seven days with six A800 Nvidia",
+          "extra_evidence": [
+            {
+              "claim": "Device NVIDIA A800, GPU number 6 (Table 2, fine-tuning)",
+              "page_pdf": 12,
+              "page_printed": 3368,
+              "quote": "GPU number 6"
+            }
+          ]
+        }
       }
-     ]
     }
-   }
-  }
- ],
- "results": [
-  {
-   "experiment_id": "X-OCEANBENCH",
-   "dataset_id": "D-DOINSTRUCT",
-   "metric": "OTHER",
-   "metric_raw": "Inter-annotator agreement (IAA) of expert quality review on 10% sample of generated instruction dataset",
-   "metric_kind": "AGREEMENT",
-   "value": 0.82,
-   "unit": "score",
-   "higher_is_better": true,
-   "split": "UNSPECIFIED",
-   "config": "human quality control of DoInstruct data (not an OceanGPT-vs-baseline result)",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 5,
-   "page_printed": 3361,
-   "quote": "ment) score for our dataset is 0.82, which satisfies"
-  }
- ],
- "limitations": [
-  {
-   "theme": "DATA",
-   "page_pdf": 9,
-   "page_printed": 3365,
-   "quote": "the distribution of pre-training data and instruction"
-  },
-  {
-   "theme": "EVALUATION",
-   "page_pdf": 9,
-   "page_printed": 3365,
-   "quote": "there is a notable issue regarding their ten-"
-  },
-  {
-   "theme": "FUTURE_WORK",
-   "page_pdf": 8,
-   "page_printed": 3364,
-   "quote": "training on larger corpus with larger models (e.g., 30B,"
-  }
- ],
- "conflicts": [],
- "not_reported": [
-  {
-   "field": "experiments[X-OCEANBENCH].training.loss",
-   "searched": [
-    "Section 3",
-    "Section 4.1",
-    "Appendix A Table 2",
-    "whole-text search for loss/objective"
-   ]
-  },
-  {
-   "field": "experiments[X-OCEANBENCH].training.optimizer",
-   "searched": [
-    "Section 4.1",
-    "Appendix A Table 2",
-    "whole-text search for Adam/optimizer"
-   ]
-  },
-  {
-   "field": "results[win rate vs baselines]",
-   "searched": [
-    "Section 5.1 text gives no numbers; Figures 5, 6, 10, 12 hold win/tie/loss only as charts, not read off curves"
-   ]
-  }
- ]
+  ],
+  "results": [
+    {
+      "experiment_id": "X-OCEANBENCH",
+      "dataset_id": "D-DOINSTRUCT",
+      "metric": "OTHER",
+      "metric_raw": "Inter-annotator agreement (IAA) of expert quality review on 10% sample of generated instruction dataset",
+      "metric_kind": "AGREEMENT",
+      "value": 0.82,
+      "unit": "score",
+      "higher_is_better": true,
+      "split": "UNSPECIFIED",
+      "config": "human quality control of DoInstruct data (not an OceanGPT-vs-baseline result)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 5,
+      "page_printed": 3361,
+      "quote": "ment) score for our dataset is 0.82, which satisfies"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "DATA",
+      "page_pdf": 9,
+      "page_printed": 3365,
+      "quote": "the distribution of pre-training data and instruction"
+    },
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 9,
+      "page_printed": 3365,
+      "quote": "there is a notable issue regarding their ten-"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-OCEANBENCH].training.loss",
+      "searched": [
+        "Section 3",
+        "Section 4.1",
+        "Appendix A Table 2",
+        "whole-text search for loss/objective"
+      ]
+    },
+    {
+      "field": "experiments[X-OCEANBENCH].training.optimizer",
+      "searched": [
+        "Section 4.1",
+        "Appendix A Table 2",
+        "whole-text search for Adam/optimizer"
+      ]
+    },
+    {
+      "field": "results[win rate vs baselines]",
+      "searched": [
+        "Section 5.1 text gives no numbers; Figures 5, 6, 10, 12 hold win/tie/loss only as charts, not read off curves"
+      ]
+    }
+  ]
 }

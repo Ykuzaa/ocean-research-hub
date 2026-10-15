@@ -74,13 +74,17 @@ export default async function CorpusPage({
       <h1 className="mt-2 font-display text-4xl font-medium text-ink-900">Les papiers, détail par détail</h1>
       <p className="mt-3 max-w-3xl text-ink-600">{summary.notice}</p>
 
-      <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <Counter value={summary.papers} label="papiers lus" />
         <Counter value={summary.experiments} label="expériences" />
         <Counter value={summary.results} label="résultats mesurés" />
         <Counter
+          value={`${summary.recheck.confirmed.toLocaleString("fr-FR")}/${summary.recheck.claims.toLocaleString("fr-FR")}`}
+          label="contre-vérifiées par une seconde lecture machine"
+        />
+        <Counter
           value={`${summary.audit.accepted}/${summary.audit.claims.toLocaleString("fr-FR")}`}
-          label="informations confirmées à la main"
+          label="confirmées à la main"
         />
         <Counter
           value={summary.access ? `${summary.access.reachable}/${summary.access.indexed}` : "—"}

@@ -1,668 +1,650 @@
 {
- "source": {
-  "source_id": "vertical-mixing-param",
-  "file": ".data/golden-pdfs/parameterizing-vertical-mixing-coefficients-in-the-ocean-sur.pdf",
-  "sha256_prefix": "8f17aac5aedf75ed45285601",
-  "pdf_pages": 35,
-  "printed_page_offset": 0,
-  "extracted_by": "paper-extractor (claude-sonnet-5-5)",
-  "extracted_at": "2026-10-14"
- },
- "paper": {
-  "paper_id": "P-VERTICAL-MIXING-PARAM",
-  "doi": null,
-  "title": "Parameterizing Vertical Mixing Coefficients in the Ocean Surface Boundary Layer using Neural Networks",
-  "year": 2023,
-  "venue": "Journal of Advances in Modeling Earth Systems (submitted; arXiv:2306.09045v3)",
-  "ocean_domains": [
-   "parameterization"
+  "source": {
+    "source_id": "vertical-mixing-param",
+    "file": ".data/golden-pdfs/parameterizing-vertical-mixing-coefficients-in-the-ocean-sur.pdf",
+    "sha256_prefix": "8f17aac5aedf75ed45285601",
+    "pdf_pages": 35,
+    "printed_page_offset": 0,
+    "extracted_by": "paper-extractor (claude-sonnet-5-5)",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-VERTICAL-MIXING-PARAM",
+    "doi": null,
+    "title": "Parameterizing Vertical Mixing Coefficients in the Ocean Surface Boundary Layer using Neural Networks",
+    "year": 2023,
+    "venue": "Journal of Advances in Modeling Earth Systems (submitted; arXiv:2306.09045v3)",
+    "ocean_domains": [
+      "parameterization"
+    ],
+    "ocean_domains_raw": [
+      "ocean_surface_boundary_layer",
+      "vertical_mixing_parameterization"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-EPBL-NN",
+      "canonical_name": "ePBL NN (neural-network eddy diffusivity shape function and velocity scale inside ePBL)",
+      "family": "MLP_DNN",
+      "family_raw": "neural networks N1 and N2 implemented within the physics-based ePBL scheme",
+      "architecture_note": "Two feed-forward MLPs (ReLU), 2 hidden layers x 32 nodes each: N1 (4 inputs f,B0,u*,h -> 16 outputs g(sigma)) and N2 (3 inputs -> scalar v0). Classified HYBRID_PHYSICS_ML by arbitration rule 1 (learned network embedded in a physical scheme); MLP_DNN is the architecture. La règle 5 classe le réseau lui-même: deux MLP insérés dans ePBL, le couplage reste décrit ci-dessus.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 25,
+          "page_printed": 25,
+          "quote": "The neural networks are implemented within the existing physics-based"
+        },
+        {
+          "field": "architecture_note",
+          "page_pdf": 16,
+          "page_printed": 16,
+          "quote": "Both networks N1 andN2 are shallow, as they have two hidden layers with 32 nodes in each."
+        }
+      ]
+    },
+    {
+      "method_id": "M-EPBL",
+      "canonical_name": "ePBL (Energetic Planetary Boundary Layer, original scheme)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "ePBL physics-based parameterization",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 18,
+          "page_printed": 18,
+          "quote": "one using the ePBL scheme as a control run"
+        }
+      ]
+    }
   ],
-  "ocean_domains_raw": [
-   "ocean_surface_boundary_layer",
-   "vertical_mixing_parameterization"
-  ]
- },
- "methods": [
-  {
-   "method_id": "M-EPBL-NN",
-   "canonical_name": "ePBL NN (neural-network eddy diffusivity shape function and velocity scale inside ePBL)",
-   "family": "HYBRID_PHYSICS_ML",
-   "family_raw": "neural networks N1 and N2 implemented within the physics-based ePBL scheme",
-   "architecture_note": "Two feed-forward MLPs (ReLU), 2 hidden layers x 32 nodes each: N1 (4 inputs f,B0,u*,h -> 16 outputs g(sigma)) and N2 (3 inputs -> scalar v0). Classified HYBRID_PHYSICS_ML by arbitration rule 1 (learned network embedded in a physical scheme); MLP_DNN is the architecture.",
-   "is_novel_in_paper": true,
-   "role": "PROPOSED",
-   "evidence": [
+  "datasets": [
     {
-     "field": "family",
-     "page_pdf": 25,
-     "page_printed": 25,
-     "quote": "The neural networks are implemented within the existing physics-based"
+      "dataset_id": "D-GOTM",
+      "canonical_name": "GOTM k-epsilon single-column simulations (second moment closure)",
+      "variables": [
+        "eddy diffusivity profile",
+        "boundary layer depth h",
+        "surface heat flux B0",
+        "surface friction velocity u*",
+        "latitude f"
+      ],
+      "spatial_resolution": "1 m vertical grid spacing, 800 m column",
+      "temporal_resolution": "60 s time step, hourly output",
+      "region": null,
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "The SMC data used to train the networks is generated using the single column model"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "The time step is set at 60 s, and the vertical grid spacing is 1 m. The depth of the column is 800 m."
+        },
+        {
+          "field": "temporal_resolution",
+          "page_pdf": 9,
+          "page_printed": 9,
+          "quote": "Data was saved at hourly intervals."
+        }
+      ]
     },
     {
-     "field": "architecture_note",
-     "page_pdf": 16,
-     "page_printed": 16,
-     "quote": "Both networks N1 andN2 are shallow, as they have two hidden layers with 32 nodes in each."
+      "dataset_id": "D-JRA",
+      "canonical_name": "JRA atmospheric forcing for GFDL OM4.0 ice-ocean model",
+      "variables": [
+        "atmospheric forcing"
+      ],
+      "spatial_resolution": "nominal 1/4 degree ocean model",
+      "temporal_resolution": null,
+      "region": "global",
+      "period_start": 1958,
+      "period_end": 2017,
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 18,
+          "page_printed": 18,
+          "quote": "is forced using the JRA forcing product"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 18,
+          "page_printed": 18,
+          "quote": "The model has a nominal 1/4 degree resolution"
+        },
+        {
+          "field": "period_start",
+          "page_pdf": 18,
+          "page_printed": 18,
+          "quote": "The simulations were performed for a period of 1958 to 2017."
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-ARGO",
+      "canonical_name": "ARGO float measurements (mixed layer depth, stratification)",
+      "variables": [
+        "mixed layer depth",
+        "temperature stratification"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "global; tropical Pacific for stratification",
+      "period_start": 2003,
+      "period_end": 2017,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 18,
+          "page_printed": 18,
+          "quote": "ARGO float measurements have been utilized"
+        },
+        {
+          "field": "period_start",
+          "page_pdf": 19,
+          "page_printed": 19,
+          "quote": "over the period 2003-2017"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-WOA",
+      "canonical_name": "World Ocean Atlas (sea surface temperature)",
+      "variables": [
+        "sea surface temperature"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "global",
+      "period_start": null,
+      "period_end": null,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 18,
+          "page_printed": 18,
+          "quote": "data from the World Ocean Atlas (WOA)"
+        }
+      ]
     }
-   ]
-  },
-  {
-   "method_id": "M-EPBL",
-   "canonical_name": "ePBL (Energetic Planetary Boundary Layer, original scheme)",
-   "family": "CLASSICAL_BASELINE",
-   "family_raw": "ePBL physics-based parameterization",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
+  ],
+  "experiments": [
     {
-     "field": "family",
-     "page_pdf": 18,
-     "page_printed": 18,
-     "quote": "one using the ePBL scheme as a control run"
-    }
-   ]
-  }
- ],
- "datasets": [
-  {
-   "dataset_id": "D-GOTM",
-   "canonical_name": "GOTM k-epsilon single-column simulations (second moment closure)",
-   "variables": [
-    "eddy diffusivity profile",
-    "boundary layer depth h",
-    "surface heat flux B0",
-    "surface friction velocity u*",
-    "latitude f"
-   ],
-   "spatial_resolution": "1 m vertical grid spacing, 800 m column",
-   "temporal_resolution": "60 s time step, hourly output",
-   "region": null,
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "The SMC data used to train the networks is generated using the single column model"
-    },
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 9,
-     "page_printed": 9,
-     "quote": "The time step is set at 60 s, and the vertical grid spacing is 1 m. The depth of the column is 800 m."
-    },
-    {
-     "field": "temporal_resolution",
-     "page_pdf": 9,
-     "page_printed": 9,
-     "quote": "Data was saved at hourly intervals."
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-JRA",
-   "canonical_name": "JRA atmospheric forcing for GFDL OM4.0 ice-ocean model",
-   "variables": [
-    "atmospheric forcing"
-   ],
-   "spatial_resolution": "nominal 1/4 degree ocean model",
-   "temporal_resolution": null,
-   "region": "global",
-   "period_start": 1958,
-   "period_end": 2017,
-   "role": "AUXILIARY_COVARIABLE",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 18,
-     "page_printed": 18,
-     "quote": "is forced using the JRA forcing product"
-    },
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 18,
-     "page_printed": 18,
-     "quote": "The model has a nominal 1/4 degree resolution"
-    },
-    {
-     "field": "period_start",
-     "page_pdf": 18,
-     "page_printed": 18,
-     "quote": "The simulations were performed for a period of 1958 to 2017."
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-ARGO",
-   "canonical_name": "ARGO float measurements (mixed layer depth, stratification)",
-   "variables": [
-    "mixed layer depth",
-    "temperature stratification"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": "global; tropical Pacific for stratification",
-   "period_start": 2003,
-   "period_end": 2017,
-   "role": "EVALUATION",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 18,
-     "page_printed": 18,
-     "quote": "ARGO float measurements have been utilized"
-    },
-    {
-     "field": "period_start",
-     "page_pdf": 19,
-     "page_printed": 19,
-     "quote": "over the period 2003-2017"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-WOA",
-   "canonical_name": "World Ocean Atlas (sea surface temperature)",
-   "variables": [
-    "sea surface temperature"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": "global",
-   "period_start": 2003,
-   "period_end": 2017,
-   "role": "EVALUATION",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 18,
-     "page_printed": 18,
-     "quote": "data from the World Ocean Atlas (WOA)"
-    },
-    {
-     "field": "period_start",
-     "page_pdf": 19,
-     "page_printed": 19,
-     "quote": "Figure 9 shows the SST bias averaged over the years 2003-2017"
-    }
-   ]
-  }
- ],
- "experiments": [
-  {
-   "experiment_id": "X-N1-SHAPE",
-   "task": "PARAMETERIZATION",
-   "task_raw": "offline training of N1 predicting shape function g(sigma) of k-epsilon diffusivity",
-   "method_id": "M-EPBL-NN",
-   "dataset_ids": [
-    "D-GOTM"
-   ],
-   "target_variable": "shape function g(sigma) at 16 sigma nodes",
-   "training": {
-    "loss": {
-     "value": "L1 loss (mean absolute error)",
-     "page_pdf": 13,
-     "page_printed": 13,
-     "quote": "We used the L1 loss function (mean absolute error) for training",
-     "extra_evidence": [
-      {
-       "claim": "loss values at nodes 8 to 13 amplified by a factor of 100",
-       "page_pdf": 13,
-       "page_printed": 13,
-       "quote": "The loss values at nodes 8 to 13 were amplified by a factor of 100"
+      "experiment_id": "X-N1-SHAPE",
+      "task": "PARAMETERIZATION",
+      "task_raw": "offline training of N1 predicting shape function g(sigma) of k-epsilon diffusivity",
+      "method_id": "M-EPBL-NN",
+      "dataset_ids": [
+        "D-GOTM"
+      ],
+      "target_variable": "shape function g(sigma) at 16 sigma nodes",
+      "training": {
+        "loss": {
+          "value": "L1 loss (mean absolute error)",
+          "page_pdf": 13,
+          "page_printed": 13,
+          "quote": "We used the L1 loss function (mean absolute error) for training",
+          "extra_evidence": [
+            {
+              "claim": "loss values at nodes 8 to 13 amplified by a factor of 100",
+              "page_pdf": 13,
+              "page_printed": 13,
+              "quote": "The loss values at nodes 8 to 13 were amplified by a factor of 100"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 13,
+          "page_printed": 13,
+          "quote": "The ADAM optimization algorithm (Kingma & Ba, 2014) has been used to train the weights"
+        },
+        "learning_rate": {
+          "value": 0.001,
+          "page_pdf": 13,
+          "page_printed": 13,
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "note": "PDF p13: '...with a learning rate of 10' followed by superscript minus 3; exponent is a math symbol."
+        },
+        "batch_size": {
+          "value": "single batch (full training set)",
+          "page_pdf": 12,
+          "page_printed": 12,
+          "quote": "Training data was randomized and provided as a single batch to train networks."
+        }
       }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 13,
-     "page_printed": 13,
-     "quote": "The ADAM optimization algorithm (Kingma & Ba, 2014) has been used to train the weights"
-    },
-    "learning_rate": {
-     "value": 0.001,
-     "page_pdf": 13,
-     "page_printed": 13,
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "note": "PDF p13: '...with a learning rate of 10' followed by superscript minus 3; exponent is a math symbol."
-    },
-    "batch_size": {
-     "value": "single batch (full training set)",
-     "page_pdf": 12,
-     "page_printed": 12,
-     "quote": "Training data was randomized and provided as a single batch to train networks."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-N2-VELOCITY",
-   "task": "PARAMETERIZATION",
-   "task_raw": "offline training of N2 predicting velocity scale v0",
-   "method_id": "M-EPBL-NN",
-   "dataset_ids": [
-    "D-GOTM"
-   ],
-   "target_variable": "velocity scale v0",
-   "training": {},
-   "note": "Paper says N2 is trained 'similarly to N1' for the log transform only; loss/optimizer/lr/batch/epochs for N2 are not stated, so none copied from N1."
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "task": "PARAMETERIZATION",
-   "task_raw": "online evaluation of ePBL NN in OM4.0 JRA-forced ice-ocean model vs ePBL control",
-   "method_id": "M-EPBL-NN",
-   "dataset_ids": [
-    "D-JRA",
-    "D-ARGO",
-    "D-WOA"
-   ],
-   "target_variable": "mixed layer depth, SST, upper-ocean stratification",
-   "training": {},
-   "note": "Online evaluation of networks trained in X-N1-SHAPE and X-N2-VELOCITY; no separate training."
-  }
- ],
- "results": [
-  {
-   "experiment_id": "X-N1-SHAPE",
-   "dataset_id": "D-GOTM",
-   "metric": "CORRELATION",
-   "metric_raw": "weight-averaged linear correlation, validation vs prediction, 16 nodes",
-   "metric_kind": "SKILL",
-   "value": 0.9,
-   "unit": "1",
-   "higher_is_better": true,
-   "split": "VALIDATION",
-   "config": "N1, 2 hidden layers x 32 nodes",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 12,
-   "page_printed": 12,
-   "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-   "note": "Text reads 'average correlation' then an approx-equal symbol then 0.9 (PDF p12, Section 3.4.3); quote would cross a math symbol."
-  },
-  {
-   "experiment_id": "X-N2-VELOCITY",
-   "dataset_id": "D-GOTM",
-   "metric": "CORRELATION",
-   "metric_raw": "linear correlation, prediction vs true values",
-   "metric_kind": "SKILL",
-   "value": 0.99,
-   "unit": "1",
-   "higher_is_better": true,
-   "split": "UNSPECIFIED",
-   "config": "N2 (2 hidden layers x 32 nodes)",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 14,
-   "page_printed": 14,
-   "quote": "The trained network has high skill (linear correlation of 0.99)",
-   "note": "Split not stated in the sentence; Figure 5 shows training and validation panels; text says data divided 80-20% to train and test."
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "metric_kind": "ERROR",
-   "value": 4.38,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL (control), summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 21,
-   "page_printed": 21,
-   "quote": "ePBL - ARGO, RMSE=4.38 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "metric_kind": "ERROR",
-   "value": 3.89,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL NN, summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "baseline_name": "ePBL",
-   "baseline_value": 4.38,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 21,
-   "page_printed": 21,
-   "quote": "ePBL_NN - ARGO, RMSE=3.89 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "metric_kind": "ERROR",
-   "value": 7.22,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL (control), summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 22,
-   "page_printed": 22,
-   "quote": "ePBL - ARGO, RMSE=7.22 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "metric_kind": "ERROR",
-   "value": 5.73,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL NN, summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "baseline_name": "ePBL",
-   "baseline_value": 7.22,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 22,
-   "page_printed": 22,
-   "quote": "ePBL_NN - ARGO, RMSE=5.73 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "metric_kind": "ERROR",
-   "value": 23.27,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL (control), winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 22,
-   "page_printed": 22,
-   "quote": "ePBL - ARGO, RMSE=23.27 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "metric_kind": "ERROR",
-   "value": 24.1,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL NN, winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
-   "baseline_name": "ePBL",
-   "baseline_value": 23.27,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 22,
-   "page_printed": 22,
-   "quote": "ePBL_NN - ARGO, RMSE=24.1 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "metric_kind": "ERROR",
-   "value": 77.67,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL (control), winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 23,
-   "page_printed": 23,
-   "quote": "ePBL - ARGO, RMSE=77.67 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "metric_kind": "ERROR",
-   "value": 78.84,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL NN, winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
-   "baseline_name": "ePBL",
-   "baseline_value": 77.67,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 23,
-   "page_printed": 23,
-   "quote": "ePBL_NN - ARGO, RMSE=78.84 (m)"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-WOA",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of SST bias",
-   "metric_kind": "ERROR",
-   "value": 0.491,
-   "unit": "degC",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL (control), SST vs WOA",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 20,
-   "page_printed": 20,
-   "quote": "ePBL - Obs, RMSE=0.491"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-WOA",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of SST bias",
-   "metric_kind": "ERROR",
-   "value": 0.503,
-   "unit": "degC",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL NN, SST vs WOA",
-   "baseline_name": "ePBL",
-   "baseline_value": 0.491,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 20,
-   "page_printed": 20,
-   "quote": "ePBL_NN - ARGO, RMSE=0.503",
-   "note": "Panel label says ARGO but caption of Figure 9 says observations are World Ocean Atlas."
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "average RMSE of MLD bias, -20 to 20 latitude",
-   "metric_kind": "ERROR",
-   "value": 7.94,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL (control), tropics",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 20,
-   "page_printed": 20,
-   "quote": "RMSE) for MLD bias in ePBL was about 7.94 m"
-  },
-  {
-   "experiment_id": "X-OGCM-ONLINE",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "average RMSE of MLD bias, -20 to 20 latitude",
-   "metric_kind": "ERROR",
-   "value": 5.18,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL NN, tropics",
-   "baseline_name": "ePBL",
-   "baseline_value": 7.94,
-   "source_table": null,
-   "is_best_in_table": true,
-   "page_pdf": 20,
-   "page_printed": 20,
-   "quote": "the bias was reduced to 5.18 m"
-  }
- ],
- "limitations": [
-  {
-   "theme": "PHYSICS",
-   "page_pdf": 25,
-   "page_printed": 25,
-   "quote": "assume downgradient diffusion and hence have no nonlocal flux terms"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 9,
-   "page_printed": 9,
-   "quote": "Any biases in the training data are inherited by the neural networks."
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 13,
-   "page_printed": 13,
-   "quote": "which falls short of having very high skill for all the regimes"
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "If the network receives inputs outside the known range, the shape function can have spurious values with irregular vertical structure."
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 26,
-   "page_printed": 26,
-   "quote": "may not show the same impact on model bias as observed in this forced"
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 26,
-   "page_printed": 26,
-   "quote": "but alternative SMC models may yield different results"
-  },
-  {
-   "theme": "FUTURE_WORK",
-   "page_pdf": 26,
-   "page_printed": 26,
-   "quote": "will be explored in the future and will likely require using graphical processing units"
-  }
- ],
- "conflicts": [
-  {
-   "field": "datasets[D-WOA].period_start",
-   "values": [
-    2003,
-    2005
-   ],
-   "sources": [
-    {
-     "page_pdf": 19,
-     "quote": "Figure 9 shows the SST bias averaged over the years 2003-2017"
     },
     {
-     "page_pdf": 20,
-     "quote": "SST and SST Bias, 2005-2017 averaged"
+      "experiment_id": "X-N2-VELOCITY",
+      "task": "PARAMETERIZATION",
+      "task_raw": "offline training of N2 predicting velocity scale v0",
+      "method_id": "M-EPBL-NN",
+      "dataset_ids": [
+        "D-GOTM"
+      ],
+      "target_variable": "velocity scale v0",
+      "training": {},
+      "note": "Paper says N2 is trained 'similarly to N1' for the log transform only; loss/optimizer/lr/batch/epochs for N2 are not stated, so none copied from N1."
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "task": "PARAMETERIZATION",
+      "task_raw": "online evaluation of ePBL NN in OM4.0 JRA-forced ice-ocean model vs ePBL control",
+      "method_id": "M-EPBL-NN",
+      "dataset_ids": [
+        "D-JRA",
+        "D-ARGO",
+        "D-WOA"
+      ],
+      "target_variable": "mixed layer depth, SST, upper-ocean stratification",
+      "training": {},
+      "note": "Online evaluation of networks trained in X-N1-SHAPE and X-N2-VELOCITY; no separate training."
     }
-   ],
-   "chosen": 2003,
-   "reason": "Body text preferred over the figure title; the two disagree."
-  }
- ],
- "not_reported": [
-  {
-   "field": "experiments[X-N1-SHAPE].training.epochs",
-   "searched": [
-    "Section 3.4.3",
-    "Section 3.4",
-    "Figure 3 caption (axis only, no stated value)"
-   ]
-  },
-  {
-   "field": "experiments[X-N1-SHAPE].training.hardware",
-   "searched": [
-    "Sections 3.2-3.5",
-    "Section 4.1 (GPU mentioned only for inference/future)"
-   ]
-  },
-  {
-   "field": "experiments[X-N2-VELOCITY].training.loss",
-   "searched": [
-    "Section 3.5",
-    "Section 3.4",
-    "Figure 5 caption"
-   ]
-  },
-  {
-   "field": "experiments[X-N2-VELOCITY].training.optimizer",
-   "searched": [
-    "Section 3.5",
-    "Section 3.4",
-    "Figure 5 caption"
-   ]
-  },
-  {
-   "field": "experiments[X-N2-VELOCITY].training.learning_rate",
-   "searched": [
-    "Section 3.5",
-    "Section 3.4",
-    "Figure 5 caption"
-   ]
-  },
-  {
-   "field": "experiments[X-N2-VELOCITY].training.batch_size",
-   "searched": [
-    "Section 3.5",
-    "Section 3.4",
-    "Figure 5 caption"
-   ]
-  },
-  {
-   "field": "experiments[X-N2-VELOCITY].training.epochs",
-   "searched": [
-    "Section 3.5",
-    "Section 3.4",
-    "Figure 5 caption"
-   ]
-  },
-  {
-   "field": "experiments[X-N2-VELOCITY].training.hardware",
-   "searched": [
-    "Section 3.5",
-    "Section 3.4",
-    "Figure 5 caption"
-   ]
-  }
- ]
+  ],
+  "results": [
+    {
+      "experiment_id": "X-N1-SHAPE",
+      "dataset_id": "D-GOTM",
+      "metric": "CORRELATION",
+      "metric_raw": "weight-averaged linear correlation, validation vs prediction, 16 nodes",
+      "metric_kind": "SKILL",
+      "value": 0.9,
+      "unit": "1",
+      "higher_is_better": true,
+      "split": "VALIDATION",
+      "config": "N1, 2 hidden layers x 32 nodes",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 12,
+      "page_printed": 12,
+      "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+      "note": "Text reads 'average correlation' then an approx-equal symbol then 0.9 (PDF p12, Section 3.4.3); quote would cross a math symbol."
+    },
+    {
+      "experiment_id": "X-N2-VELOCITY",
+      "dataset_id": "D-GOTM",
+      "metric": "CORRELATION",
+      "metric_raw": "linear correlation, prediction vs true values",
+      "metric_kind": "SKILL",
+      "value": 0.99,
+      "unit": "1",
+      "higher_is_better": true,
+      "split": "UNSPECIFIED",
+      "config": "N2 (2 hidden layers x 32 nodes)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 14,
+      "page_printed": 14,
+      "quote": "The trained network has high skill (linear correlation of 0.99)",
+      "note": "Split not stated in the sentence; Figure 5 shows training and validation panels; text says data divided 80-20% to train and test."
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "metric_kind": "ERROR",
+      "value": 4.38,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL (control), summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 21,
+      "page_printed": 21,
+      "quote": "ePBL - ARGO, RMSE=4.38 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "metric_kind": "ERROR",
+      "value": 3.89,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL NN, summer MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "baseline_name": "ePBL",
+      "baseline_value": 4.38,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 21,
+      "page_printed": 21,
+      "quote": "ePBL_NN - ARGO, RMSE=3.89 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "metric_kind": "ERROR",
+      "value": 7.22,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL (control), summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 22,
+      "page_printed": 22,
+      "quote": "ePBL - ARGO, RMSE=7.22 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "metric_kind": "ERROR",
+      "value": 5.73,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL NN, summer MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "baseline_name": "ePBL",
+      "baseline_value": 7.22,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 22,
+      "page_printed": 22,
+      "quote": "ePBL_NN - ARGO, RMSE=5.73 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "metric_kind": "ERROR",
+      "value": 23.27,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL (control), winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 22,
+      "page_printed": 22,
+      "quote": "ePBL - ARGO, RMSE=23.27 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "metric_kind": "ERROR",
+      "value": 24.1,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL NN, winter MLD bias vs ARGO, potential-energy-anomaly criterion (Reichl 2022)",
+      "baseline_name": "ePBL",
+      "baseline_value": 23.27,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 22,
+      "page_printed": 22,
+      "quote": "ePBL_NN - ARGO, RMSE=24.1 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "metric_kind": "ERROR",
+      "value": 77.67,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL (control), winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 23,
+      "page_printed": 23,
+      "quote": "ePBL - ARGO, RMSE=77.67 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of MLD bias, winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "metric_kind": "ERROR",
+      "value": 78.84,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL NN, winter MLD bias vs ARGO, density criterion (de Boyer Montegut 2004)",
+      "baseline_name": "ePBL",
+      "baseline_value": 77.67,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 23,
+      "page_printed": 23,
+      "quote": "ePBL_NN - ARGO, RMSE=78.84 (m)"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-WOA",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of SST bias",
+      "metric_kind": "ERROR",
+      "value": 0.491,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL (control), SST vs WOA",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 20,
+      "page_printed": 20,
+      "quote": "ePBL - Obs, RMSE=0.491"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-WOA",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of SST bias",
+      "metric_kind": "ERROR",
+      "value": 0.503,
+      "unit": "degC",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL NN, SST vs WOA",
+      "baseline_name": "ePBL",
+      "baseline_value": 0.491,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 20,
+      "page_printed": 20,
+      "quote": "ePBL_NN - ARGO, RMSE=0.503",
+      "note": "Panel label says ARGO but caption of Figure 9 says observations are World Ocean Atlas."
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "average RMSE of MLD bias, -20 to 20 latitude",
+      "metric_kind": "ERROR",
+      "value": 7.94,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL (control), tropics",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 20,
+      "page_printed": 20,
+      "quote": "RMSE) for MLD bias in ePBL was about 7.94 m"
+    },
+    {
+      "experiment_id": "X-OGCM-ONLINE",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "average RMSE of MLD bias, -20 to 20 latitude",
+      "metric_kind": "ERROR",
+      "value": 5.18,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL NN, tropics",
+      "baseline_name": "ePBL",
+      "baseline_value": 7.94,
+      "source_table": null,
+      "is_best_in_table": true,
+      "page_pdf": 20,
+      "page_printed": 20,
+      "quote": "the bias was reduced to 5.18 m"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 25,
+      "page_printed": 25,
+      "quote": "assume downgradient diffusion and hence have no nonlocal flux terms"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "Any biases in the training data are inherited by the neural networks."
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 13,
+      "page_printed": 13,
+      "quote": "which falls short of having very high skill for all the regimes"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "If the network receives inputs outside the known range, the shape function can have spurious values with irregular vertical structure."
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 26,
+      "page_printed": 26,
+      "quote": "may not show the same impact on model bias as observed in this forced"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 26,
+      "page_printed": 26,
+      "quote": "but alternative SMC models may yield different results"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 26,
+      "page_printed": 26,
+      "quote": "will be explored in the future and will likely require using graphical processing units"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-N1-SHAPE].training.epochs",
+      "searched": [
+        "Section 3.4.3",
+        "Section 3.4",
+        "Figure 3 caption (axis only, no stated value)"
+      ]
+    },
+    {
+      "field": "experiments[X-N1-SHAPE].training.hardware",
+      "searched": [
+        "Sections 3.2-3.5",
+        "Section 4.1 (GPU mentioned only for inference/future)"
+      ]
+    },
+    {
+      "field": "experiments[X-N2-VELOCITY].training.loss",
+      "searched": [
+        "Section 3.5",
+        "Section 3.4",
+        "Figure 5 caption"
+      ]
+    },
+    {
+      "field": "experiments[X-N2-VELOCITY].training.optimizer",
+      "searched": [
+        "Section 3.5",
+        "Section 3.4",
+        "Figure 5 caption"
+      ]
+    },
+    {
+      "field": "experiments[X-N2-VELOCITY].training.learning_rate",
+      "searched": [
+        "Section 3.5",
+        "Section 3.4",
+        "Figure 5 caption"
+      ]
+    },
+    {
+      "field": "experiments[X-N2-VELOCITY].training.batch_size",
+      "searched": [
+        "Section 3.5",
+        "Section 3.4",
+        "Figure 5 caption"
+      ]
+    },
+    {
+      "field": "experiments[X-N2-VELOCITY].training.epochs",
+      "searched": [
+        "Section 3.5",
+        "Section 3.4",
+        "Figure 5 caption"
+      ]
+    },
+    {
+      "field": "experiments[X-N2-VELOCITY].training.hardware",
+      "searched": [
+        "Section 3.5",
+        "Section 3.4",
+        "Figure 5 caption"
+      ]
+    },
+    {
+      "field": "datasets[D-WOA].period_start",
+      "searched": [
+        "Section 3 evaluation",
+        "Figure 9 caption"
+      ],
+      "note": "2003-2017 est la fenêtre de moyenne du biais SST du modèle, pas la période du World Ocean Atlas."
+    }
+  ]
 }

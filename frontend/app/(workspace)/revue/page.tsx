@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ApiError } from "@/app/lib/api";
 import {
-  DECISION_LABEL, familyLabel, fieldLabel, getReviewQueue, KIND_LABEL, taskLabel, type Claim,
+  DECISION_LABEL, familyLabel, fieldLabel, getReviewQueue, KIND_LABEL, RECHECK_LABEL,
+  taskLabel, type Claim,
 } from "@/app/lib/corpusV2";
 import { Quote } from "../corpus/components/Quote";
 import { getAuditor, recordVerdict } from "./actions";
@@ -79,6 +80,11 @@ export default async function RevuePage({
         <p><span className="block text-xs uppercase tracking-wide text-ink-400">confirmées</span>{progress.accepted}</p>
         <p><span className="block text-xs uppercase tracking-wide text-ink-400">à corriger</span>{progress.needs_fix + progress.rejected}</p>
         <p><span className="block text-xs uppercase tracking-wide text-ink-400">en attente</span>{queue.pending}</p>
+        <p className="sm:col-span-4 text-ink-600">
+          Chaque information a déjà été relue une seconde fois par une machine indépendante,
+          qui vérifie que la valeur est la bonne lecture du bon contexte. Ce n’est pas un audit :
+          c’est ce qui te reste à faire.
+        </p>
       </div>
 
       {slug ? (
@@ -144,6 +150,13 @@ export default async function RevuePage({
               {claim.pdf ? ` · ${claim.pdf}` : ""}
             </p>
             {claim.note ? <p className="mt-2 text-sm text-ink-600">Note d’extraction : {claim.note}</p> : null}
+            <p className="mt-2 text-sm text-ink-600">
+              Seconde lecture machine : {RECHECK_LABEL[claim.recheck_state]}
+              {claim.recheck?.reason ? ` — ${claim.recheck.reason}` : ""}
+            </p>
+            {claim.recheck?.triage ? (
+              <p className="mt-1 text-sm text-ink-600">Décision prise : {claim.recheck.triage.reason}</p>
+            ) : null}
             {claim.evidence_status !== "QUOTED" && claim.quote ? (
               <p className="mt-2 text-sm text-ink-600">
                 Statut : {claim.evidence_status} — la valeur a été lue, mais aucune phrase ne la porte seule.

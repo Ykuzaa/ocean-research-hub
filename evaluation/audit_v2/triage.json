@@ -1,0 +1,151 @@
+{
+  "triaged_at": "2026-10-15",
+  "triaged_by": "orchestrateur (claude-opus-5); chaque décision relue sur la page citée du PDF",
+  "note": "Ce fichier tranche les signalements du canal machine. APPLIED: l'enregistrement a été corrigé. KEPT: le signalement est écarté, avec la raison. Les limites retirées ne figurent plus comme informations et ne sont donc pas listées ici; voir le journal de corrections.",
+  "decisions": {
+    "4dvarnet-ssh-2023::methods[0].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en HYBRID_PHYSICS_ML: la règle 1 existe pour ce cas précis, un réseau appris enchâssé dans un solveur variationnel."
+    },
+    "chlorophyll-prediction::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CNN_RNN_HYBRID. Relu p17: « a CNN to extract features [...] an LSTM to forecast based on those features » — règle 6."
+    },
+    "dincae-2-2022::experiments[1].training.epochs": {
+      "decision": "APPLIED",
+      "reason": "Les 1000 époques sont déplacées vers l'expérience altimétrie, à laquelle le paragraphe p5 les rattache. Défaut de ma propre lecture."
+    },
+    "dincae-2-2022::experiments[2].training.train_time_hours": {
+      "decision": "APPLIED",
+      "reason": "Les 1,9 h sont déplacées vers le cas AVHRR/Ligurien: p5 dit « using the AVHRR dataset described in Barth et al. (2020) ». Défaut de ma propre lecture."
+    },
+    "joint-interpolation-learning::results[17]": {
+      "decision": "APPLIED",
+      "reason": "Référence corrigée en grad-OI. Relu p10: « I-scores of ≈88.3% for FP(5)-GENN vs. 84.06% for the OI baseline »."
+    },
+    "local-to-largescale-mapping::results[2]": {
+      "decision": "APPLIED",
+      "reason": "Référence corrigée de 1,53 à 0,89. Relu le tableau 2 p16: la colonne « ≤3 m RMSE » de Random Forest vaut 0,89, 1,53 est sa colonne 0-20 m."
+    },
+    "local-to-largescale-mapping::results[5]": {
+      "decision": "APPLIED",
+      "reason": "Référence corrigée de 1,53 à 0,89 (même colonne du tableau 2, p16)."
+    },
+    "local-to-largescale-mapping::results[8]": {
+      "decision": "APPLIED",
+      "reason": "Référence corrigée de 1,53 à 0,89 (même colonne du tableau 2, p16)."
+    },
+    "local-to-largescale-mapping::results[11]": {
+      "decision": "APPLIED",
+      "reason": "Référence corrigée de 1,53 à 0,89 (même colonne du tableau 2, p16)."
+    },
+    "ml-mixing-equations::methods[0].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en SYMBOLIC_REGRESSION: la forme fonctionnelle est découverte par programmation génétique, c'est la définition de la règle 6."
+    },
+    "ml-mixing-equations::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en MLP_DNN: la règle 5 classe le réseau, pas le schéma dans lequel il est branché."
+    },
+    "oai-0031::methods[0].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CNN_GENERIC: quatre convolutions et quatre poolings puis des couches denses, aucun décodeur (règle 3)."
+    },
+    "oai-0031::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en MLP_DNN: le papier dit « deep fully connected neural networks »."
+    },
+    "oai-0031::methods[2].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CLASSICAL_ML: un random forest ajuste des paramètres (règle 8)."
+    },
+    "oai-0031::methods[3].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CLASSICAL_ML: un SVM ajuste des paramètres (règle 8)."
+    },
+    "oai-0031::methods[4].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CLASSICAL_ML: une régression logistique ajuste des paramètres (règle 8)."
+    },
+    "oai-0031::methods[5].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CNN_GENERIC: un réseau résiduel n'est pas un U-Net (règle 3)."
+    },
+    "oai-0036::datasets[1].evidence[1]": {
+      "decision": "APPLIED",
+      "reason": "Rôle corrigé en EVALUATION: la citation dit que SLSTR sert au seul calcul du RMSE indépendant."
+    },
+    "oai-0036::datasets[2].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Rôle corrigé en EVALUATION: HadIOD sert à la validation in-situ, pas de covariable d'entrée."
+    },
+    "oai-0091::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CNN_GENERIC: extracteur convolutif sans décodeur suivi d'un clustering (règle 3)."
+    },
+    "oai-0091::methods[2].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CNN_GENERIC (règle 3), même motif."
+    },
+    "oai-0091::results[2]": {
+      "decision": "APPLIED",
+      "reason": "Référence mise à null: 0,584 est une autre ligne du grid-search, pas une méthode de comparaison."
+    },
+    "oai-0101::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CLASSICAL_ML: six paramètres calibrés sur la suite LES par inversion de Kalman, donc des paramètres appris (règle 8)."
+    },
+    "oceangpt-llm::methods[0].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en OTHER (règle 9): le papier ne nomme jamais son architecture, « transformeur » venait d'une connaissance extérieure."
+    },
+    "oceangpt-llm::methods[0].evidence[1]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en OTHER (règle 9), même motif."
+    },
+    "oceangpt-llm::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en OTHER (règle 9), même motif."
+    },
+    "oceangpt-llm::methods[2].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en OTHER (règle 9), même motif."
+    },
+    "oceangpt-llm::methods[3].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en OTHER (règle 9), même motif."
+    },
+    "seabed-net::methods[1].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CLASSICAL_ML: la régression multibande de Lyzenga ajuste ses coefficients sur les profondeurs (règle 8). Pas SYMBOLIC_REGRESSION: la forme vient de la littérature, elle n'est pas découverte ici."
+    },
+    "seabed-net::methods[2].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en CLASSICAL_ML: le rapport de bandes de Stumpf est également ajusté (règle 8)."
+    },
+    "vertical-mixing-param::methods[0].evidence[0]": {
+      "decision": "APPLIED",
+      "reason": "Famille corrigée en MLP_DNN: la règle 5 classe le réseau lui-même; le couplage à ePBL reste décrit dans architecture_note."
+    },
+    "coastal-sea-states-sr::limitations[5]": {
+      "decision": "KEPT",
+      "reason": "Gardée, contre l'avis du contre-vérificateur. Relu p6: la phrase continue par « wind forcing, wind growth, and white-capping are not taken into account ». C'est une restriction de périmètre que les auteurs énoncent sur leur propre dispositif, donc une limite."
+    },
+    "joint-interpolation-learning::results[18]": {
+      "decision": "KEPT",
+      "reason": "Gardée: le contrat demande explicitement de conserver la ligne de référence d'un tableau, et `config` dit déjà « AnDA baseline (reference only) ». L'attribution à l'expérience reste lâche, c'est noté."
+    },
+    "ml-mesoscale-param::limitations[6]": {
+      "decision": "KEPT",
+      "reason": "Gardée: « treated as a black box in our study » est une contrainte de périmètre que les auteurs posent sur leur propre étude, pas une mesure de performance."
+    },
+    "seabed-net::methods[7].evidence[0]": {
+      "decision": "KEPT",
+      "reason": "Gardée en OTHER (règle 9): la page ne fait que nommer SegFormer. Savoir ce qu'est SegFormer ne le fait pas dire au papier."
+    },
+    "seabed-net::methods[12].evidence[0]": {
+      "decision": "KEPT",
+      "reason": "Gardée en OTHER (règle 9): même motif pour TaskPrompter."
+    }
+  }
+}

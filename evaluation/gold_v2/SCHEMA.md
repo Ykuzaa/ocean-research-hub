@@ -77,6 +77,21 @@ Two extractors classified two near-identical 4DVarNet papers as
 7. `is_novel_in_paper` is false when the authors say they adapt an existing model,
    even if `role` is `PROPOSED`. Being the paper's subject is not the same as being
    its contribution.
+8. **A fitted model is not a `CLASSICAL_BASELINE`.** Rule 2 is about learned
+   parameters, not about being a comparison: random forest, SVM, logistic
+   regression and the empirical SDB regressions (Lyzenga, Stumpf) all fit
+   coefficients to data, so they are `CLASSICAL_ML` even when their `role` is
+   `BASELINE`. `CLASSICAL_BASELINE` stays for optimal interpolation, DIVAnd,
+   Okubo-Weiss, persistence and physics-based models with no fitted parameter.
+   `SYMBOLIC_REGRESSION` is narrower still: it is for work whose contribution is
+   the *discovered functional form*, not for a regression whose form the authors
+   took from the literature.
+9. **The family is read from the paper, not from outside knowledge.** When a paper
+   only names a method it compares against ("we also compare with SegFormer"), the
+   family is `OTHER` with the name kept in `family_raw`, even when the method is
+   famous and its architecture well known elsewhere. Knowing what SegFormer is does
+   not make it something this paper says. Classifying it anyway is the one kind of
+   inference this corpus exists to refuse.
 
 ## Shape
 
@@ -156,6 +171,21 @@ Two extractors classified two near-identical 4DVarNet papers as
   `unit` (`degC`, `K`, `cm`, `m`, `days`, `%`).
 - A paper that trains no ML model is not a failure. Write only `source`, `paper` and
   `excluded: {"reason": "", "page_pdf": 0, "quote": ""}`.
+- **A `limitation` is a limit the authors state about their own work.** Four things
+  that are routinely mistaken for one, and are not: a promise of future work ("we
+  plan to investigate this"), a data- or code-availability statement, a positive
+  result, and a remark about someone else's method. A limit phrased as a need ("a
+  higher resolution would be required") counts when it sits in the authors' own
+  enumeration of limits. When in doubt, the test is whether removing the sentence
+  would remove an admission.
+- **A training value belongs to the experiment the paper attaches it to.** A runtime
+  measured on another dataset, an epoch count stated for another case, hardware
+  given for a different implementation: each belongs to that experiment or to
+  nothing. Copying one setup across several experiments is allowed only when the
+  paper gives a single training section for all of them, and then `note` says so.
+- **A threshold is not a measurement.** "R > 0.6" states a bound the authors claim
+  to exceed, not a value they measured: it is not a `result`. The same holds for
+  "less than 0.1 degC" unless the config records it as an upper bound.
 
 ## Known ceilings (measured on the 8-paper pilot)
 

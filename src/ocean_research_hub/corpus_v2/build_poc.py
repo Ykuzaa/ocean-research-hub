@@ -16,6 +16,8 @@ import json
 import pathlib
 import sys
 
+from . import recheck, store
+
 TRAINING_FIELDS = ("loss", "optimizer", "learning_rate", "batch_size", "epochs", "hardware")
 
 
@@ -133,6 +135,8 @@ def build(gold_dir: pathlib.Path, manifest: pathlib.Path | None = None) -> dict:
         "shared_cells": len(shared),
         "figures_only": [paper["slug"] for paper in usable if not paper["results"]],
         "access": access_report(manifest) if manifest else None,
+        "recheck": recheck.progress(store.all_claims(gold_dir), recheck.load_ledger(),
+                                    recheck.load_triage()),
     }
     return {"agg": aggregate, "papers": views}
 
@@ -158,6 +162,9 @@ def main() -> int:
     print(f"{agg['experiments']} expériences, {agg['results']} résultats, {agg['quotes']} citations")
     print(f"comparabilité: {agg['shared_cells']} cellule(s) partagée(s) sur {agg['cells']}")
     print(f"résultats uniquement en figures: {len(agg['figures_only'])} papier(s)")
+    r = agg["recheck"]
+    print(f"seconde lecture: {r['confirmed']}/{r['claims']} confirmées, {r['flagged']} signalées "
+          f"({r['corrected']} corrigées, {r['flag_dismissed']} écartées)")
     if agg.get("access"):
         a = agg["access"]
         print(f"accès: {a['reachable']}/{a['indexed']} papiers atteignables "

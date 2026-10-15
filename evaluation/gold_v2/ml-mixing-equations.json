@@ -1,490 +1,484 @@
 {
- "source": {
-  "source_id": "ml-mixing-equations",
-  "file": ".data/golden-pdfs/machine-learned-equations-for-vertical-mixing-coefficients-i.pdf",
-  "sha256_prefix": "337808fd1fb2b60f1a4aa850",
-  "pdf_pages": 12,
-  "printed_page_offset": 0,
-  "extracted_by": "claude-sonnet-5-5",
-  "extracted_at": "2026-10-14"
- },
- "paper": {
-  "paper_id": "P-SANE2026-ML-EQUATIONS-MIXING",
-  "doi": "10.1029/2026GL122106",
-  "title": "Machine Learned Equations for Vertical Mixing Coefficients in the Ocean Surface Boundary Layer",
-  "year": 2026,
-  "venue": "Geophysical Research Letters",
-  "ocean_domains": [
-   "parameterization"
-  ],
-  "ocean_domains_raw": [
-   "ocean surface boundary layer",
-   "vertical mixing parameterization",
-   "mixed layer depth",
-   "climate ocean modelling"
-  ]
- },
- "methods": [
-  {
-   "method_id": "M-EPBL_EQ",
-   "canonical_name": "ePBL_EQ (ePBL with GP / least-squares discovered diffusivity equations)",
-   "family": "HYBRID_PHYSICS_ML",
-   "family_raw": "equation discovery (genetic programming and least squares fitting) embedded in the ePBL first-order scheme",
-   "architecture_note": "Closed-form expressions with O(10) fitted coefficients (Table 1), distilled from neural network predictions, replacing F1 and F2 in ePBL.",
-   "is_novel_in_paper": true,
-   "role": "PROPOSED",
-   "evidence": [
+  "source": {
+    "source_id": "ml-mixing-equations",
+    "file": ".data/golden-pdfs/machine-learned-equations-for-vertical-mixing-coefficients-i.pdf",
+    "sha256_prefix": "337808fd1fb2b60f1a4aa850",
+    "pdf_pages": 12,
+    "printed_page_offset": 0,
+    "extracted_by": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-SANE2026-ML-EQUATIONS-MIXING",
+    "doi": "10.1029/2026GL122106",
+    "title": "Machine Learned Equations for Vertical Mixing Coefficients in the Ocean Surface Boundary Layer",
+    "year": 2026,
+    "venue": "Geophysical Research Letters",
+    "ocean_domains": [
+      "parameterization"
+    ],
+    "ocean_domains_raw": [
+      "ocean surface boundary layer",
+      "vertical mixing parameterization",
+      "mixed layer depth",
+      "climate ocean modelling"
+    ]
+  },
+  "methods": [
     {
-     "field": "family",
-     "page_pdf": 3,
-     "page_printed": 3,
-     "quote": "To obtain closed‐form equations, we applied genetic programming (GP) and least squares fitting to neural"
+      "method_id": "M-EPBL_EQ",
+      "canonical_name": "ePBL_EQ (ePBL with GP / least-squares discovered diffusivity equations)",
+      "family": "SYMBOLIC_REGRESSION",
+      "family_raw": "equation discovery (genetic programming and least squares fitting) embedded in the ePBL first-order scheme",
+      "architecture_note": "Closed-form expressions with O(10) fitted coefficients (Table 1), distilled from neural network predictions, replacing F1 and F2 in ePBL. Forme fonctionnelle découverte par programmation génétique puis moindres carrés: règles 6 et 8.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "To obtain closed‐form equations, we applied genetic programming (GP) and least squares fitting to neural"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "in the equations‐based\nenhancement(referredtoasePBL_EQhereafter),theyareexpressions."
+        }
+      ]
     },
     {
-     "field": "canonical_name",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "in the equations‐based\nenhancement(referredtoasePBL_EQhereafter),theyareexpressions."
-    }
-   ]
-  },
-  {
-   "method_id": "M-EPBL_NN",
-   "canonical_name": "ePBL_NN (ePBL with neural-network shape function and velocity scale)",
-   "family": "HYBRID_PHYSICS_ML",
-   "family_raw": "neural networks embedded in ePBL",
-   "architecture_note": "Architecture of the networks is not described in this paper (see Sane et al., 2023).",
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
+      "method_id": "M-EPBL_NN",
+      "canonical_name": "ePBL_NN (ePBL with neural-network shape function and velocity scale)",
+      "family": "MLP_DNN",
+      "family_raw": "neural networks embedded in ePBL",
+      "architecture_note": "Architecture of the networks is not described in this paper (see Sane et al., 2023). Réseau inséré dans le schéma ePBL: la règle 5 classe le réseau, pas le système couplé.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "Intheneuralnetworkenhanced\nversion of ePBL (called ePBL_NN hereafter), F1 and F2 are neural networks;"
+        }
+      ]
+    },
     {
-     "field": "family",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "Intheneuralnetworkenhanced\nversion of ePBL (called ePBL_NN hereafter), F1 and F2 are neural networks;"
-    }
-   ]
-  },
-  {
-   "method_id": "M-EPBL",
-   "canonical_name": "ePBL (energetics-based Planetary Boundary Layer scheme, control)",
-   "family": "CLASSICAL_BASELINE",
-   "family_raw": "first-order physics-based closure",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
+      "method_id": "M-EPBL",
+      "canonical_name": "ePBL (energetics-based Planetary Boundary Layer scheme, control)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "first-order physics-based closure",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 2,
+          "page_printed": 2,
+          "quote": "energetics‐basedPlanetaryBoundaryLayerscheme(ePBL,Reichl&Hallberg,2018)"
+        }
+      ]
+    },
     {
-     "field": "canonical_name",
-     "page_pdf": 2,
-     "page_printed": 2,
-     "quote": "energetics‐basedPlanetaryBoundaryLayerscheme(ePBL,Reichl&Hallberg,2018)"
+      "method_id": "M-GLS",
+      "canonical_name": "Generic Length Scale (GLS) second-moment closure (ground truth)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "second-moment closure turbulence scheme",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "“GenericLengthScheme”(hereafter,GLSscheme;Umlauf&"
+        }
+      ]
     }
-   ]
-  },
-  {
-   "method_id": "M-GLS",
-   "canonical_name": "Generic Length Scale (GLS) second-moment closure (ground truth)",
-   "family": "CLASSICAL_BASELINE",
-   "family_raw": "second-moment closure turbulence scheme",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
+  ],
+  "datasets": [
     {
-     "field": "canonical_name",
-     "page_pdf": 3,
-     "page_printed": 3,
-     "quote": "“GenericLengthScheme”(hereafter,GLSscheme;Umlauf&"
-    }
-   ]
-  }
- ],
- "datasets": [
-  {
-   "dataset_id": "D-GLS-SMC",
-   "canonical_name": "Single-column GLS second-moment-closure simulations",
-   "variables": [
-    "shape function g(sigma)",
-    "velocity scale v0",
-    "|f|",
-    "B",
-    "u*",
-    "h"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": "single column, latitudes 0-90 deg",
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
+      "dataset_id": "D-GLS-SMC",
+      "canonical_name": "Single-column GLS second-moment-closure simulations",
+      "variables": [
+        "shape function g(sigma)",
+        "velocity scale v0",
+        "|f|",
+        "B",
+        "u*",
+        "h"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "single column, latitudes 0-90 deg",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "single‐columnGLSrunswereinitializedwithastablystratifiedprofile"
+        }
+      ]
+    },
     {
-     "field": "canonical_name",
-     "page_pdf": 3,
-     "page_printed": 3,
-     "quote": "single‐columnGLSrunswereinitializedwithastablystratifiedprofile"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-ARGO",
-   "canonical_name": "Argo float data (ARGO GDAC)",
-   "variables": [
-    "mixed layer depth"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": "global",
-   "period_start": "2003",
-   "period_end": "2017",
-   "role": "EVALUATION",
-   "evidence": [
+      "dataset_id": "D-ARGO",
+      "canonical_name": "Argo float data (ARGO GDAC)",
+      "variables": [
+        "mixed layer depth"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "global",
+      "period_start": "2003",
+      "period_end": "2017",
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "allrunsareevaluatedformixedlayer\npropertiesagainstARGOdata(Argo,2024)"
+        }
+      ]
+    },
     {
-     "field": "canonical_name",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "allrunsareevaluatedformixedlayer\npropertiesagainstARGOdata(Argo,2024)"
+      "dataset_id": "D-JRA55",
+      "canonical_name": "JRA55-do atmospheric reanalysis forcing",
+      "variables": [
+        "atmospheric forcing"
+      ],
+      "spatial_resolution": null,
+      "temporal_resolution": null,
+      "region": "global",
+      "period_start": "1958",
+      "period_end": "2017",
+      "role": "AUXILIARY_COVARIABLE",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "thatusestheJRA55‐do\natmosphericreanalysisforcing(Tsujinoetal.,2018)forthedurationfrom1958to2017."
+        }
+      ]
     }
-   ]
-  },
-  {
-   "dataset_id": "D-JRA55",
-   "canonical_name": "JRA55-do atmospheric reanalysis forcing",
-   "variables": [
-    "atmospheric forcing"
-   ],
-   "spatial_resolution": null,
-   "temporal_resolution": null,
-   "region": "global",
-   "period_start": "1958",
-   "period_end": "2017",
-   "role": "AUXILIARY_COVARIABLE",
-   "evidence": [
+  ],
+  "experiments": [
     {
-     "field": "canonical_name",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "thatusestheJRA55‐do\natmosphericreanalysisforcing(Tsujinoetal.,2018)forthedurationfrom1958to2017."
+      "experiment_id": "X-EQ-DISTILL",
+      "task": "PARAMETERIZATION",
+      "task_raw": "equation discovery distilled from neural networks for ePBL shape function and velocity scale",
+      "method_id": "M-EPBL_EQ",
+      "dataset_ids": [
+        "D-GLS-SMC"
+      ],
+      "target_variable": "shape function g(sigma) and velocity scale v0 / vh0",
+      "training": {},
+      "note": "Equations are obtained by GP and least squares fitting on neural-network predictions; no gradient-training hyperparameters apply. Coefficients fitted with Python Scipy curve_fit for Equation 8."
+    },
+    {
+      "experiment_id": "X-NN-GLS",
+      "task": "PARAMETERIZATION",
+      "task_raw": "neural networks trained on GLS data to predict ePBL shape function and velocity scale",
+      "method_id": "M-EPBL_NN",
+      "dataset_ids": [
+        "D-GLS-SMC"
+      ],
+      "target_variable": "shape function g(sigma) and velocity scale v0",
+      "training": {},
+      "note": "Training details are delegated to Sane et al. (2023); split said to be identical to that work."
+    },
+    {
+      "experiment_id": "X-MLD-NN",
+      "task": "PARAMETERIZATION",
+      "task_raw": "global MOM6 run with ePBL_NN, summer MLD evaluated against Argo",
+      "method_id": "M-EPBL_NN",
+      "dataset_ids": [
+        "D-ARGO",
+        "D-JRA55"
+      ],
+      "target_variable": "summer mixed layer depth",
+      "training": {}
+    },
+    {
+      "experiment_id": "X-MLD-EQ",
+      "task": "PARAMETERIZATION",
+      "task_raw": "global MOM6 run with ePBL_EQ (with and without h), summer MLD evaluated against Argo",
+      "method_id": "M-EPBL_EQ",
+      "dataset_ids": [
+        "D-ARGO",
+        "D-JRA55"
+      ],
+      "target_variable": "summer mixed layer depth",
+      "training": {}
     }
-   ]
-  }
- ],
- "experiments": [
-  {
-   "experiment_id": "X-EQ-DISTILL",
-   "task": "PARAMETERIZATION",
-   "task_raw": "equation discovery distilled from neural networks for ePBL shape function and velocity scale",
-   "method_id": "M-EPBL_EQ",
-   "dataset_ids": [
-    "D-GLS-SMC"
-   ],
-   "target_variable": "shape function g(sigma) and velocity scale v0 / vh0",
-   "training": {},
-   "note": "Equations are obtained by GP and least squares fitting on neural-network predictions; no gradient-training hyperparameters apply. Coefficients fitted with Python Scipy curve_fit for Equation 8."
-  },
-  {
-   "experiment_id": "X-NN-GLS",
-   "task": "PARAMETERIZATION",
-   "task_raw": "neural networks trained on GLS data to predict ePBL shape function and velocity scale",
-   "method_id": "M-EPBL_NN",
-   "dataset_ids": [
-    "D-GLS-SMC"
-   ],
-   "target_variable": "shape function g(sigma) and velocity scale v0",
-   "training": {},
-   "note": "Training details are delegated to Sane et al. (2023); split said to be identical to that work."
-  },
-  {
-   "experiment_id": "X-MLD-NN",
-   "task": "PARAMETERIZATION",
-   "task_raw": "global MOM6 run with ePBL_NN, summer MLD evaluated against Argo",
-   "method_id": "M-EPBL_NN",
-   "dataset_ids": [
-    "D-ARGO",
-    "D-JRA55"
-   ],
-   "target_variable": "summer mixed layer depth",
-   "training": {}
-  },
-  {
-   "experiment_id": "X-MLD-EQ",
-   "task": "PARAMETERIZATION",
-   "task_raw": "global MOM6 run with ePBL_EQ (with and without h), summer MLD evaluated against Argo",
-   "method_id": "M-EPBL_EQ",
-   "dataset_ids": [
-    "D-ARGO",
-    "D-JRA55"
-   ],
-   "target_variable": "summer mixed layer depth",
-   "training": {}
-  }
- ],
- "results": [
-  {
-   "experiment_id": "X-MLD-NN",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "global mean RMSE of summer MLD, potential anomaly criterion",
-   "metric_kind": "ERROR",
-   "value": 3.83,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL_NN, summer MLD 2003-2017, potential anomaly criterion",
-   "baseline_name": "ePBL",
-   "baseline_value": 4.38,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 7,
-   "page_printed": 7,
-   "quote": "withtheglobalmean\nRMSEdecreasingfrom4.38to3.83musingthepotentialanomalycriterion(Figure2)"
-  },
-  {
-   "experiment_id": "X-MLD-NN",
-   "dataset_id": "D-ARGO",
-   "metric": "RMSE",
-   "metric_raw": "global mean RMSE of summer MLD, density threshold criterion",
-   "metric_kind": "ERROR",
-   "value": 6.07,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "UNSPECIFIED",
-   "config": "ePBL_NN, summer MLD, density threshold criterion",
-   "baseline_name": "ePBL",
-   "baseline_value": 7.22,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 7,
-   "page_printed": 7,
-   "quote": "from7.22to6.07m\nusingthedensitythresholdcriterion"
-  }
- ],
- "limitations": [
-  {
-   "theme": "PHYSICS",
-   "page_pdf": 9,
-   "page_printed": 9,
-   "quote": "AlimitationofourworkistheinheritanceofdeficienciesandbiasesfromGLS,ourgroundtruthscheme."
-  },
-  {
-   "theme": "PHYSICS",
-   "page_pdf": 9,
-   "page_printed": 9,
-   "quote": "diffusivityonlyaccountsforshear‐and\nbuoyancy‐driventurbulence,withoutincorporatingtheeffectsofwavesthatarerelevantinclimatesimulations"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 2,
-   "page_printed": 2,
-   "quote": "LESdatasetsrequiresignificantlymorecomputationalresourcestogenerateandthereforeanLESdata\nset that spans the entire parameter space of interest is not available at present."
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 6,
-   "page_printed": 6,
-   "quote": "We\nfoundthatmodelinganonzerogradientnearσ=1waschallengingusingequations"
-  },
-  {
-   "theme": "FUTURE_WORK",
-   "page_pdf": 9,
-   "page_printed": 9,
-   "quote": "Theseimpactswillbetestedtogetherinfuturework."
-  }
- ],
- "conflicts": [],
- "not_reported": [
-  {
-   "field": "experiments[X-EQ-DISTILL].training.loss",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
-   ]
-  },
-  {
-   "field": "experiments[X-EQ-DISTILL].training.optimizer",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
-   ]
-  },
-  {
-   "field": "experiments[X-EQ-DISTILL].training.learning_rate",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
-   ]
-  },
-  {
-   "field": "experiments[X-EQ-DISTILL].training.batch_size",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
-   ]
-  },
-  {
-   "field": "experiments[X-EQ-DISTILL].training.epochs",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
-   ]
-  },
-  {
-   "field": "experiments[X-EQ-DISTILL].training.hardware",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
-   ]
-  },
-  {
-   "field": "experiments[X-NN-GLS].training.loss",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
-   ]
-  },
-  {
-   "field": "experiments[X-NN-GLS].training.optimizer",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
-   ]
-  },
-  {
-   "field": "experiments[X-NN-GLS].training.learning_rate",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
-   ]
-  },
-  {
-   "field": "experiments[X-NN-GLS].training.batch_size",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
-   ]
-  },
-  {
-   "field": "experiments[X-NN-GLS].training.epochs",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
-   ]
-  },
-  {
-   "field": "experiments[X-NN-GLS].training.hardware",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-NN].training.loss",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (inference in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-NN].training.optimizer",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (inference in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-NN].training.learning_rate",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (inference in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-NN].training.batch_size",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (inference in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-NN].training.epochs",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (inference in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-NN].training.hardware",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (inference in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-EQ].training.loss",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (equations evaluated in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-EQ].training.optimizer",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (equations evaluated in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-EQ].training.learning_rate",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (equations evaluated in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-EQ].training.batch_size",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (equations evaluated in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-EQ].training.epochs",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (equations evaluated in MOM6)"
-   ]
-  },
-  {
-   "field": "experiments[X-MLD-EQ].training.hardware",
-   "searched": [
-    "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
-    "searched Adam, batch, epoch, GPU, learning rate: no hit",
-    "no training in this experiment (equations evaluated in MOM6)"
-   ]
-  }
- ]
+  ],
+  "results": [
+    {
+      "experiment_id": "X-MLD-NN",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "global mean RMSE of summer MLD, potential anomaly criterion",
+      "metric_kind": "ERROR",
+      "value": 3.83,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL_NN, summer MLD 2003-2017, potential anomaly criterion",
+      "baseline_name": "ePBL",
+      "baseline_value": 4.38,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 7,
+      "page_printed": 7,
+      "quote": "withtheglobalmean\nRMSEdecreasingfrom4.38to3.83musingthepotentialanomalycriterion(Figure2)"
+    },
+    {
+      "experiment_id": "X-MLD-NN",
+      "dataset_id": "D-ARGO",
+      "metric": "RMSE",
+      "metric_raw": "global mean RMSE of summer MLD, density threshold criterion",
+      "metric_kind": "ERROR",
+      "value": 6.07,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "UNSPECIFIED",
+      "config": "ePBL_NN, summer MLD, density threshold criterion",
+      "baseline_name": "ePBL",
+      "baseline_value": 7.22,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 7,
+      "page_printed": 7,
+      "quote": "from7.22to6.07m\nusingthedensitythresholdcriterion"
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "AlimitationofourworkistheinheritanceofdeficienciesandbiasesfromGLS,ourgroundtruthscheme."
+    },
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 9,
+      "page_printed": 9,
+      "quote": "diffusivityonlyaccountsforshear‐and\nbuoyancy‐driventurbulence,withoutincorporatingtheeffectsofwavesthatarerelevantinclimatesimulations"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 2,
+      "page_printed": 2,
+      "quote": "LESdatasetsrequiresignificantlymorecomputationalresourcestogenerateandthereforeanLESdata\nset that spans the entire parameter space of interest is not available at present."
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 6,
+      "page_printed": 6,
+      "quote": "We\nfoundthatmodelinganonzerogradientnearσ=1waschallengingusingequations"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-EQ-DISTILL].training.loss",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
+      ]
+    },
+    {
+      "field": "experiments[X-EQ-DISTILL].training.optimizer",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
+      ]
+    },
+    {
+      "field": "experiments[X-EQ-DISTILL].training.learning_rate",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
+      ]
+    },
+    {
+      "field": "experiments[X-EQ-DISTILL].training.batch_size",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
+      ]
+    },
+    {
+      "field": "experiments[X-EQ-DISTILL].training.epochs",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
+      ]
+    },
+    {
+      "field": "experiments[X-EQ-DISTILL].training.hardware",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "equation discovery: GP settings (population, generations, operators) also not reported in the main text"
+      ]
+    },
+    {
+      "field": "experiments[X-NN-GLS].training.loss",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
+      ]
+    },
+    {
+      "field": "experiments[X-NN-GLS].training.optimizer",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
+      ]
+    },
+    {
+      "field": "experiments[X-NN-GLS].training.learning_rate",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
+      ]
+    },
+    {
+      "field": "experiments[X-NN-GLS].training.batch_size",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
+      ]
+    },
+    {
+      "field": "experiments[X-NN-GLS].training.epochs",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
+      ]
+    },
+    {
+      "field": "experiments[X-NN-GLS].training.hardware",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "paper states training details are those of Sane et al. (2023); loss curves in Supporting Information S1 (not available)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-NN].training.loss",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (inference in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-NN].training.optimizer",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (inference in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-NN].training.learning_rate",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (inference in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-NN].training.batch_size",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (inference in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-NN].training.epochs",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (inference in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-NN].training.hardware",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (inference in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-EQ].training.loss",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (equations evaluated in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-EQ].training.optimizer",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (equations evaluated in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-EQ].training.learning_rate",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (equations evaluated in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-EQ].training.batch_size",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (equations evaluated in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-EQ].training.epochs",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (equations evaluated in MOM6)"
+      ]
+    },
+    {
+      "field": "experiments[X-MLD-EQ].training.hardware",
+      "searched": [
+        "pages 1-10 (full text incl. Section 1.2 Approach, Sections 2-3, Availability Statement)",
+        "searched Adam, batch, epoch, GPU, learning rate: no hit",
+        "no training in this experiment (equations evaluated in MOM6)"
+      ]
+    }
+  ]
 }

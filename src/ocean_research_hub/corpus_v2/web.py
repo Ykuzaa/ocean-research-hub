@@ -15,13 +15,15 @@ from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import audit, store
+from . import audit, recheck, store
 from .build_poc import build
 
 SOURCING_NOTICE = (
     "Chaque valeur est sourcée: la citation existe mot pour mot sur la page citée, "
-    "vérifiée par corpus_v2.gate. « Sourcé » ne veut pas dire « audité »: seul un "
-    "verdict humain dans la file de revue rend une information auditée."
+    "vérifiée par corpus_v2.gate. Une seconde lecture machine indépendante a contrôlé "
+    "que la valeur est la bonne lecture du bon contexte. « Sourcé » et « contre-vérifié » "
+    "ne veulent pas dire « audité »: seul un verdict humain dans la file de revue rend "
+    "une information auditée."
 )
 
 
@@ -52,6 +54,8 @@ def register_corpus_v2_routes(
             "notice": SOURCING_NOTICE,
             **payload["agg"],
             "audit": audit.progress(store.all_claims(gold_dir), audit.load(ledger)),
+            "recheck": recheck.progress(store.all_claims(gold_dir), recheck.load_ledger(),
+                                        recheck.load_triage()),
         }
 
     @app.get("/api/v2/papers")
@@ -83,7 +87,10 @@ def register_corpus_v2_routes(
         if record is None:
             return error(404, "NOT_FOUND", f"no corpus v2 record named {slug!r}")
         verdicts = audit.load(ledger)
-        claims = audit.attach(list(store.claims(slug, record)), verdicts)
+        claims = recheck.attach(
+            audit.attach(list(store.claims(slug, record)), verdicts),
+            recheck.load_ledger(), recheck.load_triage(),
+        )
         return {
             "notice": SOURCING_NOTICE,
             **store.paper_detail(slug, record),
@@ -98,7 +105,8 @@ def register_corpus_v2_routes(
         limit: int = Query(default=25, ge=1, le=200),
     ) -> dict[str, Any]:
         verdicts = audit.load(ledger)
-        claims = audit.attach(store.all_claims(gold_dir), verdicts)
+        claims = recheck.attach(audit.attach(store.all_claims(gold_dir), verdicts),
+                                recheck.load_ledger(), recheck.load_triage())
         pending = [claim for claim in claims if claim["audit_state"] in ("UNAUDITED", "STALE")]
         if slug:
             pending = [claim for claim in pending if claim["slug"] == slug]

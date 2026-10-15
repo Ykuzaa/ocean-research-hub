@@ -164,6 +164,13 @@
     <div class="finding"><p id="acc-note"></p></div>
   </section>
 
+  <section id="relecture">
+    <h2 id="rc-title"></h2>
+    <p class="lede" style="margin-top:.75rem" id="rc-lede"></p>
+    <div class="bars" id="rc-bars"></div>
+    <div class="finding"><p id="rc-note"></p></div>
+  </section>
+
   <section id="couverture">
     <h2>Couverture du domaine</h2>
     <p class="lede" style="margin-top:.75rem">Tâche par famille d'architecture, en nombre de papiers. Les cases vides sont des combinaisons que personne n'a publiées dans ce corpus — un point de départ pour chercher un trou, pas une preuve qu'il est intéressant.</p>
@@ -185,7 +192,8 @@
 
   <footer>
     <p>Corpus v2 du dépôt Ocean Research Hub. Les citations sont stockées telles qu'extraites du PDF, césures et ligatures comprises. Deux contrôles automatiques vérifient que chaque citation existe à la page citée et qu'elle porte bien la valeur stockée.</p>
-    <p>Ces contrôles ne remplacent pas l'audit scientifique, qui reste à faire : aucun champ n'est marqué vérifié. Un papier dont les résultats ne figurent que dans des figures apparaît sans résultat numérique plutôt qu'avec des valeurs lues sur une courbe.</p>
+    <p>S'y ajoute une seconde lecture indépendante, faite par une autre machine contre le PDF, qui vérifie que chaque valeur a été lue dans le bon contexte : la bonne ligne, la bonne colonne, le bon modèle. Les signalements qu'elle a produits ont tous été tranchés, et les corrections appliquées sont consignées.</p>
+    <p>Rien de tout cela ne remplace l'audit scientifique, qui reste à faire : aucun champ n'est marqué vérifié par un humain. Un papier dont les résultats ne figurent que dans des figures apparaît sans résultat numérique plutôt qu'avec des valeurs lues sur une courbe.</p>
   </footer>
 </div>
 
@@ -215,7 +223,8 @@
     [agg.experiments, "expériences"],
     [agg.results, "résultats mesurés"],
     [agg.quotes, "citations relocalisées"],
-    [0, "champs marqués vérifiés"],
+    [agg.recheck.confirmed, "confirmées par une seconde lecture"],
+    [0, "champs audités par un humain"],
   ].map(([n, label]) => `<div><b>${n}</b><span>${label}</span></div>`).join("");
 
   text("gap-title", `Seules ${lrPct} % des expériences donnent leur learning rate`);
@@ -233,6 +242,29 @@
       <span>${n}/${agg.experiments}</span>
     </div>`;
   }).join("");
+
+  /* ---------- seconde lecture indépendante ---------- */
+  const rc = agg.recheck;
+  text("rc-title", `${rc.confirmed} informations sur ${rc.claims} tiennent à la seconde lecture`);
+  text("rc-lede", `Le contrôle déterministe prouve que la citation existe sur la page cité`
+    + `e. Il ne dit pas si la valeur a été lue dans le bon contexte : la bonne colonne, la bonne ligne, `
+    + `le bon modèle. Chaque information a donc été relue une seconde fois, indépendamment, contre le PDF. `
+    + `${rc.flagged} ont été signalées : ${rc.corrected} étaient de vraies erreurs et l'enregistrement a été corrigé, `
+    + `${rc.flag_dismissed} signalements ont été écartés après relecture, avec leur motif.`);
+  document.getElementById("rc-bars").innerHTML = [
+    ["confirmées", rc.confirmed],
+    ["corrigées après signalement", rc.corrected],
+    ["signalements écartés", rc.flag_dismissed],
+  ].map(([label, n]) => {
+    const pct = Math.round((n / rc.claims) * 100);
+    return `<div class="bar"><span>${label}</span>`
+      + `<span class="track" role="img" aria-label="${n} sur ${rc.claims}"><i style="width:${Math.max(pct, 0.4)}%"></i></span>`
+      + `<span>${n}/${rc.claims}</span></div>`;
+  }).join("");
+  text("rc-note", `Les deux défauts les plus fréquents n'étaient pas des chiffres faux mais des lectures `
+    + `déplacées : une famille d'architecture déduite d'une connaissance extérieure au papier, et des « limites » `
+    + `qui étaient en fait des promesses de travaux futurs ou des mesures de performance. `
+    + `« Contre-vérifié » reste une lecture machine : aucune de ces ${rc.claims} informations n'a encore été auditée par un humain.`);
 
   text("cmp-title", agg.shared_cells === 0
     ? "Aucun de ces papiers n'est comparable à un autre"

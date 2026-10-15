@@ -1,585 +1,579 @@
 {
- "source": {
-  "source_id": "ml-mesoscale-param",
-  "file": ".data/golden-pdfs/implementation-and-evaluation-of-a-machine-learned-mesoscale.pdf",
-  "sha256_prefix": "5b6ad646e448b67ff0c8803a",
-  "pdf_pages": 42,
-  "printed_page_offset": 0,
-  "extracted_by": "claude-sonnet-5-5",
-  "extracted_at": "2026-10-14"
- },
- "paper": {
-  "paper_id": "P-ML-MESOSCALE-PARAM",
-  "doi": null,
-  "title": "Implementation and Evaluation of a Machine Learned Mesoscale Eddy Parameterization into a Numerical Ocean Circulation Model",
-  "year": 2023,
-  "venue": "Journal of Advances in Modeling Earth Systems (submitted; arXiv:2303.00962v1)",
-  "ocean_domains": [
-   "eddies-fronts",
-   "parameterization",
-   "currents"
+  "source": {
+    "source_id": "ml-mesoscale-param",
+    "file": ".data/golden-pdfs/implementation-and-evaluation-of-a-machine-learned-mesoscale.pdf",
+    "sha256_prefix": "5b6ad646e448b67ff0c8803a",
+    "pdf_pages": 42,
+    "printed_page_offset": 0,
+    "extracted_by": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-ML-MESOSCALE-PARAM",
+    "doi": null,
+    "title": "Implementation and Evaluation of a Machine Learned Mesoscale Eddy Parameterization into a Numerical Ocean Circulation Model",
+    "year": 2023,
+    "venue": "Journal of Advances in Modeling Earth Systems (submitted; arXiv:2303.00962v1)",
+    "ocean_domains": [
+      "eddies-fronts",
+      "parameterization",
+      "currents"
+    ],
+    "ocean_domains_raw": [
+      "mesoscale eddies",
+      "subgrid parameterization",
+      "ocean circulation modelling"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-GZ21-CNN",
+      "canonical_name": "GZ21 stochastic-deep learning CNN momentum-forcing parameterization (Guillaumin & Zanna, 2021) coupled to MOM6",
+      "family": "CNN_GENERIC",
+      "family_raw": "Fully Convolutional Neural Network (CNN) with eight convolutional layers",
+      "architecture_note": "Predicts mean and standard deviation of a Gaussian subgrid momentum forcing, sampled stochastically online inside MOM6; classified on the network itself, not on the MOM6 coupling.",
+      "is_novel_in_paper": false,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The stochastic-deep learning model of GZ21 is a Fully Convolutional Neural Network (CNN) with eight convolutional layers"
+        },
+        {
+          "field": "is_novel_in_paper",
+          "page_pdf": 3,
+          "page_printed": 3,
+          "quote": "This study explores and documents the issues associated with implementing a pre-deﬁned ML parameterization"
+        }
+      ]
+    },
+    {
+      "method_id": "M-R4-NO-PARAM",
+      "canonical_name": "MOM6 coarse-resolution simulation without ML parameterization (R4, biharmonic Smagorinsky friction)",
+      "family": "CLASSICAL_BASELINE",
+      "family_raw": "coarse-resolution model R4 with biharmonic friction and Smagorinsky eddy viscosity",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "For the turbulence model we use a biharmonic friction with a Smagorinsky eddy viscosity"
+        }
+      ]
+    }
   ],
-  "ocean_domains_raw": [
-   "mesoscale eddies",
-   "subgrid parameterization",
-   "ocean circulation modelling"
+  "datasets": [
+    {
+      "dataset_id": "D-CM26",
+      "canonical_name": "CM2.6 high-resolution coupled climate model surface velocity (original GZ21 training data)",
+      "variables": [
+        "surface velocity"
+      ],
+      "spatial_resolution": "1/10 degree ocean",
+      "temporal_resolution": null,
+      "region": "four subdomains",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The CNN was trained and validated with surface velocity data from the high-resolution coupled"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "which has a nominal resolution in the ocean"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-R32-TRUTH",
+      "canonical_name": "MOM6 wind-driven double gyre 1/32 degree reference run (R32)",
+      "variables": [
+        "sea surface height",
+        "kinetic energy",
+        "relative vorticity"
+      ],
+      "spatial_resolution": "1/32 degree (about 3 km)",
+      "temporal_resolution": "time step 2.25 min",
+      "region": "idealized double gyre, 0-22 degree longitude, 30-50 degree latitude",
+      "period_start": null,
+      "period_end": null,
+      "role": "EVALUATION",
+      "evidence": [
+        {
+          "field": "canonical_name",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "a 1 /32◦ model is"
+        },
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "Grid spacing, km (approx.) 24 3"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-DOUBLE-GYRE-UNSCALED",
+      "task": "PARAMETERIZATION",
+      "task_raw": "online evaluation of ML subgrid momentum forcing in MOM6 double gyre without tuning",
+      "method_id": "M-GZ21-CNN",
+      "dataset_ids": [
+        "D-CM26",
+        "D-R32-TRUTH"
+      ],
+      "target_variable": "subgrid momentum forcing (evaluated on five-year averaged SSH)",
+      "training": {
+        "loss": {
+          "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
+          "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-DOUBLE-GYRE-SCALED",
+      "task": "PARAMETERIZATION",
+      "task_raw": "online evaluation with layer-wise scaling (tuning) of the forcing",
+      "method_id": "M-GZ21-CNN",
+      "dataset_ids": [
+        "D-CM26",
+        "D-R32-TRUTH"
+      ],
+      "target_variable": "subgrid momentum forcing (evaluated on five-year averaged SSH)",
+      "training": {
+        "loss": {
+          "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
+          "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-BOUNDARY-BOX",
+      "task": "PARAMETERIZATION",
+      "task_raw": "online evaluation with a box island perturbing the double gyre topography",
+      "method_id": "M-GZ21-CNN",
+      "dataset_ids": [
+        "D-CM26",
+        "D-R32-TRUTH"
+      ],
+      "target_variable": "subgrid momentum forcing (evaluated on five-year averaged SSH)",
+      "training": {
+        "loss": {
+          "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
+          "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-INFERENCE-COST",
+      "task": "PARAMETERIZATION",
+      "task_raw": "computational cost of CNN inference, CPU versus GPU",
+      "method_id": "M-GZ21-CNN",
+      "dataset_ids": [
+        "D-R32-TRUTH"
+      ],
+      "target_variable": "CNN inference cost",
+      "training": {
+        "loss": {
+          "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
+          "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
+        }
+      }
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-DOUBLE-GYRE-UNSCALED",
+      "dataset_id": "D-R32-TRUTH",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of five-year averaged SSH vs R32",
+      "metric_kind": "ERROR",
+      "value": 0.2202,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "R4-P without scaling, 50-member ensemble mean SSH vs R32",
+      "baseline_name": "R4 without parameterization",
+      "baseline_value": 0.278,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "The root mean square error (RMSE) of R4 SSH (relative to R32 SSH) is 0 .2780m and the RMSE of R4-P SSH is 0.2202m."
+    },
+    {
+      "experiment_id": "X-DOUBLE-GYRE-SCALED",
+      "dataset_id": "D-R32-TRUTH",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of time-mean SSH",
+      "metric_kind": "ERROR",
+      "value": 0.2034,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "1/4 degree, best scaling of forcing",
+      "baseline_name": "R4 without parameterization",
+      "baseline_value": 0.278,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 21,
+      "page_printed": 21,
+      "quote": "1/4◦ 0.2780 0.2202 20.7914 0.2034 26.8345",
+      "note": "Row label 1/4 degree is on the same line; columns: no param, param without scaling, improved %, param with best scaling, improved %."
+    },
+    {
+      "experiment_id": "X-DOUBLE-GYRE-SCALED",
+      "dataset_id": "D-R32-TRUTH",
+      "metric": "RMSE",
+      "metric_raw": "RMSE of time-mean SSH",
+      "metric_kind": "ERROR",
+      "value": 0.0891,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "1/8 degree, best scaling of forcing",
+      "baseline_name": "1/8 degree without parameterization",
+      "baseline_value": 0.0971,
+      "source_table": "Table 2",
+      "is_best_in_table": false,
+      "page_pdf": 21,
+      "page_printed": 21,
+      "quote": "1/8◦ 0.0971 0.0905 6.7971 0.0891 8.2389",
+      "note": "Lowest absolute RMSE in table but grids differ per row, so not flagged as best."
+    },
+    {
+      "experiment_id": "X-BOUNDARY-BOX",
+      "dataset_id": "D-R32-TRUTH",
+      "metric": "RMSE",
+      "metric_raw": "RMS difference of time-mean SSH vs R32",
+      "metric_kind": "ERROR",
+      "value": 0.2503,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "R4-P without scaling, box island",
+      "baseline_name": "R4 without parameterization",
+      "baseline_value": 0.1765,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 22,
+      "page_printed": 22,
+      "quote": "",
+      "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+      "note": "Value 0.2503 m read on page 22 where extraction splits digits as '0 .2503m'; baseline 0.1765 from the same sentence."
+    },
+    {
+      "experiment_id": "X-INFERENCE-COST",
+      "dataset_id": "D-R32-TRUTH",
+      "metric": "OTHER",
+      "metric_raw": "floating point operations per grid point",
+      "metric_kind": "EFFICIENCY",
+      "value": 268005,
+      "unit": "FLOPs per grid point per time step",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "GZ21 network per-grid-point inference cost",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": null,
+      "is_best_in_table": false,
+      "page_pdf": 23,
+      "page_printed": 23,
+      "quote": "",
+      "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+      "note": "Extraction splits digits as '268 , 005 in FLOPs' (page 23); page 27 gives the same figure as number of weights."
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 2,
+      "page_printed": 2,
+      "quote": "the forcing near boundaries is not predicted as well as in the open ocean"
+    },
+    {
+      "theme": "COMPUTE",
+      "page_pdf": 2,
+      "page_printed": 2,
+      "quote": "the cost of the parameterization is prohibitively high on CPUs"
+    },
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 2,
+      "page_printed": 2,
+      "quote": "tuning of the outputs from the parameterization at various depths is necessary"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 21,
+      "page_printed": 21,
+      "quote": "deliberately excluded any coastal waters or land"
+    },
+    {
+      "theme": "PHYSICS",
+      "page_pdf": 28,
+      "page_printed": 28,
+      "quote": "this parameterization conserves neither momentum nor energy"
+    },
+    {
+      "theme": "COMPUTE",
+      "page_pdf": 27,
+      "page_printed": 27,
+      "quote": "We encountered a hardware constraint that prohibited us from evaluating the ML pa-"
+    },
+    {
+      "theme": "REPRODUCIBILITY",
+      "page_pdf": 28,
+      "page_printed": 28,
+      "quote": "is treated as a ”black box” in our study"
+    }
+  ],
+  "conflicts": [],
+  "not_reported": [
+    {
+      "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.optimizer",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.learning_rate",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.batch_size",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.epochs",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.hardware",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-SCALED].training.optimizer",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-SCALED].training.learning_rate",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-SCALED].training.batch_size",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-SCALED].training.epochs",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-DOUBLE-GYRE-SCALED].training.hardware",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-BOUNDARY-BOX].training.optimizer",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-BOUNDARY-BOX].training.learning_rate",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-BOUNDARY-BOX].training.batch_size",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-BOUNDARY-BOX].training.epochs",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-BOUNDARY-BOX].training.hardware",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-INFERENCE-COST].training.optimizer",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-INFERENCE-COST].training.learning_rate",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-INFERENCE-COST].training.batch_size",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-INFERENCE-COST].training.epochs",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    },
+    {
+      "field": "experiments[X-INFERENCE-COST].training.hardware",
+      "searched": [
+        "abstract",
+        "section 2.2",
+        "section 3",
+        "section 4.4",
+        "section 4.5",
+        "section 5"
+      ]
+    }
   ]
- },
- "methods": [
-  {
-   "method_id": "M-GZ21-CNN",
-   "canonical_name": "GZ21 stochastic-deep learning CNN momentum-forcing parameterization (Guillaumin & Zanna, 2021) coupled to MOM6",
-   "family": "CNN_GENERIC",
-   "family_raw": "Fully Convolutional Neural Network (CNN) with eight convolutional layers",
-   "architecture_note": "Predicts mean and standard deviation of a Gaussian subgrid momentum forcing, sampled stochastically online inside MOM6; classified on the network itself, not on the MOM6 coupling.",
-   "is_novel_in_paper": false,
-   "role": "PROPOSED",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "The stochastic-deep learning model of GZ21 is a Fully Convolutional Neural Network (CNN) with eight convolutional layers"
-    },
-    {
-     "field": "is_novel_in_paper",
-     "page_pdf": 3,
-     "page_printed": 3,
-     "quote": "This study explores and documents the issues associated with implementing a pre-deﬁned ML parameterization"
-    }
-   ]
-  },
-  {
-   "method_id": "M-R4-NO-PARAM",
-   "canonical_name": "MOM6 coarse-resolution simulation without ML parameterization (R4, biharmonic Smagorinsky friction)",
-   "family": "CLASSICAL_BASELINE",
-   "family_raw": "coarse-resolution model R4 with biharmonic friction and Smagorinsky eddy viscosity",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "For the turbulence model we use a biharmonic friction with a Smagorinsky eddy viscosity"
-    }
-   ]
-  }
- ],
- "datasets": [
-  {
-   "dataset_id": "D-CM26",
-   "canonical_name": "CM2.6 high-resolution coupled climate model surface velocity (original GZ21 training data)",
-   "variables": [
-    "surface velocity"
-   ],
-   "spatial_resolution": "1/10 degree ocean",
-   "temporal_resolution": null,
-   "region": "four subdomains",
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "The CNN was trained and validated with surface velocity data from the high-resolution coupled"
-    },
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "which has a nominal resolution in the ocean"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-R32-TRUTH",
-   "canonical_name": "MOM6 wind-driven double gyre 1/32 degree reference run (R32)",
-   "variables": [
-    "sea surface height",
-    "kinetic energy",
-    "relative vorticity"
-   ],
-   "spatial_resolution": "1/32 degree (about 3 km)",
-   "temporal_resolution": "time step 2.25 min",
-   "region": "idealized double gyre, 0-22 degree longitude, 30-50 degree latitude",
-   "period_start": null,
-   "period_end": null,
-   "role": "EVALUATION",
-   "evidence": [
-    {
-     "field": "canonical_name",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "a 1 /32◦ model is"
-    },
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "Grid spacing, km (approx.) 24 3"
-    }
-   ]
-  }
- ],
- "experiments": [
-  {
-   "experiment_id": "X-DOUBLE-GYRE-UNSCALED",
-   "task": "PARAMETERIZATION",
-   "task_raw": "online evaluation of ML subgrid momentum forcing in MOM6 double gyre without tuning",
-   "method_id": "M-GZ21-CNN",
-   "dataset_ids": [
-    "D-CM26",
-    "D-R32-TRUTH"
-   ],
-   "target_variable": "subgrid momentum forcing (evaluated on five-year averaged SSH)",
-   "training": {
-    "loss": {
-     "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
-     "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-DOUBLE-GYRE-SCALED",
-   "task": "PARAMETERIZATION",
-   "task_raw": "online evaluation with layer-wise scaling (tuning) of the forcing",
-   "method_id": "M-GZ21-CNN",
-   "dataset_ids": [
-    "D-CM26",
-    "D-R32-TRUTH"
-   ],
-   "target_variable": "subgrid momentum forcing (evaluated on five-year averaged SSH)",
-   "training": {
-    "loss": {
-     "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
-     "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-BOUNDARY-BOX",
-   "task": "PARAMETERIZATION",
-   "task_raw": "online evaluation with a box island perturbing the double gyre topography",
-   "method_id": "M-GZ21-CNN",
-   "dataset_ids": [
-    "D-CM26",
-    "D-R32-TRUTH"
-   ],
-   "target_variable": "subgrid momentum forcing (evaluated on five-year averaged SSH)",
-   "training": {
-    "loss": {
-     "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
-     "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-INFERENCE-COST",
-   "task": "PARAMETERIZATION",
-   "task_raw": "computational cost of CNN inference, CPU versus GPU",
-   "method_id": "M-GZ21-CNN",
-   "dataset_ids": [
-    "D-R32-TRUTH"
-   ],
-   "target_variable": "CNN inference cost",
-   "training": {
-    "loss": {
-     "value": "negative Gaussian log-likelihood of the forcing (replaces MSE)",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "The mean square error (MSE) loss function is replaced by a full negative Gaussian log-likelihood of the forcing.",
-     "note": "Loss of the original GZ21 training as recapitulated by this paper; this paper does not retrain the CNN. Same for all experiments."
-    }
-   }
-  }
- ],
- "results": [
-  {
-   "experiment_id": "X-DOUBLE-GYRE-UNSCALED",
-   "dataset_id": "D-R32-TRUTH",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of five-year averaged SSH vs R32",
-   "metric_kind": "ERROR",
-   "value": 0.2202,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "R4-P without scaling, 50-member ensemble mean SSH vs R32",
-   "baseline_name": "R4 without parameterization",
-   "baseline_value": 0.278,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "The root mean square error (RMSE) of R4 SSH (relative to R32 SSH) is 0 .2780m and the RMSE of R4-P SSH is 0.2202m."
-  },
-  {
-   "experiment_id": "X-DOUBLE-GYRE-SCALED",
-   "dataset_id": "D-R32-TRUTH",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of time-mean SSH",
-   "metric_kind": "ERROR",
-   "value": 0.2034,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "1/4 degree, best scaling of forcing",
-   "baseline_name": "R4 without parameterization",
-   "baseline_value": 0.278,
-   "source_table": "Table 2",
-   "is_best_in_table": false,
-   "page_pdf": 21,
-   "page_printed": 21,
-   "quote": "1/4◦ 0.2780 0.2202 20.7914 0.2034 26.8345",
-   "note": "Row label 1/4 degree is on the same line; columns: no param, param without scaling, improved %, param with best scaling, improved %."
-  },
-  {
-   "experiment_id": "X-DOUBLE-GYRE-SCALED",
-   "dataset_id": "D-R32-TRUTH",
-   "metric": "RMSE",
-   "metric_raw": "RMSE of time-mean SSH",
-   "metric_kind": "ERROR",
-   "value": 0.0891,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "1/8 degree, best scaling of forcing",
-   "baseline_name": "1/8 degree without parameterization",
-   "baseline_value": 0.0971,
-   "source_table": "Table 2",
-   "is_best_in_table": false,
-   "page_pdf": 21,
-   "page_printed": 21,
-   "quote": "1/8◦ 0.0971 0.0905 6.7971 0.0891 8.2389",
-   "note": "Lowest absolute RMSE in table but grids differ per row, so not flagged as best."
-  },
-  {
-   "experiment_id": "X-BOUNDARY-BOX",
-   "dataset_id": "D-R32-TRUTH",
-   "metric": "RMSE",
-   "metric_raw": "RMS difference of time-mean SSH vs R32",
-   "metric_kind": "ERROR",
-   "value": 0.2503,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "R4-P without scaling, box island",
-   "baseline_name": "R4 without parameterization",
-   "baseline_value": 0.1765,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 22,
-   "page_printed": 22,
-   "quote": "",
-   "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-   "note": "Value 0.2503 m read on page 22 where extraction splits digits as '0 .2503m'; baseline 0.1765 from the same sentence."
-  },
-  {
-   "experiment_id": "X-INFERENCE-COST",
-   "dataset_id": "D-R32-TRUTH",
-   "metric": "OTHER",
-   "metric_raw": "floating point operations per grid point",
-   "metric_kind": "EFFICIENCY",
-   "value": 268005,
-   "unit": "FLOPs per grid point per time step",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "GZ21 network per-grid-point inference cost",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": null,
-   "is_best_in_table": false,
-   "page_pdf": 23,
-   "page_printed": 23,
-   "quote": "",
-   "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-   "note": "Extraction splits digits as '268 , 005 in FLOPs' (page 23); page 27 gives the same figure as number of weights."
-  }
- ],
- "limitations": [
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 2,
-   "page_printed": 2,
-   "quote": "the forcing near boundaries is not predicted as well as in the open ocean"
-  },
-  {
-   "theme": "COMPUTE",
-   "page_pdf": 2,
-   "page_printed": 2,
-   "quote": "the cost of the parameterization is prohibitively high on CPUs"
-  },
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 2,
-   "page_printed": 2,
-   "quote": "tuning of the outputs from the parameterization at various depths is necessary"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 21,
-   "page_printed": 21,
-   "quote": "deliberately excluded any coastal waters or land"
-  },
-  {
-   "theme": "PHYSICS",
-   "page_pdf": 28,
-   "page_printed": 28,
-   "quote": "this parameterization conserves neither momentum nor energy"
-  },
-  {
-   "theme": "COMPUTE",
-   "page_pdf": 27,
-   "page_printed": 27,
-   "quote": "We encountered a hardware constraint that prohibited us from evaluating the ML pa-"
-  },
-  {
-   "theme": "FUTURE_WORK",
-   "page_pdf": 27,
-   "page_printed": 27,
-   "quote": "if the network were trained with multiple resolutions"
-  },
-  {
-   "theme": "REPRODUCIBILITY",
-   "page_pdf": 28,
-   "page_printed": 28,
-   "quote": "is treated as a ”black box” in our study"
-  }
- ],
- "conflicts": [],
- "not_reported": [
-  {
-   "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.optimizer",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.learning_rate",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.batch_size",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.epochs",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-UNSCALED].training.hardware",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-SCALED].training.optimizer",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-SCALED].training.learning_rate",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-SCALED].training.batch_size",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-SCALED].training.epochs",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-DOUBLE-GYRE-SCALED].training.hardware",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-BOUNDARY-BOX].training.optimizer",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-BOUNDARY-BOX].training.learning_rate",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-BOUNDARY-BOX].training.batch_size",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-BOUNDARY-BOX].training.epochs",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-BOUNDARY-BOX].training.hardware",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-INFERENCE-COST].training.optimizer",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-INFERENCE-COST].training.learning_rate",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-INFERENCE-COST].training.batch_size",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-INFERENCE-COST].training.epochs",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  },
-  {
-   "field": "experiments[X-INFERENCE-COST].training.hardware",
-   "searched": [
-    "abstract",
-    "section 2.2",
-    "section 3",
-    "section 4.4",
-    "section 4.5",
-    "section 5"
-   ]
-  }
- ]
 }

@@ -9,6 +9,38 @@ import { API_BASE_URL, ApiError } from "./api";
 
 export type AuditState = "UNAUDITED" | "STALE" | "ACCEPTED" | "NEEDS_FIX" | "REJECTED";
 
+/**
+ * The independent machine re-check: a second reading of the paper that checks the
+ * value was read in the right context. It is never a human audit, and the API keeps
+ * the two in separate fields for exactly that reason.
+ */
+export type RecheckState =
+  | "NOT_RECHECKED" | "STALE" | "CONFIRMED" | "UNREADABLE"
+  | "SUSPECT" | "SUSPECT_APPLIED" | "SUSPECT_KEPT";
+
+export type Recheck = {
+  verdict: "CONFIRMED" | "SUSPECT" | "UNREADABLE";
+  reason: string | null;
+  correct_reading: unknown;
+  checker: string;
+  checked_at: string | null;
+  stale?: boolean;
+  triage: { decision: "APPLIED" | "KEPT"; reason: string } | null;
+};
+
+export type RecheckProgress = {
+  claims: number;
+  rechecked: number;
+  confirmed: number;
+  flagged: number;
+  corrected: number;
+  flag_dismissed: number;
+  outstanding: number;
+  stale: number;
+  not_rechecked: number;
+  checkers: string[];
+};
+
 export type Verdict = {
   claim_id: string;
   decision: "ACCEPTED" | "NEEDS_FIX" | "REJECTED";
@@ -38,6 +70,8 @@ export type Claim = {
   pdf: string | null;
   audit: Verdict | null;
   audit_state: AuditState;
+  recheck: Recheck | null;
+  recheck_state: RecheckState;
 };
 
 export type PaperAudit = { claims: number; audited: number; accepted: number } | null;
@@ -146,6 +180,7 @@ export type CorpusSummaryV2 = {
   cells: number;
   shared_cells: number;
   figures_only: string[];
+  recheck: RecheckProgress;
   access: { indexed: number; reachable: number; blocked: number; no_oa: number; unresolved: number } | null;
   audit: AuditProgress;
 };
@@ -220,6 +255,16 @@ export const KIND_LABEL: Record<Claim["kind"], string> = {
   CONFLICT: "Valeurs contradictoires",
   EXCLUSION: "Papier écarté",
   OTHER: "Autre",
+};
+
+export const RECHECK_LABEL: Record<RecheckState, string> = {
+  CONFIRMED: "contre-vérifiée : la seconde lecture confirme le contexte",
+  SUSPECT: "signalée par la seconde lecture, non tranchée",
+  SUSPECT_APPLIED: "signalée par la seconde lecture, l’enregistrement a été corrigé",
+  SUSPECT_KEPT: "signalée par la seconde lecture, signalement écarté après relecture",
+  UNREADABLE: "page trop abîmée pour une seconde lecture",
+  STALE: "la valeur a changé depuis la contre-vérification",
+  NOT_RECHECKED: "pas encore contre-vérifiée",
 };
 
 export const DECISION_LABEL: Record<string, string> = {

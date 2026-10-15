@@ -1,2018 +1,2018 @@
 {
- "source": {
-  "source_id": "seabed-net",
-  "file": ".data/golden-pdfs/seabed-net-a-multi-task-network-for-joint-bathymetry-estimat.pdf",
-  "sha256_prefix": "426c42be548f3bdb8bcc95c4",
-  "pdf_pages": 21,
-  "printed_page_offset": 0,
-  "extracted_by": "claude-sonnet-5-5",
-  "extracted_at": "2026-10-14"
- },
- "paper": {
-  "paper_id": "P-SEABEDNET",
-  "doi": null,
-  "title": "Seabed-Net: A multi-task network for joint bathymetry estimation and seabed classification from remote sensing imagery in shallow waters",
-  "year": 2025,
-  "year_note": "Not printed in the PDF text; inferred from the most recent references (2025). Treat as unverified.",
-  "venue": null,
-  "ocean_domains": [
-   "bathymetry"
+  "source": {
+    "source_id": "seabed-net",
+    "file": ".data/golden-pdfs/seabed-net-a-multi-task-network-for-joint-bathymetry-estimat.pdf",
+    "sha256_prefix": "426c42be548f3bdb8bcc95c4",
+    "pdf_pages": 21,
+    "printed_page_offset": 0,
+    "extracted_by": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-14"
+  },
+  "paper": {
+    "paper_id": "P-SEABEDNET",
+    "doi": null,
+    "title": "Seabed-Net: A multi-task network for joint bathymetry estimation and seabed classification from remote sensing imagery in shallow waters",
+    "year": 2025,
+    "year_note": "Not printed in the PDF text; inferred from the most recent references (2025). Treat as unverified.",
+    "venue": null,
+    "ocean_domains": [
+      "bathymetry"
+    ],
+    "ocean_domains_raw": [
+      "shallow-water bathymetry",
+      "seabed habitat classification",
+      "coastal remote sensing"
+    ]
+  },
+  "methods": [
+    {
+      "method_id": "M-SEABEDNET",
+      "canonical_name": "Seabed-Net",
+      "family": "CNN_UNET",
+      "family_raw": "dual-branch multi-task network (convolutional encoders/decoders with skip connections, AFF and Swin-Transformer fusion)",
+      "architecture_note": "Classified on the encoder-decoder with skip connections described in Sec. 2.1/2.4; windowed Swin-Transformer fusion (Sec. 2.3) and Attention Feature Fusion (Sec. 2.2) are the cross-task fusion modules.",
+      "is_novel_in_paper": true,
+      "role": "PROPOSED",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 5,
+          "page_printed": 5,
+          "quote": "Both decoders are composed of successive upsampling"
+        }
+      ]
+    },
+    {
+      "method_id": "M-MULTIBAND",
+      "canonical_name": "Multiband Linear (Lyzenga, 1978)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "empirical SDB model",
+      "architecture_note": "Régression empirique à coefficients ajustés sur les profondeurs: règle 8.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "The empirical models tested in this study-Multiband"
+        }
+      ]
+    },
+    {
+      "method_id": "M-LOGRATIO",
+      "canonical_name": "Log Band Ratio (Stumpf et al., 2003)",
+      "family": "CLASSICAL_ML",
+      "family_raw": "empirical SDB model",
+      "architecture_note": "Régression empirique à coefficients ajustés sur les profondeurs: règle 8.",
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "Linear (Lyzenga, 1978) and Log Band Ratio (Stumpf et al.,"
+        }
+      ]
+    },
+    {
+      "method_id": "M-RF",
+      "canonical_name": "Random Forest Regression",
+      "family": "CLASSICAL_ML",
+      "family_raw": "traditional ML regression (300 trees)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "machinelearningmodelssuchasRandomForestRegression"
+        }
+      ]
+    },
+    {
+      "method_id": "M-SVR",
+      "canonical_name": "Support Vector Regression",
+      "family": "CLASSICAL_ML",
+      "family_raw": "traditional ML regression (RBF kernel)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "VectorRegression(SVR)with"
+        }
+      ]
+    },
+    {
+      "method_id": "M-UNETBATHY",
+      "canonical_name": "UNet-bathy",
+      "family": "CNN_UNET",
+      "family_raw": "UNet-bathy variant",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "Among single-task deep learning-based approaches, a"
+        }
+      ]
+    },
+    {
+      "method_id": "M-UNET",
+      "canonical_name": "UNet",
+      "family": "CNN_UNET",
+      "family_raw": "UNet",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "et al., 2024) and UNet (Ronneberger et al., 2015) serve as"
+        }
+      ]
+    },
+    {
+      "method_id": "M-SEGFORMER",
+      "canonical_name": "SegFormer",
+      "family": "OTHER",
+      "family_raw": "single-task segmentation baseline (architecture not described in the paper)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "while SegFormer (Xie et al., 2021) is"
+        }
+      ]
+    },
+    {
+      "method_id": "M-PADNET",
+      "canonical_name": "PAD-Net",
+      "family": "OTHER",
+      "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "state-of-the-artdeeplearning-basedmodels,includingPAD-"
+        }
+      ]
+    },
+    {
+      "method_id": "M-MTINET",
+      "canonical_name": "MTI-Net",
+      "family": "OTHER",
+      "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "Net (Xu et al., 2018), MTI-Net (Vandenhende et al., 2020),"
+        }
+      ]
+    },
+    {
+      "method_id": "M-MTL",
+      "canonical_name": "MTL (Ekim and Sertel, 2021)",
+      "family": "OTHER",
+      "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "MTL (Ekim and Sertel, 2021), JSH-Net (Zhang et al.,"
+        }
+      ]
+    },
+    {
+      "method_id": "M-JSHNET",
+      "canonical_name": "JSH-Net",
+      "family": "OTHER",
+      "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "MTL (Ekim and Sertel, 2021), JSH-Net (Zhang et al.,"
+        }
+      ]
+    },
+    {
+      "method_id": "M-TASKPROMPTER",
+      "canonical_name": "TaskPrompter",
+      "family": "OTHER",
+      "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
+      "architecture_note": null,
+      "is_novel_in_paper": false,
+      "role": "BASELINE",
+      "evidence": [
+        {
+          "field": "family",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "2022a),andTaskPrompter(YeandXu,2024).Thesemodels"
+        }
+      ]
+    }
   ],
-  "ocean_domains_raw": [
-   "shallow-water bathymetry",
-   "seabed habitat classification",
-   "coastal remote sensing"
+  "datasets": [
+    {
+      "dataset_id": "D-MBN-AERIAL",
+      "canonical_name": "MagicBathyNet - aerial orthoimagery (Agia Napa and Puck Lagoon)",
+      "variables": [
+        "RGB bands",
+        "seabed depth (LiDAR/sonar reference)",
+        "seabed class labels"
+      ],
+      "spatial_resolution": "0.25 m",
+      "temporal_resolution": null,
+      "region": "Agia Napa (Cyprus) and Puck Lagoon (Poland)",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "in airborne imagery (0.25 m spatial resolution)."
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "we used the Magic-"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-MBN-SPOT6",
+      "canonical_name": "MagicBathyNet - SPOT 6 imagery (Agia Napa and Puck Lagoon)",
+      "variables": [
+        "RGB bands",
+        "seabed depth (LiDAR/sonar reference)",
+        "seabed class labels"
+      ],
+      "spatial_resolution": "6 m",
+      "temporal_resolution": null,
+      "region": "Agia Napa (Cyprus) and Puck Lagoon (Poland)",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "SPOT6imagery(6mspatialresolution)and720x720pixels"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "we used the Magic-"
+        }
+      ]
+    },
+    {
+      "dataset_id": "D-MBN-S2",
+      "canonical_name": "MagicBathyNet - Sentinel-2 L2A imagery (Agia Napa and Puck Lagoon)",
+      "variables": [
+        "RGB bands",
+        "seabed depth (LiDAR/sonar reference)",
+        "seabed class labels"
+      ],
+      "spatial_resolution": "10 m",
+      "temporal_resolution": null,
+      "region": "Agia Napa (Cyprus) and Puck Lagoon (Poland)",
+      "period_start": null,
+      "period_end": null,
+      "role": "PRIMARY_TRAINING",
+      "evidence": [
+        {
+          "field": "spatial_resolution",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "Sentinel-2imagery(10mspatialresolution),30x30pixelsin"
+        },
+        {
+          "field": "canonical_name",
+          "page_pdf": 6,
+          "page_printed": 6,
+          "quote": "we used the Magic-"
+        }
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "experiment_id": "X-BATHY-AERIAL",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "bathymetry estimation",
+      "method_id": "M-SEABEDNET",
+      "dataset_ids": [
+        "D-MBN-AERIAL"
+      ],
+      "target_variable": "water depth (m)",
+      "training": {
+        "loss": {
+          "value": "combined multi-task loss (Eq. 15)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
+            },
+            {
+              "claim": "bathymetry term is an RMSE loss",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "The bathymetry task is supervised using the Root Mean"
+            },
+            {
+              "claim": "classification term is cross-entropy",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "cross-entropy loss"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "cosine annealing learning-rate scheduler",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
+            }
+          ]
+        },
+        "learning_rate": {
+          "value": "1e-5",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "note": "Initial learning rate for aerial data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "aerial data for a 10-epoch training period",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "each epoch is 10,000 iterations",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "Each epoch consisted of 10.000 iterations"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "1x NVIDIA A100 80GB",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "using one NVIDIA A100 80GB GPU",
+          "note": "Same training setup for all experiments (training and testing)."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SEG-AERIAL",
+      "task": "CLASSIFICATION_SEGMENTATION",
+      "task_raw": "pixel-based seabed classification",
+      "method_id": "M-SEABEDNET",
+      "dataset_ids": [
+        "D-MBN-AERIAL"
+      ],
+      "target_variable": "seabed class (5 classes: seagrass, macroalgae, eelgrass/pondweed, sand, rock)",
+      "training": {
+        "loss": {
+          "value": "combined multi-task loss (Eq. 15)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
+            },
+            {
+              "claim": "bathymetry term is an RMSE loss",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "The bathymetry task is supervised using the Root Mean"
+            },
+            {
+              "claim": "classification term is cross-entropy",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "cross-entropy loss"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "cosine annealing learning-rate scheduler",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
+            }
+          ]
+        },
+        "learning_rate": {
+          "value": "1e-5",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "note": "Initial learning rate for aerial data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "aerial data for a 10-epoch training period",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "each epoch is 10,000 iterations",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "Each epoch consisted of 10.000 iterations"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "1x NVIDIA A100 80GB",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "using one NVIDIA A100 80GB GPU",
+          "note": "Same training setup for all experiments (training and testing)."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-BATHY-SPOT6",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "bathymetry estimation",
+      "method_id": "M-SEABEDNET",
+      "dataset_ids": [
+        "D-MBN-SPOT6"
+      ],
+      "target_variable": "water depth (m)",
+      "training": {
+        "loss": {
+          "value": "combined multi-task loss (Eq. 15)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
+            },
+            {
+              "claim": "bathymetry term is an RMSE loss",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "The bathymetry task is supervised using the Root Mean"
+            },
+            {
+              "claim": "classification term is cross-entropy",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "cross-entropy loss"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "cosine annealing learning-rate scheduler",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
+            }
+          ]
+        },
+        "learning_rate": {
+          "value": "1e-4",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "aerial data for a 10-epoch training period",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "each epoch is 10,000 iterations",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "Each epoch consisted of 10.000 iterations"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "1x NVIDIA A100 80GB",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "using one NVIDIA A100 80GB GPU",
+          "note": "Same training setup for all experiments (training and testing)."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SEG-SPOT6",
+      "task": "CLASSIFICATION_SEGMENTATION",
+      "task_raw": "pixel-based seabed classification",
+      "method_id": "M-SEABEDNET",
+      "dataset_ids": [
+        "D-MBN-SPOT6"
+      ],
+      "target_variable": "seabed class (5 classes: seagrass, macroalgae, eelgrass/pondweed, sand, rock)",
+      "training": {
+        "loss": {
+          "value": "combined multi-task loss (Eq. 15)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
+            },
+            {
+              "claim": "bathymetry term is an RMSE loss",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "The bathymetry task is supervised using the Root Mean"
+            },
+            {
+              "claim": "classification term is cross-entropy",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "cross-entropy loss"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "cosine annealing learning-rate scheduler",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
+            }
+          ]
+        },
+        "learning_rate": {
+          "value": "1e-4",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "aerial data for a 10-epoch training period",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "each epoch is 10,000 iterations",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "Each epoch consisted of 10.000 iterations"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "1x NVIDIA A100 80GB",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "using one NVIDIA A100 80GB GPU",
+          "note": "Same training setup for all experiments (training and testing)."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "task": "BATHYMETRY_ESTIMATION",
+      "task_raw": "bathymetry estimation",
+      "method_id": "M-SEABEDNET",
+      "dataset_ids": [
+        "D-MBN-S2"
+      ],
+      "target_variable": "water depth (m)",
+      "training": {
+        "loss": {
+          "value": "combined multi-task loss (Eq. 15)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
+            },
+            {
+              "claim": "bathymetry term is an RMSE loss",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "The bathymetry task is supervised using the Root Mean"
+            },
+            {
+              "claim": "classification term is cross-entropy",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "cross-entropy loss"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "cosine annealing learning-rate scheduler",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
+            }
+          ]
+        },
+        "learning_rate": {
+          "value": "1e-4",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "aerial data for a 10-epoch training period",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "each epoch is 10,000 iterations",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "Each epoch consisted of 10.000 iterations"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "1x NVIDIA A100 80GB",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "using one NVIDIA A100 80GB GPU",
+          "note": "Same training setup for all experiments (training and testing)."
+        }
+      }
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "task": "CLASSIFICATION_SEGMENTATION",
+      "task_raw": "pixel-based seabed classification",
+      "method_id": "M-SEABEDNET",
+      "dataset_ids": [
+        "D-MBN-S2"
+      ],
+      "target_variable": "seabed class (5 classes: seagrass, macroalgae, eelgrass/pondweed, sand, rock)",
+      "training": {
+        "loss": {
+          "value": "combined multi-task loss (Eq. 15)",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
+            },
+            {
+              "claim": "bathymetry term is an RMSE loss",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "The bathymetry task is supervised using the Root Mean"
+            },
+            {
+              "claim": "classification term is cross-entropy",
+              "page_pdf": 6,
+              "page_printed": 6,
+              "quote": "cross-entropy loss"
+            }
+          ]
+        },
+        "optimizer": {
+          "value": "Adam",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "the combined loss function (Eq. 15) alongside the Adam",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "cosine annealing learning-rate scheduler",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
+            }
+          ]
+        },
+        "learning_rate": {
+          "value": "1e-4",
+          "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+          "page_pdf": 8,
+          "page_printed": 8,
+          "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
+        },
+        "epochs": {
+          "value": 10,
+          "page_pdf": 8,
+          "page_printed": 8,
+          "quote": "aerial data for a 10-epoch training period",
+          "note": "Same training setup for all experiments.",
+          "extra_evidence": [
+            {
+              "claim": "each epoch is 10,000 iterations",
+              "page_pdf": 7,
+              "page_printed": 7,
+              "quote": "Each epoch consisted of 10.000 iterations"
+            }
+          ]
+        },
+        "hardware": {
+          "value": "1x NVIDIA A100 80GB",
+          "page_pdf": 7,
+          "page_printed": 7,
+          "quote": "using one NVIDIA A100 80GB GPU",
+          "note": "Same training setup for all experiments (training and testing)."
+        }
+      }
+    }
+  ],
+  "results": [
+    {
+      "experiment_id": "X-BATHY-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.556,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "TaskPrompter",
+      "baseline_value": 0.596,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
+    },
+    {
+      "experiment_id": "X-BATHY-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.408,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "UNet-bathy",
+      "baseline_value": 0.42,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet-bathy)."
+    },
+    {
+      "experiment_id": "X-SEG-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "IOU",
+      "metric_raw": "mIoU (header says %, values are fractions)",
+      "metric_kind": "AGREEMENT",
+      "value": 0.885,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "UNet",
+      "baseline_value": 0.879,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet)."
+    },
+    {
+      "experiment_id": "X-SEG-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 95.33,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "UNet",
+      "baseline_value": 94.67,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet)."
+    },
+    {
+      "experiment_id": "X-BATHY-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.26,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "UNet-bathy",
+      "baseline_value": 0.298,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet-bathy)."
+    },
+    {
+      "experiment_id": "X-BATHY-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.152,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "UNet-bathy",
+      "baseline_value": 0.187,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet-bathy)."
+    },
+    {
+      "experiment_id": "X-SEG-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "IOU",
+      "metric_raw": "mIoU (header says %, values are fractions)",
+      "metric_kind": "AGREEMENT",
+      "value": 0.961,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "JSH-Net",
+      "baseline_value": 0.923,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
+    },
+    {
+      "experiment_id": "X-SEG-AERIAL",
+      "dataset_id": "D-MBN-AERIAL",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 98.0,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "SegFormer",
+      "baseline_value": 97.33,
+      "source_table": "Table 2",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
+    },
+    {
+      "experiment_id": "X-BATHY-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.651,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "MTL",
+      "baseline_value": 0.679,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (MTL)."
+    },
+    {
+      "experiment_id": "X-BATHY-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.445,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "MTL",
+      "baseline_value": 0.464,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (MTL)."
+    },
+    {
+      "experiment_id": "X-SEG-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "IOU",
+      "metric_raw": "mIoU (header says %, values are fractions)",
+      "metric_kind": "AGREEMENT",
+      "value": 0.645,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "JSH-Net",
+      "baseline_value": 0.634,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
+    },
+    {
+      "experiment_id": "X-SEG-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 82.0,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "JSH-Net",
+      "baseline_value": 80.27,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
+    },
+    {
+      "experiment_id": "X-BATHY-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.457,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "MTL",
+      "baseline_value": 0.532,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (MTL)."
+    },
+    {
+      "experiment_id": "X-BATHY-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.254,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "Random Forest Regression",
+      "baseline_value": 0.28,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (Random Forest Regression)."
+    },
+    {
+      "experiment_id": "X-SEG-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "IOU",
+      "metric_raw": "mIoU (header says %, values are fractions)",
+      "metric_kind": "AGREEMENT",
+      "value": 0.784,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "SegFormer",
+      "baseline_value": 0.708,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
+    },
+    {
+      "experiment_id": "X-SEG-SPOT6",
+      "dataset_id": "D-MBN-SPOT6",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 87.92,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "SegFormer",
+      "baseline_value": 86.66,
+      "source_table": "Table 3",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.66,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "TaskPrompter",
+      "baseline_value": 0.753,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.451,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "TaskPrompter",
+      "baseline_value": 0.521,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "IOU",
+      "metric_raw": "mIoU (header says %, values are fractions)",
+      "metric_kind": "AGREEMENT",
+      "value": 0.643,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "JSH-Net",
+      "baseline_value": 0.626,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 84.35,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa",
+      "baseline_name": "TaskPrompter",
+      "baseline_value": 79.99,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.431,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "JSH-Net",
+      "baseline_value": 0.48,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "MAE",
+      "metric_raw": "MAE",
+      "metric_kind": "ERROR",
+      "value": 0.253,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "TaskPrompter",
+      "baseline_value": 0.256,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "IOU",
+      "metric_raw": "mIoU (header says %, values are fractions)",
+      "metric_kind": "AGREEMENT",
+      "value": 0.742,
+      "unit": "",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "SegFormer",
+      "baseline_value": 0.71,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 85.23,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "Seabed-Net, Puck Lagoon",
+      "baseline_name": "SegFormer",
+      "baseline_value": 82.55,
+      "source_table": "Table 4",
+      "is_best_in_table": true,
+      "page_pdf": 10,
+      "page_printed": 10,
+      "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
+      "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RUNTIME",
+      "metric_raw": "inference time, depth head",
+      "metric_kind": "EFFICIENCY",
+      "value": 1.99,
+      "unit": "s",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa Sentinel-2, NVIDIA A5000 24GB",
+      "baseline_name": "MTL",
+      "baseline_value": 1.92,
+      "source_table": "Table 6",
+      "is_best_in_table": false,
+      "page_pdf": 18,
+      "page_printed": 18,
+      "quote": "Inference Time (s) 1.99 5.17 1.92 4.45",
+      "note": "Row label sits on this line; column headers (Seabed-Net Depth, Classes, MTL Depth, Classes) are on the lines above."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RUNTIME",
+      "metric_raw": "inference time, classification head",
+      "metric_kind": "EFFICIENCY",
+      "value": 5.17,
+      "unit": "s",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "Seabed-Net, Agia Napa Sentinel-2, NVIDIA A5000 24GB",
+      "baseline_name": "MTL",
+      "baseline_value": 4.45,
+      "source_table": "Table 6",
+      "is_best_in_table": false,
+      "page_pdf": 18,
+      "page_printed": 18,
+      "quote": "Inference Time (s) 1.99 5.17 1.92 4.45",
+      "note": "Same row as the depth runtime."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.66,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: full model",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": true,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "4 FAA and 4 Vit blocks 0.660 84.35 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 84.35,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: full model",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": true,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "4 FAA and 4 Vit blocks 0.660 84.35 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.891,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: 3 FAA and 3 ViT blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "3 FAA and 3 Vit blocks 0.891 76.19 106M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 76.19,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: 3 FAA and 3 ViT blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "3 FAA and 3 Vit blocks 0.891 76.19 106M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 1.125,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no FAA and ViT blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No FAA and Vit blocks 1.125 74.83 15M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 74.83,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no FAA and ViT blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No FAA and Vit blocks 1.125 74.83 15M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.963,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no FAA blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No FAA blocks 0.963 78.91 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 78.91,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no FAA blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No FAA blocks 0.963 78.91 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.872,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no ViT blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No ViT blocks 0.872 77.55 16M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 77.55,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no ViT blocks",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No ViT blocks 0.872 77.55 16M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.923,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no spatial attention in AFF",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No spatial attention in AFF 0.923 80.27 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 80.27,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no spatial attention in AFF",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No spatial attention in AFF 0.923 80.27 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 1.012,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no channel attention in AFF",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No channel attention in AFF 1.012 80.95 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 80.95,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no channel attention in AFF",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No channel attention in AFF 1.012 80.95 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.854,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: 2 ViT heads",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "2 ViT heads (instead of 4) 0.854 76.87 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 76.87,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: 2 ViT heads",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "2 ViT heads (instead of 4) 0.854 76.87 380M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.873,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no cross attention in ViT",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No cross attention in ViT 0.873 82.31 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 82.31,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: no cross attention in ViT",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "No cross attention in ViT 0.873 82.31 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 1.567,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: BN added to bathymetry branch",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "Bathymetry branch with BN 1.567 79.59 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 79.59,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: BN added to bathymetry branch",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "Bathymetry branch with BN 1.567 79.59 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-BATHY-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "RMSE",
+      "metric_raw": "RMSE",
+      "metric_kind": "ERROR",
+      "value": 0.883,
+      "unit": "m",
+      "higher_is_better": false,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: BN removed from classification branch",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "Classification branch without BN 0.883 80.67 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    },
+    {
+      "experiment_id": "X-SEG-S2",
+      "dataset_id": "D-MBN-S2",
+      "metric": "ACCURACY",
+      "metric_raw": "OA",
+      "metric_kind": "AGREEMENT",
+      "value": 80.67,
+      "unit": "%",
+      "higher_is_better": true,
+      "split": "TEST",
+      "config": "ablation, Agia Napa Sentinel-2: BN removed from classification branch",
+      "baseline_name": null,
+      "baseline_value": null,
+      "source_table": "Table 5",
+      "is_best_in_table": false,
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "Classification branch without BN 0.883 80.67 379M",
+      "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
+    }
+  ],
+  "limitations": [
+    {
+      "theme": "GENERALIZATION",
+      "page_pdf": 17,
+      "page_printed": 17,
+      "quote": "they may still be optimistic relative"
+    },
+    {
+      "theme": "EVALUATION",
+      "page_pdf": 17,
+      "page_printed": 17,
+      "quote": "can lead to an overestimation of"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 18,
+      "page_printed": 18,
+      "quote": "In future work, we intend to explore spatially disjoint"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 16,
+      "page_printed": 16,
+      "quote": "imposed by the spatial resolution of the data."
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 17,
+      "page_printed": 17,
+      "quote": "This reduces confusion during training but does not fully"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 18,
+      "page_printed": 18,
+      "quote": "One critical issue involves the inherent variability and"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 18,
+      "page_printed": 18,
+      "quote": "A further, often overlooked, source of error arises from"
+    },
+    {
+      "theme": "DATA",
+      "page_pdf": 19,
+      "page_printed": 19,
+      "quote": "While our model requires paired in-situ bathymetry"
+    },
+    {
+      "theme": "COMPUTE",
+      "page_pdf": 19,
+      "page_printed": 19,
+      "quote": "Although the current architecture is relatively large, the"
+    },
+    {
+      "theme": "FUTURE_WORK",
+      "page_pdf": 19,
+      "page_printed": 19,
+      "quote": "However, we also plan to explore the inte-"
+    }
+  ],
+  "conflicts": [
+    {
+      "field": "claims.max_seabed_classification_accuracy_gain",
+      "values": [
+        8,
+        16
+      ],
+      "sources": [
+        {
+          "page_pdf": 1,
+          "quote": "improvesseabedclassificationaccuracyupto8%"
+        },
+        {
+          "page_pdf": 19,
+          "quote": "classificationaccuracybyupto16%inthesamelow"
+        }
+      ],
+      "chosen": null,
+      "reason": "Abstract says up to 8%, conclusion says up to 16% in the same low-resolution settings; Sec. 4.1.4 gives 8.72% over SegFormer. No value from this claim is stored in results."
+    },
+    {
+      "field": "datasets.Puck Lagoon annotated patches",
+      "values": [
+        1971,
+        498
+      ],
+      "sources": [
+        {
+          "page_pdf": 8,
+          "quote": "InthelargerPuckLagoonarea,1971"
+        },
+        {
+          "page_pdf": 7,
+          "quote": "# of Patches 35 498 -"
+        }
+      ],
+      "chosen": null,
+      "reason": "Sec. 3.3 gives 1971 annotated patches (1575 train / 396 test) for Puck Lagoon while Table 1 gives 498 patches; not used in results."
+    }
+  ],
+  "not_reported": [
+    {
+      "field": "datasets[D-MBN-AERIAL].temporal_resolution",
+      "searched": [
+        "3.1 Dataset description",
+        "Table 1",
+        "3.3 Experimental setup"
+      ]
+    },
+    {
+      "field": "datasets[D-MBN-AERIAL].period_start/period_end",
+      "searched": [
+        "3.1 Dataset description (acquisition dates deferred to Agrafiotis et al. 2024)",
+        "3.3 Experimental setup"
+      ]
+    },
+    {
+      "field": "datasets[D-MBN-SPOT6].temporal_resolution",
+      "searched": [
+        "3.1 Dataset description",
+        "Table 1",
+        "3.3 Experimental setup"
+      ]
+    },
+    {
+      "field": "datasets[D-MBN-SPOT6].period_start/period_end",
+      "searched": [
+        "3.1 Dataset description (acquisition dates deferred to Agrafiotis et al. 2024)",
+        "3.3 Experimental setup"
+      ]
+    },
+    {
+      "field": "datasets[D-MBN-S2].temporal_resolution",
+      "searched": [
+        "3.1 Dataset description",
+        "Table 1",
+        "3.3 Experimental setup"
+      ]
+    },
+    {
+      "field": "datasets[D-MBN-S2].period_start/period_end",
+      "searched": [
+        "3.1 Dataset description (acquisition dates deferred to Agrafiotis et al. 2024)",
+        "3.3 Experimental setup"
+      ]
+    },
+    {
+      "field": "experiments[X-BATHY-AERIAL].training.batch_size",
+      "searched": [
+        "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
+        "3.3 Experimental setup",
+        "Tables 2-6",
+        "full text"
+      ]
+    },
+    {
+      "field": "experiments[X-SEG-AERIAL].training.batch_size",
+      "searched": [
+        "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
+        "3.3 Experimental setup",
+        "Tables 2-6",
+        "full text"
+      ]
+    },
+    {
+      "field": "experiments[X-BATHY-SPOT6].training.batch_size",
+      "searched": [
+        "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
+        "3.3 Experimental setup",
+        "Tables 2-6",
+        "full text"
+      ]
+    },
+    {
+      "field": "experiments[X-SEG-SPOT6].training.batch_size",
+      "searched": [
+        "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
+        "3.3 Experimental setup",
+        "Tables 2-6",
+        "full text"
+      ]
+    },
+    {
+      "field": "experiments[X-BATHY-S2].training.batch_size",
+      "searched": [
+        "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
+        "3.3 Experimental setup",
+        "Tables 2-6",
+        "full text"
+      ]
+    },
+    {
+      "field": "experiments[X-SEG-S2].training.batch_size",
+      "searched": [
+        "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
+        "3.3 Experimental setup",
+        "Tables 2-6",
+        "full text"
+      ]
+    },
+    {
+      "field": "paper.doi",
+      "searched": [
+        "page 1 header",
+        "reference list"
+      ]
+    },
+    {
+      "field": "paper.venue",
+      "searched": [
+        "page 1 header",
+        "footers (only 'Revised article')"
+      ]
+    }
   ]
- },
- "methods": [
-  {
-   "method_id": "M-SEABEDNET",
-   "canonical_name": "Seabed-Net",
-   "family": "CNN_UNET",
-   "family_raw": "dual-branch multi-task network (convolutional encoders/decoders with skip connections, AFF and Swin-Transformer fusion)",
-   "architecture_note": "Classified on the encoder-decoder with skip connections described in Sec. 2.1/2.4; windowed Swin-Transformer fusion (Sec. 2.3) and Attention Feature Fusion (Sec. 2.2) are the cross-task fusion modules.",
-   "is_novel_in_paper": true,
-   "role": "PROPOSED",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 5,
-     "page_printed": 5,
-     "quote": "Both decoders are composed of successive upsampling"
-    }
-   ]
-  },
-  {
-   "method_id": "M-MULTIBAND",
-   "canonical_name": "Multiband Linear (Lyzenga, 1978)",
-   "family": "CLASSICAL_BASELINE",
-   "family_raw": "empirical SDB model",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "The empirical models tested in this study-Multiband"
-    }
-   ]
-  },
-  {
-   "method_id": "M-LOGRATIO",
-   "canonical_name": "Log Band Ratio (Stumpf et al., 2003)",
-   "family": "CLASSICAL_BASELINE",
-   "family_raw": "empirical SDB model",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "Linear (Lyzenga, 1978) and Log Band Ratio (Stumpf et al.,"
-    }
-   ]
-  },
-  {
-   "method_id": "M-RF",
-   "canonical_name": "Random Forest Regression",
-   "family": "CLASSICAL_ML",
-   "family_raw": "traditional ML regression (300 trees)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "machinelearningmodelssuchasRandomForestRegression"
-    }
-   ]
-  },
-  {
-   "method_id": "M-SVR",
-   "canonical_name": "Support Vector Regression",
-   "family": "CLASSICAL_ML",
-   "family_raw": "traditional ML regression (RBF kernel)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "VectorRegression(SVR)with"
-    }
-   ]
-  },
-  {
-   "method_id": "M-UNETBATHY",
-   "canonical_name": "UNet-bathy",
-   "family": "CNN_UNET",
-   "family_raw": "UNet-bathy variant",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "Among single-task deep learning-based approaches, a"
-    }
-   ]
-  },
-  {
-   "method_id": "M-UNET",
-   "canonical_name": "UNet",
-   "family": "CNN_UNET",
-   "family_raw": "UNet",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "et al., 2024) and UNet (Ronneberger et al., 2015) serve as"
-    }
-   ]
-  },
-  {
-   "method_id": "M-SEGFORMER",
-   "canonical_name": "SegFormer",
-   "family": "OTHER",
-   "family_raw": "single-task segmentation baseline (architecture not described in the paper)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "while SegFormer (Xie et al., 2021) is"
-    }
-   ]
-  },
-  {
-   "method_id": "M-PADNET",
-   "canonical_name": "PAD-Net",
-   "family": "OTHER",
-   "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "state-of-the-artdeeplearning-basedmodels,includingPAD-"
-    }
-   ]
-  },
-  {
-   "method_id": "M-MTINET",
-   "canonical_name": "MTI-Net",
-   "family": "OTHER",
-   "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "Net (Xu et al., 2018), MTI-Net (Vandenhende et al., 2020),"
-    }
-   ]
-  },
-  {
-   "method_id": "M-MTL",
-   "canonical_name": "MTL (Ekim and Sertel, 2021)",
-   "family": "OTHER",
-   "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "MTL (Ekim and Sertel, 2021), JSH-Net (Zhang et al.,"
-    }
-   ]
-  },
-  {
-   "method_id": "M-JSHNET",
-   "canonical_name": "JSH-Net",
-   "family": "OTHER",
-   "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "MTL (Ekim and Sertel, 2021), JSH-Net (Zhang et al.,"
-    }
-   ]
-  },
-  {
-   "method_id": "M-TASKPROMPTER",
-   "canonical_name": "TaskPrompter",
-   "family": "OTHER",
-   "family_raw": "multi-task deep learning baseline (architecture not described in the paper)",
-   "architecture_note": null,
-   "is_novel_in_paper": false,
-   "role": "BASELINE",
-   "evidence": [
-    {
-     "field": "family",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "2022a),andTaskPrompter(YeandXu,2024).Thesemodels"
-    }
-   ]
-  }
- ],
- "datasets": [
-  {
-   "dataset_id": "D-MBN-AERIAL",
-   "canonical_name": "MagicBathyNet - aerial orthoimagery (Agia Napa and Puck Lagoon)",
-   "variables": [
-    "RGB bands",
-    "seabed depth (LiDAR/sonar reference)",
-    "seabed class labels"
-   ],
-   "spatial_resolution": "0.25 m",
-   "temporal_resolution": null,
-   "region": "Agia Napa (Cyprus) and Puck Lagoon (Poland)",
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "in airborne imagery (0.25 m spatial resolution)."
-    },
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 6,
-     "quote": "we used the Magic-"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-MBN-SPOT6",
-   "canonical_name": "MagicBathyNet - SPOT 6 imagery (Agia Napa and Puck Lagoon)",
-   "variables": [
-    "RGB bands",
-    "seabed depth (LiDAR/sonar reference)",
-    "seabed class labels"
-   ],
-   "spatial_resolution": "6 m",
-   "temporal_resolution": null,
-   "region": "Agia Napa (Cyprus) and Puck Lagoon (Poland)",
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "SPOT6imagery(6mspatialresolution)and720x720pixels"
-    },
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 6,
-     "quote": "we used the Magic-"
-    }
-   ]
-  },
-  {
-   "dataset_id": "D-MBN-S2",
-   "canonical_name": "MagicBathyNet - Sentinel-2 L2A imagery (Agia Napa and Puck Lagoon)",
-   "variables": [
-    "RGB bands",
-    "seabed depth (LiDAR/sonar reference)",
-    "seabed class labels"
-   ],
-   "spatial_resolution": "10 m",
-   "temporal_resolution": null,
-   "region": "Agia Napa (Cyprus) and Puck Lagoon (Poland)",
-   "period_start": null,
-   "period_end": null,
-   "role": "PRIMARY_TRAINING",
-   "evidence": [
-    {
-     "field": "spatial_resolution",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "Sentinel-2imagery(10mspatialresolution),30x30pixelsin"
-    },
-    {
-     "field": "canonical_name",
-     "page_pdf": 6,
-     "page_printed": 6,
-     "quote": "we used the Magic-"
-    }
-   ]
-  }
- ],
- "experiments": [
-  {
-   "experiment_id": "X-BATHY-AERIAL",
-   "task": "BATHYMETRY_ESTIMATION",
-   "task_raw": "bathymetry estimation",
-   "method_id": "M-SEABEDNET",
-   "dataset_ids": [
-    "D-MBN-AERIAL"
-   ],
-   "target_variable": "water depth (m)",
-   "training": {
-    "loss": {
-     "value": "combined multi-task loss (Eq. 15)",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
-      },
-      {
-       "claim": "bathymetry term is an RMSE loss",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "The bathymetry task is supervised using the Root Mean"
-      },
-      {
-       "claim": "classification term is cross-entropy",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "cross-entropy loss"
-      }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "cosine annealing learning-rate scheduler",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
-      }
-     ]
-    },
-    "learning_rate": {
-     "value": "1e-5",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "note": "Initial learning rate for aerial data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
-    },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "aerial data for a 10-epoch training period",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "each epoch is 10,000 iterations",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "Each epoch consisted of 10.000 iterations"
-      }
-     ]
-    },
-    "hardware": {
-     "value": "1x NVIDIA A100 80GB",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "using one NVIDIA A100 80GB GPU",
-     "note": "Same training setup for all experiments (training and testing)."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-SEG-AERIAL",
-   "task": "CLASSIFICATION_SEGMENTATION",
-   "task_raw": "pixel-based seabed classification",
-   "method_id": "M-SEABEDNET",
-   "dataset_ids": [
-    "D-MBN-AERIAL"
-   ],
-   "target_variable": "seabed class (5 classes: seagrass, macroalgae, eelgrass/pondweed, sand, rock)",
-   "training": {
-    "loss": {
-     "value": "combined multi-task loss (Eq. 15)",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
-      },
-      {
-       "claim": "bathymetry term is an RMSE loss",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "The bathymetry task is supervised using the Root Mean"
-      },
-      {
-       "claim": "classification term is cross-entropy",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "cross-entropy loss"
-      }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "cosine annealing learning-rate scheduler",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
-      }
-     ]
-    },
-    "learning_rate": {
-     "value": "1e-5",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "note": "Initial learning rate for aerial data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
-    },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "aerial data for a 10-epoch training period",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "each epoch is 10,000 iterations",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "Each epoch consisted of 10.000 iterations"
-      }
-     ]
-    },
-    "hardware": {
-     "value": "1x NVIDIA A100 80GB",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "using one NVIDIA A100 80GB GPU",
-     "note": "Same training setup for all experiments (training and testing)."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-BATHY-SPOT6",
-   "task": "BATHYMETRY_ESTIMATION",
-   "task_raw": "bathymetry estimation",
-   "method_id": "M-SEABEDNET",
-   "dataset_ids": [
-    "D-MBN-SPOT6"
-   ],
-   "target_variable": "water depth (m)",
-   "training": {
-    "loss": {
-     "value": "combined multi-task loss (Eq. 15)",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
-      },
-      {
-       "claim": "bathymetry term is an RMSE loss",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "The bathymetry task is supervised using the Root Mean"
-      },
-      {
-       "claim": "classification term is cross-entropy",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "cross-entropy loss"
-      }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "cosine annealing learning-rate scheduler",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
-      }
-     ]
-    },
-    "learning_rate": {
-     "value": "1e-4",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
-    },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "aerial data for a 10-epoch training period",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "each epoch is 10,000 iterations",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "Each epoch consisted of 10.000 iterations"
-      }
-     ]
-    },
-    "hardware": {
-     "value": "1x NVIDIA A100 80GB",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "using one NVIDIA A100 80GB GPU",
-     "note": "Same training setup for all experiments (training and testing)."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-SEG-SPOT6",
-   "task": "CLASSIFICATION_SEGMENTATION",
-   "task_raw": "pixel-based seabed classification",
-   "method_id": "M-SEABEDNET",
-   "dataset_ids": [
-    "D-MBN-SPOT6"
-   ],
-   "target_variable": "seabed class (5 classes: seagrass, macroalgae, eelgrass/pondweed, sand, rock)",
-   "training": {
-    "loss": {
-     "value": "combined multi-task loss (Eq. 15)",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
-      },
-      {
-       "claim": "bathymetry term is an RMSE loss",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "The bathymetry task is supervised using the Root Mean"
-      },
-      {
-       "claim": "classification term is cross-entropy",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "cross-entropy loss"
-      }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "cosine annealing learning-rate scheduler",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
-      }
-     ]
-    },
-    "learning_rate": {
-     "value": "1e-4",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
-    },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "aerial data for a 10-epoch training period",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "each epoch is 10,000 iterations",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "Each epoch consisted of 10.000 iterations"
-      }
-     ]
-    },
-    "hardware": {
-     "value": "1x NVIDIA A100 80GB",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "using one NVIDIA A100 80GB GPU",
-     "note": "Same training setup for all experiments (training and testing)."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "task": "BATHYMETRY_ESTIMATION",
-   "task_raw": "bathymetry estimation",
-   "method_id": "M-SEABEDNET",
-   "dataset_ids": [
-    "D-MBN-S2"
-   ],
-   "target_variable": "water depth (m)",
-   "training": {
-    "loss": {
-     "value": "combined multi-task loss (Eq. 15)",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
-      },
-      {
-       "claim": "bathymetry term is an RMSE loss",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "The bathymetry task is supervised using the Root Mean"
-      },
-      {
-       "claim": "classification term is cross-entropy",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "cross-entropy loss"
-      }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "cosine annealing learning-rate scheduler",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
-      }
-     ]
-    },
-    "learning_rate": {
-     "value": "1e-4",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
-    },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "aerial data for a 10-epoch training period",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "each epoch is 10,000 iterations",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "Each epoch consisted of 10.000 iterations"
-      }
-     ]
-    },
-    "hardware": {
-     "value": "1x NVIDIA A100 80GB",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "using one NVIDIA A100 80GB GPU",
-     "note": "Same training setup for all experiments (training and testing)."
-    }
-   }
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "task": "CLASSIFICATION_SEGMENTATION",
-   "task_raw": "pixel-based seabed classification",
-   "method_id": "M-SEABEDNET",
-   "dataset_ids": [
-    "D-MBN-S2"
-   ],
-   "target_variable": "seabed class (5 classes: seagrass, macroalgae, eelgrass/pondweed, sand, rock)",
-   "training": {
-    "loss": {
-     "value": "combined multi-task loss (Eq. 15)",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "uncertainty weighting of the two task losses (Kendall et al. 2018)",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "basedontaskuncertaintyweighting,asproposedinKendall"
-      },
-      {
-       "claim": "bathymetry term is an RMSE loss",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "The bathymetry task is supervised using the Root Mean"
-      },
-      {
-       "claim": "classification term is cross-entropy",
-       "page_pdf": 6,
-       "page_printed": 6,
-       "quote": "cross-entropy loss"
-      }
-     ]
-    },
-    "optimizer": {
-     "value": "Adam",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "the combined loss function (Eq. 15) alongside the Adam",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "cosine annealing learning-rate scheduler",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "optimizer(Kingma,2014),withacosineannealinglearning"
-      }
-     ]
-    },
-    "learning_rate": {
-     "value": "1e-4",
-     "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
-     "page_pdf": 8,
-     "page_printed": 8,
-     "note": "Initial learning rate for SPOT 6 and Sentinel-2 data, read on PDF page 8, Sec. 3.3 (sentence 'The initial learning rate was 10-4 for SPOT 6 and Sentinel-2, and 10-5 for aerial data'); the quote crosses a superscript exponent that extracts as a mangled symbol, so no safe quote is stored."
-    },
-    "epochs": {
-     "value": 10,
-     "page_pdf": 8,
-     "page_printed": 8,
-     "quote": "aerial data for a 10-epoch training period",
-     "note": "Same training setup for all experiments.",
-     "extra_evidence": [
-      {
-       "claim": "each epoch is 10,000 iterations",
-       "page_pdf": 7,
-       "page_printed": 7,
-       "quote": "Each epoch consisted of 10.000 iterations"
-      }
-     ]
-    },
-    "hardware": {
-     "value": "1x NVIDIA A100 80GB",
-     "page_pdf": 7,
-     "page_printed": 7,
-     "quote": "using one NVIDIA A100 80GB GPU",
-     "note": "Same training setup for all experiments (training and testing)."
-    }
-   }
-  }
- ],
- "results": [
-  {
-   "experiment_id": "X-BATHY-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.556,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "TaskPrompter",
-   "baseline_value": 0.596,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
-  },
-  {
-   "experiment_id": "X-BATHY-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "MAE",
-   "metric_raw": "MAE",
-   "metric_kind": "ERROR",
-   "value": 0.408,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "UNet-bathy",
-   "baseline_value": 0.42,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet-bathy)."
-  },
-  {
-   "experiment_id": "X-SEG-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "IOU",
-   "metric_raw": "mIoU (header says %, values are fractions)",
-   "metric_kind": "AGREEMENT",
-   "value": 0.885,
-   "unit": "",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "UNet",
-   "baseline_value": 0.879,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet)."
-  },
-  {
-   "experiment_id": "X-SEG-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 95.33,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "UNet",
-   "baseline_value": 94.67,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet)."
-  },
-  {
-   "experiment_id": "X-BATHY-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.26,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "UNet-bathy",
-   "baseline_value": 0.298,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet-bathy)."
-  },
-  {
-   "experiment_id": "X-BATHY-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "MAE",
-   "metric_raw": "MAE",
-   "metric_kind": "ERROR",
-   "value": 0.152,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "UNet-bathy",
-   "baseline_value": 0.187,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (UNet-bathy)."
-  },
-  {
-   "experiment_id": "X-SEG-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "IOU",
-   "metric_raw": "mIoU (header says %, values are fractions)",
-   "metric_kind": "AGREEMENT",
-   "value": 0.961,
-   "unit": "",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "JSH-Net",
-   "baseline_value": 0.923,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
-  },
-  {
-   "experiment_id": "X-SEG-AERIAL",
-   "dataset_id": "D-MBN-AERIAL",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 98.0,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "SegFormer",
-   "baseline_value": 97.33,
-   "source_table": "Table 2",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.556 0.408 0.541 0.885 95.33 0.260 0.152 0.254 0.961 98.00",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
-  },
-  {
-   "experiment_id": "X-BATHY-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.651,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "MTL",
-   "baseline_value": 0.679,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (MTL)."
-  },
-  {
-   "experiment_id": "X-BATHY-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "MAE",
-   "metric_raw": "MAE",
-   "metric_kind": "ERROR",
-   "value": 0.445,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "MTL",
-   "baseline_value": 0.464,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (MTL)."
-  },
-  {
-   "experiment_id": "X-SEG-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "IOU",
-   "metric_raw": "mIoU (header says %, values are fractions)",
-   "metric_kind": "AGREEMENT",
-   "value": 0.645,
-   "unit": "",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "JSH-Net",
-   "baseline_value": 0.634,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
-  },
-  {
-   "experiment_id": "X-SEG-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 82.0,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "JSH-Net",
-   "baseline_value": 80.27,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
-  },
-  {
-   "experiment_id": "X-BATHY-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.457,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "MTL",
-   "baseline_value": 0.532,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (MTL)."
-  },
-  {
-   "experiment_id": "X-BATHY-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "MAE",
-   "metric_raw": "MAE",
-   "metric_kind": "ERROR",
-   "value": 0.254,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "Random Forest Regression",
-   "baseline_value": 0.28,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (Random Forest Regression)."
-  },
-  {
-   "experiment_id": "X-SEG-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "IOU",
-   "metric_raw": "mIoU (header says %, values are fractions)",
-   "metric_kind": "AGREEMENT",
-   "value": 0.784,
-   "unit": "",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "SegFormer",
-   "baseline_value": 0.708,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
-  },
-  {
-   "experiment_id": "X-SEG-SPOT6",
-   "dataset_id": "D-MBN-SPOT6",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 87.92,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "SegFormer",
-   "baseline_value": 86.66,
-   "source_table": "Table 3",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.651 0.445 0.649 0.645 82.00 0.457 0.254 0.457 0.784 87.92",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.66,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "TaskPrompter",
-   "baseline_value": 0.753,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "MAE",
-   "metric_raw": "MAE",
-   "metric_kind": "ERROR",
-   "value": 0.451,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "TaskPrompter",
-   "baseline_value": 0.521,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "IOU",
-   "metric_raw": "mIoU (header says %, values are fractions)",
-   "metric_kind": "AGREEMENT",
-   "value": 0.643,
-   "unit": "",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "JSH-Net",
-   "baseline_value": 0.626,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 84.35,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa",
-   "baseline_name": "TaskPrompter",
-   "baseline_value": 79.99,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Agia Napa are the first five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.431,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "JSH-Net",
-   "baseline_value": 0.48,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (JSH-Net)."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "MAE",
-   "metric_raw": "MAE",
-   "metric_kind": "ERROR",
-   "value": 0.253,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "TaskPrompter",
-   "baseline_value": 0.256,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (TaskPrompter)."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "IOU",
-   "metric_raw": "mIoU (header says %, values are fractions)",
-   "metric_kind": "AGREEMENT",
-   "value": 0.742,
-   "unit": "",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "SegFormer",
-   "baseline_value": 0.71,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 85.23,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "Seabed-Net, Puck Lagoon",
-   "baseline_name": "SegFormer",
-   "baseline_value": 82.55,
-   "source_table": "Table 4",
-   "is_best_in_table": true,
-   "page_pdf": 10,
-   "page_printed": 10,
-   "quote": "Seabed-Net (ours) 380 0.660 0.451 0.658 0.643 84.35 0.431 0.253 0.429 0.742 85.23",
-   "note": "Quote is the full Table row; Seabed-Net values for Puck Lagoon are the second five columns (RMSE, MAE, Std, mIoU, OA). baseline_value is the best non-Seabed-Net row for this site/metric in the same table (SegFormer)."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RUNTIME",
-   "metric_raw": "inference time, depth head",
-   "metric_kind": "EFFICIENCY",
-   "value": 1.99,
-   "unit": "s",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa Sentinel-2, NVIDIA A5000 24GB",
-   "baseline_name": "MTL",
-   "baseline_value": 1.92,
-   "source_table": "Table 6",
-   "is_best_in_table": false,
-   "page_pdf": 18,
-   "page_printed": 18,
-   "quote": "Inference Time (s) 1.99 5.17 1.92 4.45",
-   "note": "Row label sits on this line; column headers (Seabed-Net Depth, Classes, MTL Depth, Classes) are on the lines above."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RUNTIME",
-   "metric_raw": "inference time, classification head",
-   "metric_kind": "EFFICIENCY",
-   "value": 5.17,
-   "unit": "s",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "Seabed-Net, Agia Napa Sentinel-2, NVIDIA A5000 24GB",
-   "baseline_name": "MTL",
-   "baseline_value": 4.45,
-   "source_table": "Table 6",
-   "is_best_in_table": false,
-   "page_pdf": 18,
-   "page_printed": 18,
-   "quote": "Inference Time (s) 1.99 5.17 1.92 4.45",
-   "note": "Same row as the depth runtime."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.66,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: full model",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": true,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "4 FAA and 4 Vit blocks 0.660 84.35 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 84.35,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: full model",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": true,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "4 FAA and 4 Vit blocks 0.660 84.35 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.891,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: 3 FAA and 3 ViT blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "3 FAA and 3 Vit blocks 0.891 76.19 106M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 76.19,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: 3 FAA and 3 ViT blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "3 FAA and 3 Vit blocks 0.891 76.19 106M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 1.125,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no FAA and ViT blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No FAA and Vit blocks 1.125 74.83 15M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 74.83,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no FAA and ViT blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No FAA and Vit blocks 1.125 74.83 15M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.963,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no FAA blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No FAA blocks 0.963 78.91 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 78.91,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no FAA blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No FAA blocks 0.963 78.91 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.872,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no ViT blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No ViT blocks 0.872 77.55 16M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 77.55,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no ViT blocks",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No ViT blocks 0.872 77.55 16M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.923,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no spatial attention in AFF",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No spatial attention in AFF 0.923 80.27 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 80.27,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no spatial attention in AFF",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No spatial attention in AFF 0.923 80.27 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 1.012,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no channel attention in AFF",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No channel attention in AFF 1.012 80.95 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 80.95,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no channel attention in AFF",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No channel attention in AFF 1.012 80.95 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.854,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: 2 ViT heads",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "2 ViT heads (instead of 4) 0.854 76.87 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 76.87,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: 2 ViT heads",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "2 ViT heads (instead of 4) 0.854 76.87 380M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.873,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no cross attention in ViT",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No cross attention in ViT 0.873 82.31 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 82.31,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: no cross attention in ViT",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "No cross attention in ViT 0.873 82.31 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 1.567,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: BN added to bathymetry branch",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "Bathymetry branch with BN 1.567 79.59 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 79.59,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: BN added to bathymetry branch",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "Bathymetry branch with BN 1.567 79.59 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-BATHY-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "RMSE",
-   "metric_raw": "RMSE",
-   "metric_kind": "ERROR",
-   "value": 0.883,
-   "unit": "m",
-   "higher_is_better": false,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: BN removed from classification branch",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "Classification branch without BN 0.883 80.67 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  },
-  {
-   "experiment_id": "X-SEG-S2",
-   "dataset_id": "D-MBN-S2",
-   "metric": "ACCURACY",
-   "metric_raw": "OA",
-   "metric_kind": "AGREEMENT",
-   "value": 80.67,
-   "unit": "%",
-   "higher_is_better": true,
-   "split": "TEST",
-   "config": "ablation, Agia Napa Sentinel-2: BN removed from classification branch",
-   "baseline_name": null,
-   "baseline_value": null,
-   "source_table": "Table 5",
-   "is_best_in_table": false,
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "Classification branch without BN 0.883 80.67 379M",
-   "note": "Row label as extracted; Table 5 columns are Setting, RMSE(m), OA%, Params. Ablation covers Agia Napa Sentinel-2 only."
-  }
- ],
- "limitations": [
-  {
-   "theme": "GENERALIZATION",
-   "page_pdf": 17,
-   "page_printed": 17,
-   "quote": "they may still be optimistic relative"
-  },
-  {
-   "theme": "EVALUATION",
-   "page_pdf": 17,
-   "page_printed": 17,
-   "quote": "can lead to an overestimation of"
-  },
-  {
-   "theme": "FUTURE_WORK",
-   "page_pdf": 18,
-   "page_printed": 18,
-   "quote": "In future work, we intend to explore spatially disjoint"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 16,
-   "page_printed": 16,
-   "quote": "imposed by the spatial resolution of the data."
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 17,
-   "page_printed": 17,
-   "quote": "This reduces confusion during training but does not fully"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 18,
-   "page_printed": 18,
-   "quote": "One critical issue involves the inherent variability and"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 18,
-   "page_printed": 18,
-   "quote": "A further, often overlooked, source of error arises from"
-  },
-  {
-   "theme": "DATA",
-   "page_pdf": 19,
-   "page_printed": 19,
-   "quote": "While our model requires paired in-situ bathymetry"
-  },
-  {
-   "theme": "COMPUTE",
-   "page_pdf": 19,
-   "page_printed": 19,
-   "quote": "Although the current architecture is relatively large, the"
-  },
-  {
-   "theme": "FUTURE_WORK",
-   "page_pdf": 19,
-   "page_printed": 19,
-   "quote": "However, we also plan to explore the inte-"
-  }
- ],
- "conflicts": [
-  {
-   "field": "claims.max_seabed_classification_accuracy_gain",
-   "values": [
-    8,
-    16
-   ],
-   "sources": [
-    {
-     "page_pdf": 1,
-     "quote": "improvesseabedclassificationaccuracyupto8%"
-    },
-    {
-     "page_pdf": 19,
-     "quote": "classificationaccuracybyupto16%inthesamelow"
-    }
-   ],
-   "chosen": null,
-   "reason": "Abstract says up to 8%, conclusion says up to 16% in the same low-resolution settings; Sec. 4.1.4 gives 8.72% over SegFormer. No value from this claim is stored in results."
-  },
-  {
-   "field": "datasets.Puck Lagoon annotated patches",
-   "values": [
-    1971,
-    498
-   ],
-   "sources": [
-    {
-     "page_pdf": 8,
-     "quote": "InthelargerPuckLagoonarea,1971"
-    },
-    {
-     "page_pdf": 7,
-     "quote": "# of Patches 35 498 -"
-    }
-   ],
-   "chosen": null,
-   "reason": "Sec. 3.3 gives 1971 annotated patches (1575 train / 396 test) for Puck Lagoon while Table 1 gives 498 patches; not used in results."
-  }
- ],
- "not_reported": [
-  {
-   "field": "datasets[D-MBN-AERIAL].temporal_resolution",
-   "searched": [
-    "3.1 Dataset description",
-    "Table 1",
-    "3.3 Experimental setup"
-   ]
-  },
-  {
-   "field": "datasets[D-MBN-AERIAL].period_start/period_end",
-   "searched": [
-    "3.1 Dataset description (acquisition dates deferred to Agrafiotis et al. 2024)",
-    "3.3 Experimental setup"
-   ]
-  },
-  {
-   "field": "datasets[D-MBN-SPOT6].temporal_resolution",
-   "searched": [
-    "3.1 Dataset description",
-    "Table 1",
-    "3.3 Experimental setup"
-   ]
-  },
-  {
-   "field": "datasets[D-MBN-SPOT6].period_start/period_end",
-   "searched": [
-    "3.1 Dataset description (acquisition dates deferred to Agrafiotis et al. 2024)",
-    "3.3 Experimental setup"
-   ]
-  },
-  {
-   "field": "datasets[D-MBN-S2].temporal_resolution",
-   "searched": [
-    "3.1 Dataset description",
-    "Table 1",
-    "3.3 Experimental setup"
-   ]
-  },
-  {
-   "field": "datasets[D-MBN-S2].period_start/period_end",
-   "searched": [
-    "3.1 Dataset description (acquisition dates deferred to Agrafiotis et al. 2024)",
-    "3.3 Experimental setup"
-   ]
-  },
-  {
-   "field": "experiments[X-BATHY-AERIAL].training.batch_size",
-   "searched": [
-    "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
-    "3.3 Experimental setup",
-    "Tables 2-6",
-    "full text"
-   ]
-  },
-  {
-   "field": "experiments[X-SEG-AERIAL].training.batch_size",
-   "searched": [
-    "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
-    "3.3 Experimental setup",
-    "Tables 2-6",
-    "full text"
-   ]
-  },
-  {
-   "field": "experiments[X-BATHY-SPOT6].training.batch_size",
-   "searched": [
-    "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
-    "3.3 Experimental setup",
-    "Tables 2-6",
-    "full text"
-   ]
-  },
-  {
-   "field": "experiments[X-SEG-SPOT6].training.batch_size",
-   "searched": [
-    "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
-    "3.3 Experimental setup",
-    "Tables 2-6",
-    "full text"
-   ]
-  },
-  {
-   "field": "experiments[X-BATHY-S2].training.batch_size",
-   "searched": [
-    "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
-    "3.3 Experimental setup",
-    "Tables 2-6",
-    "full text"
-   ]
-  },
-  {
-   "field": "experiments[X-SEG-S2].training.batch_size",
-   "searched": [
-    "2.1 Task-specific encoders (B only defined symbolically as the batch size)",
-    "3.3 Experimental setup",
-    "Tables 2-6",
-    "full text"
-   ]
-  },
-  {
-   "field": "paper.doi",
-   "searched": [
-    "page 1 header",
-    "reference list"
-   ]
-  },
-  {
-   "field": "paper.venue",
-   "searched": [
-    "page 1 header",
-    "footers (only 'Revised article')"
-   ]
-  }
- ]
 }

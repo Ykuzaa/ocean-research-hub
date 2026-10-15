@@ -1,0 +1,765 @@
+{
+ "source": {
+  "source_id": "eddy-param-generalizable",
+  "file": ".data/golden-pdfs/generalizable-neural-network-parameterization-of-mesoscale-e.pdf",
+  "sha256_prefix": "bd321c546769aa7f738d0f42",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2505.08900v6 [physics.ao-ph] 24 Sep 2025"
+  },
+  "resolved_from": {
+   "doi": "10.1029/2025GL117046",
+   "via": "OpenAlex",
+   "note": "DOI de la version publiée, absent du fichier lu; sert à retrouver le PDF, pas à sourcer une valeur"
+  },
+  "pdf_pages": 41,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-sonnet-5-5",
+  "extracted_at": "2026-10-15"
+ },
+ "paper": {
+  "paper_id": "P-EDDY-PARAM-GENERALIZABLE",
+  "doi": null,
+  "title": "Generalizable neural-network parameterization of mesoscale eddies in idealized and global ocean models",
+  "year": 2025,
+  "venue": null,
+  "ocean_domains": [
+   "parameterization",
+   "eddies-fronts",
+   "currents"
+  ],
+  "ocean_domains_raw": [
+   "mesoscale eddy parameterization",
+   "eddy fluxes",
+   "global ocean model"
+  ],
+  "venue_note": "Le fichier lu est la préimpression arXiv; il indique « manuscript submitted to Geophysical Research Letters », ce qui n'établit pas un lieu de publication."
+ },
+ "methods": [
+  {
+   "method_id": "M-ANN-DIMSCALE",
+   "canonical_name": "ANN mesoscale eddy-flux parameterization with local dimensional scaling (coupled to MOM6)",
+   "family": "MLP_DNN",
+   "family_raw": "ANN, also known as a multilayer perceptron (MLP), with two hidden layers, 32 neurons each (offline); one hidden layer with 20 neurons (online)",
+   "architecture_note": "Predicts three momentum-flux components from velocity gradients on a 3x3 stencil, scaled by grid spacing and local norm of the inputs; implemented online in MOM6 (classified on the network itself).",
+   "is_novel_in_paper": true,
+   "role": "PROPOSED",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 24,
+     "quote": "we use an ANN, also known as a multilayer perc eptron (MLP), with two hidden layers, 32 neurons each, in a total of 2051 paramet ers"
+    },
+    {
+     "field": "is_novel_in_paper",
+     "page_pdf": 3,
+     "quote": "we introduce a local dimensional scaling constructed from the grid s pacing and veloc- ity gradients (Prakash et al., 2022)",
+     "page_printed": 3,
+     "note": "Les auteurs écrivent « we introduce » tout en citant Prakash et al. (2022) pour l'idée de mise à l'échelle: la nouveauté revendiquée est la paramétrisation, pas l'analyse dimensionnelle elle-même."
+    }
+   ]
+  },
+  {
+   "method_id": "M-ANN-FIXNORM",
+   "canonical_name": "ANN eddy-flux parameterization with fixed normalization coefficients",
+   "family": "MLP_DNN",
+   "family_raw": "same ANN (multilayer perceptron) without dimensional scaling",
+   "architecture_note": "Same network as the dimensional-scaling ANN, but inputs and outputs divided by fixed coefficients.",
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 24,
+     "quote": "two hidden layers, 32 neurons each, in a total of 2051 paramet ers, both for parameteriza- tions with and without dimensional scaling"
+    },
+    {
+     "field": "role",
+     "page_pdf": 6,
+     "page_printed": 6,
+     "quote": "We consider a baseline data-driven parameterization of eddy ﬂuxes wi th ﬁxed nor- malization coeﬃcients"
+    }
+   ]
+  },
+  {
+   "method_id": "M-CONTROL-NOPARAM",
+   "canonical_name": "MOM6 coarse-resolution control simulation (biharmonic Smagorinsky only)",
+   "family": "CLASSICAL_BASELINE",
+   "family_raw": "biharmonic Smagorinsky scheme for gridscale dissipation",
+   "architecture_note": null,
+   "is_novel_in_paper": false,
+   "role": "BASELINE",
+   "evidence": [
+    {
+     "field": "family",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "The biharmonic Smagorinsky scheme for gridscale dissipation is used wi th viscos- ity coeﬃcient"
+    }
+   ]
+  }
+ ],
+ "datasets": [
+  {
+   "dataset_id": "D-CM26",
+   "canonical_name": "CM2.6 climate model ocean velocity, filtered and coarse-grained (training data)",
+   "variables": [
+    "velocity gradients (shearing strain, tension, relative vorticity)",
+    "subfilter forcing"
+   ],
+   "spatial_resolution": "0.1 degree nominal ocean; coarse grids 0.4, 0.9, 1.2, 1.5 degree",
+   "temporal_resolution": "5-day snapshot averages, snapshots 1 month apart",
+   "region": "all globe including polar latitudes",
+   "period_start": null,
+   "period_end": null,
+   "role": "PRIMARY_TRAINING",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "The training dataset is created using the climate model CM2.6 (Griﬃ es et al., 2015), which has a nominal ocean resolution of 0 .1◦."
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 29,
+     "quote": "Coarse Grid Spacing, ∆ (nominal) 0 .4◦, 0 .9◦, 1 .2◦, 1 .5◦"
+    },
+    {
+     "field": "temporal_resolution",
+     "page_pdf": 29,
+     "quote": "Snapshot Averaging Interval 5 days"
+    },
+    {
+     "field": "region",
+     "page_pdf": 29,
+     "quote": "Horizontal extent All globe including polar latitudes"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-NW2",
+   "canonical_name": "NeverWorld2 idealized single-basin configuration with 1/32 degree reference",
+   "variables": [
+    "eddy kinetic energy",
+    "available potential energy",
+    "isopycnal interface position",
+    "upscale kinetic energy transfer"
+   ],
+   "spatial_resolution": "1/32 degree reference; coarse 1/3, 1/4, 1/6 degree",
+   "temporal_resolution": null,
+   "region": "idealized single basin with a reentrant channel",
+   "period_start": null,
+   "period_end": null,
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "15 stacked shallow water layers, featuring a single basin oce an with a reentrant channel."
+    },
+    {
+     "field": "spatial_resolution",
+     "page_pdf": 30,
+     "quote": "Online results in idealized conﬁguration NeverWorld2 at thr ee coarse resolutions"
+    }
+   ]
+  },
+  {
+   "dataset_id": "D-OM4",
+   "canonical_name": "OM4 global ocean-sea-ice model with CORE-II interannual forcing",
+   "variables": [
+    "eddy kinetic energy",
+    "available potential energy",
+    "kinetic energy",
+    "potential temperature",
+    "ACC transport",
+    "AMOC"
+   ],
+   "spatial_resolution": "eddy-permitting 1/4 degree",
+   "temporal_resolution": null,
+   "region": "global ocean",
+   "period_start": "1948",
+   "period_end": "2007",
+   "role": "EVALUATION",
+   "evidence": [
+    {
+     "field": "canonical_name",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "is a coupled ocean-sea-i ce model forced at the air-sea interface by prescribing the atmospher e state according to the CORE-II interannual forcing (IAF) protocol"
+    },
+    {
+     "field": "period",
+     "page_pdf": 7,
+     "page_printed": 7,
+     "quote": "The si mula- tions span 60 years (1948-2007)"
+    }
+   ]
+  }
+ ],
+ "experiments": [
+  {
+   "experiment_id": "X-OFFLINE-GENERALIZATION-DIMSCALE",
+   "task": "PARAMETERIZATION",
+   "task_raw": "offline generalization to unseen grid resolutions and depths",
+   "method_id": "M-ANN-DIMSCALE",
+   "dataset_ids": [
+    "D-CM26"
+   ],
+   "target_variable": "subfilter momentum forcing",
+   "training": {
+    "loss": {
+     "value": "mean squared error (MSE) loss",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "We learn the components of T by minimizing the mean squared error (MSE) loss function:",
+     "extra_evidence": [
+      {
+       "claim": "MSE is normalized by the l2-norm of S and masks wet points (SI)",
+       "page_pdf": 25,
+       "quote": "The mean squared error (MSE) loss is minimized on every 2D sna pshot of subﬁlter forcing S and normalized by the corresponding l2-norm of S"
+      }
+     ]
+    },
+    "note": "Trained on a single depth (5 m) and resolution (0.9 degree) for this experiment."
+   }
+  },
+  {
+   "experiment_id": "X-OFFLINE-GENERALIZATION-FIXNORM",
+   "task": "PARAMETERIZATION",
+   "task_raw": "offline generalization to unseen grid resolutions and depths (fixed-normalization baseline)",
+   "method_id": "M-ANN-FIXNORM",
+   "dataset_ids": [
+    "D-CM26"
+   ],
+   "target_variable": "subfilter momentum forcing",
+   "training": {
+    "loss": {
+     "value": "mean squared error (MSE) loss",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "We learn the components of T by minimizing the mean squared error (MSE) loss function:",
+     "extra_evidence": [
+      {
+       "claim": "MSE is normalized by the l2-norm of S and masks wet points (SI)",
+       "page_pdf": 25,
+       "quote": "The mean squared error (MSE) loss is minimized on every 2D sna pshot of subﬁlter forcing S and normalized by the corresponding l2-norm of S"
+      }
+     ]
+    },
+    "note": "Trained on a single depth (5 m) and resolution (0.9 degree) for this experiment."
+   }
+  },
+  {
+   "experiment_id": "X-ONLINE-NW2",
+   "task": "PARAMETERIZATION",
+   "task_raw": "online evaluation in idealized NeverWorld2 at 1/3, 1/4, 1/6 degree",
+   "method_id": "M-ANN-DIMSCALE",
+   "dataset_ids": [
+    "D-CM26",
+    "D-NW2"
+   ],
+   "target_variable": "isopycnal interface position, EKE, APE",
+   "training": {
+    "loss": {
+     "value": "mean squared error (MSE) loss",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "We learn the components of T by minimizing the mean squared error (MSE) loss function:",
+     "extra_evidence": [
+      {
+       "claim": "MSE is normalized by the l2-norm of S and masks wet points (SI)",
+       "page_pdf": 25,
+       "quote": "The mean squared error (MSE) loss is minimized on every 2D sna pshot of subﬁlter forcing S and normalized by the corresponding l2-norm of S"
+      }
+     ]
+    },
+    "note": "One training section (Text S3) covers all ANN trainings; online runs use a smaller retrained network (1 hidden layer, 20 neurons)."
+   }
+  },
+  {
+   "experiment_id": "X-ONLINE-OM4",
+   "task": "PARAMETERIZATION",
+   "task_raw": "online evaluation in global ocean-sea-ice model OM4 at 1/4 degree",
+   "method_id": "M-ANN-DIMSCALE",
+   "dataset_ids": [
+    "D-CM26",
+    "D-OM4"
+   ],
+   "target_variable": "EKE, APE, global circulation metrics",
+   "training": {
+    "loss": {
+     "value": "mean squared error (MSE) loss",
+     "page_pdf": 4,
+     "page_printed": 4,
+     "quote": "We learn the components of T by minimizing the mean squared error (MSE) loss function:",
+     "extra_evidence": [
+      {
+       "claim": "MSE is normalized by the l2-norm of S and masks wet points (SI)",
+       "page_pdf": 25,
+       "quote": "The mean squared error (MSE) loss is minimized on every 2D sna pshot of subﬁlter forcing S and normalized by the corresponding l2-norm of S"
+      }
+     ]
+    },
+    "note": "One training section (Text S3) covers all ANN trainings; online runs use a smaller retrained network (1 hidden layer, 20 neurons)."
+   }
+  }
+ ],
+ "results": [
+  {
+   "experiment_id": "X-OFFLINE-GENERALIZATION-DIMSCALE",
+   "dataset_id": "D-CM26",
+   "metric": "R2",
+   "metric_raw": "coefficient of determination of norm of subfilter forcing",
+   "metric_kind": "SKILL",
+   "value": 0.81,
+   "unit": "dimensionless",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "trained and tested at 0.9 degree, 5 m (held-out data)",
+   "baseline_name": "ANN with fixed normalization coefficients",
+   "baseline_value": 0.81,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "Both ANNs exhibit high and equal pattern correlation (0 .90) and R 2 (0.81) in the prediction of the norm of subﬁlter forcing."
+  },
+  {
+   "experiment_id": "X-OFFLINE-GENERALIZATION-DIMSCALE",
+   "dataset_id": "D-CM26",
+   "metric": "R2",
+   "metric_raw": "coefficient of determination of norm of subfilter forcing",
+   "metric_kind": "SKILL",
+   "value": 0.87,
+   "unit": "dimensionless",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "unseen resolution 0.4 degree, depth 5 m",
+   "baseline_name": "ANN with fixed normalization coefficients",
+   "baseline_value": -2.71,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "resulting in a low R 2 (−2.71). Instead, the ANN with dimensional scaling (Eq. (11)) oﬀers improved generalization capability. The proposed ANN naturally accounts for the reduction of the grid spacing and reduces the magnitude of the pr ediction, re- sulting in high pattern correlation (0 .94) and R 2 (0.87) metrics"
+  },
+  {
+   "experiment_id": "X-OFFLINE-GENERALIZATION-FIXNORM",
+   "dataset_id": "D-CM26",
+   "metric": "R2",
+   "metric_raw": "coefficient of determination of norm of subfilter forcing",
+   "metric_kind": "SKILL",
+   "value": -2.71,
+   "unit": "dimensionless",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "unseen resolution 0.4 degree, depth 5 m",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "the magnitude of the prediction is too large, resulting in a low R 2 (−2.71)."
+  },
+  {
+   "experiment_id": "X-OFFLINE-GENERALIZATION-FIXNORM",
+   "dataset_id": "D-CM26",
+   "metric": "R2",
+   "metric_raw": "coefficient of determination of norm of subfilter forcing",
+   "metric_kind": "SKILL",
+   "value": 0.81,
+   "unit": "dimensionless",
+   "higher_is_better": true,
+   "split": "TEST",
+   "config": "trained and tested at 0.9 degree, 5 m (held-out data)",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 8,
+   "page_printed": 8,
+   "quote": "Both ANNs exhibit high and equal pattern correlation (0 .90) and R 2 (0.81) in the prediction of the norm of subﬁlter forcing."
+  },
+  {
+   "experiment_id": "X-ONLINE-NW2",
+   "dataset_id": "D-NW2",
+   "metric": "RMSE",
+   "metric_raw": "RMSE of 1000-day averaged interface position, transect at 0E",
+   "metric_kind": "ERROR",
+   "value": 29.2,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ANN at 1/4 degree, longitude 0E",
+   "baseline_name": "Control(1/4)",
+   "baseline_value": 52.1,
+   "source_table": "Table S2",
+   "is_best_in_table": false,
+   "page_pdf": 30,
+   "quote": "Control(1/4◦) 52.1 42.1 40.3 34.6 Yankovsky24(1/4◦) 27.8 23.0 20.7 21.3 ZB20-Reynolds(1/4◦) 26.9 21.0 18.4 18.5 ANN(1/4◦) 29.2 20.0 16 .7 19.7",
+   "note": "At 0E the ZB20-Reynolds (26.9) and Yankovsky24 (27.8) rows have lower RMSE than the ANN; baseline here is Control."
+  },
+  {
+   "experiment_id": "X-ONLINE-NW2",
+   "dataset_id": "D-NW2",
+   "metric": "RMSE",
+   "metric_raw": "RMSE of 1000-day averaged interface position, transect at 45E",
+   "metric_kind": "ERROR",
+   "value": 19.7,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ANN at 1/4 degree, longitude 45E",
+   "baseline_name": "Control(1/4)",
+   "baseline_value": 34.6,
+   "source_table": "Table S2",
+   "is_best_in_table": false,
+   "page_pdf": 30,
+   "quote": "Control(1/4◦) 52.1 42.1 40.3 34.6 Yankovsky24(1/4◦) 27.8 23.0 20.7 21.3 ZB20-Reynolds(1/4◦) 26.9 21.0 18.4 18.5 ANN(1/4◦) 29.2 20.0 16 .7 19.7"
+  },
+  {
+   "experiment_id": "X-ONLINE-NW2",
+   "dataset_id": "D-NW2",
+   "metric": "RMSE",
+   "metric_raw": "RMSE of 1000-day averaged interface position, transect at 30E",
+   "metric_kind": "ERROR",
+   "value": 13.8,
+   "unit": "m",
+   "higher_is_better": false,
+   "split": "TEST",
+   "config": "ANN at 1/6 degree, longitude 30E",
+   "baseline_name": "Control(1/6)",
+   "baseline_value": 31.8,
+   "source_table": "Table S2",
+   "is_best_in_table": true,
+   "page_pdf": 30,
+   "evidence_status": "VALUE_READ_NO_SAFE_QUOTE",
+   "note": "Table S2, row ANN(1/6), 30E column; the extraction splits digits ('13 .8') so no quote supports the number. Lowest RMSE in the whole table; baseline 31.8 is Control(1/6) at 30E."
+  },
+  {
+   "experiment_id": "X-ONLINE-OM4",
+   "dataset_id": "D-OM4",
+   "metric": "OTHER",
+   "metric_raw": "relative change of APE vs control, Southern Ocean",
+   "metric_kind": "OTHER",
+   "value": -12,
+   "unit": "%",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "ANN at 1/4 degree, Southern Ocean, year 2003 (Figure 3 averaging)",
+   "baseline_name": "Control(1/4)",
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 12,
+   "page_printed": 12,
+   "quote": "APE is primarily reduced in the South- ern Ocean ( −12%)",
+   "note": "A reduction is described by the authors as the expected effect; no reference-truth value exists in OM4."
+  },
+  {
+   "experiment_id": "X-ONLINE-OM4",
+   "dataset_id": "D-OM4",
+   "metric": "RUNTIME",
+   "metric_raw": "ANN inference share of ocean model runtime",
+   "metric_kind": "EFFICIENCY",
+   "value": 10,
+   "unit": "% of ocean model runtime",
+   "higher_is_better": false,
+   "split": "UNSPECIFIED",
+   "config": "online network with one hidden layer and 20 neurons",
+   "baseline_name": null,
+   "baseline_value": null,
+   "source_table": null,
+   "is_best_in_table": false,
+   "page_pdf": 27,
+   "quote": "The ANN inference takes ≈ 10% of the ocean model runtime, for a neural network with one hidden layer and 20 neurons."
+  }
+ ],
+ "limitations": [
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 10,
+   "page_printed": 10,
+   "quote": "However, the EKE increase in western boundary current extension (40 ◦N, 10 ◦E−20◦E) and subpolar gyre (50 ◦N−70◦N) is smaller than expected from the high-resolution simulation."
+  },
+  {
+   "theme": "EVALUATION",
+   "page_pdf": 12,
+   "page_printed": 12,
+   "quote": "We note that the evaluation presented in this section is qualitative and can be strength- ened by comparing the parameterized global ocean model to ﬁltered and c oarse-grained higher-resolution simulations."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 12,
+   "page_printed": 12,
+   "quote": "The complexity of the mode l prohibits us from identifying a single mechanism."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 12,
+   "page_printed": 12,
+   "quote": "That is, both parameterized ocean simulations are l ess consistent with the observational data than the control simulation (Figure 4)."
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 13,
+   "page_printed": 13,
+   "quote": "At 1 /2◦, however, the ANN oﬀers no clear improvement compared to the control si mulation, likely due to less resolved eddies and stronger viscosity."
+  },
+  {
+   "theme": "PHYSICS",
+   "page_pdf": 14,
+   "page_printed": 14,
+   "quote": "Both pa- rameterization approaches exhibit substantial departures from observ ations and contribute comparably to persistent model biases."
+  },
+  {
+   "theme": "REPRODUCIBILITY",
+   "page_pdf": 26,
+   "quote": "However, there is some sensitivity to t he training algorithm initialization for the mean ﬂow prediction: the response pa ttern in the mean ﬂow is similar, but the response magnitude can vary by 50%."
+  },
+  {
+   "theme": "GENERALIZATION",
+   "page_pdf": 27,
+   "quote": "In the idealized conﬁguration NeverWorld2 (NW2, Marques et al. (2022)), howeve r, tuning is required to improve the numerical stability"
+  }
+ ],
+ "conflicts": [],
+ "not_reported": [
+  {
+   "field": "paper.doi",
+   "searched": [
+    "pdf pages 1-2 (header, abstract)",
+    "reference list"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-DIMSCALE].training.optimizer",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-DIMSCALE].training.learning_rate",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-DIMSCALE].training.batch_size",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-DIMSCALE].training.hardware",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-DIMSCALE].training.epochs",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ],
+   "note": "Table S1 gives only 'Number of Training Iterations 16000 (each iteration randomly selects 2D snapshot)', not epochs."
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-FIXNORM].training.optimizer",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-FIXNORM].training.learning_rate",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-FIXNORM].training.batch_size",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-FIXNORM].training.hardware",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-OFFLINE-GENERALIZATION-FIXNORM].training.epochs",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ],
+   "note": "Table S1 gives only 'Number of Training Iterations 16000 (each iteration randomly selects 2D snapshot)', not epochs."
+  },
+  {
+   "field": "experiments[X-ONLINE-NW2].training.optimizer",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-NW2].training.learning_rate",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-NW2].training.batch_size",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-NW2].training.hardware",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-NW2].training.epochs",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ],
+   "note": "Table S1 gives only 'Number of Training Iterations 16000 (each iteration randomly selects 2D snapshot)', not epochs."
+  },
+  {
+   "field": "experiments[X-ONLINE-OM4].training.optimizer",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-OM4].training.learning_rate",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-OM4].training.batch_size",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-OM4].training.hardware",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ]
+  },
+  {
+   "field": "experiments[X-ONLINE-OM4].training.epochs",
+   "searched": [
+    "abstract",
+    "section 3",
+    "section 4",
+    "section 5",
+    "Text S3 (SI, p24-26)",
+    "Table S1 (SI, p29)"
+   ],
+   "note": "Table S1 gives only 'Number of Training Iterations 16000 (each iteration randomly selects 2D snapshot)', not epochs."
+  }
+ ]
+}

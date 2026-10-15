@@ -3,6 +3,11 @@
     "source_id": "dl-infer-ocean-dynamics",
     "file": ".data/golden-pdfs/deep-learning-to-infer-ocean-dynamics.pdf",
     "sha256_prefix": "ab332d0085af6478809cf751",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "This is a non-peer-reviewed preprint submitted to EarthArXiv."
+    },
     "pdf_pages": 27,
     "printed_page_offset": -1,
     "extracted_by": "paper-extractor",
@@ -14,7 +19,12 @@
     "title": "Deep Learning to Infer Ocean Dynamics",
     "year": 2026,
     "venue": "Annual Review of Marine Science",
-    "ocean_domains": ["reviews", "data-assimilation", "forecasting", "parameterization"]
+    "ocean_domains": [
+      "reviews",
+      "data-assimilation",
+      "forecasting",
+      "parameterization"
+    ]
   },
   "excluded": {
     "reason": "Review article: it surveys published DL work on ocean dynamics and trains no ML model of its own.",

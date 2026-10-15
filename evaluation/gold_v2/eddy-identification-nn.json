@@ -3,6 +3,11 @@
     "source_id": "eddy-identification-nn",
     "file": ".data/golden-pdfs/ocean-eddy-identification-and-tracking-using-neural-networks.pdf",
     "sha256_prefix": "2182da2fc53b4b8df03cad9c",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:1803.07436v2 [cs.CV] 15 May 2018"
+    },
     "pdf_pages": 4,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

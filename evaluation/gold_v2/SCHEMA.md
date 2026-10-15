@@ -93,6 +93,38 @@ Two extractors classified two near-identical 4DVarNet papers as
    not make it something this paper says. Classifying it anyway is the one kind of
    inference this corpus exists to refuse.
 
+### Which edition was read
+
+10. **The edition is evidenced, never assumed.** A preprint's table is not always the
+    published one, so a record states which file was read — `VERSION_OF_RECORD`,
+    `ACCEPTED_MANUSCRIPT` (accepted but not typeset: an IEEE early-access page, a
+    publisher proof), `AUTHOR_MANUSCRIPT` (the authors' own file, deposited nowhere) or
+    `PREPRINT` (an arXiv/EarthArXiv deposit, a "submitted to" footer) — and proves it
+    with a quote from the file itself, which the gate relocates like any other quote.
+    `corpus_v2.edition.classify` must read the declared edition back out of that quote:
+    a label its own evidence does not carry is a defect, not a judgement call.
+
+    The edition describes **the file that was read**, not the paper's publication status.
+    An arXiv file whose article has since appeared in a journal is still `PREPRINT`,
+    because the numbers in the corpus came from the arXiv file.
+
+    **A DOI alone is not proof of publication.** An accepted manuscript and a publisher's
+    proof both print the DOI of the article they will become, so a `VERSION_OF_RECORD`
+    record must also carry, on the page its evidence cites, a mark only a published
+    article has: the citation line, the editorial dates ("Received… Accepted…"), the
+    copyright line, or the article number. That second check reads the page text, not the
+    quote, and `tests/test_corpus_v2_edition.py` runs it wherever the PDFs are.
+
+    When the file read prints no DOI of its own but was located through one (a preprint
+    found from its published DOI), that identifier goes in `source.resolved_from`, which
+    is provenance: it says how the file was found and may never be cited as the source of
+    a value. `paper.doi` stays null, because the file carries none.
+
+    The evidence node holds no `value`, so it never enters the human audit queue: there
+    is nothing left to rule on that the gate and the classifier do not already settle.
+    `store.PROVENANCE_PATHS` names that exception, and the coverage test asserts the
+    queue is never narrower than the gate anywhere else.
+
 ## Shape
 
 ```json
@@ -100,6 +132,9 @@ Two extractors classified two near-identical 4DVarNet papers as
   "source": {
     "source_id": "", "file": ".data/golden-pdfs/<file>.pdf",
     "sha256_prefix": "", "pdf_pages": 0, "printed_page_offset": 0,
+    "edition": "VERSION_OF_RECORD | ACCEPTED_MANUSCRIPT | AUTHOR_MANUSCRIPT | PREPRINT",
+    "edition_evidence": {"page_pdf": 1, "quote": ""},
+    "resolved_from": {"doi": "", "via": "", "note": ""},
     "extracted_by": "", "extracted_at": "YYYY-MM-DD"
   },
   "paper": {

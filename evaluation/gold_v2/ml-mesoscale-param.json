@@ -3,6 +3,11 @@
     "source_id": "ml-mesoscale-param",
     "file": ".data/golden-pdfs/implementation-and-evaluation-of-a-machine-learned-mesoscale.pdf",
     "sha256_prefix": "5b6ad646e448b67ff0c8803a",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2303.00962v1 [physics.ao-ph] 2 Mar 2023"
+    },
     "pdf_pages": 42,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5",

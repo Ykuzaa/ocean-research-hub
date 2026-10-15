@@ -3,6 +3,11 @@
     "source_id": "sdb-ml-optical",
     "file": ".data/golden-pdfs/satellite-derived-bathymetry-using-machine-learning-and-opti.pdf",
     "sha256_prefix": "1e1f7c0707bd49ba175be26b",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "To link to this article: https://doi.org/10.1080/15481603.2022.2100597"
+    },
     "pdf_pages": 17,
     "printed_page_offset": 1141,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

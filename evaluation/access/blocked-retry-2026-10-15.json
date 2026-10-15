@@ -1,0 +1,234 @@
+{
+ "retried_on": "2026-10-15",
+ "what": "Nouvelle tentative d'accès libre sur les 22 papiers que l'issue #32 donnait pour bloqués (paquet B08, feuille SOURCE_ACCESS). Même résolveur que le corpus: ocean_research_hub.corpus_v2.fetch_oa, via OpenAlex, sans clé et sans adresse e-mail envoyée à un tiers.",
+ "statuses": {
+  "DOWNLOADED": "un PDF a été obtenu et est maintenant extrait dans le corpus",
+  "BLOCKED": "une URL était annoncée, aucune n'a rendu un PDF (403, page de péage en HTML)",
+  "NO_OA_PDF": "OpenAlex n'annonce aucune localisation en accès libre"
+ },
+ "result": {
+  "DOWNLOADED": 2,
+  "BLOCKED": 8,
+  "NO_OA_PDF": 12
+ },
+ "papers": [
+  {
+   "doi": "10.1016/j.jmarsys.2024.104037",
+   "title": "An Informer-based prediction model for extensive spatiotemporal prediction of sea surface temperature and marine heatwave in Bohai Sea",
+   "year": 2024,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1007/s13131-024-2424-6",
+   "title": "Attention-enhanced deep learning approach for marine heatwave forecasting",
+   "year": 2025,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1109/TCYB.2025.3539990",
+   "title": "Deep Learning for Ocean Forecasting: A Comprehensive Review of Methods, Applications, and Datasets",
+   "year": 2025,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1093/nsr/nwag063",
+   "title": "AI for atmosphere–ocean sciences: advancements, challenges and ways forward",
+   "year": 2026,
+   "status": "DOWNLOADED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://publications.pik-potsdam.de/pubman/item/item_34891_1/component/file_34892/Luo_2026_nwag063.pdf"
+   ],
+   "file": ".data/golden-pdfs/ai-for-atmosphere-ocean-sciences-advancements-challenges-and.pdf"
+  },
+  {
+   "doi": "10.1016/j.isprsjprs.2026.04.044",
+   "title": "Ocean color remote sensing: From 2D legacy to the 3D, AI-driven future",
+   "year": 2026,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://doi.org/10.1016/j.isprsjprs.2026.04.044"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1029/2021JC017362",
+   "title": "Reconstructing Fine‐Scale Ocean Variability via Data Assimilation of the SWOT Pre‐Launch In Situ Observing System",
+   "year": 2022,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1002/joc.8384",
+   "title": "Prediction of seasonal sea surface temperature based on temperature and salinity of subsurface ocean using machine learning",
+   "year": 2024,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.dsr.2025.104457",
+   "title": "Forecasting summer marine heatwaves in the South China Sea using explainable machine learning models",
+   "year": 2025,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1029/2026JH001380",
+   "title": "Global Subseasonal‐to‐Seasonal Marine Heatwave Forecasts Boosted by Explainable Deep Learning",
+   "year": 2026,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://doi.org/10.1029/2026jh001380"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.aosl.2025.100690",
+   "title": "Combined LFS and ConvLSTM to forecast marine heatwaves: a case study",
+   "year": 2025,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://doi.org/10.1016/j.aosl.2025.100690"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1038/s41561-024-01593-0",
+   "title": "Multi-month forecasts of marine heatwaves and ocean acidification extremes",
+   "year": 2024,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "http://dx.doi.org/10.21203/rs.3.rs-3879825/v1"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.oceaneng.2025.121804",
+   "title": "Underwater glider persistent coverage using deep reinforcement learning for ocean observation",
+   "year": 2025,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.oceaneng.2026.124736",
+   "title": "Reinforcement learning-based path planning for underwater gliders using ocean current forecasts",
+   "year": 2026,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.oceaneng.2024.118498",
+   "title": "Adaptive meta-reinforcement learning for AUVs 3D guidance and control under unknown ocean currents",
+   "year": 2024,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.oceaneng.2026.127056",
+   "title": "Reference-based current estimation using reinforcement learning and dynamic modeling of underwater gliders",
+   "year": 2026,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1029/2024JH000272",
+   "title": "Mapping Dissolved Oxygen Concentrations by Combining Shipboard and Argo Observations Using Machine Learning Algorithms",
+   "year": 2024,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://doi.org/10.1029/2024jh000272"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1029/2026GL123513",
+   "title": "Calibration of a Neural Network Ocean Closure for Improved Mean State and Variability",
+   "year": 2026,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://doi.org/10.1029/2026gl123513"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1029/2025GL117046",
+   "title": "Generalizable Neural‐Network Parameterization of Mesoscale Eddies in Idealized and Global Ocean Models",
+   "year": 2025,
+   "status": "DOWNLOADED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://arxiv.org/pdf/2505.08900"
+   ],
+   "file": ".data/golden-pdfs/generalizable-neural-network-parameterization-of-mesoscale-e.pdf"
+  },
+  {
+   "doi": "10.1016/j.ocemod.2025.102601",
+   "title": "Pre-trained physics-informed neural networks for one-dimensional wave propagation in coastal engineering",
+   "year": 2025,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.oceaneng.2025.121150",
+   "title": "Physics-informed temporal convolutional network with auto-regressive residual for significant wave height prediction",
+   "year": 2025,
+   "status": "NO_OA_PDF",
+   "is_oa": false,
+   "urls_tried": [],
+   "file": null
+  },
+  {
+   "doi": "10.1029/2024GL110731",
+   "title": "A Machine Learning‐Based Model Infers the Sea Surface Velocity of Surface Water and Ocean Topography (SWOT)",
+   "year": 2025,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1029/2024GL110731"
+   ],
+   "file": null
+  },
+  {
+   "doi": "10.1016/j.oceaneng.2026.125851",
+   "title": "CoastalBench-downscaling: a machine learning benchmark for reconstructing high-resolution three-dimensional coastal fields from surface data",
+   "year": 2026,
+   "status": "BLOCKED",
+   "is_oa": true,
+   "urls_tried": [
+    "https://doi.org/10.1016/j.oceaneng.2026.125851"
+   ],
+   "file": null
+  }
+ ]
+}

@@ -3,6 +3,11 @@
     "source_id": "neural-operator-eval",
     "file": ".data/golden-pdfs/evaluation-of-deep-neural-operator-models-toward-ocean-forec.pdf",
     "sha256_prefix": "6c9552e210a897ddda6db007",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2308.11814v1 [cs.LG] 22 Aug 2023"
+    },
     "pdf_pages": 9,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor",

@@ -3,6 +3,11 @@
     "source_id": "coastal-bathymetry-ml",
     "file": ".data/golden-pdfs/machine-learning-based-estimation-of-coastal-bathymetry-from.pdf",
     "sha256_prefix": "596da2141324550260e7e517",
+    "edition": "ACCEPTED_MANUSCRIPT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "content may change prior to final publication. Citation information: DOI 10.1109/JSTARS.2023.3326238"
+    },
     "pdf_pages": 8,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

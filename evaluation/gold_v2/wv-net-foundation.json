@@ -3,6 +3,11 @@
   "source_id": "wv-net-foundation",
   "file": ".data/golden-pdfs/wv-net-a-foundation-model-for-sar-wv-mode-satellite-imagery.pdf",
   "sha256_prefix": "d63743aefb4ed75e56169e51",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2406.18765v1 [cs.LG] 26 Jun 2024"
+  },
   "pdf_pages": 20,
   "printed_page_offset": 0,
   "extracted_by": "paper-extractor",

@@ -3,6 +3,11 @@
     "source_id": "multispectral-sdb",
     "file": ".data/golden-pdfs/a-machine-learning-approach-to-multispectral-satellite-deriv.pdf",
     "sha256_prefix": "1a8c354207ff79706ad7f791",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "https://doi.org/10.5194/isprs-annals-V-3-2020-565-2020 | © Authors 2020. CC BY 4.0 License."
+    },
     "pdf_pages": 6,
     "printed_page_offset": 564,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

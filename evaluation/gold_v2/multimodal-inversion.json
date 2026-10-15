@@ -3,6 +3,11 @@
     "source_id": "multimodal-inversion",
     "file": ".data/golden-pdfs/multimodal-learning-based-inversion-models-for-the-space-tim.pdf",
     "sha256_prefix": "77103ec71287250828168d73",
+    "edition": "PREPRINT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "arXiv:2203.10640v1 [cs.CV] 20 Mar 2022"
+    },
     "pdf_pages": 7,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

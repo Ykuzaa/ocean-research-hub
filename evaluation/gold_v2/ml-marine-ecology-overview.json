@@ -3,6 +3,11 @@
   "source_id": "machine-learning-in-marine-ecology-an-overview-of-techniques",
   "file": ".data/golden-pdfs/machine-learning-in-marine-ecology-an-overview-of-techniques.pdf",
   "sha256_prefix": "f4bfa77fb75f88ad191c48e5",
+  "edition": "VERSION_OF_RECORD",
+  "edition_evidence": {
+   "page_pdf": 2,
+   "quote": "DOI:10.1093/icesjms/fsad100"
+  },
   "pdf_pages": 26,
   "printed_page_offset": 1827,
   "extracted_by": "claude-sonnet-5-5",

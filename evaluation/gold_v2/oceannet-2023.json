@@ -3,6 +3,11 @@
   "source_id": "oceannet-2023",
   "file": ".data/golden-pdfs/oceannet-2023.pdf",
   "sha256_prefix": "be82ff557769aff04b119490",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2310.00813v2 [cs.LG] 4 Sep 2024"
+  },
   "pdf_pages": 17,
   "printed_page_offset": 0,
   "extracted_by": "claude-sonnet-5-5 subagent",

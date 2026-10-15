@@ -3,6 +3,11 @@
     "source_id": "S-GLOBAL-EDDY-IDENTIFICATION",
     "file": ".data/golden-pdfs/global-oceanic-eddy-identification-a-deep-learning-method-fr.pdf",
     "sha256_prefix": "2174d45172f1606ef79591b7",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fmars.2021.646926"
+    },
     "pdf_pages": 15,
     "printed_page_offset": 0,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",

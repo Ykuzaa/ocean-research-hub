@@ -3,6 +3,11 @@
     "source_id": "dincae-2-2022",
     "file": ".data/golden-pdfs/dincae-2-2022.pdf",
     "sha256_prefix": "017757e5a2394713d7c18f9b",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "https://doi.org/10.5194/gmd-15-2183-2022"
+    },
     "pdf_pages": 14,
     "printed_page_offset": 2182,
     "extracted_by": "claude-opus-5 (reference pass, read by hand)",

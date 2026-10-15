@@ -3,6 +3,11 @@
     "source_id": "seabed-net",
     "file": ".data/golden-pdfs/seabed-net-a-multi-task-network-for-joint-bathymetry-estimat.pdf",
     "sha256_prefix": "426c42be548f3bdb8bcc95c4",
+    "edition": "AUTHOR_MANUSCRIPT",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "P. Agrafiotis and B. Demir:Revised article Page 1 of 21"
+    },
     "pdf_pages": 21,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5",

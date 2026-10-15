@@ -3,6 +3,11 @@
   "source_id": "glonet-2025",
   "file": ".data/golden-pdfs/glonet-2025.pdf",
   "sha256_prefix": "bc9627304aefb8c29b1eb069",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2412.05454v3 [physics.flu-dyn] 29 Sep 2025"
+  },
   "pdf_pages": 34,
   "printed_page_offset": 0,
   "extracted_by": "claude-sonnet-5-5 subagent",

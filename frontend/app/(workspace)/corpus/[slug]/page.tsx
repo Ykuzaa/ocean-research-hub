@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApiError } from "@/app/lib/api";
 import {
+  EDITION_CAVEAT, EDITION_LABEL,
   familyLabel, fieldLabel, getCorpusV2Paper, roleLabel, taskLabel, type ResultRow,
 } from "@/app/lib/corpusV2";
 import { Quote, ValueWithSource } from "../components/Quote";
@@ -140,6 +141,27 @@ export default async function CorpusPaperPage({ params }: { params: Promise<{ sl
         PDF {paper.source.pdf_pages} pages · sha256 {paper.source.sha256_prefix}
         {paper.source.printed_page_offset ? ` · décalage pagination ${paper.source.printed_page_offset}` : ""}
       </p>
+
+      {paper.source.edition ? (
+        <div className="mt-4 rounded-2xl border border-rule bg-sheet-2 p-4 text-sm">
+          <p className="text-ink-900">
+            <span className="font-medium">Fichier lu : {EDITION_LABEL[paper.source.edition]}.</span>{" "}
+            <span className="text-ink-600">{EDITION_CAVEAT[paper.source.edition]}</span>
+          </p>
+          {paper.source.edition_evidence ? (
+            <Quote
+              quote={paper.source.edition_evidence.quote}
+              page={paper.source.edition_evidence.page_pdf}
+            />
+          ) : null}
+          {paper.source.resolved_from ? (
+            <p className="mt-2 text-xs text-ink-400">
+              Fichier retrouvé à partir du DOI {paper.source.resolved_from.doi} ({paper.source.resolved_from.via}).{" "}
+              {paper.source.resolved_from.note}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       {paper.excluded_evidence ? (
         <Section title="Papier écarté" hint="Ce papier n’entraîne aucun modèle : rien n’en a été extrait.">

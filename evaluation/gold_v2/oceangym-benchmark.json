@@ -3,6 +3,11 @@
   "source_id": "S-OCEANGYM",
   "file": ".data/golden-pdfs/oceangym-a-benchmark-environment-for-underwater-embodied-age.pdf",
   "sha256_prefix": "74228e97c9cfdcf08dfa7d27",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2509.26536v3 [cs.CL] 28 Aug 2026"
+  },
   "pdf_pages": 22,
   "printed_page_offset": 0,
   "extracted_by": "paper-extractor (claude-sonnet-5-5)",

@@ -1,0 +1,43 @@
+{
+ "source": {
+  "source_id": "ai-atmosphere-ocean-review",
+  "file": ".data/golden-pdfs/ai-for-atmosphere-ocean-sciences-advancements-challenges-and.pdf",
+  "sha256_prefix": "dc404e8f19d62fd102b3fc00",
+  "edition": "VERSION_OF_RECORD",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "https://doi.org/10.1093/nsr/nwag063"
+  },
+  "resolved_from": {
+   "doi": "10.1093/nsr/nwag063",
+   "via": "OpenAlex -> publications.pik-potsdam.de",
+   "note": "déposé par un institut co-auteur; le fichier est la version publiée, cf. edition_evidence"
+  },
+  "pdf_pages": 27,
+  "printed_page_offset": 0,
+  "extracted_by": "claude-opus-5",
+  "extracted_at": "2026-10-15"
+ },
+ "paper": {
+  "paper_id": "P-AI-ATMOSPHERE-OCEAN-REVIEW",
+  "doi": "10.1093/nsr/nwag063",
+  "title": "AI for atmosphere–ocean sciences: advancements, challenges and ways forward",
+  "year": 2026,
+  "venue": "National Science Review",
+  "ocean_domains": [
+   "reviews",
+   "forecasting",
+   "sst",
+   "marine-heatwaves",
+   "sea-ice"
+  ],
+  "ocean_domains_raw": [
+   "AI applications in atmosphere-ocean sciences"
+  ]
+ },
+ "excluded": {
+  "reason": "Revue multi-auteurs des applications de l'IA aux sciences de l'atmosphère et de l'océan; les auteurs n'entraînent aucun modèle à eux. Aucune occurrence de \"batch size\", \"learning rate\", \"epoch\" ni \"Adam\" dans les 27 pages.",
+  "page_pdf": 2,
+  "quote": "This review article summarizes recent ad- vances and challenges in broad AI applications in atmosphere–ocean sciences along with poten- tial ways forward."
+ }
+}

@@ -3,6 +3,11 @@
     "source_id": "oai-0036-s41598-025-23682-9",
     "file": ".data/golden-pdfs/oai-0036-s41598-025-23682-9.pdf",
     "sha256_prefix": "10f2e89adee7cf9aa1b1845e",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "Scientific Reports | (2025) 15:39928 1| https://doi.org/10.1038/s41598-025-23682-9"
+    },
     "pdf_pages": 17,
     "printed_page_offset": 0,
     "extracted_by": "claude-sonnet-5-5",

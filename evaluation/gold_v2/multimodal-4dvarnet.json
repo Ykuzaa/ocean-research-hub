@@ -3,6 +3,11 @@
   "source_id": "multimodal-4dvarnet",
   "file": ".data/golden-pdfs/multimodal-4dvarnets-for-the-reconstruction-of-sea-surface-d.pdf",
   "sha256_prefix": "73045f52b73dfe865f11ad26",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 1,
+   "quote": "arXiv:2207.01372v2 [eess.IV] 6 Jan 2023"
+  },
   "pdf_pages": 17,
   "printed_page_offset": 0,
   "extracted_by": "claude-sonnet-5-5",

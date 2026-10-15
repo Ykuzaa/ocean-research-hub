@@ -92,8 +92,20 @@ export type PaperSummaryV2 = {
   result_count: number;
   claim_count: number;
   pdf_pages: number | null;
+  /** Quelle édition du papier a été lue. Un chiffre lu sur une préimpression n'est pas
+   *  forcément celui de l'article publié, donc l'app le dit au lieu de le supposer. */
+  edition: Edition | null;
+  /** DOI de l'article publié quand le fichier lu n'en imprime aucun: une recherche sur
+   *  ce DOI doit retrouver le papier, sans pour autant le présenter comme sa source. */
+  resolved_from_doi: string | null;
   audit: PaperAudit;
 };
+
+export type Edition =
+  | "VERSION_OF_RECORD"
+  | "ACCEPTED_MANUSCRIPT"
+  | "AUTHOR_MANUSCRIPT"
+  | "PREPRINT";
 
 export type Evidence = { field?: string | null; page: number | null; quote: string | null };
 
@@ -127,7 +139,11 @@ export type ResultRow = {
 };
 
 export type PaperDetailV2 = PaperSummaryV2 & {
-  source: { file: string; sha256_prefix: string; pdf_pages: number; printed_page_offset?: number };
+  source: {
+    file: string; sha256_prefix: string; pdf_pages: number; printed_page_offset?: number;
+    edition?: Edition; edition_evidence?: { page_pdf: number; quote: string };
+    resolved_from?: { doi: string; via: string; note: string };
+  };
   methods: Array<{
     name: string; family: string; family_raw: string | null; role: string | null;
     is_novel_in_paper: boolean; architecture_note: string | null; evidence: Evidence[];
@@ -265,6 +281,24 @@ export const RECHECK_LABEL: Record<RecheckState, string> = {
   UNREADABLE: "page trop abîmée pour une seconde lecture",
   STALE: "la valeur a changé depuis la contre-vérification",
   NOT_RECHECKED: "pas encore contre-vérifiée",
+};
+
+export const EDITION_LABEL: Record<Edition, string> = {
+  VERSION_OF_RECORD: "version publiée",
+  ACCEPTED_MANUSCRIPT: "manuscrit accepté, non encore composé",
+  AUTHOR_MANUSCRIPT: "manuscrit d’auteur, non publié",
+  PREPRINT: "préimpression",
+};
+
+/** Ce qu'il faut savoir avant de comparer deux chiffres venus d'éditions différentes. */
+export const EDITION_CAVEAT: Record<Edition, string> = {
+  VERSION_OF_RECORD: "Lu dans l’article publié par la revue.",
+  ACCEPTED_MANUSCRIPT:
+    "Lu dans un manuscrit accepté mais pas encore composé : la pagination et les chiffres peuvent bouger d’ici la version finale.",
+  AUTHOR_MANUSCRIPT:
+    "Lu dans le fichier des auteurs, qui n’est ni déposé ni publié : rien ne garantit qu’il corresponde à une version finale.",
+  PREPRINT:
+    "Lu dans une préimpression. Les tableaux d’une préimpression diffèrent parfois de ceux de l’article publié ; ces chiffres sont ceux du fichier lu.",
 };
 
 export const DECISION_LABEL: Record<string, string> = {

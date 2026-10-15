@@ -3,6 +3,11 @@
     "source_id": "dl-physical-oceanography-review",
     "file": ".data/golden-pdfs/applications-of-deep-learning-in-physical-oceanography-a-com.pdf",
     "sha256_prefix": "27adbea26067c18d7e38d4e5",
+    "edition": "VERSION_OF_RECORD",
+    "edition_evidence": {
+      "page_pdf": 1,
+      "quote": "doi: 10.3389/fmars.2024.1396322"
+    },
     "pdf_pages": 22,
     "extracted_by": "paper-extractor (claude-sonnet-5-5)",
     "extracted_at": "2026-10-14",

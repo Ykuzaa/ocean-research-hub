@@ -3,6 +3,11 @@
   "source_id": "coastal-sea-states-sr",
   "file": ".data/golden-pdfs/a-deep-learning-super-resolution-model-to-speed-up-computati.pdf",
   "sha256_prefix": "402b2df536c8397c685bdb66",
+  "edition": "PREPRINT",
+  "edition_evidence": {
+   "page_pdf": 3,
+   "quote": "Kuehn et al.: Preprint submitted to Elsevier Page 1 of 30"
+  },
   "pdf_pages": 38,
   "printed_page_offset": -2,
   "extracted_by": "claude-sonnet-5-5",

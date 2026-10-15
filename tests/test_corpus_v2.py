@@ -10,11 +10,22 @@ from ocean_research_hub.corpus_v2.gate import check, normalise, supports
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 GOLD = sorted((REPO_ROOT / "evaluation" / "gold_v2").glob("*.json"))
 
+# Le gate relit les PDF eux-mêmes. Ils ne sont pas versionnés (369 Mo, fichiers d'éditeurs),
+# donc il ne tourne que là où ils sont: en local, et jamais en CI. Un test sauté se voit
+# dans le rapport; le faire passer sans les PDF reviendrait à affirmer une vérification
+# qui n'a pas eu lieu.
+PDFS = REPO_ROOT / ".data" / "golden-pdfs"
+needs_pdfs = pytest.mark.skipif(
+    not PDFS.is_dir(),
+    reason=f"les PDF sources sont absents de {PDFS}; le gate ne peut pas relocaliser les citations",
+)
+
 
 def test_gold_corpus_is_not_empty() -> None:
     assert GOLD, "aucun enregistrement dans evaluation/gold_v2"
 
 
+@needs_pdfs
 @pytest.mark.parametrize("record_path", GOLD, ids=lambda path: path.stem)
 def test_every_quote_is_relocatable(record_path: pathlib.Path) -> None:
     record = json.loads(record_path.read_text())

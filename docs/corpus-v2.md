@@ -108,4 +108,21 @@ uv run pytest tests/test_corpus_v2.py tests/test_corpus_v2_app.py -q
 `test_corpus_v2.py` runs the gate over every record (no locate failure, no support
 warning). `test_corpus_v2_app.py` checks that the audit queue covers everything the gate
 checks **plus** the values the gate cannot check, that no displayed value lacks its
-evidence, and that a verdict must be signed and reasoned.
+evidence, and that a verdict must be signed and reasoned. `test_corpus_v2_recheck.py`
+checks that every claim is re-checked, that no verdict is stale and that every flag has
+been ruled on. `test_corpus_v2_ask.py` checks that a question nobody parsed gets no
+answer and that a ranking question is told why none is computable.
+
+## What CI checks, and what it cannot
+
+`.github/workflows/ci.yml` runs the suite, the re-check completeness assertions and the
+frontend build on every push. It **cannot run the gate**: the gate re-reads the source
+PDFs, and those are not in the repository (369 MB of publisher files). Those tests are
+therefore *skipped* in CI, visibly, and run locally where the PDFs are:
+
+```bash
+uv run pytest tests/test_corpus_v2.py -q    # 43 records gated, locally
+```
+
+A green tick in CI means the structure, the ledgers and the app hold. It does not mean the
+quotes were re-located; only a local run says that.

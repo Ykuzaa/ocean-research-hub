@@ -1,0 +1,57 @@
+name: CI
+
+# What this workflow can and cannot check, stated once so nobody mistakes a green tick
+# for a verified corpus: the deterministic gate re-reads the source PDFs, which are not
+# in the repository (369 MB of publisher files). Its tests are therefore *skipped* here,
+# visibly, and run locally where the PDFs are. Everything that does not need them —
+# every claim's structure, the entity views, the question layer, the audit and re-check
+# ledgers, the API and the frontend — runs on every push.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --all-extras --frozen
+      - name: Tests
+        run: uv run pytest -q
+      - name: Every claim is re-checked and every flag is ruled on
+        run: |
+          uv run python -c "
+          import pathlib
+          from ocean_research_hub.corpus_v2 import recheck, store
+          state = recheck.progress(store.all_claims(), recheck.load_ledger(), recheck.load_triage())
+          print(state['rechecked'], '/', state['claims'], 'rechecked;', state['outstanding'], 'outstanding')
+          assert state['not_rechecked'] == 0, state['states']
+          assert state['stale'] == 0, 'a verdict given on a value that has since changed is void'
+          assert state['outstanding'] == 0, 'a flag nobody decided is an open defect'
+          "
+      - name: The page is a build artifact of the corpus
+        run: |
+          mkdir -p .data
+          uv run python -m ocean_research_hub.corpus_v2.build_poc --manifest /nonexistent.json
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit -p tsconfig.json
+      - run: npx vitest run
+      - run: npx next build

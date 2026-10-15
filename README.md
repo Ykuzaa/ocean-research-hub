@@ -86,6 +86,36 @@ The side-by-side HTML view is at
 architecture, training, losses, evaluation, results, and limitations without stripping status,
 provenance, evidence, `NOT_REPORTED`, or conflict alternatives.
 
+## Query normalized research intelligence
+
+Every successful ingest is also projected into normalized, cross-paper entities while the complete
+`PaperRecord` remains the lossless source of truth. Query all datasets, for example:
+
+```bash
+curl "http://127.0.0.1:8000/api/research/entities?entity_type=DATASET"
+```
+
+`GET /api/research/entities/{ENTITY_ID}` returns every paper relationship with original wording,
+status, provenance, and evidence. `GET /api/research/papers/{PAPER_ID}` returns source editions,
+all canonical field states, entity relationships, all training hyperparameters (including `NOT_REPORTED` and
+`EXTRACTION_ERROR`), entity-field states, reported results, limitations, and future work. Field
+states preserve audit metadata and exact evidence-edition bindings. Entity-to-entity relationships
+require an explicit evidence-backed API call and are never inferred from co-occurring lists.
+Bibliography field states are also edition-scoped, so a primary-source upgrade does not erase the
+superseded metadata title, authors, identifiers, URLs, or their evidence.
+
+Register an additional PDF or supplement edition without overwriting another version:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/research/papers/PAPER_ID/source-editions \
+  -H 'content-type: application/json' \
+  -d '{"edition_key":"publisher-v2","source_type":"PRIMARY_PDF","uri":"https://example.org/paper-v2.pdf","content_hash":"sha256:...","version_label":"version 2","is_primary":true}'
+```
+
+Edition-key retries must be identical; changed identity returns HTTP `409`. The normalization and
+future corpus-manifest boundary are documented in
+[`docs/adr/0002-research-intelligence-model.md`](docs/adr/0002-research-intelligence-model.md).
+
 ## Run the extraction benchmark
 
 The repository includes three independently audited golden papers and a deterministic field-level
